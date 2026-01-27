@@ -1,15 +1,36 @@
-"""Effect class."""
+"""Effect module."""
 
 from src.base.keywords import Keyword
 
 
 class Effect():
+    """
+    Effect class.
+
+    :var keyword: Effect's keyword.
+    :vartype keyword: Keyword
+
+    :var value: Effect's value.
+    :vartype value: float
+
+    :var duration: Effect's duration in turns, in relation to the Entity the Effect
+    will be applied to.
+    :vartype duration: int
+
+    :var decay: Effect's value decay for each turn. A negative decay will increase the
+    Effect's value instead.
+    :vartype decay: float
+
+    :var chance: Effect's chance of being applied.
+    :vartype chance: float
+    """
+
     def __init__(
         self,
         keyword: Keyword,
         value: float = None,
         duration: int = None,
-        decay: int = None,
+        decay: float = None,
         chance: float = None
     ):
         self.keyword = keyword

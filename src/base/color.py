@@ -85,14 +85,22 @@ class Color(Enum):
 
 
 def get_color_code(color: Tuple[int, int, int] | Color) -> str:
-    "Returns a RGB-based code from a code."
+    """
+    Returns a RGB-based code for a color.
+
+    :param color: A tuple of 3 integers containing RGB values or a Color constant.
+    :type color: Tuple[int, int, int] | Color
+
+    :return: A RGB-based code.
+    :rtype: str
+    """
 
     if isinstance(color, tuple) and len(color) == 3:
         return f"{color[0]};{color[1]};{color[2]}m"
     elif isinstance(color, Color):
         return f"{color.value[0]};{color.value[1]};{color.value[2]}m"
     else:
-        raise ValueError("'color' parameter must be either a Tuple of 3 integers or of Color class")
+        raise ValueError("'color' parameter must be either a Tuple of 3 integers or a Color constant")
 
 
 def color_string(
@@ -109,22 +117,39 @@ def color_string(
     """
     Colors and returns a string.
 
-    Parameters:
-    * string: string that will be colored. If this parameter is not a string, a cast to string will
-    be attemped so the coloring can be applied.
+    :param string: string that will be colored. If this parameter is not a string, a
+    cast to string will be attemped so the coloring can be applied.
+    :type string: str
 
-    Optional Parameter:
-    * foreground_color: color that will be used on the string itself. Default value is (255, 255, 255), 
-        which is the terminal's default white.
-    * background_color: color that will be used on the background. Default value is (12, 12, 12), 
-        which is the terminal's default black.
-    * intensity: intensity of the string itself, which can be 'BRIGHT', 'DIM', 'SLOW_BLINK' or
-        'RAPID_BLINK'. Default value is 'BRIGHT'.
-    * italic: if the text will be in italic or not. Default value is False.
-    * underlined: if the text will be underlined or not. Default value is False.
-    * inverted: if the text will be inverted or not. Default value is False.
-    * concealed: if the text will be concealed or not. Default value is False.
-    * strikethrough: if the text will be strikethrough or not. Default value is False.
+    :param foreground_color: color that will be used on the string itself. Default value
+    is (255, 255, 255), which is the terminal's default white.
+    :type foreground_color: Tuple[int, int, int] | Color
+
+    :param background_color: color that will be used on the background. Default value
+    is (12, 12, 12), which is the terminal's default black.
+    :type background_color: Tuple[int, int, int] | Color
+
+    :param intensity: intensity of the string itself, which can be 'BRIGHT', 'DIM',
+    'SLOW_BLINK' or 'RAPID_BLINK'. Default value is 'BRIGHT'.
+    :type intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"]
+
+    :param italic: if the text will be in italic or not. Default value is False.
+    :type italic: bool
+
+    :param underlined: if the text will be in underlined or not. Default value is False.
+    :type underlined: bool
+
+    :param inverted: if the text will be in inverted or not. Default value is False.
+    :type inverted: bool
+
+    :param concealed: if the text will be in concealed or not. Default value is False.
+    :type concealed: bool
+
+    :param strikethrough: if the text will be in strikethrough or not. Default value is False.
+    :type strikethrough: bool
+
+    :return: A colored string.
+    :rtype: str
     """
     try:
         string = str(string)

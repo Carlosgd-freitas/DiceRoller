@@ -1,4 +1,4 @@
-"""Side class."""
+"""Side module."""
 
 from typing import List, Tuple
 from src.base.effect import Effect
@@ -6,6 +6,16 @@ from src.base.keywords import Keyword
 
 
 class Side:
+    """
+    Side class.
+    
+    :var effects: Side's effects, which will be executed in order.
+    :vartype effects: List[Effect]
+
+    :var weight: Side's weight when rolling a dice. Default value is 1.
+    :vartype weight: float
+    """
+
     def __init__(self, effects: List[Effect], weight: float = 1):
         self.effects = effects
         self.weight = weight
@@ -22,14 +32,19 @@ class Side:
         Returns a list of indexes and effects based on a series of filters.
 
         :param self: Side object.
+
         :param keyword: Filters effects that have the same keyword parameter.
         :type keyword: Keyword
+
         :param value: Filters effects that have the same value parameter.
         :type value: float
+
         :param duration: Filters effects that have the same duration parameter.
         :type duration: int
+
         :param decay: Filters effects that have the same decay parameter.
         :type decay: int
+
         :param chance: Filters effects that have the same chance parameter.
         :type chance: float
 

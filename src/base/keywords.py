@@ -1,9 +1,11 @@
-"""Effect keywords."""
+"""Keyword module."""
 
 from enum import Enum
 
 
 class Keyword(Enum):
+    """Effect keywords."""
+
     ATTACK = "ATTACK"
     BLEED = "BLEED"
     BLOCK = "BLOCK"
