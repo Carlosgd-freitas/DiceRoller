@@ -20,6 +20,17 @@ class Side:
         self.effects = effects
         self.weight = weight
 
+    def __str__(self) -> str:
+        _str = ""
+        
+        for idx, effect in enumerate(self.effects):
+            if idx > 0:
+                _str += " + "
+
+            _str += str(effect)
+
+        return _str
+
     def get_effects(
         self,
         keyword: Keyword = None,

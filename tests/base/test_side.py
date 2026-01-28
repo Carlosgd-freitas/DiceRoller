@@ -1,8 +1,8 @@
 """Tests for Side class."""
 
-from base.side import Side
-from base.effect import Effect
-from base.keywords import Keyword
+from src.base.side import Side
+from src.base.effect import Effect
+from src.base.keywords import Keyword
 
 
 def test_get_effects_single():

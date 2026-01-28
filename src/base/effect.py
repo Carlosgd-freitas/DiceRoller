@@ -1,6 +1,6 @@
 """Effect module."""
 
-from src.base.keywords import Keyword
+from src.base.keywords import Keyword, color_keyword
 
 
 class Effect():
@@ -40,16 +40,11 @@ class Effect():
         self.chance = chance
 
     def __str__(self) -> str:
-        _str = f"Keyword: {self.keyword.name}"
+        _str = f"{color_keyword(self.keyword)}"
 
         if self.value:
-            _str += f"; Value: {self.value}"
+            _str += f" {self.value}"
         if self.duration:
-            _str += f"; Duration: {self.duration}"
-        if self.decay:
-            _str += f"; Decay: {self.decay}"
-        if self.chance:
-            _str += f"; Chance: {self.chance}"
+            _str += f" [{self.duration} Turns]"
 
         return _str
-

@@ -1,9 +1,9 @@
 """Tests for Dice class."""
 
-from base.side import Side
-from base.dice import Dice
-from base.effect import Effect
-from base.keywords import Keyword
+from src.base.side import Side
+from src.base.dice import Dice
+from src.base.effect import Effect
+from src.base.keywords import Keyword
 
 
 def test_dice_roll_single():
