@@ -1,15 +1,22 @@
 """Entity module."""
 
+from uuid import uuid4
 from typing import List
 from base.dice import Dice
 from base.side import Side
+from base.effect import Effect
 
 
 class Entity():
     """
     Entity class.
     
-    :var id: Entity's unique identifier.
+    :var global_id: All objects of the same Entity subclass will have this same
+    identifier.
+    :vartype id: str
+
+    :var local_id: Each Entity object will have its own identifier. The default value
+    is a generated UUID version 4 in str format.
     :vartype id: str
 
     :var dice: Entity's dice.
@@ -30,22 +37,29 @@ class Entity():
 
     def __init__(
         self,
-        id: str = None,
-        dice: List[Dice] = [],
+        global_id: str = None,
+        local_id: str = str(uuid4()),
         name: str = None,
         description: str = None,
         hp: int = None,
         max_hp: int = None,
+        speed: int = None,
+        dice: List[Dice] = [],
+        effects: List[Effect] = [],
         **kwargs
     ):
-        self.id: str = id
-        self.dice: List[Dice] = dice
+        self.global_id: str = global_id
+        self.local_id: str = local_id
 
         self.name: str = name
         self.description: str = description
 
         self.hp: int = hp
         self.max_hp: int = max_hp
+        self.speed: int = speed
+
+        self.dice: List[Dice] = dice
+        self.effects: List[Effect] = effects
 
     def roll(self) -> List[Side]:
         """
@@ -55,9 +69,9 @@ class Entity():
         :rtype: List[Side]
         """
 
-        picked = [
+        rolled = [
             dice.roll()
             for dice in self.dice
         ]
 
-        return picked
+        return rolled

@@ -29,9 +29,13 @@ class Slime(Monster):
         ])
 
         super().__init__(
-            dice = [
+            global_id="MONSTER_0",
+            dice=[
                 dice_0,
                 dice_1,
             ],
+            hp=6,
+            max_hp=6,
+            speed=1,
             **kwargs
         )
