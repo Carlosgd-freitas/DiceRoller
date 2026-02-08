@@ -2,9 +2,9 @@
 
 from enum import Enum
 from typing import List
-from base.skill import Skill
-from base.entity import Entity
-from base.difficulties import Difficulty
+from src.base.skill import Skill
+from src.base.entity import Entity
+from src.base.difficulties import Difficulty
 
 
 class ControlType(Enum):
@@ -28,8 +28,8 @@ class Monster(Entity):
     it's actions. Default is NORMAL.
     :vartype difficulty: Difficulty
 
-    :var team: Monster's team name.
-    :vartype team: str
+    :var team_name: Monster's team name.
+    :vartype team_name: str
     """
 
     def __init__(
@@ -37,11 +37,11 @@ class Monster(Entity):
         skills: List[Skill] = [],
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
-        team: str = None,
+        team_name: str = None,
         **kwargs
     ):
         super().__init__(**kwargs)
         self.skills: List[Skill] = skills
         self.control_type = control_type
         self.difficulty = difficulty
-        self.team = team
+        self.team_name = team_name

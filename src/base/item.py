@@ -1,7 +1,7 @@
 """Item module."""
 
 from enum import Enum
-from base.entity import Entity
+from src.base.entity import Entity
 
 
 class ItemType(Enum):

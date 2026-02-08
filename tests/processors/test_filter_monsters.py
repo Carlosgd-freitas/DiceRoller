@@ -1,11 +1,8 @@
-"""Tests for Entity class."""
+"""Tests for target processing's filter_monsters() method."""
 
 from pytest import fixture
 from src.base.monster import Monster
-from src.processors.target import (
-    filter_monsters,
-    get_targets,
-)
+from src.processors.targets import filter_monsters
 
 
 @fixture

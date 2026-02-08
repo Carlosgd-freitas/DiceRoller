@@ -2,9 +2,9 @@
 
 from uuid import uuid4
 from typing import List
-from base.dice import Dice
-from base.side import Side
-from base.effect import Effect
+from src.base.dice import Dice
+from src.base.side import Side
+from src.base.effect import Effect
 
 
 class Entity():
@@ -75,3 +75,14 @@ class Entity():
         ]
 
         return rolled
+
+    def equalize_stats(self) -> None:
+        """
+        Equalize stats to acceptable values:
+        * Entity's HP will be changed to [0, max_hp] interval.
+        """
+        if self.hp < 0:
+            self.hp = 0
+        elif self.hp > self.max_hp:
+            self.hp = self.max_hp
+        return

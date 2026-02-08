@@ -1,11 +1,11 @@
-"""Target processor module."""
+"""Targets processor module."""
 
 from random import choices
-from base.side import Side
-from base.monster import Monster
-from base.keywords import Keyword
-from base.difficulties import Difficulty
+from src.base.side import Side
+from src.base.monster import Monster
+from src.base.keywords import Keyword
 from typing import List, Callable, Literal
+from src.base.difficulties import Difficulty
 
 
 def filter_monsters(

@@ -9,6 +9,7 @@ class Keyword(Enum):
 
     ATTACK = "ATTACK"
     BLEED = "BLEED"
+    BLIND = "BLIND"
     BLOCK = "BLOCK"
     BURN = "BURN"
     CLEANSE = "CLEANSE"
@@ -28,6 +29,7 @@ class Keyword(Enum):
     OMNI_DRAIN = "OMNI_DRAIN"
     PIERCE = "PIERCE"
     POISON = "POISON"
+    REGEN = "REGEN"
     REVIVE = "REVIVE"
     SCORCH = "SCORCH"
     STRENGTHEN = "STRENGTHEN"
@@ -52,11 +54,11 @@ def color_keyword(keyword: Keyword) -> str:
         foreground_color = Color.RED
     elif keyword == Keyword.CLEANSE:
         foreground_color = Color.AERO
-    elif keyword in [Keyword.COUNTER, Keyword.STUN]:
+    elif keyword in [Keyword.BLIND, Keyword.COUNTER, Keyword.STUN]:
         foreground_color = Color.GRAY
     elif keyword == Keyword.CURSE:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.DRAIN, Keyword.HEAL]:
+    elif keyword in [Keyword.DRAIN, Keyword.HEAL, Keyword.REGEN]:
         foreground_color = Color.GRASS_GREEN
     elif keyword in [Keyword.FORTIFY, Keyword.STRENGTHEN]:
         foreground_color = Color.PINK

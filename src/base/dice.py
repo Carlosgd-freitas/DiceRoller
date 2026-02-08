@@ -1,8 +1,8 @@
 """Dice module."""
 
 from typing import List
-from base.side import Side
 from random import choices
+from src.base.side import Side
 
 
 class Dice:
