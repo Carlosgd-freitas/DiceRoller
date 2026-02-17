@@ -77,8 +77,8 @@ def get_targets(
     current_monster: Monster,
     side: Side,
     k: int = 1,
-    current_team: List[Monster] = [],
-    enemies: List[Monster] = []
+    current_team: List[Monster] = None,
+    enemies: List[Monster] = None,
 ) -> List[Monster]:
     """
     Returns a list of Monster objects based on the Side keywords.
@@ -102,6 +102,8 @@ def get_targets(
     :rtype: List[Monster]
     """
     difficulty = current_monster.difficulty
+    current_team = [] if current_team is None else list(current_team)
+    enemies = [] if enemies is None else list(enemies)
 
     # The targets are chosen based on the Side's first keyword
     effect = side.effects[0]

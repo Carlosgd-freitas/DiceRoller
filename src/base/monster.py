@@ -34,14 +34,14 @@ class Monster(Entity):
 
     def __init__(
         self,
-        skills: List[Skill] = [],
+        skills: List[Skill] = None,
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
         team_name: str = None,
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.skills: List[Skill] = skills
+        self.skills = [] if skills is None else list(skills)
         self.control_type = control_type
         self.difficulty = difficulty
         self.team_name = team_name

@@ -8,9 +8,14 @@ from src.processors.effects import process_effect
 
 def process_side(
     side: Side,
+    source: Monster,
     targets: List[Monster]
 ) -> List[Monster]:
     for effect in side.effects:
-        targets = process_effect(effect, targets)
+        targets = process_effect(
+            effect=effect,
+            source=source,
+            targets=targets,
+        )
 
     return targets

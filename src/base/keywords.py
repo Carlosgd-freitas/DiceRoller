@@ -26,6 +26,7 @@ class Keyword(Enum):
     MAGIC = "MAGIC"
     MANA = "MANA"
     MANA_DRAIN = "MANA_DRAIN"
+    NOTHING = "NOTHING"
     OMNI_DRAIN = "OMNI_DRAIN"
     PIERCE = "PIERCE"
     POISON = "POISON"

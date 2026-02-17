@@ -2,6 +2,7 @@
 
 from random import shuffle
 from typing import List, Literal, Dict
+from src.combat.logger import CombatLogger
 from src.processors.sides import process_side
 from src.processors.targets import get_targets
 from src.base.monster import Monster, ControlType
@@ -34,12 +35,15 @@ class CombatManager():
 
     def __init__(
         self,
-        teams: List[List[Monster]] = [],
-        team_names: List[str] = [],
+        teams: List[List[Monster]] = None,
+        team_names: List[str] = None,
         order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"] = "FASTER",
-        current_monster_id: Monster | str = None,
+        current_monster_id: str = None,
     ):
         self.turn: int = 1
+        self.logger: CombatLogger = CombatLogger()
+        teams = [] if teams is None else list(teams)
+        team_names = [] if team_names is None else list(team_names)
 
         if (teams) and (team_names) and (len(teams) != len(team_names)):
             raise AssertionError(
@@ -47,7 +51,6 @@ class CombatManager():
             )
 
         for idx, team in enumerate(teams):
-
             if team_names:
                 team_name = team_names[idx]
             else:
@@ -57,7 +60,7 @@ class CombatManager():
                 if monster.team_name is None:
                     monster.team_name = team_name
 
-        self.teams: List[List[Monster]] = teams
+        self.teams = teams
 
         self.order_strategy = order_strategy
         self.order = self._set_order()
@@ -65,6 +68,7 @@ class CombatManager():
         # take place.
 
         self.current_monster_id = current_monster_id
+        self.current_monster = self.get_monster(self.current_monster_id)
 
     def _set_order(
         self,
@@ -98,6 +102,9 @@ class CombatManager():
         :return: A monster in the turn order.
         :rtype: Monster
         """
+        if not monster_local_id:
+            return None
+
         for monster in self.order:
             if monster.local_id == monster_local_id:
                 return monster
@@ -221,29 +228,73 @@ class CombatManager():
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
         self.current_monster_id = self.order[0].local_id
+        self.current_monster = self.get_monster(self.current_monster_id)
+        return
+
+    def start_turn(self) -> None:
+        """Start the current monster's turn."""
         return
 
     def take_turn(self) -> None:
         """The current monster takes its turn."""
-        current_monster = self.get_monster(self.current_monster_id)
-
-        # Turn start
-
-        # Take actions
-        if current_monster.control_type == ControlType.AI:
-            sides = current_monster.roll()
-            current_team = self.get_team(current_monster)
-            enemies = self.get_team(current_monster, "ENEMIES")
+        if self.current_monster.control_type == ControlType.AI:
+            sides = self.current_monster.roll()
+            current_team = self.get_team(self.current_monster)
+            enemies = self.get_team(self.current_monster, "ENEMIES")
 
             for side in sides:
-                targets = get_targets(current_monster, side, current_team, enemies)
-                targets = process_side(side, targets)
+                targets = get_targets(
+                    current_monster=self.current_monster,
+                    side=side,
+                    current_team=current_team,
+                    enemies=enemies,
+                )
+                targets = process_side(
+                    side=side,
+                    source=self.current_monster,
+                    targets=targets,
+                )
 
-        elif current_monster.control_type == ControlType.PLAYER:
+        elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError()
 
-        # Turn end
         return
+
+    def end_turn(self) -> Dict:
+        """
+        End the current monster's turn. All effects on the current monsters will be
+        decayed and removed if their duration are <= 0.
+
+        :return: A dictionary containing objects that were affected by the turn ending.
+        :rtype: Dict
+
+        **Return keys**
+        * ``removed_effects``: a list of effects that were removed from the current
+        monster
+        """
+
+        # Decaying and removing effects
+        idx_removed_effects = []
+
+        for idx, effect in enumerate(self.current_monster.effects):
+            effect.duration -= 1
+            effect.value -= effect.decay
+
+            if effect.duration <= 0:
+                idx_removed_effects.append(idx)
+
+        removed_effects = [
+            effect for idx, effect in enumerate(self.current_monster.effects)
+            if idx in idx_removed_effects
+        ]
+        self.current_monster.effects = [
+            effect for idx, effect in enumerate(self.current_monster.effects)
+            if idx not in idx_removed_effects
+        ]
+
+        return {
+            "removed_effects": removed_effects,
+        }
 
     def next_turn(self) -> None:
         """Sets up next monster turn."""
@@ -261,6 +312,7 @@ class CombatManager():
 
             if monster.hp > 0:
                 self.current_monster_id = monster.local_id
+                self.current_monster = self.get_monster(self.current_monster_id)
                 break
 
         return

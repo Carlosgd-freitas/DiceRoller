@@ -5,6 +5,7 @@ from typing import List
 from src.base.dice import Dice
 from src.base.side import Side
 from src.base.effect import Effect
+from src.base.keywords import Keyword
 
 
 class Entity():
@@ -19,9 +20,6 @@ class Entity():
     is a generated UUID version 4 in str format.
     :vartype id: str
 
-    :var dice: Entity's dice.
-    :vartype dice: List[Dice]
-
     :var name: Entity's name.
     :vartype name: str
 
@@ -33,6 +31,15 @@ class Entity():
 
     :var max_hp: Entity's maximum health points.
     :vartype max_hp: int
+
+    :var speed: Entity's speed.
+    :vartype speed: int
+
+    :var dice: Entity's dice.
+    :vartype dice: List[Dice]
+
+    :var effects: Entity's effects.
+    :vartype effects: List[Effect]
     """
 
     def __init__(
@@ -44,8 +51,8 @@ class Entity():
         hp: int = None,
         max_hp: int = None,
         speed: int = None,
-        dice: List[Dice] = [],
-        effects: List[Effect] = [],
+        dice: List[Dice] = None,
+        effects: List[Effect] = None,
         **kwargs
     ):
         self.global_id: str = global_id
@@ -60,6 +67,9 @@ class Entity():
 
         self.dice: List[Dice] = dice
         self.effects: List[Effect] = effects
+
+        self.dice = [] if dice is None else list(dice)
+        self.effects = [] if effects is None else list(effects)
 
     def roll(self) -> List[Side]:
         """
@@ -86,3 +96,18 @@ class Entity():
         elif self.hp > self.max_hp:
             self.hp = self.max_hp
         return
+
+    def get_effect(self, keyword: Keyword) -> Effect:
+        """
+        Returns a effect from the entity based on a keyword.
+
+        :param keyword: A keyword.
+        :type keyword: Keyword
+
+        :return: An effect.
+        :rtype: Effect
+        """
+        for effect in self.effects:
+            if effect.keyword == keyword:
+                return effect
+        return None
