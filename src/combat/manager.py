@@ -105,63 +105,63 @@ class CombatManager():
     
     def get_team(
         self,
-        type: Literal["ALLIES", "ENEMIES"] = None,
-        current_monster: Monster = None,
-        team_name: str = None,
+        monster: Monster = None,
+        type: Literal["ALLIES", "ENEMIES", "SELF"] = "SELF",
     ) -> List[Monster]:
         """
-        Get a team (list) of monsters.
+        Get a list of monsters from the same team, relative to a monster.
 
-        :param type: A type of team. Default value is None.
-        :type type: Literal["ALLIES", "ENEMIES"]
+        :param type: A type of team. Default value is "SELF".
+        :type type: Literal["ALLIES", "ENEMIES", "SELF"]
 
-        :param current_monster: The current Monster. This parameter must be passed if
-        type is passed.
-        :type current_monster: Monster
-
-        :param team_name: A monster team's name.
-        :type team_name: str
+        :param monster: The monster which the relative team will be returned.
+        :type monster: Monster
 
         **Team types**
-        * ``ALLIES``: all other monsters from the same team
+        * ``ALLIES``: all monsters from the same team, excluding itself
         * ``ENEMIES``: all monsters from different teams
+        * ``SELF``: all monsters from the same team, including itself
 
-        :return: A list of monsters from the same team.
+        :return: A list of monsters.
         :rtype: List[Monster]
         """
+        selected: List[Monster] = []
 
-        if type == "ALLIES":
-            return [
-                monster for monster in self.order
-                if (
-                    (monster.team == current_monster.team)
-                    and (monster.local_id != current_monster.local_id)
-                )
-            ]
+        for team in self.teams:
+            if (type == "SELF") \
+                and (team[0].team_name == monster.team_name):
+                    return [
+                        team_monster for team_monster in team
+                    ]
 
-        elif type == "ENEMIES":
-            return [
-                monster for monster in self.order
-                if monster.team != current_monster.team
-            ]
-        
-        elif team_name:
-            return [
-                monster for monster in self.order
-                if monster.team == team_name
-            ]
+            elif (type == "ALLIES") \
+                and (team[0].team_name == monster.team_name):
+                return [
+                    team_monster for team_monster in team
+                    if team_monster.local_id != monster.local_id
+                ]
 
-        return []
+            elif (type == "ENEMIES") \
+                and (team[0].team_name != monster.team_name):
+                    selected.extend([
+                        team_monster for team_monster in team
+                    ])
 
-    # ToDo: Testing
+        return selected
+
     def get_team_status(
         self,
-        team: List[Monster]
+        monster: Monster = None,
+        team: List[Monster] = None,
     ) -> Literal["ALIVE", "DEFEATED"]:
         """
-        Returns the status of liveness of a list of monsters:
+        Returns the liveness status of a list of monsters:
         * ``ALIVE``: if at least one monster has their hp > 0
         * ``DEFEATED``: if all monsters have their hp = 0
+        If a monster is passed, its team's liveness status will be returned.
+
+        :param team: A monster.
+        :type team: Monster
 
         :param team: A list of monsters.
         :type team: List[Monster]
@@ -171,15 +171,17 @@ class CombatManager():
         """
         status: str = "DEFEATED"
 
-        for monster in team:
-            if monster.hp > 0:
+        if (monster) and (not team):
+            team = self.get_team(monster)
+
+        for team_monster in team:
+            if team_monster.hp > 0:
                 status = "ALIVE"
                 break
 
         return status
 
-    # ToDo: Testing
-    def get_result(self) -> Dict:
+    def get_combat_result(self) -> Dict:
         """
         Returns the current result of the combat.
 
@@ -202,7 +204,7 @@ class CombatManager():
         }
 
         for team in self.teams:
-            team_status = self.get_team_status(team)
+            team_status = self.get_team_status(team=team)
             teams_status[team_status].append(team)
 
         if (len(teams_status["ALIVE"]) == 0):
@@ -230,11 +232,11 @@ class CombatManager():
         # Take actions
         if current_monster.control_type == ControlType.AI:
             sides = current_monster.roll()
-            allies = self.get_team(type="ALLIES", current_monster=current_monster)
-            enemies = self.get_team(type="ENEMIES", current_monster=current_monster)
+            current_team = self.get_team(current_monster)
+            enemies = self.get_team(current_monster, "ENEMIES")
 
             for side in sides:
-                targets = get_targets(current_monster, side, allies, enemies)
+                targets = get_targets(current_monster, side, current_team, enemies)
                 targets = process_side(side, targets)
 
         elif current_monster.control_type == ControlType.PLAYER:

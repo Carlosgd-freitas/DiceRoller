@@ -77,7 +77,7 @@ def get_targets(
     current_monster: Monster,
     side: Side,
     k: int = 1,
-    allies: List[Monster] = [],
+    current_team: List[Monster] = [],
     enemies: List[Monster] = []
 ) -> List[Monster]:
     """
@@ -92,9 +92,8 @@ def get_targets(
     :param k: The number of Monster objects which will be returned.
     :type k: int
 
-    :param allies: A list of Monster objects representing the current monsters allies,
-    which doesn't include itself.
-    :type allies: List[Monster]
+    :param current_team: A list of Monster objects representing the current monster's team.
+    :type current_team: List[Monster]
 
     :param enemies: A list of Monster objects representing the current monsters enemies.
     :type enemies: List[Monster]
@@ -103,7 +102,6 @@ def get_targets(
     :rtype: List[Monster]
     """
     difficulty = current_monster.difficulty
-    current_team = allies.copy().append(current_monster)
 
     # The targets are chosen based on the Side's first keyword
     effect = side.effects[0]
