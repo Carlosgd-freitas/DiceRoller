@@ -1,4 +1,4 @@
-"""Tests for effect processing's process_effect() method."""
+"""Tests for debuff effects processing."""
 
 from pytest import fixture
 from src.base.side import Side
@@ -27,73 +27,31 @@ def monsters():
     ]
 
 
-def test_keyword_attack(monsters):
-    side = Side(
-        effects=[
-            Effect(Keyword.ATTACK, 6),
-        ]
-    )
-
-    targets = process_effect(
-        side.effects[0],
-        source=monsters[1],
-        targets=[monsters[0]],
-    )
-
-    conditions = [
-        len(targets) == 1,
-
-        monsters[0].local_id == "MONSTER_0",
-        monsters[0].hp == 0,
-        monsters[0].max_hp == 10,
-    ]
-
-    assert all(conditions)
-
-
-def test_keyword_heal(monsters):
-    side = Side(
-        effects=[
-            Effect(Keyword.HEAL, 6),
-        ]
-    )
-
-    targets = process_effect(
-        side.effects[0],
-        source=monsters[1],
-        targets=[monsters[0]],
-    )
-    
-    conditions = [
-        len(targets) == 1,
-
-        monsters[0].local_id == "MONSTER_0",
-        monsters[0].hp == 10,
-        monsters[0].max_hp == 10,
-    ]
-
-    assert all(conditions)
-
-
 def test_keyword_blind(monsters):
     side_0 = Side(
         effects=[
             Effect(
                 Keyword.BLIND,
-                value=100,
+                value=1,
                 duration=1,
             ),
         ]
     )
     side_1 = Side(
         effects=[
-            Effect(Keyword.ATTACK, 1),
+            Effect(Keyword.HEAL, 2),
         ]
     )
 
     _ = process_effect(
         side_0.effects[0],
         source=monsters[1],
+        targets=[monsters[0]],
+    )
+
+    _ = process_effect(
+        side_1.effects[0],
+        source=monsters[0],
         targets=[monsters[0]],
     )
 
@@ -107,8 +65,8 @@ def test_keyword_blind(monsters):
         monsters[0].local_id == "MONSTER_0",
         len(monsters[0].effects) == 1,
         monsters[0].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
-        monsters[0].get_effect(Keyword.BLIND).value == 100,
-        monsters[0].hp == 5,
+        monsters[0].get_effect(Keyword.BLIND).value == 1,
+        monsters[0].hp == 7,
 
         monsters[1].local_id == "MONSTER_1",
         len(monsters[1].effects) == 0,

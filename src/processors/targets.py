@@ -133,6 +133,9 @@ def get_targets(
                 alive=True,
             )
 
+    elif effect.keyword in [Keyword.CURSE, Keyword.MANA]:
+        return [current_monster]
+
     elif effect.keyword == Keyword.HEAL:
         if difficulty == Difficulty.EASY:
             return filter_monsters(

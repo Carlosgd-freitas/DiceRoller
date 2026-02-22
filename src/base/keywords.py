@@ -33,6 +33,7 @@ class Keyword(Enum):
     REGEN = "REGEN"
     REVIVE = "REVIVE"
     SCORCH = "SCORCH"
+    SLOW = "SLOW"
     STRENGTHEN = "STRENGTHEN"
     STUN = "STUN"
     TAUNT = "TAUNT"

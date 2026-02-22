@@ -35,6 +35,9 @@ class Entity():
     :var speed: Entity's speed.
     :vartype speed: int
 
+    :var mana: Entity's mana points.
+    :vartype mana: int
+
     :var dice: Entity's dice.
     :vartype dice: List[Dice]
 
@@ -51,6 +54,7 @@ class Entity():
         hp: int = None,
         max_hp: int = None,
         speed: int = None,
+        mana: int = None,
         dice: List[Dice] = None,
         effects: List[Effect] = None,
         **kwargs
@@ -64,6 +68,7 @@ class Entity():
         self.hp: int = hp
         self.max_hp: int = max_hp
         self.speed: int = speed
+        self.mana: int = mana
 
         self.dice: List[Dice] = dice
         self.effects: List[Effect] = effects

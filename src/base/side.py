@@ -37,7 +37,7 @@ class Side:
         value: float = None,
         duration: int = None,
         decay: int = None,
-        chance: float = None
+        accuracy: float = None
     ) -> List[Tuple[int, Effect]]:
         """
         Returns a list of indexes and effects based on a series of filters.
@@ -56,8 +56,8 @@ class Side:
         :param decay: Filters effects that have the same decay parameter.
         :type decay: int
 
-        :param chance: Filters effects that have the same chance parameter.
-        :type chance: float
+        :param accuracy: Filters effects that have the same accuracy parameter.
+        :type accuracy: float
 
         :return: List of Tuples, where the first element is the Side 'effects' parameter's
         index, and the second is the effect itself.
@@ -73,7 +73,7 @@ class Side:
                 ("value", value),
                 ("duration", duration),
                 ("decay", decay),
-                ("chance", chance)
+                ("accuracy", accuracy)
             ]:
                 if comparison_value is not None:
                     if effect.__getattribute__(comparison_key) == comparison_value:

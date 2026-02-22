@@ -37,5 +37,6 @@ class Slime(Monster):
             hp=6,
             max_hp=6,
             speed=1,
+            mana=0,
             **kwargs
         )
