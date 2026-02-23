@@ -44,10 +44,10 @@ class Effect():
     def __init__(
         self,
         keyword: Keyword,
-        value: float = None,
-        duration: int = None,
-        decay: float = None,
-        accuracy: float = 1.0,
+        value: float = 0,
+        duration: int = 0,
+        decay: float = 0,
+        accuracy: float = 1,
         dispellable: bool = True,
     ):
         self.keyword = keyword

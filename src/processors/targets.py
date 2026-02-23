@@ -4,6 +4,7 @@ from random import choices
 from src.base.side import Side
 from src.base.monster import Monster
 from src.base.keywords import Keyword
+from src.base.effect import EffectType
 from typing import List, Callable, Literal
 from src.base.difficulties import Difficulty
 
@@ -108,7 +109,7 @@ def get_targets(
     # The targets are chosen based on the Side's first keyword
     effect = side.effects[0]
 
-    if effect.keyword == Keyword.ATTACK:
+    if effect.type == EffectType.OFFENSIVE:
         if difficulty == Difficulty.EASY:
             return filter_monsters(
                 enemies,

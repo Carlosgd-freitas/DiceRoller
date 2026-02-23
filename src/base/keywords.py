@@ -64,7 +64,7 @@ def color_keyword(keyword: Keyword) -> str:
         foreground_color = Color.GRASS_GREEN
     elif keyword in [Keyword.FORTIFY, Keyword.STRENGTHEN]:
         foreground_color = Color.PINK
-    elif keyword in [Keyword.FRAGILE, Keyword.WEAKEN]:
+    elif keyword in [Keyword.FRAGILE, Keyword.SLOW, Keyword.WEAKEN]:
         foreground_color = Color.BEIGE
     elif keyword == Keyword.FREEZE:
         foreground_color = Color.SKY_BLUE
