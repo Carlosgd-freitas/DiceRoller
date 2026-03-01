@@ -1,6 +1,5 @@
 """Tests for debuff effects processing."""
 
-from src.base.side import Side
 from src.base.effect import Effect
 from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
@@ -10,28 +9,16 @@ from src.processors.effects import process_effect
 def test_keyword_blind(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side_blind = Side(
-        effects=[
-            Effect(
-                Keyword.BLIND,
-                value=1,
-                duration=1,
-            ),
-        ]
+    effect_blind = Effect(
+        Keyword.BLIND,
+        value=1,
+        duration=1,
     )
-    side_attack = Side(
-        effects=[
-            Effect(Keyword.ATTACK, 2),
-        ]
-    )
-    side_heal = Side(
-        effects=[
-            Effect(Keyword.HEAL, 2),
-        ]
-    )
+    effect_attack = Effect(Keyword.ATTACK, 2)
+    effect_heal = Effect(Keyword.HEAL, 2)
 
     _ = process_effect(
-        side_blind.effects[0],
+        effect_blind,
         source=combat_manager.order[1],
         targets=[combat_manager.order[0]],
     )
@@ -51,13 +38,13 @@ def test_keyword_blind(effect_processing):
     ]
 
     _ = process_effect(
-        side_heal.effects[0],
+        effect_heal,
         source=combat_manager.order[0],
         targets=[combat_manager.order[0]],
     )
 
     _ = process_effect(
-        side_attack.effects[0],
+        effect_attack,
         source=combat_manager.order[0],
         targets=[combat_manager.order[1]],
     )
@@ -70,13 +57,13 @@ def test_keyword_blind(effect_processing):
     combat_manager.end_turn()
 
     _ = process_effect(
-        side_heal.effects[0],
+        effect_heal,
         source=combat_manager.order[0],
         targets=[combat_manager.order[0]],
     )
 
     _ = process_effect(
-        side_attack.effects[0],
+        effect_attack,
         source=combat_manager.order[0],
         targets=[combat_manager.order[1]],
     )
@@ -95,27 +82,15 @@ def test_keyword_blind(effect_processing):
 def test_keyword_stun(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side_stun = Side(
-        effects=[
-            Effect(
-                Keyword.STUN,
-                duration=1,
-            ),
-        ]
+    effect_stun = Effect(
+        Keyword.STUN,
+        duration=1,
     )
-    side_attack = Side(
-        effects=[
-            Effect(Keyword.ATTACK, 2),
-        ]
-    )
-    side_heal = Side(
-        effects=[
-            Effect(Keyword.HEAL, 2),
-        ]
-    )
+    effect_attack = Effect(Keyword.ATTACK, 2)
+    effect_heal = Effect(Keyword.HEAL, 2)
 
     _ = process_effect(
-        side_stun.effects[0],
+        effect_stun,
         source=combat_manager.order[1],
         targets=[combat_manager.order[0]],
     )
@@ -134,13 +109,13 @@ def test_keyword_stun(effect_processing):
     ]
 
     _ = process_effect(
-        side_heal.effects[0],
+        effect_heal,
         source=combat_manager.order[0],
         targets=[combat_manager.order[0]],
     )
 
     _ = process_effect(
-        side_attack.effects[0],
+        effect_attack,
         source=combat_manager.order[0],
         targets=[combat_manager.order[1]],
     )
@@ -153,13 +128,13 @@ def test_keyword_stun(effect_processing):
     combat_manager.end_turn()
 
     _ = process_effect(
-        side_heal.effects[0],
+        effect_heal,
         source=combat_manager.order[0],
         targets=[combat_manager.order[0]],
     )
 
     _ = process_effect(
-        side_attack.effects[0],
+        effect_attack,
         source=combat_manager.order[0],
         targets=[combat_manager.order[1]],
     )

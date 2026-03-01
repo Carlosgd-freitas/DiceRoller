@@ -105,9 +105,9 @@ def get_color_code(color: Tuple[int, int, int] | Color) -> str:
 
 def color_string(
     string: str,
-    foreground_color: Tuple[int, int, int] | Color = (255, 255, 255),
-    background_color: Tuple[int, int, int] | Color = (12, 12, 12),
-    intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"] = "BRIGHT",
+    foreground_color: Tuple[int, int, int] | Color = None,
+    background_color: Tuple[int, int, int] | Color = None,
+    intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"] = None,
     italic: bool = False,
     underlined: bool = False,
     inverted: bool = False,
@@ -122,15 +122,15 @@ def color_string(
     :type string: str
 
     :param foreground_color: color that will be used on the string itself. Default value
-    is (255, 255, 255), which is the terminal's default white.
+    is the terminal's foreground color.
     :type foreground_color: Tuple[int, int, int] | Color
 
     :param background_color: color that will be used on the background. Default value
-    is (12, 12, 12), which is the terminal's default black.
+    is the terminal's background color.
     :type background_color: Tuple[int, int, int] | Color
 
     :param intensity: intensity of the string itself, which can be 'BRIGHT', 'DIM',
-    'SLOW_BLINK' or 'RAPID_BLINK'. Default value is 'BRIGHT'.
+    'SLOW_BLINK' or 'RAPID_BLINK'. Default value is None.
     :type intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"]
 
     :param italic: if the text will be in italic or not. Default value is False.
@@ -181,7 +181,9 @@ def color_string(
         parts.append(ANSICode.STRIKETHROUGH.value)
 
     # Text colors
-    parts.append(ANSICode.FOREGROUND.value + get_color_code(foreground_color))
-    parts.append(ANSICode.BACKGROUND.value + get_color_code(background_color))
+    if foreground_color:
+        parts.append(ANSICode.FOREGROUND.value + get_color_code(foreground_color))
+    if background_color:
+        parts.append(ANSICode.BACKGROUND.value + get_color_code(background_color))
 
     return "".join(parts) + string + ANSICode.RESET.value

@@ -81,7 +81,7 @@ def color_keyword(keyword: Keyword) -> str:
     elif keyword == Keyword.THORNS:
         foreground_color = Color.OLIVE
     else:
-        foreground_color = Color.WHITE        
+        foreground_color = None        
 
     return color_string(
         keyword.value,

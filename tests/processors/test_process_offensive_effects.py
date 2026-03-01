@@ -1,6 +1,5 @@
 """Tests for offensive effects processing."""
 
-from src.base.side import Side
 from src.base.effect import Effect
 from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
@@ -10,14 +9,10 @@ from src.processors.effects import process_effect
 def test_keyword_attack(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side = Side(
-        effects=[
-            Effect(Keyword.ATTACK, 6),
-        ]
-    )
+    effect = Effect(Keyword.ATTACK, 6)
 
     targets = process_effect(
-        side.effects[0],
+        effect,
         source=combat_manager.order[1],
         targets=[combat_manager.order[0]],
     )
@@ -36,14 +31,10 @@ def test_keyword_attack(effect_processing):
 def test_keyword_curse(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side = Side(
-        effects=[
-            Effect(Keyword.CURSE, 6),
-        ]
-    )
+    effect = Effect(Keyword.CURSE, 6)
 
     targets = process_effect(
-        side.effects[0],
+        effect,
         source=combat_manager.order[0],
         targets=[combat_manager.order[0]],
     )

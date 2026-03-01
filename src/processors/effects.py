@@ -75,7 +75,6 @@ def process_effect(
     return targets
 
 
-# ToDo: Testing
 def stack_effect(
     effect: Effect,
     target: Monster,

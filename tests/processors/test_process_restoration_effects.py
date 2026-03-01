@@ -1,6 +1,5 @@
 """Tests for restoration effects processing."""
 
-from src.base.side import Side
 from src.base.effect import Effect
 from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
@@ -10,14 +9,10 @@ from src.processors.effects import process_effect
 def test_keyword_heal(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side = Side(
-        effects=[
-            Effect(Keyword.HEAL, 6),
-        ]
-    )
+    effect = Effect(Keyword.HEAL, 6)
 
     targets = process_effect(
-        side.effects[0],
+        effect,
         source=combat_manager.order[1],
         targets=[combat_manager.order[0]],
     )
@@ -36,16 +31,12 @@ def test_keyword_heal(effect_processing):
 def test_keyword_mana(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    side = Side(
-        effects=[
-            Effect(Keyword.MANA, 2),
-        ]
-    )
+    effect = Effect(Keyword.MANA, 2)
 
     mana_before = combat_manager.order[0].mana
 
     targets = process_effect(
-        side.effects[0],
+        effect,
         source=combat_manager.order[1],
         targets=[combat_manager.order[0]],
     )
