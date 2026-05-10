@@ -100,6 +100,9 @@ class Effect():
             Keyword.MANA,
         ]:
             self.type = EffectType.RESTORATION
+        
+        else:
+            self.type = None
 
     def __str__(self) -> str:
         _str = f"{color_keyword(self.keyword)}"

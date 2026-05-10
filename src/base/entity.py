@@ -83,11 +83,14 @@ class Entity():
         :return: A list of Side objects.
         :rtype: List[Side]
         """
+        rolled = []
+        bleeding = self.get_effect(Keyword.BLEED)
 
-        rolled = [
-            dice.roll()
-            for dice in self.dice
-        ]
+        for dice in self.dice:
+            rolled.append(dice.roll())
+
+            if bleeding:
+                self.hp -= bleeding.value
 
         return rolled
 

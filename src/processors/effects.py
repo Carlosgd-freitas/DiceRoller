@@ -52,13 +52,20 @@ def process_effect(
         if effect.keyword in [Keyword.ATTACK, Keyword.CURSE]:
             target.hp -= effect.value
 
-        elif effect.keyword in [Keyword.BLIND, Keyword.STUN]:
+        elif effect.keyword in [
+            Keyword.BLEED,
+            Keyword.BLIND,
+            Keyword.BURN,
+            Keyword.POISON,
+            Keyword.STUN
+        ]:
             target = stack_effect(
                 effect=effect,
                 target=target,
                 rules=[
                     ("add", "value"),
                     ("add", "duration"),
+                    ("overwrite", "decay"),
                 ],
             )
 
