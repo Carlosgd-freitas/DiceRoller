@@ -33,7 +33,7 @@ def combat_manager():
     return combat_manager
 
 
-def test_get_team_self(combat_manager):
+def test_get_team_self(combat_manager: CombatManager):
     monster_local_ids = []
 
     for monster in combat_manager.order:
@@ -57,7 +57,7 @@ def test_get_team_self(combat_manager):
     assert all(conditions)
 
 
-def test_get_team_allies(combat_manager):
+def test_get_team_allies(combat_manager: CombatManager):
     monster_local_ids = []
 
     for monster in combat_manager.order:
@@ -77,7 +77,7 @@ def test_get_team_allies(combat_manager):
     assert all(conditions)
 
 
-def test_get_team_enemies(combat_manager):
+def test_get_team_enemies(combat_manager: CombatManager):
     monster_local_ids = []
 
     for monster in combat_manager.order:
@@ -100,7 +100,7 @@ def test_get_team_enemies(combat_manager):
     assert all(conditions)
 
 
-def test_get_team_status_monster(combat_manager):
+def test_get_team_status_monster(combat_manager: CombatManager):
     teams_status = []
 
     for monster in combat_manager.order:
@@ -117,7 +117,7 @@ def test_get_team_status_monster(combat_manager):
     assert all(conditions)
 
 
-def test_get_team_status_team(combat_manager):
+def test_get_team_status_team(combat_manager: CombatManager):
     teams_status = []
 
     for team in combat_manager.teams:
@@ -133,7 +133,7 @@ def test_get_team_status_team(combat_manager):
     assert all(conditions)
 
 
-def test_get_combat_result_winner(combat_manager):
+def test_get_combat_result_winner(combat_manager: CombatManager):
     result = combat_manager.get_combat_result()
 
     conditions = [
@@ -149,7 +149,7 @@ def test_get_combat_result_winner(combat_manager):
     assert all(conditions)
 
 
-def test_get_combat_result_draw(combat_manager):
+def test_get_combat_result_draw(combat_manager: CombatManager):
     combat_manager.order[0].hp = 0
 
     result = combat_manager.get_combat_result()
@@ -167,7 +167,7 @@ def test_get_combat_result_draw(combat_manager):
     assert all(conditions)
 
 
-def test_get_combat_result_ongoing(combat_manager):
+def test_get_combat_result_ongoing(combat_manager: CombatManager):
     combat_manager.order[2].hp = 10
 
     result = combat_manager.get_combat_result()

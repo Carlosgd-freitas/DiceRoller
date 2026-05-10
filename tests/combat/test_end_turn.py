@@ -41,7 +41,7 @@ def combat_manager():
     return combat_manager
 
 
-def test_end_turn_remove_effects(combat_manager):
+def test_end_turn_remove_effects(combat_manager: CombatManager):
     effects_by_turn = [
         deepcopy(combat_manager.order[0].effects)
     ]
@@ -84,7 +84,7 @@ def test_end_turn_remove_effects(combat_manager):
     assert all(conditions)
 
 
-def test_end_turn_decay_effects(combat_manager):
+def test_end_turn_decay_effects(combat_manager: CombatManager):
     effects_by_turn = [
         deepcopy(combat_manager.order[0].effects)
     ]

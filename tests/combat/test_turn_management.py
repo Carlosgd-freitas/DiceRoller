@@ -38,7 +38,7 @@ def combat_manager():
     return combat_manager
 
 
-def test_next_turn(combat_manager):
+def test_next_turn(combat_manager: CombatManager):
     turn_0_monster_id = combat_manager.current_monster_id
 
     combat_manager.next_turn()
