@@ -3,6 +3,7 @@
 from math import isclose
 from src.base.effect import Effect
 from src.base.keywords import Keyword
+from tests.utils import assert_conditions
 from src.combat.manager import CombatManager
 from src.processors.effects import stack_effect
 
@@ -26,7 +27,7 @@ def test_stack_effect_new(effect_processing):
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
 
-    assert all([
+    conditions = [
         stacked_effect is not None,
         len(monster.effects) == 1,
 
@@ -35,7 +36,9 @@ def test_stack_effect_new(effect_processing):
         stacked_effect.duration == 2,
         stacked_effect.decay == 3,
         isclose(stacked_effect.accuracy, 0.1),
-    ])
+    ]
+
+    assert_conditions(conditions)
 
 
 def test_stack_effect_add(effect_processing):
@@ -72,7 +75,7 @@ def test_stack_effect_add(effect_processing):
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
 
-    assert all([
+    conditions = [
         stacked_effect is not None,
         len(monster.effects) == 1,
 
@@ -81,7 +84,9 @@ def test_stack_effect_add(effect_processing):
         stacked_effect.duration == 7,
         stacked_effect.decay == 9,
         isclose(stacked_effect.accuracy, 0.3),
-    ])
+    ]
+
+    assert_conditions(conditions)
 
 
 def test_stack_effect_overwrite(effect_processing):
@@ -118,7 +123,7 @@ def test_stack_effect_overwrite(effect_processing):
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
 
-    assert all([
+    conditions = [
         stacked_effect is not None,
         len(monster.effects) == 1,
 
@@ -127,7 +132,9 @@ def test_stack_effect_overwrite(effect_processing):
         stacked_effect.duration == 5,
         stacked_effect.decay == 6,
         isclose(stacked_effect.accuracy, 0.2),
-    ])
+    ]
+
+    assert_conditions(conditions)
 
 
 def test_stack_effect_remove(effect_processing):
@@ -166,7 +173,7 @@ def test_stack_effect_remove(effect_processing):
         ]
     )
 
-    assert all([
+    conditions = [
         len(monster.effects) == 2,
 
         monster.get_effect(Keyword.STRENGTHEN).keyword == Keyword.STRENGTHEN,
@@ -182,4 +189,6 @@ def test_stack_effect_remove(effect_processing):
         isclose(monster.get_effect(Keyword.FORTIFY).accuracy, 0.1),
 
         monster.get_effect(Keyword.WEAKEN) == None,
-    ])
+    ]
+
+    assert_conditions(conditions)

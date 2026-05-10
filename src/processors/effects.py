@@ -11,6 +11,34 @@ type stack_method = Literal["add", "overwrite"]
 type effect_param = Literal["value", "duration", "decay", "accuracy", "dispellable"]
 
 
+def calculate_damage(
+    effect: Effect,
+    source: Monster,
+    target: Monster,
+    consider_block: bool = True,
+) -> None:
+    damage = effect.value
+
+    if consider_block:
+        blocking = target.get_effect(Keyword.BLOCK)
+
+        if blocking:
+            min_value = min(damage, blocking.value)
+
+            damage -= min_value
+            blocking.value -= min_value
+
+            if blocking.value <= 0:
+                target.effects.remove(blocking)
+
+    if damage < 0:
+        damage = 0
+
+    target.hp -= damage
+
+    return
+
+
 def process_effect(
     effect: Effect,
     source: Monster,
@@ -49,16 +77,33 @@ def process_effect(
         if not (chance < accuracy):
             continue
 
-        if effect.keyword in [Keyword.ATTACK, Keyword.CURSE]:
-            target.hp -= effect.value
+        # Damage
+        if effect.keyword == Keyword.ATTACK:
+            calculate_damage(
+                effect=effect,
+                source=source,
+                target=target,
+                consider_block=True,
+            )
 
-        elif effect.keyword in [
-            Keyword.BLEED,
-            Keyword.BLIND,
-            Keyword.BURN,
-            Keyword.POISON,
-            Keyword.STUN
-        ]:
+        elif effect.keyword in [Keyword.CURSE, Keyword.PIERCE]:
+            calculate_damage(
+                effect=effect,
+                source=source,
+                target=target,
+                consider_block=False,
+            )
+
+        # Heal
+        elif effect.keyword == Keyword.HEAL:
+            target.hp += effect.value
+
+        # Mana
+        elif effect.keyword == Keyword.MANA:
+            target.mana += effect.value
+
+        # Other effects
+        else:
             target = stack_effect(
                 effect=effect,
                 target=target,
@@ -68,12 +113,6 @@ def process_effect(
                     ("overwrite", "decay"),
                 ],
             )
-
-        elif effect.keyword == Keyword.HEAL:
-            target.hp += effect.value
-
-        elif effect.keyword == Keyword.MANA:
-            target.mana += effect.value
 
         target.equalize_stats()
     

@@ -2,6 +2,7 @@
 
 from pytest import fixture
 from src.base.monster import Monster
+from tests.utils import assert_conditions
 from src.processors.targets import filter_monsters
 
 
@@ -61,7 +62,7 @@ def test_filter_lowest_hp_monsters(targets):
         filtered_monsters[0].hp == 0,
     ]
     
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_filter_highest_hp_monsters(targets):
@@ -79,7 +80,7 @@ def test_filter_highest_hp_monsters(targets):
         filtered_monsters[0].hp == 200,
     ]
     
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_filter_alive_monsters(targets):
@@ -101,7 +102,7 @@ def test_filter_alive_monsters(targets):
         filtered_monsters[1].hp == 10,
     ]
     
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_filter_hurt_monsters(targets):
@@ -123,4 +124,4 @@ def test_filter_hurt_monsters(targets):
         filtered_monsters[1].hp == 10,
     ]
     
-    assert all(conditions)
+    assert_conditions(conditions)

@@ -2,6 +2,7 @@
 
 from src.base.effect import Effect
 from src.base.keywords import Keyword
+from tests.utils import assert_conditions
 from src.combat.manager import CombatManager
 from src.processors.effects import process_effect
 
@@ -25,7 +26,7 @@ def test_keyword_heal(effect_processing):
         combat_manager.order[0].max_hp == 10,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_keyword_mana(effect_processing):
@@ -49,4 +50,4 @@ def test_keyword_mana(effect_processing):
         combat_manager.order[0].mana == 2,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)

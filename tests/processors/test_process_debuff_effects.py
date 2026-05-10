@@ -4,6 +4,7 @@ from src.base.side import Side
 from src.base.dice import Dice
 from src.base.effect import Effect
 from src.base.keywords import Keyword
+from tests.utils import assert_conditions
 from src.combat.manager import CombatManager
 from src.processors.effects import process_effect
 
@@ -70,7 +71,7 @@ def test_keyword_bleed(effect_processing):
         combat_manager.order[1].hp == 5,
     ])
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_keyword_blind(effect_processing):
@@ -143,7 +144,7 @@ def test_keyword_blind(effect_processing):
         combat_manager.order[1].hp == 3,
     ])
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_keyword_burn(effect_processing):
@@ -187,7 +188,7 @@ def test_keyword_burn(effect_processing):
         combat_manager.order[1].hp == 5,
     ])
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_keyword_poison(effect_processing):
@@ -231,7 +232,7 @@ def test_keyword_poison(effect_processing):
         combat_manager.order[1].hp == 5,
     ])
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_keyword_stun(effect_processing):
@@ -302,4 +303,4 @@ def test_keyword_stun(effect_processing):
         combat_manager.order[1].hp == 3,
     ])
 
-    assert all(conditions)
+    assert_conditions(conditions)
