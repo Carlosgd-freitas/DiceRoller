@@ -1,6 +1,7 @@
 """Keyword module."""
 
 from enum import Enum
+from typing import List
 from src.base.color import Color, color_string
 
 
@@ -23,11 +24,9 @@ class Keyword(Enum):
     HEAL = "HEAL"
     HEMORRAGY = "HEMORRAGY"
     HEX = "HEX"
-    MAGIC = "MAGIC"
     MANA = "MANA"
-    MANA_DRAIN = "MANA_DRAIN"
+    MANA_REGEN = "MANA_REGEN"
     NOTHING = "NOTHING"
-    OMNI_DRAIN = "OMNI_DRAIN"
     PIERCE = "PIERCE"
     POISON = "POISON"
     REGEN = "REGEN"
@@ -40,6 +39,29 @@ class Keyword(Enum):
     THORNS = "THORNS"
     TOXIC = "TOXIC"
     WEAKEN = "WEAKEN"
+
+
+def get_incompatible_keywords(keyword: Keyword) -> List[Keyword]:
+    if keyword == Keyword.BURN:
+        return [Keyword.FREEZE]
+
+    elif keyword == Keyword.FORTIFY:
+        return [Keyword.FRAGILE]
+
+    elif keyword == Keyword.FRAGILE:
+        return [Keyword.FORTIFY]
+
+    elif keyword == Keyword.FREEZE:
+        return [Keyword.BURN]
+
+    elif keyword == Keyword.STRENGTHEN:
+        return [Keyword.WEAKEN]
+
+    elif keyword == Keyword.WEAKEN:
+        return [Keyword.STRENGTHEN]
+
+    else:
+        return None
 
 
 def color_keyword(keyword: Keyword) -> str:
@@ -70,9 +92,9 @@ def color_keyword(keyword: Keyword) -> str:
         foreground_color = Color.SKY_BLUE
     elif keyword == Keyword.HEX:
         foreground_color = Color.COFFEE
-    elif keyword in [Keyword.MAGIC, Keyword.MANA, Keyword.MANA_DRAIN]:
+    elif keyword in [Keyword.MANA, Keyword.MANA_REGEN]:
         foreground_color = Color.LILAC
-    elif keyword in [Keyword.OMNI_DRAIN, Keyword.REVIVE]:
+    elif keyword == Keyword.REVIVE:
         foreground_color = Color.LEMON
     elif keyword in [Keyword.POISON, Keyword.TOXIC]:
         foreground_color = Color.EMERALD_GREEN

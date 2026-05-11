@@ -27,11 +27,7 @@ def test_keyword_bleed(effect_processing):
         Dice(sides=[Side([effect_nothing_3])]),
     ]
 
-    _ = process_effect(
-        effect_bleed,
-        source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(effect_bleed)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -85,11 +81,7 @@ def test_keyword_blind(effect_processing):
     effect_attack = Effect(Keyword.ATTACK, 2)
     effect_heal = Effect(Keyword.HEAL, 2)
 
-    _ = process_effect(
-        effect_blind,
-        source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(effect_blind)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -156,11 +148,7 @@ def test_keyword_burn(effect_processing):
         duration=1,
     )
 
-    _ = process_effect(
-        effect_burn,
-        source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(effect_burn)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -200,11 +188,7 @@ def test_keyword_poison(effect_processing):
         duration=1,
     )
 
-    _ = process_effect(
-        effect_poison,
-        source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(effect_poison)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -245,11 +229,7 @@ def test_keyword_stun(effect_processing):
     effect_attack = Effect(Keyword.ATTACK, 2)
     effect_heal = Effect(Keyword.HEAL, 2)
 
-    _ = process_effect(
-        effect_stun,
-        source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(effect_stun)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",

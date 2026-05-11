@@ -1,11 +1,12 @@
 """Combat Manager module."""
 
 from random import shuffle
-from src.base.keywords import Keyword
+from src.base.triggers import Trigger
 from typing import List, Literal, Dict
 from src.combat.logger import CombatLogger
 from src.processors.sides import process_side
 from src.processors.targets import get_targets
+from src.processors.effects import process_effect
 from src.base.monster import Monster, ControlType
 
 
@@ -236,12 +237,12 @@ class CombatManager():
         """Start the current monster's turn."""
 
         for effect in self.current_monster.effects:
-            if effect.keyword in [
-                Keyword.BURN,
-                Keyword.POISON
-            ]:
-                self.current_monster.hp -= effect.value
-                self.current_monster.equalize_stats()
+            if effect.trigger == Trigger.TURN_START:
+                process_effect(
+                    effect,
+                    None,
+                    [self.current_monster],
+                )
 
         return
 

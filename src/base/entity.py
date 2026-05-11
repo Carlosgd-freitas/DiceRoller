@@ -1,11 +1,16 @@
 """Entity module."""
 
 from uuid import uuid4
-from typing import List
+from copy import deepcopy
 from src.base.dice import Dice
 from src.base.side import Side
 from src.base.effect import Effect
+from src.base.triggers import Trigger
 from src.base.keywords import Keyword
+from typing import List, Literal, Tuple
+# from src.processors.effects import process_effect
+
+type stack_method = Literal["add", "overwrite"]
 
 
 class Entity():
@@ -84,13 +89,21 @@ class Entity():
         :rtype: List[Side]
         """
         rolled = []
-        bleeding = self.get_effect(Keyword.BLEED)
+        rolling_effects = [
+            effect
+            for effect in self.effects
+            if effect.trigger == Trigger.ROLL
+        ]
 
         for dice in self.dice:
             rolled.append(dice.roll())
 
-            if bleeding:
-                self.hp -= bleeding.value
+            # for effect in rolling_effects:
+            #     process_effect(
+            #         effect,
+            #         None,
+            #         [self],
+            #     )
 
         return rolled
 
@@ -118,4 +131,87 @@ class Entity():
         for effect in self.effects:
             if effect.keyword == keyword:
                 return effect
+        return None
+
+    def add_effect(
+        self,
+        effect: Effect,
+        stack_value: stack_method = "overwrite",
+        stack_duration: stack_method = "overwrite",
+        stack_decay: stack_method = "overwrite",
+        stack_accuracy: stack_method = "overwrite",
+    ) -> None:
+        """
+        Add an effect to the Entity, also stacking it by the stacking parameters if the
+        Entity already has an effect with that same keyword. Effects with incompatible
+        keywords will also be removed from the Entity.
+
+        :param effect: The effect that will be added to the Entity.
+        :type effect: Effect
+
+        :param stack_value: How the Effect's value is stacked. By default, this value is
+        "overwrite".
+        :type stack_value: stack_method
+
+        :param stack_duration: How the Effect's duration is stacked. By default, this
+        value is "overwrite".
+        :type stack_duration: stack_method
+
+        :param stack_decay: How the Effect's decay is stacked. By default, this value is
+        "overwrite".
+        :type stack_decay: stack_method
+
+        :param stack_accuracy: How the Effect's accuracy is stacked. By default, this
+        value is "overwrite".
+        :type stack_accuracy: stack_method
+
+        **Stack Methods**
+        * ``add``: if the monster has an existing effect with the same Keyword, the values
+        of the existing effect and the new effect for that parameter will be added.
+
+        * ``overwrite``: if the monster has an existing effect with the same Keyword, the
+        value of the existing effect will be overwritten by the new effect for that
+        parameter.
+        """
+        # Remove incompatible effects
+        for keyword in effect.incompatible:
+            effect_to_remove = self.get_effect(keyword)
+            if effect_to_remove:
+                self.effects.remove(effect_to_remove)
+
+        # Stack effect
+        current_effect = self.get_effect(effect.keyword)
+
+        if current_effect:
+            for parameter, method in [
+                ("value", stack_value),
+                ("duration", stack_duration),
+                ("decay", stack_decay),
+                ("accuracy", stack_accuracy),
+            ]:
+                current_value = getattr(current_effect, parameter)
+                new_value = getattr(effect, parameter)
+
+                if method == "overwrite":
+                    setattr(
+                        current_effect,
+                        parameter,
+                        new_value,
+                    )
+
+                elif method == "add":
+                    current_value = current_value if current_value else 0
+                    new_value = new_value if new_value else 0
+
+                    setattr(
+                        current_effect,
+                        parameter,
+                        current_value+new_value,
+                    )
+
+        else:
+            self.effects.append(
+                deepcopy(effect)
+            )
+
         return None

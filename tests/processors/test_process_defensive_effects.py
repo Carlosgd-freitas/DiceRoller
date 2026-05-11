@@ -14,11 +14,7 @@ def test_keyword_block(effect_processing):
     attack_effect_2 = Effect(Keyword.ATTACK, 4)
     block_effect = Effect(Keyword.BLOCK, 6)
 
-    _ = process_effect(
-        block_effect,
-        source=combat_manager.order[0],
-        targets=[combat_manager.order[0]],
-    )
+    combat_manager.order[0].add_effect(block_effect)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -52,7 +48,7 @@ def test_keyword_block(effect_processing):
 
     conditions.extend([
         combat_manager.order[0].local_id == "MONSTER_0",
-        combat_manager.order[0].hp == 4, ##
+        combat_manager.order[0].hp == 4,
 
         combat_manager.order[0].get_effect(Keyword.BLOCK) == None,
     ])

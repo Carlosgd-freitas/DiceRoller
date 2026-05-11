@@ -5,7 +5,6 @@ from src.base.effect import Effect
 from src.base.keywords import Keyword
 from tests.utils import assert_conditions
 from src.combat.manager import CombatManager
-from src.processors.effects import stack_effect
 
 
 def test_stack_effect_new(effect_processing):
@@ -20,10 +19,7 @@ def test_stack_effect_new(effect_processing):
         accuracy=0.1,
     )
     
-    monster = stack_effect(
-        effect=effect,
-        target=monster,
-    )
+    monster.add_effect(effect)
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
 
@@ -60,17 +56,14 @@ def test_stack_effect_add(effect_processing):
         accuracy=0.2,
     )
 
-    monster.effects.append(effect_0)
-    
-    monster = stack_effect(
-        effect=effect_1,
-        target=monster,
-        rules=[
-            ("add", "value"),
-            ("add", "duration"),
-            ("add", "decay"),
-            ("add", "accuracy"),
-        ],
+    monster.add_effect(effect_0)
+
+    monster.add_effect(
+        effect_1,
+        stack_value="add",
+        stack_duration="add",
+        stack_decay="add",
+        stack_accuracy="add",
     )
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
@@ -108,17 +101,14 @@ def test_stack_effect_overwrite(effect_processing):
         accuracy=0.2,
     )
 
-    monster.effects.append(effect_0)
-    
-    monster = stack_effect(
-        effect=effect_1,
-        target=monster,
-        rules=[
-            ("overwrite", "value"),
-            ("overwrite", "duration"),
-            ("overwrite", "decay"),
-            ("overwrite", "accuracy"),
-        ],
+    monster.add_effect(effect_0)
+
+    monster.add_effect(
+        effect_1,
+        stack_value="overwrite",
+        stack_duration="overwrite",
+        stack_decay="overwrite",
+        stack_accuracy="overwrite",
     )
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
@@ -141,21 +131,21 @@ def test_stack_effect_remove(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
     monster = combat_manager.order[0]
 
-    effect_0 = Effect(
+    effect_weaken = Effect(
         Keyword.WEAKEN,
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_1 = Effect(
+    effect_fortify = Effect(
         Keyword.FORTIFY,
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_2 = Effect(
+    effect_strengthen = Effect(
         Keyword.STRENGTHEN,
         value=4,
         duration=5,
@@ -163,15 +153,9 @@ def test_stack_effect_remove(effect_processing):
         accuracy=0.2,
     )
 
-    monster.effects.extend([effect_0, effect_1])
-    
-    monster = stack_effect(
-        effect=effect_2,
-        target=monster,
-        remove=[
-            Keyword.WEAKEN,
-        ]
-    )
+    monster.add_effect(effect_weaken)
+    monster.add_effect(effect_fortify)
+    monster.add_effect(effect_strengthen)
 
     conditions = [
         len(monster.effects) == 2,
