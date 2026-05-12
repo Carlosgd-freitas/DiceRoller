@@ -8,6 +8,7 @@ from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
+from src.effects.sleep import SleepEffect
 from tests.utils import assert_conditions
 from src.effects.attack import AttackEffect
 from src.effects.freeze import FreezeEffect
@@ -32,7 +33,7 @@ def test_keyword_bleed(effect_processing):
         Dice(sides=[Side([effect_attack_3])]),
     ]
 
-    combat_manager.order[0].add_effect(effect_bleed)
+    combat_manager.order[0].apply_effect(effect_bleed)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -85,7 +86,7 @@ def test_keyword_blind(effect_processing):
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
 
-    combat_manager.order[0].add_effect(effect_blind)
+    combat_manager.order[0].apply_effect(effect_blind)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -101,12 +102,14 @@ def test_keyword_blind(effect_processing):
         combat_manager.order[1].hp == 5,
     ]
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
@@ -118,12 +121,14 @@ def test_keyword_blind(effect_processing):
 
     combat_manager.end_turn()
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
@@ -147,7 +152,7 @@ def test_keyword_burn(effect_processing):
         duration=1,
     )
 
-    combat_manager.order[0].add_effect(effect_burn)
+    combat_manager.order[0].apply_effect(effect_burn)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -187,7 +192,7 @@ def test_keyword_freeze(effect_processing):
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
-    combat_manager.order[0].add_effect(effect_freeze)
+    combat_manager.order[0].apply_effect(effect_freeze)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -202,12 +207,14 @@ def test_keyword_freeze(effect_processing):
         combat_manager.order[1].hp == 5,
     ]
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
@@ -219,12 +226,14 @@ def test_keyword_freeze(effect_processing):
 
     combat_manager.end_turn()
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
@@ -248,7 +257,7 @@ def test_keyword_poison(effect_processing):
         duration=1,
     )
 
-    combat_manager.order[0].add_effect(effect_poison)
+    combat_manager.order[0].apply_effect(effect_poison)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -279,6 +288,82 @@ def test_keyword_poison(effect_processing):
     assert_conditions(conditions)
 
 
+def test_keyword_sleep(effect_processing):
+    combat_manager: CombatManager = effect_processing["combat_manager"]
+
+    effect_sleep = SleepEffect(
+        duration=1,
+    )
+    effect_attack = AttackEffect(2)
+    effect_heal = HealEffect(2)
+
+    combat_manager.order[0].apply_effect(effect_sleep)
+
+    conditions = [
+        combat_manager.order[0].local_id == "MONSTER_0",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.SLEEP).keyword == Keyword.SLEEP,
+        combat_manager.order[0].get_effect(Keyword.SLEEP).duration == 1,
+        combat_manager.order[0].hp == 5,
+
+        combat_manager.order[1].local_id == "MONSTER_1",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.SLEEP) == None,
+        combat_manager.order[1].hp == 5,
+    ]
+
+    combat_manager.activate_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.activate_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend([
+        combat_manager.order[0].hp == 5,
+        combat_manager.order[1].hp == 5,
+    ])
+
+    combat_manager.activate_effect(
+        effect_attack,
+        source=combat_manager.order[1],
+        target=combat_manager.order[0],
+    )
+
+    conditions.extend([
+        len(combat_manager.order[0].effects) == 0,
+        combat_manager.order[0].get_effect(Keyword.SLEEP) == None, ##
+        combat_manager.order[0].hp == 3,
+    ])
+
+    combat_manager.activate_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.activate_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend([
+        len(combat_manager.order[0].effects) == 0,
+        combat_manager.order[0].get_effect(Keyword.SLEEP) == None,
+        combat_manager.order[0].hp == 5,
+
+        combat_manager.order[1].hp == 3,
+    ])
+
+    assert_conditions(conditions)
+
+
 def test_keyword_stun(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
@@ -288,7 +373,7 @@ def test_keyword_stun(effect_processing):
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
-    combat_manager.order[0].add_effect(effect_stun)
+    combat_manager.order[0].apply_effect(effect_stun)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -303,12 +388,14 @@ def test_keyword_stun(effect_processing):
         combat_manager.order[1].hp == 5,
     ]
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
@@ -320,12 +407,14 @@ def test_keyword_stun(effect_processing):
 
     combat_manager.end_turn()
 
-    effect_heal.activate(
+    combat_manager.activate_effect(
+        effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    effect_attack.activate(
+    combat_manager.activate_effect(
+        effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )

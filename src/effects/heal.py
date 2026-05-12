@@ -33,6 +33,13 @@ class HealEffect(Effect):
             EffectType.RESTORATION,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",

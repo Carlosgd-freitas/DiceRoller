@@ -15,7 +15,8 @@ class PierceEffect(Effect):
     """
     Pierce Effect.
 
-    Will reduce the target's HP by the effect value. Ignores Block.
+    Will reduce the target's HP by the effect value and remove Sleep from it. Ignores
+    Block.
     """
 
     def __init__(
@@ -34,11 +35,20 @@ class PierceEffect(Effect):
             EffectType.OFFENSIVE,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",
         target: "Entity",
     ) -> None:
+        target.remove_effect(Keyword.SLEEP)
+
         damage = calculate_damage(
             self,
             source,

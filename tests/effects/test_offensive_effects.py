@@ -15,7 +15,8 @@ def test_keyword_attack(effect_processing):
 
     effect = AttackEffect(6)
 
-    effect.activate(
+    combat_manager.activate_effect(
+        effect,
         source=combat_manager.order[1],
         target=combat_manager.order[0],
     )
@@ -34,7 +35,8 @@ def test_keyword_curse(effect_processing):
 
     effect = CurseEffect(6)
 
-    effect.activate(
+    combat_manager.activate_effect(
+        effect,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
@@ -54,9 +56,10 @@ def test_keyword_drain(effect_processing):
     drain_effect = DrainEffect(3)
     block_effect = BlockEffect(1)
 
-    combat_manager.order[0].add_effect(block_effect)
+    combat_manager.order[0].apply_effect(block_effect)
 
-    drain_effect.activate(
+    combat_manager.activate_effect(
+        drain_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[0],
     )
@@ -79,9 +82,10 @@ def test_keyword_pierce(effect_processing):
     pierce_effect = PierceEffect(2)
     block_effect = BlockEffect(6)
 
-    combat_manager.order[0].add_effect(block_effect)
+    combat_manager.order[0].apply_effect(block_effect)
 
-    pierce_effect.activate(
+    combat_manager.activate_effect(
+        pierce_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[0],
     )

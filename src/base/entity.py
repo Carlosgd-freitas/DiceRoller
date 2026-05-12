@@ -101,7 +101,7 @@ class Entity():
 
     def get_effect(self, keyword: Keyword) -> Effect:
         """
-        Returns a effect from the entity based on a keyword.
+        Returns an effect from the entity based on a keyword.
 
         :param keyword: A keyword.
         :type keyword: Keyword
@@ -114,9 +114,10 @@ class Entity():
                 return effect
         return None
 
-    def add_effect(
+    def apply_effect(
         self,
         effect: Effect,
+        source: "Entity" = None,
         stack_value: stack_method = "overwrite",
         stack_duration: stack_method = "overwrite",
         stack_decay: stack_method = "overwrite",
@@ -129,6 +130,9 @@ class Entity():
 
         :param effect: The effect that will be added to the Entity.
         :type effect: Effect
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
 
         :param stack_value: How the Effect's value is stacked. By default, this value is
         "overwrite".
@@ -154,15 +158,9 @@ class Entity():
         value of the existing effect will be overwritten by the new effect for that
         parameter.
         """
-        # Remove incompatible effects
-        for keyword in effect.incompatible:
-            effect_to_remove = self.get_effect(keyword)
-            if effect_to_remove:
-                self.effects.remove(effect_to_remove)
-
-        # Stack effect
         current_effect = self.get_effect(effect.keyword)
 
+        # Stack existing effect
         if current_effect:
             for parameter, method in [
                 ("value", stack_value),
@@ -190,9 +188,48 @@ class Entity():
                         current_value+new_value,
                     )
 
+        # Add new effect
         else:
             self.effects.append(
                 deepcopy(effect)
             )
 
+        effect.on_apply(
+            source,
+            self,
+        )
+
         return None
+
+    def remove_effect(
+        self,
+        keyword: Keyword,
+    ) -> Effect:
+        """
+        Remove an effect from the Entity.
+
+        :param keyword: A keyword.
+        :type keyword: Keyword
+
+        :return: The removed effect.
+        :rtype: Effect
+        """
+        effect_to_remove = self.get_effect(keyword)
+
+        if effect_to_remove:
+            self.effects.remove(effect_to_remove)
+
+        return effect_to_remove
+
+    def can_act(self) -> bool:
+        """
+        Returns if the Entity can act.
+
+        :return: If the Entity can act.
+        :rtype: bool
+        """
+        return not any([
+            self.get_effect(Keyword.FREEZE),
+            self.get_effect(Keyword.SLEEP),
+            self.get_effect(Keyword.STUN),
+        ])

@@ -32,6 +32,13 @@ class NothingEffect(Effect):
             accuracy,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",

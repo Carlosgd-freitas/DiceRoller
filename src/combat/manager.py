@@ -1,13 +1,13 @@
 """Combat Manager module."""
 
-from random import shuffle
 from src.base.side import Side
+from random import shuffle, random
+from src.base.effect import Effect
 from src.base.entity import Entity
+from src.base.keywords import Keyword
 from src.base.triggers import Trigger
 from typing import List, Literal, Dict
 from src.combat.logger import CombatLogger
-from src.processors.sides import process_side
-from src.processors.targets import get_targets
 from src.base.monster import Monster, ControlType
 
 
@@ -230,8 +230,64 @@ class CombatManager():
 
         return teams_status
 
+    def activate_effect(
+        self,
+        effect: Effect,
+        source: Entity,
+        target: Entity,
+        check_can_act: bool = True,
+        check_accuracy: bool = True,
+    ) -> bool:
+        """
+        Activates an Effect while taking the source and target Entities' effects on
+        consideration.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+
+        :param check_can_act: If True, a check if the source can act will be done
+        before trying do activate the Effect. Default value is True.
+        :type check_can_act: bool
+
+        :param check_accuracy: If True, an accuracy check will be done before
+        trying do activate the Effect. Default value is True.
+        :type check_accuracy: bool
+        """
+        # Check can act
+        if (check_can_act) and (not source.can_act()):
+            return False
+
+        # Check accuracy 
+        if check_accuracy:
+            accuracy = effect.accuracy
+
+            # Blind check
+            blinded = source.get_effect(Keyword.BLIND)
+
+            if blinded and source != target:
+                accuracy -= blinded.value
+
+            if random() >= accuracy:
+                return False
+
+        effect.activate(source, target)
+
+        return True
+
     def roll(self, entity: Entity) -> List[Side]:
-        """Roll an Entity's dice and returns the rolled Sides."""
+        """
+        Rolls all Entity's dice and returns the rolled Sides. The entity will be
+        affected by Effects that triggers on dice roll.
+
+        :param entity: An Entity.
+        :type entity: Entity
+        """
         rolled = []
 
         rolling_effects = [
@@ -244,9 +300,12 @@ class CombatManager():
             rolled.append(dice.roll())
 
             for effect in rolling_effects:
-                effect.activate(
+                self.activate_effect(
+                    effect,
                     None,
                     entity,
+                    check_can_act=False,
+                    check_accuracy=False,
                 )
 
         return rolled
@@ -264,14 +323,20 @@ class CombatManager():
         return
 
     def start_turn(self) -> None:
-        """Start the current monster's turn."""
+        """
+        Start the current monster's turn. The entity will be affected by Effects that
+        triggers on turn start.
+        """
         self.turn += 1
 
         for effect in self.current_monster.effects:
             if effect.trigger == Trigger.TURN_START:
-                effect.activate(
+                self.activate_effect(
+                    effect,
                     None,
                     self.current_monster,
+                    check_can_act=False,
+                    check_accuracy=False,
                 )
 
         return
@@ -283,18 +348,21 @@ class CombatManager():
             current_team = self.get_team(self.current_monster)
             enemies = self.get_team(self.current_monster, "ENEMIES")
 
-            for side in sides:
-                targets = get_targets(
-                    current_monster=self.current_monster,
-                    side=side,
-                    current_team=current_team,
-                    enemies=enemies,
-                )
-                targets = process_side(
-                    side=side,
-                    source=self.current_monster,
-                    targets=targets,
-                )
+            # for side in sides:
+            #     targets = self.current_monster.get_targets(
+            #         side=side,
+            #         current_team=current_team,
+            #         enemies=enemies,
+            #     )
+
+            #     for target in targets:
+
+            #         for effect in side.effects:
+            #             self.activate_effect(
+            #                 effect,
+            #                 self.current_monster,
+            #                 target,
+            #             )
 
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError()
@@ -303,7 +371,8 @@ class CombatManager():
 
     def end_turn(self) -> Dict:
         """
-        End the current monster's turn. All effects on the current monsters will be
+        End the current monster's turn. The entity will be affected by Effects that
+        triggers on turn end. Then, all effects on the current monsters will be
         decayed and removed if their duration are <= 0.
 
         :return: A dictionary containing objects that were affected by the turn ending.
@@ -316,9 +385,12 @@ class CombatManager():
         # Procesing effects on turn end
         for effect in self.current_monster.effects:
             if effect.trigger == Trigger.TURN_END:
-                effect.activate(
+                self.activate_effect(
+                    effect,
                     None,
                     self.current_monster,
+                    check_can_act=False,
+                    check_accuracy=False,
                 )
 
         # Decaying and removing effects
@@ -345,7 +417,7 @@ class CombatManager():
         }
 
     def next_turn(self) -> None:
-        """Sets up next monster turn."""
+        """Sets up the next turn in the turn order."""
 
         idx_monster: int = None
         for idx, monster in enumerate(self.order):

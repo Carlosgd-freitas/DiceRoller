@@ -1,4 +1,4 @@
-"""Blind effect module."""
+"""Sleep effect module."""
 
 from __future__ import annotations
 
@@ -10,11 +10,12 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class BlindEffect(Effect):
+class SleepEffect(Effect):
     """
-    Blind Effect.
+    Sleep Effect.
 
-    This is a debuff which will reduce the target dice's accuracies.
+    This is a debuff which will make the target unable to roll dice, use items or
+    active skills.
     """
 
     def __init__(
@@ -25,7 +26,7 @@ class BlindEffect(Effect):
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.BLIND,
+            Keyword.SLEEP,
             value,
             duration,
             decay,

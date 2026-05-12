@@ -34,6 +34,13 @@ class CurseEffect(Effect):
             EffectType.OFFENSIVE,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",

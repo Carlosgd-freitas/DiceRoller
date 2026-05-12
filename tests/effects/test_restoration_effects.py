@@ -14,7 +14,8 @@ def test_keyword_heal(effect_processing):
 
     effect = HealEffect(6)
 
-    effect.activate(
+    combat_manager.activate_effect(
+        effect,
         source=combat_manager.order[1],
         target=combat_manager.order[0],
     )
@@ -35,7 +36,8 @@ def test_keyword_mana(effect_processing):
 
     mana_before = combat_manager.order[0].mana
 
-    effect.activate(
+    combat_manager.activate_effect(
+        effect,
         source=combat_manager.order[1],
         target=combat_manager.order[0],
     )
@@ -52,12 +54,12 @@ def test_keyword_mana(effect_processing):
 def test_keyword_mana_regen(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect_mana_regen = ManaRegenEffect(
+    effect = ManaRegenEffect(
         value=1,
         duration=1,
     )
 
-    combat_manager.order[0].add_effect(effect_mana_regen)
+    combat_manager.order[0].apply_effect(effect)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
@@ -85,12 +87,12 @@ def test_keyword_mana_regen(effect_processing):
 def test_keyword_regen(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect_regen = RegenEffect(
+    effect = RegenEffect(
         value=1,
         duration=1,
     )
 
-    combat_manager.order[0].add_effect(effect_regen)
+    combat_manager.order[0].apply_effect(effect)
 
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",

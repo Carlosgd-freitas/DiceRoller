@@ -36,6 +36,13 @@ class RegenEffect(Effect):
             Trigger.TURN_START,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",

@@ -32,9 +32,15 @@ class FreezeEffect(Effect):
             decay,
             accuracy,
             EffectType.DEBUFF,
-            None,
-            [Keyword.BURN],
         )
+
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        target.remove_effect(Keyword.BURN)
+        return
 
     def activate(
         self,

@@ -35,8 +35,15 @@ class BurnEffect(Effect):
             accuracy,
             EffectType.DEBUFF,
             Trigger.TURN_START,
-            [Keyword.FREEZE],
         )
+
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        target.remove_effect(Keyword.FREEZE)
+        return
 
     def activate(
         self,

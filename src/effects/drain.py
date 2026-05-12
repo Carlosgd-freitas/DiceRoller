@@ -15,8 +15,8 @@ class DrainEffect(Effect):
     """
     Drain Effect.
 
-    Will reduce the target's HP by the effect value, while increasing the source's HP.
-    The damage done will be affected by the target's Block.
+    Will reduce the target's HP by the effect value, while increasing the source's HP
+    and remove Sleep from it. The damage done will be affected by the target's Block.
     """
 
     def __init__(
@@ -35,11 +35,20 @@ class DrainEffect(Effect):
             EffectType.OFFENSIVE,
         )
 
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        return
+
     def activate(
         self,
         source: "Entity",
         target: "Entity",
     ) -> None:
+        target.remove_effect(Keyword.SLEEP)
+
         damage = calculate_damage(
             self,
             source,

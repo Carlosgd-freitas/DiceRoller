@@ -1,4 +1,4 @@
-"""Blind effect module."""
+"""Absorb effect module."""
 
 from __future__ import annotations
 
@@ -10,27 +10,28 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class BlindEffect(Effect):
+class AbsorbEffect(Effect):
     """
-    Blind Effect.
+    Absorb Effect.
 
-    This is a debuff which will reduce the target dice's accuracies.
+    This will reduce direct damage done to the target's HP, while healing it by the
+    damage reduced.
     """
 
     def __init__(
         self,
         value: float = 0,
-        duration: int = 0,
+        duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.BLIND,
+            Keyword.ABSORB,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.DEBUFF,
+            EffectType.DEFENSIVE,
         )
 
     def on_apply(

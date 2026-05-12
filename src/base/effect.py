@@ -1,9 +1,9 @@
 """Effect module."""
 
 from enum import Enum
-from abc import abstractmethod
+from typing import TYPE_CHECKING
+from abc import ABC, abstractmethod
 from src.base.triggers import Trigger
-from typing import List, TYPE_CHECKING
 from src.base.keywords import Keyword, color_keyword
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ class EffectType(Enum):
     RESTORATION = "RESTORATION"
 
 
-class Effect():
+class Effect(ABC):
     """
     Effect class.
 
@@ -64,7 +64,6 @@ class Effect():
         accuracy: float = 1,
         type: EffectType = None,
         trigger: Trigger = None,
-        incompatible: List[Keyword] = None,
     ):
         self.keyword = keyword
         self.value = value
@@ -73,7 +72,6 @@ class Effect():
         self.accuracy = accuracy
         self.type = type
         self.trigger = trigger
-        self.incompatible = incompatible if incompatible else []
 
     def __str__(self) -> str:
         _str = color_keyword(self.keyword)
@@ -84,9 +82,35 @@ class Effect():
         return _str
 
     @abstractmethod
+    def on_apply(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        """
+        What the Effect will do when being applied to an Entity.
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def activate(
         self,
         source: "Entity",
         target: "Entity",
     ) -> None:
+        """
+        What the Effect will done when activated.
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+        """
         raise NotImplementedError

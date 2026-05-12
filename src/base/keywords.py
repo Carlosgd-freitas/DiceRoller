@@ -5,6 +5,8 @@ from src.base.color import Color, color_string
 
 
 class Keyword(Enum):
+    """Effect keywords (identifiers)."""
+    ABSORB = "ABSORB"
     ATTACK = "ATTACK"
     BLEED = "BLEED"
     BLIND = "BLIND"
@@ -18,6 +20,7 @@ class Keyword(Enum):
     FORTIFY = "FORTIFY"
     FRAGILE = "FRAGILE"
     FREEZE = "FREEZE"
+    HASTE = "HASTE"
     HEAL = "HEAL"
     HEMORRAGY = "HEMORRAGY"
     HEX = "HEX"
@@ -29,6 +32,7 @@ class Keyword(Enum):
     REGEN = "REGEN"
     REVIVE = "REVIVE"
     SCORCH = "SCORCH"
+    SLEEP = "SLEEP"
     SLOW = "SLOW"
     STRENGTHEN = "STRENGTHEN"
     STUN = "STUN"
@@ -41,7 +45,9 @@ class Keyword(Enum):
 def color_keyword(keyword: Keyword) -> str:
     intensity = "BRIGHT"
 
-    if keyword in [Keyword.ATTACK, Keyword.PIERCE]:
+    if keyword in [Keyword.ABSORB, Keyword.DRAIN, Keyword.REGEN]:
+        foreground_color = Color.GRASS_GREEN
+    elif keyword in [Keyword.ATTACK, Keyword.PIERCE]:
         foreground_color = Color.ORANGE
     elif keyword in [Keyword.BLEED, Keyword.HEMORRAGY]:
         foreground_color = Color.BURGUNDY
@@ -54,24 +60,25 @@ def color_keyword(keyword: Keyword) -> str:
         foreground_color = Color.AERO
     elif keyword in [Keyword.BLIND, Keyword.COUNTER, Keyword.STUN]:
         foreground_color = Color.GRAY
-    elif keyword == Keyword.CURSE:
+    elif keyword in [Keyword.CURSE, Keyword.HEX]:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.DRAIN, Keyword.HEAL, Keyword.REGEN]:
-        foreground_color = Color.GRASS_GREEN
-    elif keyword in [Keyword.FORTIFY, Keyword.STRENGTHEN]:
+    elif keyword in [Keyword.FORTIFY, Keyword.HASTE, Keyword.STRENGTHEN]:
         foreground_color = Color.PINK
     elif keyword in [Keyword.FRAGILE, Keyword.SLOW, Keyword.WEAKEN]:
         foreground_color = Color.BEIGE
     elif keyword == Keyword.FREEZE:
         foreground_color = Color.SKY_BLUE
-    elif keyword == Keyword.HEX:
-        foreground_color = Color.COFFEE
+    elif keyword == Keyword.HEAL:
+        foreground_color = Color.GREEN
     elif keyword in [Keyword.MANA, Keyword.MANA_REGEN]:
         foreground_color = Color.LILAC
     elif keyword == Keyword.REVIVE:
         foreground_color = Color.LEMON
     elif keyword in [Keyword.POISON, Keyword.TOXIC]:
         foreground_color = Color.EMERALD_GREEN
+    elif keyword == Keyword.SLEEP:
+        foreground_color = Color.METALLIC_BLUE
+        intensity = "DIM"
     elif keyword == Keyword.TAUNT:
         foreground_color = Color.HOT_PINK
     elif keyword == Keyword.THORNS:

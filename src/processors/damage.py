@@ -25,10 +25,11 @@ def calculate_damage(
     :param source: The Entity object where the effect is from.
     :type source: Entity
 
-    :param target: A Entity object which the effect will be applied.
+    :param target: An Entity object which the effect will be applied.
     :type target: Entity
 
-    :param consider_block: If Block effect on the target will reduce the damage.
+    :param consider_block: If Block or Absorb effects on the target will reduce the
+    damage. Absorb has priority over Block.
     :type consider_block: bool
 
     :return: The damage caused on the target Entity.
@@ -37,6 +38,22 @@ def calculate_damage(
     damage = effect.value
 
     if consider_block:
+        # Absorb
+        absorbing = target.get_effect(Keyword.ABSORB)
+
+        if absorbing:
+            min_value = min(damage, absorbing.value)
+
+            damage -= min_value
+            absorbing.value -= min_value
+
+            target.hp += min_value
+            target.equalize_stats()
+
+            if absorbing.value <= 0:
+                target.effects.remove(absorbing)
+
+        # Block
         blocking = target.get_effect(Keyword.BLOCK)
 
         if blocking:

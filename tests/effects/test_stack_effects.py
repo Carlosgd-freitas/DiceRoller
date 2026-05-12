@@ -21,7 +21,7 @@ def test_stack_effect_new(effect_processing):
         accuracy=0.1,
     )
     
-    monster.add_effect(effect)
+    monster.apply_effect(effect)
 
     stacked_effect = monster.get_effect(Keyword.NOTHING)
 
@@ -56,9 +56,9 @@ def test_stack_effect_add(effect_processing):
         accuracy=0.2,
     )
 
-    monster.add_effect(effect_0)
+    monster.apply_effect(effect_0)
 
-    monster.add_effect(
+    monster.apply_effect(
         effect_1,
         stack_value="add",
         stack_duration="add",
@@ -99,9 +99,9 @@ def test_stack_effect_overwrite(effect_processing):
         accuracy=0.2,
     )
 
-    monster.add_effect(effect_0)
+    monster.apply_effect(effect_0)
 
-    monster.add_effect(
+    monster.apply_effect(
         effect_1,
         stack_value="overwrite",
         stack_duration="overwrite",
@@ -148,9 +148,9 @@ def test_stack_effect_remove(effect_processing):
         accuracy=0.2,
     )
 
-    monster.add_effect(effect_freeze)
-    monster.add_effect(effect_stun)
-    monster.add_effect(effect_burn)
+    monster.apply_effect(effect_freeze)
+    monster.apply_effect(effect_stun)
+    monster.apply_effect(effect_burn)
 
     conditions = [
         len(monster.effects) == 2,
