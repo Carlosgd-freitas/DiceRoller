@@ -2,23 +2,20 @@
 
 from copy import deepcopy
 from pytest import fixture
-from src.base.effect import Effect
 from src.base.monster import Monster
-from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
+from src.effects.nothing import NothingEffect
 
 
 @fixture
 def combat_manager():
-    effect_0 = Effect(
-        Keyword.NOTHING,
+    effect_0 = NothingEffect(
         value=5,
         duration=2,
         decay=1,
     )
 
-    effect_1 = Effect(
-        Keyword.NOTHING,
+    effect_1 = NothingEffect(
         value=10,
         duration=4,
         decay=5,

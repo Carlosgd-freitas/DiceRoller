@@ -1,13 +1,10 @@
 """Keyword module."""
 
 from enum import Enum
-from typing import List
 from src.base.color import Color, color_string
 
 
 class Keyword(Enum):
-    """Effect keywords."""
-
     ATTACK = "ATTACK"
     BLEED = "BLEED"
     BLIND = "BLIND"
@@ -39,29 +36,6 @@ class Keyword(Enum):
     THORNS = "THORNS"
     TOXIC = "TOXIC"
     WEAKEN = "WEAKEN"
-
-
-def get_incompatible_keywords(keyword: Keyword) -> List[Keyword]:
-    if keyword == Keyword.BURN:
-        return [Keyword.FREEZE]
-
-    elif keyword == Keyword.FORTIFY:
-        return [Keyword.FRAGILE]
-
-    elif keyword == Keyword.FRAGILE:
-        return [Keyword.FORTIFY]
-
-    elif keyword == Keyword.FREEZE:
-        return [Keyword.BURN]
-
-    elif keyword == Keyword.STRENGTHEN:
-        return [Keyword.WEAKEN]
-
-    elif keyword == Keyword.WEAKEN:
-        return [Keyword.STRENGTHEN]
-
-    else:
-        return None
 
 
 def color_keyword(keyword: Keyword) -> str:

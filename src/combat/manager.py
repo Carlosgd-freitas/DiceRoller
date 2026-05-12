@@ -1,12 +1,13 @@
 """Combat Manager module."""
 
 from random import shuffle
+from src.base.side import Side
+from src.base.entity import Entity
 from src.base.triggers import Trigger
 from typing import List, Literal, Dict
 from src.combat.logger import CombatLogger
 from src.processors.sides import process_side
 from src.processors.targets import get_targets
-from src.processors.effects import process_effect
 from src.base.monster import Monster, ControlType
 
 
@@ -42,7 +43,9 @@ class CombatManager():
         order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"] = "FASTER",
         current_monster_id: str = None,
     ):
-        self.turn: int = 1
+        self.round: int = 0
+        self.turn: int = 0
+
         self.logger: CombatLogger = CombatLogger()
         teams = [] if teams is None else list(teams)
         team_names = [] if team_names is None else list(team_names)
@@ -66,7 +69,7 @@ class CombatManager():
 
         self.order_strategy = order_strategy
         self.order = self._set_order()
-        # Reminder: Dead monsters are not deleted from order, their actions just don't
+        # Reminder + ToDo: Dead monsters are not deleted from order, their actions just don't
         # take place.
 
         self.current_monster_id = current_monster_id
@@ -227,21 +230,48 @@ class CombatManager():
 
         return teams_status
 
+    def roll(self, entity: Entity) -> List[Side]:
+        """Roll an Entity's dice and returns the rolled Sides."""
+        rolled = []
+
+        rolling_effects = [
+            effect
+            for effect in entity.effects
+            if effect.trigger == Trigger.ROLL
+        ]
+
+        for dice in entity.dice:
+            rolled.append(dice.roll())
+
+            for effect in rolling_effects:
+                effect.activate(
+                    None,
+                    entity,
+                )
+
+        return rolled
+
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
         self.current_monster_id = self.order[0].local_id
         self.current_monster = self.get_monster(self.current_monster_id)
         return
 
+    def start_round(self) -> None:
+        """Start the current round."""
+        self.round += 1
+        self.turn = 0
+        return
+
     def start_turn(self) -> None:
         """Start the current monster's turn."""
+        self.turn += 1
 
         for effect in self.current_monster.effects:
             if effect.trigger == Trigger.TURN_START:
-                process_effect(
-                    effect,
+                effect.activate(
                     None,
-                    [self.current_monster],
+                    self.current_monster,
                 )
 
         return
@@ -283,6 +313,13 @@ class CombatManager():
         * ``removed_effects``: a list of effects that were removed from the current
         monster
         """
+        # Procesing effects on turn end
+        for effect in self.current_monster.effects:
+            if effect.trigger == Trigger.TURN_END:
+                effect.activate(
+                    None,
+                    self.current_monster,
+                )
 
         # Decaying and removing effects
         idx_removed_effects = []
@@ -326,6 +363,10 @@ class CombatManager():
                 self.current_monster = self.get_monster(self.current_monster_id)
                 break
 
+        return
+
+    def end_round(self) -> None:
+        """End the current round."""
         return
 
     def end_combat(self) -> None:

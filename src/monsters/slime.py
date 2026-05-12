@@ -1,9 +1,8 @@
 from src.base.side import Side
 from src.base.dice import Dice
-from src.base.effect import Effect
 from src.base.monster import Monster
-from src.base.keywords import Keyword
-
+from src.effects.block import BlockEffect
+from src.effects.attack import AttackEffect
 
 class Slime(Monster):
     """
@@ -14,19 +13,15 @@ class Slime(Monster):
         self,
         **kwargs
     ):
-        dice_0 = Dice(sides=[
-            Side([Effect(Keyword.ATTACK, 1)]),
-            Side([Effect(Keyword.ATTACK, 2)]),
-            Side([Effect(Keyword.ATTACK, 3)]),
-            Side([Effect(Keyword.ATTACK, 4)]),
-        ])
+        attacking_sides = []
+        blocking_sides = []
 
-        dice_1 = Dice(sides=[
-            Side([Effect(Keyword.BLOCK, 1)]),
-            Side([Effect(Keyword.BLOCK, 2)]),
-            Side([Effect(Keyword.BLOCK, 3)]),
-            Side([Effect(Keyword.BLOCK, 4)]),
-        ])
+        for i in range(1, 5):
+            attacking_sides.append(Side([AttackEffect(i)]))
+            blocking_sides.append(Side([BlockEffect(i)]))
+
+        dice_0 = Dice(sides=attacking_sides)
+        dice_1 = Dice(sides=blocking_sides)
 
         super().__init__(
             global_id="MONSTER_0",

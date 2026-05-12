@@ -1,26 +1,25 @@
 """Tests for restoration effects processing."""
 
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.effects.heal import HealEffect
+from src.effects.mana import ManaEffect
+from src.effects.regen import RegenEffect
 from tests.utils import assert_conditions
 from src.combat.manager import CombatManager
-from src.processors.effects import process_effect
+from src.effects.mana_regen import ManaRegenEffect
 
 
 def test_keyword_heal(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect = Effect(Keyword.HEAL, 6)
+    effect = HealEffect(6)
 
-    targets = process_effect(
-        effect,
+    effect.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
     
     conditions = [
-        len(targets) == 1,
-
         combat_manager.order[0].local_id == "MONSTER_0",
         combat_manager.order[0].hp == 10,
         combat_manager.order[0].max_hp == 10,
@@ -32,19 +31,16 @@ def test_keyword_heal(effect_processing):
 def test_keyword_mana(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect = Effect(Keyword.MANA, 2)
+    effect = ManaEffect(2)
 
     mana_before = combat_manager.order[0].mana
 
-    targets = process_effect(
-        effect,
+    effect.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
     
     conditions = [
-        len(targets) == 1,
-
         combat_manager.order[0].local_id == "MONSTER_0",
         mana_before == 0,
         combat_manager.order[0].mana == 2,
@@ -56,8 +52,7 @@ def test_keyword_mana(effect_processing):
 def test_keyword_mana_regen(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect_mana_regen = Effect(
-        Keyword.MANA_REGEN,
+    effect_mana_regen = ManaRegenEffect(
         value=1,
         duration=1,
     )
@@ -90,8 +85,7 @@ def test_keyword_mana_regen(effect_processing):
 def test_keyword_regen(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect_regen = Effect(
-        Keyword.REGEN,
+    effect_regen = RegenEffect(
         value=1,
         duration=1,
     )

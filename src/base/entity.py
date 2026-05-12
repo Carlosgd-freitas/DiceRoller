@@ -4,11 +4,9 @@ from uuid import uuid4
 from copy import deepcopy
 from src.base.dice import Dice
 from src.base.side import Side
+from typing import List, Literal
 from src.base.effect import Effect
-from src.base.triggers import Trigger
 from src.base.keywords import Keyword
-from typing import List, Literal, Tuple
-# from src.processors.effects import process_effect
 
 type stack_method = Literal["add", "overwrite"]
 
@@ -88,24 +86,7 @@ class Entity():
         :return: A list of Side objects.
         :rtype: List[Side]
         """
-        rolled = []
-        rolling_effects = [
-            effect
-            for effect in self.effects
-            if effect.trigger == Trigger.ROLL
-        ]
-
-        for dice in self.dice:
-            rolled.append(dice.roll())
-
-            # for effect in rolling_effects:
-            #     process_effect(
-            #         effect,
-            #         None,
-            #         [self],
-            #     )
-
-        return rolled
+        return [dice.roll() for dice in self.dice]
 
     def equalize_stats(self) -> None:
         """

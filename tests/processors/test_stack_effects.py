@@ -1,18 +1,20 @@
 """Tests for stacking effects."""
 
 from math import isclose
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.effects.burn import BurnEffect
+from src.effects.stun import StunEffect
 from tests.utils import assert_conditions
+from src.effects.freeze import FreezeEffect
 from src.combat.manager import CombatManager
+from src.effects.nothing import NothingEffect
 
 
 def test_stack_effect_new(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
     monster = combat_manager.order[0]
 
-    effect = Effect(
-        Keyword.NOTHING,
+    effect = NothingEffect(
         value=1,
         duration=2,
         decay=3,
@@ -41,15 +43,13 @@ def test_stack_effect_add(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
     monster = combat_manager.order[0]
 
-    effect_0 = Effect(
-        Keyword.NOTHING,
+    effect_0 = NothingEffect(
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_1 = Effect(
-        Keyword.NOTHING,
+    effect_1 = NothingEffect(
         value=4,
         duration=5,
         decay=6,
@@ -86,15 +86,13 @@ def test_stack_effect_overwrite(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
     monster = combat_manager.order[0]
 
-    effect_0 = Effect(
-        Keyword.NOTHING,
+    effect_0 = NothingEffect(
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_1 = Effect(
-        Keyword.NOTHING,
+    effect_1 = NothingEffect(
         value=4,
         duration=5,
         decay=6,
@@ -131,48 +129,45 @@ def test_stack_effect_remove(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
     monster = combat_manager.order[0]
 
-    effect_weaken = Effect(
-        Keyword.WEAKEN,
+    effect_freeze = FreezeEffect(
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_fortify = Effect(
-        Keyword.FORTIFY,
+    effect_stun = StunEffect(
         value=1,
         duration=2,
         decay=3,
         accuracy=0.1,
     )
-    effect_strengthen = Effect(
-        Keyword.STRENGTHEN,
+    effect_burn = BurnEffect(
         value=4,
         duration=5,
         decay=6,
         accuracy=0.2,
     )
 
-    monster.add_effect(effect_weaken)
-    monster.add_effect(effect_fortify)
-    monster.add_effect(effect_strengthen)
+    monster.add_effect(effect_freeze)
+    monster.add_effect(effect_stun)
+    monster.add_effect(effect_burn)
 
     conditions = [
         len(monster.effects) == 2,
 
-        monster.get_effect(Keyword.STRENGTHEN).keyword == Keyword.STRENGTHEN,
-        monster.get_effect(Keyword.STRENGTHEN).value == 4,
-        monster.get_effect(Keyword.STRENGTHEN).duration == 5,
-        monster.get_effect(Keyword.STRENGTHEN).decay == 6,
-        isclose(monster.get_effect(Keyword.STRENGTHEN).accuracy, 0.2),
+        monster.get_effect(Keyword.STUN).keyword == Keyword.STUN,
+        monster.get_effect(Keyword.STUN).value == 1,
+        monster.get_effect(Keyword.STUN).duration == 2,
+        monster.get_effect(Keyword.STUN).decay == 3,
+        isclose(monster.get_effect(Keyword.STUN).accuracy, 0.1),
 
-        monster.get_effect(Keyword.FORTIFY).keyword == Keyword.FORTIFY,
-        monster.get_effect(Keyword.FORTIFY).value == 1,
-        monster.get_effect(Keyword.FORTIFY).duration == 2,
-        monster.get_effect(Keyword.FORTIFY).decay == 3,
-        isclose(monster.get_effect(Keyword.FORTIFY).accuracy, 0.1),
+        monster.get_effect(Keyword.BURN).keyword == Keyword.BURN,
+        monster.get_effect(Keyword.BURN).value == 4,
+        monster.get_effect(Keyword.BURN).duration == 5,
+        monster.get_effect(Keyword.BURN).decay == 6,
+        isclose(monster.get_effect(Keyword.BURN).accuracy, 0.2),
 
-        monster.get_effect(Keyword.WEAKEN) == None,
+        monster.get_effect(Keyword.FREEZE) == None,
     ]
 
     assert_conditions(conditions)

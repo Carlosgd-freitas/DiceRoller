@@ -1,26 +1,26 @@
 """Tests for offensive effects processing."""
 
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.effects.block import BlockEffect
+from src.effects.curse import CurseEffect
+from src.effects.drain import DrainEffect
 from tests.utils import assert_conditions
+from src.effects.attack import AttackEffect
+from src.effects.pierce import PierceEffect
 from src.combat.manager import CombatManager
-from src.processors.effects import process_effect
 
 
 def test_keyword_attack(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect = Effect(Keyword.ATTACK, 6)
+    effect = AttackEffect(6)
 
-    targets = process_effect(
-        effect,
+    effect.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions = [
-        len(targets) == 1,
-
         combat_manager.order[0].local_id == "MONSTER_0",
         combat_manager.order[0].hp == 0,
         combat_manager.order[0].max_hp == 10,
@@ -32,17 +32,14 @@ def test_keyword_attack(effect_processing):
 def test_keyword_curse(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    effect = Effect(Keyword.CURSE, 6)
+    effect = CurseEffect(6)
 
-    targets = process_effect(
-        effect,
+    effect.activate(
         source=combat_manager.order[0],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions = [
-        len(targets) == 1,
-
         combat_manager.order[0].local_id == "MONSTER_0",
         combat_manager.order[0].hp == 0,
         combat_manager.order[0].max_hp == 10,
@@ -54,15 +51,14 @@ def test_keyword_curse(effect_processing):
 def test_keyword_drain(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    drain_effect = Effect(Keyword.DRAIN, 3)
-    block_effect = Effect(Keyword.BLOCK, 1)
+    drain_effect = DrainEffect(3)
+    block_effect = BlockEffect(1)
 
     combat_manager.order[0].add_effect(block_effect)
 
-    _ = process_effect(
-        drain_effect,
+    drain_effect.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions = [
@@ -80,15 +76,14 @@ def test_keyword_drain(effect_processing):
 def test_keyword_pierce(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    pierce_effect = Effect(Keyword.PIERCE, 2)
-    block_effect = Effect(Keyword.BLOCK, 6)
+    pierce_effect = PierceEffect(2)
+    block_effect = BlockEffect(6)
 
     combat_manager.order[0].add_effect(block_effect)
 
-    _ = process_effect(
-        pierce_effect,
+    pierce_effect.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions = [

@@ -1,13 +1,13 @@
 """Effect module."""
 
 from enum import Enum
-from typing import List
+from abc import abstractmethod
 from src.base.triggers import Trigger
-from src.base.keywords import (
-    Keyword,
-    color_keyword,
-    get_incompatible_keywords,
-)
+from typing import List, TYPE_CHECKING
+from src.base.keywords import Keyword, color_keyword
+
+if TYPE_CHECKING:
+    from src.base.entity import Entity
 
 
 class EffectType(Enum):
@@ -71,89 +71,22 @@ class Effect():
         self.duration = duration
         self.decay = decay
         self.accuracy = accuracy
-
-        self.type = type if type \
-            else self._get_default_effect_type(self.keyword)
-
-        self.trigger = trigger if trigger \
-            else self._get_default_effect_trigger(self.keyword)
-
-        self.incompatible = incompatible if incompatible \
-            else get_incompatible_keywords(self.keyword)
-        self.incompatible = self.incompatible if self.incompatible \
-            else []
-
-    def _get_default_effect_type(self, keyword: Keyword) -> EffectType:
-        if keyword in [
-            Keyword.FORTIFY,
-            Keyword.STRENGTHEN,
-        ]:
-            return EffectType.BUFF
-
-        elif keyword in [
-            Keyword.BLEED,
-            Keyword.BLIND,
-            Keyword.BURN,
-            Keyword.FRAGILE,
-            Keyword.FREEZE,
-            Keyword.POISON,
-            Keyword.STUN,
-            Keyword.WEAKEN,
-        ]:
-            return EffectType.DEBUFF
-
-        elif keyword in [
-            Keyword.BLOCK,
-        ]:
-            return EffectType.DEFENSIVE
-
-        elif keyword in [
-            Keyword.HEX,
-        ]:
-            return EffectType.DETERIORATION
-
-        elif keyword in [
-            Keyword.ATTACK,
-            Keyword.CURSE,
-            Keyword.DRAIN,
-            Keyword.PIERCE,
-        ]:
-            return EffectType.OFFENSIVE
-
-        elif keyword in [
-            Keyword.HEAL,
-            Keyword.MANA,
-            Keyword.MANA_REGEN,
-            Keyword.REGEN,
-        ]:
-            return EffectType.RESTORATION
-        
-        else:
-            return None
-
-    def _get_default_effect_trigger(self, keyword: Keyword) -> Trigger:
-        if keyword in [
-            Keyword.BLEED
-        ]:
-            return Trigger.ROLL
-
-        if keyword in [
-            Keyword.BURN,
-            Keyword.MANA_REGEN,
-            Keyword.POISON,
-            Keyword.REGEN,
-        ]:
-            return Trigger.TURN_START
-
-        else:
-            return None
+        self.type = type
+        self.trigger = trigger
+        self.incompatible = incompatible if incompatible else []
 
     def __str__(self) -> str:
-        _str = f"{color_keyword(self.keyword)}"
+        _str = color_keyword(self.keyword)
 
         if self.value:
             _str += f" {self.value}"
-        if self.duration:
-            _str += f" [{self.duration} Turns]"
 
         return _str
+
+    @abstractmethod
+    def activate(
+        self,
+        source: "Entity",
+        target: "Entity",
+    ) -> None:
+        raise NotImplementedError

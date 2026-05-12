@@ -1,18 +1,18 @@
 """Tests for defensive effects processing."""
 
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.effects.block import BlockEffect
 from tests.utils import assert_conditions
+from src.effects.attack import AttackEffect
 from src.combat.manager import CombatManager
-from src.processors.effects import process_effect
 
 
 def test_keyword_block(effect_processing):
     combat_manager: CombatManager = effect_processing["combat_manager"]
 
-    attack_effect_1 = Effect(Keyword.ATTACK, 3)
-    attack_effect_2 = Effect(Keyword.ATTACK, 4)
-    block_effect = Effect(Keyword.BLOCK, 6)
+    attack_effect_1 = AttackEffect(3)
+    attack_effect_2 = AttackEffect(4)
+    block_effect = BlockEffect(6)
 
     combat_manager.order[0].add_effect(block_effect)
 
@@ -26,10 +26,9 @@ def test_keyword_block(effect_processing):
         combat_manager.order[1].get_effect(Keyword.BLOCK) == None,
     ]
 
-    _ = process_effect(
-        attack_effect_1,
+    attack_effect_1.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions.extend([
@@ -40,10 +39,9 @@ def test_keyword_block(effect_processing):
         combat_manager.order[0].get_effect(Keyword.BLOCK).value == 3,
     ])
 
-    _ = process_effect(
-        attack_effect_2,
+    attack_effect_2.activate(
         source=combat_manager.order[1],
-        targets=[combat_manager.order[0]],
+        target=combat_manager.order[0],
     )
 
     conditions.extend([

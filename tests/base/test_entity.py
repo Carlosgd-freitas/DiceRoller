@@ -2,15 +2,16 @@
 
 from src.base.side import Side
 from src.base.dice import Dice
-from src.base.effect import Effect
 from src.base.entity import Entity
 from src.base.keywords import Keyword
+from src.effects.block import BlockEffect
+from src.effects.attack import AttackEffect
 
 
 def test_entity_roll_single():
     side = Side(
         effects=[
-            Effect(Keyword.ATTACK, 1)
+            AttackEffect(1)
         ]
     )
 
@@ -41,7 +42,7 @@ def test_entity_roll_single():
 def test_entity_roll_multiple():
     side_0 = Side(
         effects=[
-            Effect(Keyword.ATTACK, 1)
+            AttackEffect(1)
         ]
     )
 
@@ -53,7 +54,7 @@ def test_entity_roll_multiple():
 
     side_1 = Side(
         effects=[
-            Effect(Keyword.BLOCK, 2)
+            BlockEffect(2)
         ]
     )
 

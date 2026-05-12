@@ -1,15 +1,16 @@
 """Tests for Side class."""
 
 from src.base.side import Side
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.effects.block import BlockEffect
+from src.effects.attack import AttackEffect
 
 
 def test_get_effects_single():
     side = Side(
         effects=[
-            Effect(Keyword.ATTACK, 1),
-            Effect(Keyword.ATTACK, 2),
+            AttackEffect(1),
+            AttackEffect(2),
         ]
     )
 
@@ -32,10 +33,10 @@ def test_get_effects_single():
 def test_get_effects_multiple():
     side = Side(
         effects=[
-            Effect(Keyword.ATTACK, 1),
-            Effect(Keyword.BLOCK, 1),
-            Effect(Keyword.ATTACK, 2),
-            Effect(Keyword.BLOCK, 2),
+            AttackEffect(1),
+            BlockEffect(1),
+            AttackEffect(2),
+            BlockEffect(2),
         ]
     )
 
