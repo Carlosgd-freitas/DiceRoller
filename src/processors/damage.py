@@ -1,29 +1,37 @@
 """Damage processor module."""
 
-from src.base.effect import Effect
-from src.base.monster import Monster
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from src.base.keywords import Keyword
 
+if TYPE_CHECKING:
+    from src.base.effect import Effect
+    from src.base.monster import Entity
+    
 
 def calculate_damage(
     effect: Effect,
-    source: Monster,
-    target: Monster,
-    consider_block: bool = True,
+    source: "Entity",
+    target: "Entity",
+    consider_block: bool = False,
 ) -> int:
     """
     Calculate damage which will be done to a target.
 
-    :param effect: The effect that will be processed.
+    :param effect: The effect used to calculate the damage.
     :type effect: Effect
 
-    :param source: The Monster object where the Effect is from.
-    :type source: Monster
+    :param source: The Entity object where the effect is from.
+    :type source: Entity
 
-    :param target: A Monster object which the effect will be applied.
-    :type target: Monster
+    :param target: A Entity object which the effect will be applied.
+    :type target: Entity
 
-    :return: The damage caused on the target Monster.
+    :param consider_block: If Block effect on the target will reduce the damage.
+    :type consider_block: bool
+
+    :return: The damage caused on the target Entity.
     :rtype: int
     """
     damage = effect.value
@@ -42,7 +50,5 @@ def calculate_damage(
 
     if damage < 0:
         damage = 0
-
-    target.hp -= damage
 
     return damage

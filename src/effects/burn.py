@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from src.base.triggers import Trigger
 from src.base.keywords import Keyword
 from src.base.effect import Effect, EffectType
+from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -42,7 +43,13 @@ class BurnEffect(Effect):
         source: "Entity",
         target: "Entity",
     ) -> None:
-        target.hp -= self.value
+        damage = calculate_damage(
+            self,
+            source,
+            target,
+        )
+
+        target.hp -= damage
         target.equalize_stats()
 
         return

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from src.base.keywords import Keyword
 from src.base.effect import Effect, EffectType
+from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -39,20 +40,12 @@ class AttackEffect(Effect):
         source: "Entity",
         target: "Entity",
     ) -> None:
-        damage = self.value
-        blocking = target.get_effect(Keyword.BLOCK)
-
-        if blocking:
-            min_value = min(damage, blocking.value)
-
-            damage -= min_value
-            blocking.value -= min_value
-
-            if blocking.value <= 0:
-                target.effects.remove(blocking)
-
-        if damage < 0:
-            damage = 0
+        damage = calculate_damage(
+            self,
+            source,
+            target,
+            consider_block=True
+        )
 
         target.hp -= damage
         target.equalize_stats()

@@ -6,7 +6,7 @@ from src.effects.block import BlockEffect
 from src.effects.attack import AttackEffect
 
 
-def test_get_effects_single():
+def test_side_get_effects_single():
     side = Side(
         effects=[
             AttackEffect(1),
@@ -30,7 +30,7 @@ def test_get_effects_single():
     assert all(conditions)
 
 
-def test_get_effects_multiple():
+def test_side_get_effects_multiple():
     side = Side(
         effects=[
             AttackEffect(1),
