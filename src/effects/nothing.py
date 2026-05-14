@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from src.base.effect import Effect, EffectType
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -30,18 +30,19 @@ class NothingEffect(Effect):
             duration,
             decay,
             accuracy,
+            EffectType.NOTHING,
         )
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return

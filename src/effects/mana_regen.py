@@ -38,16 +38,17 @@ class ManaRegenEffect(Effect):
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
-        target.mana += self.value
+        if (target.hp > 0):
+            target.mana += self.value
 
         return

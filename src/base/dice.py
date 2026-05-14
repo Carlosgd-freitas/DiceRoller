@@ -1,8 +1,12 @@
 """Dice module."""
 
-from typing import List
+from __future__ import annotations
+
 from random import choices
-from src.base.side import Side
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.base.side import Side
 
 
 class Dice:
@@ -13,8 +17,8 @@ class Dice:
     :vartype sides: List[Side]
     """
 
-    def __init__(self, sides = List[Side]):
-        self.sides: List[Side] = sides
+    def __init__(self, sides: List[Side] = None):
+        self.sides = [] if sides is None else sides
 
     def roll(self) -> Side:
         """

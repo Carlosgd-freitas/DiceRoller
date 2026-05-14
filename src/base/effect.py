@@ -1,5 +1,7 @@
 """Effect module."""
 
+from __future__ import annotations
+
 from enum import Enum
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
@@ -17,6 +19,7 @@ class EffectType(Enum):
     DEBUFF = "DEBUFF"
     DEFENSIVE = "DEFENSIVE"
     DETERIORATION = "DETERIORATION"
+    NOTHING = "NOTHING"
     OFFENSIVE = "OFFENSIVE"
     RESTORATION = "RESTORATION"
 
@@ -84,8 +87,8 @@ class Effect(ABC):
     @abstractmethod
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         """
         What the Effect will do when being applied to an Entity.
@@ -101,8 +104,8 @@ class Effect(ABC):
     @abstractmethod
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         """
         What the Effect will done when activated.

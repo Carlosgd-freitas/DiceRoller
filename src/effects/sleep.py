@@ -36,14 +36,14 @@ class SleepEffect(Effect):
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return

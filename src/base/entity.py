@@ -1,12 +1,17 @@
 """Entity module."""
 
+from __future__ import annotations
+
 from uuid import uuid4
 from copy import deepcopy
-from src.base.dice import Dice
-from src.base.side import Side
-from typing import List, Literal
-from src.base.effect import Effect
 from src.base.keywords import Keyword
+from typing import List, Literal, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.base.dice import Dice
+    from src.base.side import Side
+    from src.base.effect import Effect
+    from src.base.entity import Entity
 
 type stack_method = Literal["add", "overwrite"]
 
@@ -76,8 +81,8 @@ class Entity():
         self.dice: List[Dice] = dice
         self.effects: List[Effect] = effects
 
-        self.dice = [] if dice is None else list(dice)
-        self.effects = [] if effects is None else list(effects)
+        self.dice = [] if dice is None else dice
+        self.effects = [] if effects is None else effects
 
     def roll(self) -> List[Side]:
         """
@@ -117,7 +122,7 @@ class Entity():
     def apply_effect(
         self,
         effect: Effect,
-        source: "Entity" = None,
+        source: Entity = None,
         stack_value: stack_method = "overwrite",
         stack_duration: stack_method = "overwrite",
         stack_decay: stack_method = "overwrite",

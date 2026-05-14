@@ -4,6 +4,8 @@ from enum import Enum
 
 
 class Tag(Enum):
+    """Tag."""
+
     # Species
     ANGEL = "ANGEL"
     BEAST = "BEAST"

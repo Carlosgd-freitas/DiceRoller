@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 def calculate_damage(
     effect: Effect,
-    source: "Entity",
-    target: "Entity",
+    source: Entity,
+    target: Entity,
     consider_block: bool = False,
 ) -> int:
     """

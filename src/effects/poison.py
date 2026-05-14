@@ -39,15 +39,15 @@ class PoisonEffect(Effect):
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         damage = calculate_damage(
             self,

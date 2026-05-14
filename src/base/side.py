@@ -1,8 +1,12 @@
 """Side module."""
 
-from typing import List, Tuple
-from src.base.effect import Effect
+from __future__ import annotations
+
 from src.base.keywords import Keyword
+from typing import List, Tuple, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.base.effect import Effect
 
 
 class Side:
@@ -86,3 +90,21 @@ class Side:
                 result.append((idx, effect))
 
         return result
+
+    def get_effects_summary(self) -> Dict:
+        """
+        Gets a summary of the Side's effects based on their types.
+
+        :return: A dictionary where the keys are effect types and the values are lists
+        containing the keywords of the effects.
+        :rtype: Dict
+        """
+        types = {}
+
+        for effect in self.effects:
+            if effect.type.value not in types:
+                types[effect.type.value] = [effect.keyword]
+            else:
+                types[effect.type.value].append(effect.keyword)
+        
+        return types

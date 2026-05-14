@@ -9,6 +9,7 @@ from typing import Tuple, Literal
 
 class ANSICode(Enum):
     "ANSI codes for various text components."
+
     FOREGROUND = "\033[38;2;"
     BACKGROUND = "\033[48;2;"
 
@@ -30,6 +31,7 @@ class ANSICode(Enum):
 
 class Color(Enum):
     "A color represented with its' RGB values in a 3-integer tuple format."
+
     RED = (255, 0, 0)
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 255)

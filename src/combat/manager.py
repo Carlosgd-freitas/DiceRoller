@@ -9,6 +9,7 @@ from src.base.triggers import Trigger
 from typing import List, Literal, Dict
 from src.combat.logger import CombatLogger
 from src.base.monster import Monster, ControlType
+from src.targeting.selectors.manager import SelectorManager
 
 
 class CombatManager():
@@ -46,9 +47,11 @@ class CombatManager():
         self.round: int = 0
         self.turn: int = 0
 
-        self.logger: CombatLogger = CombatLogger()
-        teams = [] if teams is None else list(teams)
-        team_names = [] if team_names is None else list(team_names)
+        self.selector_manager = SelectorManager()
+        self.logger = CombatLogger()
+
+        teams = [] if teams is None else teams
+        team_names = [] if team_names is None else team_names
 
         if (teams) and (team_names) and (len(teams) != len(team_names)):
             raise AssertionError(
@@ -345,27 +348,38 @@ class CombatManager():
         """The current monster takes its turn."""
         if self.current_monster.control_type == ControlType.AI:
             sides = self.current_monster.roll()
-            current_team = self.get_team(self.current_monster)
+            allies = self.get_team(self.current_monster, "ALLIES")
             enemies = self.get_team(self.current_monster, "ENEMIES")
 
-            # for side in sides:
-            #     targets = self.current_monster.get_targets(
-            #         side=side,
-            #         current_team=current_team,
-            #         enemies=enemies,
-            #     )
+            for side in sides:
+                targets:  List[Monster] = SelectorManager.get_targets(
+                    side=side,
+                    source=self.current_monster,
+                    allies=allies,
+                    enemies=enemies,
+                    k=1,
+                    difficulty=self.current_monster.difficulty,
+                )
 
-            #     for target in targets:
+                targets_ids = [
+                    target.local_id
+                    for target in targets
+                ]
 
-            #         for effect in side.effects:
-            #             self.activate_effect(
-            #                 effect,
-            #                 self.current_monster,
-            #                 target,
-            #             )
+                for target_id in targets_ids:
+
+                    for monster in self.order:
+                        if monster.local_id == target_id:
+                            for effect in side.effects:
+                                self.activate_effect(
+                                    effect=effect,
+                                    source=self.current_monster,
+                                    target=monster,
+                                )
+                            break
 
         elif self.current_monster.control_type == ControlType.PLAYER:
-            raise NotImplementedError()
+            raise NotImplementedError
 
         return
 

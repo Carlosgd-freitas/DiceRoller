@@ -4,6 +4,7 @@ from src.base.monster import Monster
 from src.effects.block import BlockEffect
 from src.effects.attack import AttackEffect
 
+
 class Slime(Monster):
     """
     Slime class.

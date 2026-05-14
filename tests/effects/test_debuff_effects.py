@@ -337,7 +337,7 @@ def test_keyword_sleep(effect_processing):
 
     conditions.extend([
         len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.SLEEP) == None, ##
+        combat_manager.order[0].get_effect(Keyword.SLEEP) == None,
         combat_manager.order[0].hp == 3,
     ])
 

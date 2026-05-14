@@ -5,6 +5,7 @@ from enum import Enum
 
 class Trigger(Enum):
     """Triggers for Effects or Skills activations."""
+
     ATTACK = "ATTACK"
     BEING_ATTACKED = "BEING_ATTACKED"
     BEING_BUFFED = "BEING_BUFFED"

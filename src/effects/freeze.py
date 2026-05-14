@@ -36,15 +36,15 @@ class FreezeEffect(Effect):
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         target.remove_effect(Keyword.BURN)
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return

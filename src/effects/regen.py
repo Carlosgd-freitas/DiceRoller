@@ -38,17 +38,18 @@ class RegenEffect(Effect):
 
     def on_apply(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
         return
 
     def activate(
         self,
-        source: "Entity",
-        target: "Entity",
+        source: Entity,
+        target: Entity,
     ) -> None:
-        target.hp += self.value
+        if (target.hp > 0):
+            target.hp += self.value
         target.equalize_stats()
 
         return

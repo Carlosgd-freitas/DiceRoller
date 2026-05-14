@@ -4,6 +4,8 @@ from enum import Enum
 
 
 class Element(Enum):
+    """Element."""
+
     DARKNESS = "DARKNESS"
     EARTH = "EARTH"
     ELECTRIC = "ELECTRIC"

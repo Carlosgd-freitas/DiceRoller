@@ -1,10 +1,14 @@
 """Monster module."""
 
+from __future__ import annotations
+
 from enum import Enum
-from typing import List
-from src.base.skill import Skill
 from src.base.entity import Entity
+from typing import List, TYPE_CHECKING
 from src.base.difficulties import Difficulty
+
+if TYPE_CHECKING:
+    from src.base.skill import Skill
 
 
 class ControlType(Enum):
@@ -41,7 +45,7 @@ class Monster(Entity):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.skills = [] if skills is None else list(skills)
+        self.skills = [] if skills is None else skills
         self.control_type = control_type
         self.difficulty = difficulty
         self.team_name = team_name
