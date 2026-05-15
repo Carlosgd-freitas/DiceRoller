@@ -1,8 +1,8 @@
-from src.base.side import Side
 from src.base.dice import Dice
 from src.base.monster import Monster
-from src.effects.block import BlockEffect
+from src.base.side import Side
 from src.effects.attack import AttackEffect
+from src.effects.block import BlockEffect
 
 
 class Slime(Monster):
@@ -10,10 +10,7 @@ class Slime(Monster):
     Slime class.
     """
 
-    def __init__(
-        self,
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         attacking_sides = []
         blocking_sides = []
 

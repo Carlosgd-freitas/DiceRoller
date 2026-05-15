@@ -1,6 +1,7 @@
 """Tests for combat team management."""
 
 from pytest import fixture
+
 from src.base.monster import Monster
 from src.combat.manager import CombatManager
 
@@ -20,10 +21,7 @@ def combat_manager():
         hp=0,
     )
 
-    teams = [
-        [monster_0, monster_1],
-        [monster_2]
-    ]
+    teams = [[monster_0, monster_1], [monster_2]]
 
     combat_manager = CombatManager(
         teams=teams,
@@ -44,13 +42,10 @@ def test_get_team_self(combat_manager: CombatManager):
 
     conditions = [
         len(monster_local_ids) == 5,
-
         monster_local_ids[0] == "MONSTER_0",
         monster_local_ids[1] == "MONSTER_1",
-
         monster_local_ids[2] == "MONSTER_0",
         monster_local_ids[3] == "MONSTER_1",
-
         monster_local_ids[4] == "MONSTER_2",
     ]
 
@@ -68,9 +63,7 @@ def test_get_team_allies(combat_manager: CombatManager):
 
     conditions = [
         len(monster_local_ids) == 2,
-
         monster_local_ids[0] == "MONSTER_1",
-
         monster_local_ids[1] == "MONSTER_0",
     ]
 
@@ -88,11 +81,8 @@ def test_get_team_enemies(combat_manager: CombatManager):
 
     conditions = [
         len(monster_local_ids) == 4,
-
         monster_local_ids[0] == "MONSTER_2",
-
         monster_local_ids[1] == "MONSTER_2",
-
         monster_local_ids[2] == "MONSTER_0",
         monster_local_ids[3] == "MONSTER_1",
     ]
@@ -104,9 +94,7 @@ def test_get_team_status_monster(combat_manager: CombatManager):
     teams_status = []
 
     for monster in combat_manager.order:
-        teams_status.append(
-            combat_manager.get_team_status(monster=monster)
-        )
+        teams_status.append(combat_manager.get_team_status(monster=monster))
 
     conditions = [
         teams_status[0] == "ALIVE",
@@ -121,9 +109,7 @@ def test_get_team_status_team(combat_manager: CombatManager):
     teams_status = []
 
     for team in combat_manager.teams:
-        teams_status.append(
-            combat_manager.get_team_status(team=team)
-        )
+        teams_status.append(combat_manager.get_team_status(team=team))
 
     conditions = [
         teams_status[0] == "ALIVE",
@@ -138,10 +124,8 @@ def test_get_combat_result_winner(combat_manager: CombatManager):
 
     conditions = [
         result["status"] == "WINNER",
-
         len(result["ALIVE"]) == 1,
         len(result["ALIVE"][0]) == 2,
-
         len(result["DEFEATED"]) == 1,
         len(result["DEFEATED"][0]) == 1,
     ]
@@ -156,9 +140,7 @@ def test_get_combat_result_draw(combat_manager: CombatManager):
 
     conditions = [
         result["status"] == "DRAW",
-
         len(result["ALIVE"]) == 0,
-
         len(result["DEFEATED"]) == 2,
         len(result["DEFEATED"][0]) == 2,
         len(result["DEFEATED"][1]) == 1,
@@ -174,11 +156,9 @@ def test_get_combat_result_ongoing(combat_manager: CombatManager):
 
     conditions = [
         result["status"] == "ONGOING",
-
         len(result["ALIVE"]) == 2,
         len(result["ALIVE"][0]) == 2,
         len(result["ALIVE"][1]) == 1,
-
         len(result["DEFEATED"]) == 0,
     ]
 

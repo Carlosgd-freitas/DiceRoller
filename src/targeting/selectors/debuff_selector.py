@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from random import random
+from typing import TYPE_CHECKING, List
+
 from src.base.keywords import Keyword
-from typing import List, TYPE_CHECKING
 from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    
+
 
 class DebuffSelector(Selector):
     """
@@ -35,7 +36,7 @@ class DebuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -74,7 +75,7 @@ class DebuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -93,7 +94,7 @@ class DebuffSelector(Selector):
                 k=k,
                 method="RANDOM",
                 alive=True,
-                keyword_blacklist=[main_keyword]
+                keyword_blacklist=[main_keyword],
             )
 
         else:
@@ -102,14 +103,14 @@ class DebuffSelector(Selector):
                 k=k,
                 method="RANDOM",
                 alive=True,
-                keyword_whitelist=[main_keyword]
+                keyword_whitelist=[main_keyword],
             )
 
         if len(targets) < k:
             targets.extend(
                 filter(
                     enemies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
@@ -137,7 +138,7 @@ class DebuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -156,7 +157,7 @@ class DebuffSelector(Selector):
                 k=k,
                 method="RANDOM",
                 alive=True,
-                keyword_blacklist=[main_keyword]
+                keyword_blacklist=[main_keyword],
             )
 
         else:
@@ -165,14 +166,14 @@ class DebuffSelector(Selector):
                 k=k,
                 method="RANDOM",
                 alive=True,
-                keyword_whitelist=[main_keyword]
+                keyword_whitelist=[main_keyword],
             )
 
         if len(targets) < k:
             targets.extend(
                 filter(
                     enemies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                     local_id_blacklist=[target.local_id for target in targets],

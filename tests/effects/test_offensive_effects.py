@@ -1,13 +1,13 @@
 """Tests for offensive effects processing."""
 
 from src.base.keywords import Keyword
+from src.combat.manager import CombatManager
+from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.curse import CurseEffect
 from src.effects.drain import DrainEffect
-from tests.utils import assert_conditions
-from src.effects.attack import AttackEffect
 from src.effects.pierce import PierceEffect
-from src.combat.manager import CombatManager
+from tests.utils import assert_conditions
 
 
 def test_keyword_attack(effect_processing):
@@ -67,8 +67,7 @@ def test_keyword_drain(effect_processing):
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
         combat_manager.order[0].hp == 3,
-        combat_manager.order[0].get_effect(Keyword.BLOCK) == None,
-
+        combat_manager.order[0].get_effect(Keyword.BLOCK) is None,
         combat_manager.order[1].local_id == "MONSTER_1",
         combat_manager.order[1].hp == 7,
     ]
@@ -93,7 +92,6 @@ def test_keyword_pierce(effect_processing):
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_0",
         combat_manager.order[0].hp == 3,
-
         combat_manager.order[0].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
         combat_manager.order[0].get_effect(Keyword.BLOCK).value == 6,
     ]

@@ -1,18 +1,19 @@
 """Combat Manager module."""
 
-from src.base.side import Side
-from random import shuffle, random
+from random import random, shuffle
+from typing import Dict, List, Literal
+
 from src.base.effect import Effect
 from src.base.entity import Entity
 from src.base.keywords import Keyword
+from src.base.monster import ControlType, Monster
+from src.base.side import Side
 from src.base.triggers import Trigger
-from typing import List, Literal, Dict
 from src.combat.logger import CombatLogger
-from src.base.monster import Monster, ControlType
 from src.targeting.selectors.manager import SelectorManager
 
 
-class CombatManager():
+class CombatManager:
     """
     Combat Manager class.
 
@@ -90,10 +91,10 @@ class CombatManager():
         order: List[Monster] = [monster for team in self.teams for monster in team]
 
         if self.order_strategy == "FASTER":
-            order.sort(key = lambda x: x.speed, reverse=True)
+            order.sort(key=lambda x: x.speed, reverse=True)
 
         elif self.order_strategy == "SLOWER":
-            order.sort(key = lambda x: x.speed)
+            order.sort(key=lambda x: x.speed)
 
         elif self.order_strategy == "SHUFFLE":
             shuffle(order)
@@ -103,7 +104,7 @@ class CombatManager():
     def get_monster(self, monster_local_id: str) -> Monster:
         """
         Get a monster in the turn order.
-        
+
         :param monster_local_id: Monster's unique local identifier.
         :type monster_local_id: str
 
@@ -117,7 +118,7 @@ class CombatManager():
             if monster.local_id == monster_local_id:
                 return monster
         return None
-    
+
     def get_team(
         self,
         monster: Monster = None,
@@ -143,24 +144,18 @@ class CombatManager():
         selected: List[Monster] = []
 
         for team in self.teams:
-            if (type == "SELF") \
-                and (team[0].team_name == monster.team_name):
-                    return [
-                        team_monster for team_monster in team
-                    ]
+            if (type == "SELF") and (team[0].team_name == monster.team_name):
+                return [team_monster for team_monster in team]
 
-            elif (type == "ALLIES") \
-                and (team[0].team_name == monster.team_name):
+            elif (type == "ALLIES") and (team[0].team_name == monster.team_name):
                 return [
-                    team_monster for team_monster in team
+                    team_monster
+                    for team_monster in team
                     if team_monster.local_id != monster.local_id
                 ]
 
-            elif (type == "ENEMIES") \
-                and (team[0].team_name != monster.team_name):
-                    selected.extend([
-                        team_monster for team_monster in team
-                    ])
+            elif (type == "ENEMIES") and (team[0].team_name != monster.team_name):
+                selected.extend([team_monster for team_monster in team])
 
         return selected
 
@@ -222,10 +217,10 @@ class CombatManager():
             team_status = self.get_team_status(team=team)
             teams_status[team_status].append(team)
 
-        if (len(teams_status["ALIVE"]) == 0):
+        if len(teams_status["ALIVE"]) == 0:
             teams_status["status"] = "DRAW"
 
-        elif (len(teams_status["ALIVE"]) == 1):
+        elif len(teams_status["ALIVE"]) == 1:
             teams_status["status"] = "WINNER"
 
         else:
@@ -266,7 +261,7 @@ class CombatManager():
         if (check_can_act) and (not source.can_act()):
             return False
 
-        # Check accuracy 
+        # Check accuracy
         if check_accuracy:
             accuracy = effect.accuracy
 
@@ -294,9 +289,7 @@ class CombatManager():
         rolled = []
 
         rolling_effects = [
-            effect
-            for effect in entity.effects
-            if effect.trigger == Trigger.ROLL
+            effect for effect in entity.effects if effect.trigger == Trigger.ROLL
         ]
 
         for dice in entity.dice:
@@ -352,7 +345,7 @@ class CombatManager():
             enemies = self.get_team(self.current_monster, "ENEMIES")
 
             for side in sides:
-                targets:  List[Monster] = SelectorManager.get_targets(
+                targets: List[Monster] = SelectorManager.get_targets(
                     side=side,
                     source=self.current_monster,
                     allies=allies,
@@ -361,10 +354,7 @@ class CombatManager():
                     difficulty=self.current_monster.difficulty,
                 )
 
-                targets_ids = [
-                    target.local_id
-                    for target in targets
-                ]
+                targets_ids = [target.local_id for target in targets]
 
                 for target_id in targets_ids:
 
@@ -418,11 +408,13 @@ class CombatManager():
                 idx_removed_effects.append(idx)
 
         removed_effects = [
-            effect for idx, effect in enumerate(self.current_monster.effects)
+            effect
+            for idx, effect in enumerate(self.current_monster.effects)
             if idx in idx_removed_effects
         ]
         self.current_monster.effects = [
-            effect for idx, effect in enumerate(self.current_monster.effects)
+            effect
+            for idx, effect in enumerate(self.current_monster.effects)
             if idx not in idx_removed_effects
         ]
 

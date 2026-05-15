@@ -4,7 +4,7 @@ Needs a previously executed colorama.init() to work.
 """
 
 from enum import Enum
-from typing import Tuple, Literal
+from typing import Literal, Tuple
 
 
 class ANSICode(Enum):
@@ -102,7 +102,9 @@ def get_color_code(color: Tuple[int, int, int] | Color) -> str:
     elif isinstance(color, Color):
         return f"{color.value[0]};{color.value[1]};{color.value[2]}m"
     else:
-        raise ValueError("'color' parameter must be either a Tuple of 3 integers or a Color constant")
+        raise ValueError(
+            "'color' parameter must be either a Tuple of 3 integers or a Color constant"
+        )
 
 
 def color_string(
@@ -155,8 +157,10 @@ def color_string(
     """
     try:
         string = str(string)
-    except:
-        raise Exception("'string' parameter is neither a string or can be casted to string")
+    except Exception as err:
+        raise TypeError(
+            "'string' parameter is neither a string or can be cast to string"
+        ) from err
 
     parts = []
 

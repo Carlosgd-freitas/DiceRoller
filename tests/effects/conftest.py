@@ -1,7 +1,9 @@
 """Pytest configuration file for processing tests."""
 
 from typing import Dict
+
 from pytest import fixture
+
 from src.base.monster import Monster
 from src.combat.manager import CombatManager
 
@@ -31,6 +33,4 @@ def effect_processing() -> Dict:
 
     combat_manager.start_combat()
 
-    return {
-        "combat_manager": combat_manager
-    }
+    return {"combat_manager": combat_manager}

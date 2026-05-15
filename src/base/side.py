@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Dict, List, Tuple
+
 from src.base.keywords import Keyword
-from typing import List, Tuple, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 class Side:
     """
     Side class.
-    
+
     :var effects: Side's effects, which will be executed in order.
     :vartype effects: List[Effect]
 
@@ -26,7 +27,7 @@ class Side:
 
     def __str__(self) -> str:
         _str = ""
-        
+
         for idx, effect in enumerate(self.effects):
             if idx > 0:
                 _str += " + "
@@ -41,7 +42,7 @@ class Side:
         value: float = None,
         duration: int = None,
         decay: int = None,
-        accuracy: float = None
+        accuracy: float = None,
     ) -> List[Tuple[int, Effect]]:
         """
         Returns a list of indexes and effects based on a series of filters.
@@ -77,7 +78,7 @@ class Side:
                 ("value", value),
                 ("duration", duration),
                 ("decay", decay),
-                ("accuracy", accuracy)
+                ("accuracy", accuracy),
             ]:
                 if comparison_value is not None:
                     if effect.__getattribute__(comparison_key) == comparison_value:
@@ -106,5 +107,5 @@ class Side:
                 types[effect.type.value] = [effect.keyword]
             else:
                 types[effect.type.value].append(effect.keyword)
-        
+
         return types

@@ -1,6 +1,7 @@
 """Item module."""
 
 from enum import Enum
+
 from src.base.entity import Entity
 
 
@@ -21,10 +22,6 @@ class Item(Entity):
     :vartype type: ItemType
     """
 
-    def __init__(
-        self,
-        type: ItemType = None,
-        **kwargs
-    ):
+    def __init__(self, type: ItemType = None, **kwargs):
         super().__init__(**kwargs)
         self.type: ItemType = type

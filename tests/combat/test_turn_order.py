@@ -1,6 +1,7 @@
 """Tests for combat turn management."""
 
 from pytest import fixture
+
 from src.base.monster import Monster
 from src.combat.manager import CombatManager
 
@@ -20,10 +21,7 @@ def teams():
         speed=10,
     )
 
-    return [
-        [monster_0, monster_1],
-        [monster_2]
-    ]
+    return [[monster_0, monster_1], [monster_2]]
 
 
 def test_turn_order_set(teams):

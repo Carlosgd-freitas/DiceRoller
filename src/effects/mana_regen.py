@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.base.triggers import Trigger
-from src.base.keywords import Keyword
+
 from src.base.effect import Effect, EffectType
+from src.base.keywords import Keyword
+from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -15,7 +16,7 @@ class ManaRegenEffect(Effect):
     """
     Mana Regen Effect.
 
-    Will increase the target's mana by the effect value at the start of each of the 
+    Will increase the target's mana by the effect value at the start of each of the
     arget's turn.
     """
 
@@ -48,7 +49,7 @@ class ManaRegenEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> None:
-        if (target.hp > 0):
+        if target.hp > 0:
             target.mana += self.value
 
         return

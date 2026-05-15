@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from random import choices
-from typing import TYPE_CHECKING
-from typing import List, Callable, Literal
+from typing import TYPE_CHECKING, Callable, List, Literal
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -37,7 +36,7 @@ def filter(
 
     :param sort_function: A function to sort the list of entities.
     :type sort_function: Callable
-    
+
     :param alive: Whether to consider only alive entities (hp > 0). Default value is
     True.
     :type alive: bool
@@ -73,16 +72,10 @@ def filter(
 
     # Entity attribute conditions
     if alive:
-        filtered = [
-            entity for entity in filtered
-            if entity.hp > 0
-        ]
+        filtered = [entity for entity in filtered if entity.hp > 0]
 
     if hurt:
-        filtered = [
-            entity for entity in filtered
-            if entity.hp < entity.max_hp
-        ]
+        filtered = [entity for entity in filtered if entity.hp < entity.max_hp]
 
     # Whitelist and blacklist conditions
     to_remove = []
@@ -93,24 +86,17 @@ def filter(
             to_remove.append(index)
             continue
 
-        if not all(
-            entity.get_effect(keyword)
-            for keyword in keyword_whitelist
-        ):
+        if not all(entity.get_effect(keyword) for keyword in keyword_whitelist):
             to_remove.append(index)
             continue
 
-        if any(
-            entity.get_effect(keyword)
-            for keyword in keyword_blacklist
-        ):
+        if any(entity.get_effect(keyword) for keyword in keyword_blacklist):
             to_remove.append(index)
             continue
 
     if to_remove:
         filtered = [
-            entity for index, entity in enumerate(entities)
-            if index not in to_remove
+            entity for index, entity in enumerate(entities) if index not in to_remove
         ]
 
     # Method picking

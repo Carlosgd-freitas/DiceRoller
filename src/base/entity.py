@@ -2,24 +2,25 @@
 
 from __future__ import annotations
 
-from uuid import uuid4
 from copy import deepcopy
+from typing import TYPE_CHECKING, List, Literal
+from uuid import uuid4
+
 from src.base.keywords import Keyword
-from typing import List, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
-    from src.base.side import Side
     from src.base.effect import Effect
     from src.base.entity import Entity
+    from src.base.side import Side
 
 type stack_method = Literal["add", "overwrite"]
 
 
-class Entity():
+class Entity:
     """
     Entity class.
-    
+
     :var global_id: All objects of the same Entity subclass will have this same
     identifier.
     :vartype id: str
@@ -65,7 +66,7 @@ class Entity():
         mana: int = None,
         dice: List[Dice] = None,
         effects: List[Effect] = None,
-        **kwargs
+        **kwargs,
     ):
         self.global_id: str = global_id
         self.local_id: str = local_id
@@ -190,14 +191,12 @@ class Entity():
                     setattr(
                         current_effect,
                         parameter,
-                        current_value+new_value,
+                        current_value + new_value,
                     )
 
         # Add new effect
         else:
-            self.effects.append(
-                deepcopy(effect)
-            )
+            self.effects.append(deepcopy(effect))
 
         effect.on_apply(
             source,
@@ -233,8 +232,10 @@ class Entity():
         :return: If the Entity can act.
         :rtype: bool
         """
-        return not any([
-            self.get_effect(Keyword.FREEZE),
-            self.get_effect(Keyword.SLEEP),
-            self.get_effect(Keyword.STUN),
-        ])
+        return not any(
+            [
+                self.get_effect(Keyword.FREEZE),
+                self.get_effect(Keyword.SLEEP),
+                self.get_effect(Keyword.STUN),
+            ]
+        )

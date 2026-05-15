@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from enum import Enum
-from src.base.entity import Entity
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+
 from src.base.difficulties import Difficulty
+from src.base.entity import Entity
 
 if TYPE_CHECKING:
     from src.base.skill import Skill
@@ -42,7 +43,7 @@ class Monster(Entity):
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
         team_name: str = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.skills = [] if skills is None else skills

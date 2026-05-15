@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from src.base.keywords import Keyword
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.monster import Entity
-    
+
 
 def calculate_damage(
     effect: Effect,

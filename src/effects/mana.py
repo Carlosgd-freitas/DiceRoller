@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.base.keywords import Keyword
+
 from src.base.effect import Effect, EffectType
+from src.base.keywords import Keyword
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -45,7 +46,7 @@ class ManaEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> None:
-        if (target.hp > 0):
+        if target.hp > 0:
             target.mana += self.value
 
         return

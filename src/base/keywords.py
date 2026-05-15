@@ -1,11 +1,13 @@
 """Keyword module."""
 
 from enum import Enum
+
 from src.base.color import Color, color_string
 
 
 class Keyword(Enum):
     """Effect keywords (identifiers)."""
+
     ABSORB = "ABSORB"
     ATTACK = "ATTACK"
     BLEED = "BLEED"
@@ -84,7 +86,7 @@ def color_keyword(keyword: Keyword) -> str:
     elif keyword == Keyword.THORNS:
         foreground_color = Color.OLIVE
     else:
-        foreground_color = None        
+        foreground_color = None
 
     return color_string(
         keyword.value,

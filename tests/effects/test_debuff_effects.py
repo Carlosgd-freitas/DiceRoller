@@ -1,19 +1,19 @@
 """Tests for debuff effects processing."""
 
-from src.base.side import Side
 from src.base.dice import Dice
 from src.base.keywords import Keyword
-from src.effects.heal import HealEffect
-from src.effects.burn import BurnEffect
-from src.effects.stun import StunEffect
+from src.base.side import Side
+from src.combat.manager import CombatManager
+from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
-from src.effects.sleep import SleepEffect
-from tests.utils import assert_conditions
-from src.effects.attack import AttackEffect
+from src.effects.burn import BurnEffect
 from src.effects.freeze import FreezeEffect
+from src.effects.heal import HealEffect
 from src.effects.poison import PoisonEffect
-from src.combat.manager import CombatManager
+from src.effects.sleep import SleepEffect
+from src.effects.stun import StunEffect
+from tests.utils import assert_conditions
 
 
 def test_keyword_bleed(effect_processing):
@@ -42,36 +42,37 @@ def test_keyword_bleed(effect_processing):
         combat_manager.order[0].get_effect(Keyword.BLEED).value == 1,
         combat_manager.order[0].get_effect(Keyword.BLEED).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.BLEED) == None,
+        combat_manager.order[1].get_effect(Keyword.BLEED) is None,
         combat_manager.order[1].hp == 5,
     ]
 
     rolled = combat_manager.roll(combat_manager.order[0])
 
-    conditions.extend([
-        len(rolled) == 3,
-        rolled[0].effects[0].value == 1,
-        rolled[1].effects[0].value == 2,
-        rolled[2].effects[0].value == 3,
-
-        combat_manager.order[0].hp == 2,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            len(rolled) == 3,
+            rolled[0].effects[0].value == 1,
+            rolled[1].effects[0].value == 2,
+            rolled[2].effects[0].value == 3,
+            combat_manager.order[0].hp == 2,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     combat_manager.end_turn()
 
     rolled = combat_manager.order[0].roll()
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.BLEED) == None,
-
-        combat_manager.order[0].hp == 2,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.BLEED) is None,
+            combat_manager.order[0].hp == 2,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -95,10 +96,9 @@ def test_keyword_blind(effect_processing):
         combat_manager.order[0].get_effect(Keyword.BLIND).value == 1,
         combat_manager.order[0].get_effect(Keyword.BLIND).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.BLIND) == None,
+        combat_manager.order[1].get_effect(Keyword.BLIND) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -114,10 +114,12 @@ def test_keyword_blind(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        combat_manager.order[0].hp == 7,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 7,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     combat_manager.end_turn()
 
@@ -133,13 +135,14 @@ def test_keyword_blind(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.BLIND) == None,
-        combat_manager.order[0].hp == 9,
-
-        combat_manager.order[1].hp == 3,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.BLIND) is None,
+            combat_manager.order[0].hp == 9,
+            combat_manager.order[1].hp == 3,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -161,10 +164,9 @@ def test_keyword_burn(effect_processing):
         combat_manager.order[0].get_effect(Keyword.BURN).value == 2,
         combat_manager.order[0].get_effect(Keyword.BURN).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.BURN) == None,
+        combat_manager.order[1].get_effect(Keyword.BURN) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -172,13 +174,14 @@ def test_keyword_burn(effect_processing):
 
     combat_manager.end_turn()
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.BURN) == None,
-
-        combat_manager.order[0].hp == 3,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.BURN) is None,
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -200,10 +203,9 @@ def test_keyword_freeze(effect_processing):
         combat_manager.order[0].get_effect(Keyword.FREEZE).keyword == Keyword.FREEZE,
         combat_manager.order[0].get_effect(Keyword.FREEZE).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.FREEZE) == None,
+        combat_manager.order[1].get_effect(Keyword.FREEZE) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -219,10 +221,12 @@ def test_keyword_freeze(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        combat_manager.order[0].hp == 5,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 5,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     combat_manager.end_turn()
 
@@ -238,13 +242,14 @@ def test_keyword_freeze(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.FREEZE) == None,
-        combat_manager.order[0].hp == 7,
-
-        combat_manager.order[1].hp == 3,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.FREEZE) is None,
+            combat_manager.order[0].hp == 7,
+            combat_manager.order[1].hp == 3,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -266,10 +271,9 @@ def test_keyword_poison(effect_processing):
         combat_manager.order[0].get_effect(Keyword.POISON).value == 2,
         combat_manager.order[0].get_effect(Keyword.POISON).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.POISON) == None,
+        combat_manager.order[1].get_effect(Keyword.POISON) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -277,13 +281,14 @@ def test_keyword_poison(effect_processing):
 
     combat_manager.end_turn()
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.POISON) == None,
-
-        combat_manager.order[0].hp == 3,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.POISON) is None,
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -305,10 +310,9 @@ def test_keyword_sleep(effect_processing):
         combat_manager.order[0].get_effect(Keyword.SLEEP).keyword == Keyword.SLEEP,
         combat_manager.order[0].get_effect(Keyword.SLEEP).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.SLEEP) == None,
+        combat_manager.order[1].get_effect(Keyword.SLEEP) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -324,10 +328,12 @@ def test_keyword_sleep(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        combat_manager.order[0].hp == 5,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 5,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     combat_manager.activate_effect(
         effect_attack,
@@ -335,11 +341,13 @@ def test_keyword_sleep(effect_processing):
         target=combat_manager.order[0],
     )
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.SLEEP) == None,
-        combat_manager.order[0].hp == 3,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.SLEEP) is None,
+            combat_manager.order[0].hp == 3,
+        ]
+    )
 
     combat_manager.activate_effect(
         effect_heal,
@@ -353,13 +361,14 @@ def test_keyword_sleep(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.SLEEP) == None,
-        combat_manager.order[0].hp == 5,
-
-        combat_manager.order[1].hp == 3,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.SLEEP) is None,
+            combat_manager.order[0].hp == 5,
+            combat_manager.order[1].hp == 3,
+        ]
+    )
 
     assert_conditions(conditions)
 
@@ -381,10 +390,9 @@ def test_keyword_stun(effect_processing):
         combat_manager.order[0].get_effect(Keyword.STUN).keyword == Keyword.STUN,
         combat_manager.order[0].get_effect(Keyword.STUN).duration == 1,
         combat_manager.order[0].hp == 5,
-
         combat_manager.order[1].local_id == "MONSTER_1",
         len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.STUN) == None,
+        combat_manager.order[1].get_effect(Keyword.STUN) is None,
         combat_manager.order[1].hp == 5,
     ]
 
@@ -400,10 +408,12 @@ def test_keyword_stun(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        combat_manager.order[0].hp == 5,
-        combat_manager.order[1].hp == 5,
-    ])
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 5,
+            combat_manager.order[1].hp == 5,
+        ]
+    )
 
     combat_manager.end_turn()
 
@@ -419,12 +429,13 @@ def test_keyword_stun(effect_processing):
         target=combat_manager.order[1],
     )
 
-    conditions.extend([
-        len(combat_manager.order[0].effects) == 0,
-        combat_manager.order[0].get_effect(Keyword.STUN) == None,
-        combat_manager.order[0].hp == 7,
-
-        combat_manager.order[1].hp == 3,
-    ])
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.STUN) is None,
+            combat_manager.order[0].hp == 7,
+            combat_manager.order[1].hp == 3,
+        ]
+    )
 
     assert_conditions(conditions)

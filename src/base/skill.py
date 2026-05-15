@@ -1,6 +1,7 @@
 """Skill module."""
 
 from enum import Enum
+
 from base.entity import Entity
 
 
@@ -19,10 +20,6 @@ class Skill(Entity):
     :vartype type: SkillType
     """
 
-    def __init__(
-        self,
-        type: SkillType = None,
-        **kwargs
-    ):
+    def __init__(self, type: SkillType = None, **kwargs):
         super().__init__(**kwargs)
         self.type: SkillType = type

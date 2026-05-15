@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
-from typing import List, TYPE_CHECKING
-from src.base.effect import EffectType
+from typing import TYPE_CHECKING, List
+
 from src.base.difficulties import Difficulty
+from src.base.effect import EffectType
 from src.targeting.selectors.buff_selector import BuffSelector
 from src.targeting.selectors.debuff_selector import DebuffSelector
-from src.targeting.selectors.random_selector import RandomSelector
-from src.targeting.selectors.offensive_selector import OffensiveSelector
 from src.targeting.selectors.defensive_selector import DefensiveSelector
+from src.targeting.selectors.offensive_selector import OffensiveSelector
+from src.targeting.selectors.random_selector import RandomSelector
 
 if TYPE_CHECKING:
-    from src.base.side import Side
     from src.base.monster import Monster
+    from src.base.side import Side
 
 
-
-class SelectorManager():
+class SelectorManager:
     def get_targets(
         side: Side,
         source: Monster,
@@ -37,7 +37,7 @@ class SelectorManager():
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -52,7 +52,7 @@ class SelectorManager():
         :rtype: List[Monster]
         """
 
-        # Determining the main properties 
+        # Determining the main properties
         main_keyword = None
         main_effect_type = None
         main_count = 0
@@ -69,7 +69,7 @@ class SelectorManager():
 
         elif main_effect_type in [
             EffectType.DEFENSIVE.value,
-            EffectType.RESTORATION.value
+            EffectType.RESTORATION.value,
         ]:
             selector = DefensiveSelector()
 

@@ -1,6 +1,7 @@
 """Tests for combat turn management."""
 
 from pytest import fixture
+
 from src.base.monster import Monster
 from src.combat.manager import CombatManager
 
@@ -23,10 +24,7 @@ def combat_manager():
         speed=10,
     )
 
-    teams = [
-        [monster_0, monster_1],
-        [monster_2]
-    ]
+    teams = [[monster_0, monster_1], [monster_2]]
 
     combat_manager = CombatManager(
         teams=teams,

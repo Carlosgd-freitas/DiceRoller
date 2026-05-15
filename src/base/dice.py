@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from random import choices
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from src.base.side import Side
@@ -27,10 +27,8 @@ class Dice:
         :return: A Side object.
         :rtype: Side
         """
-        picked = choices(
-            self.sides,
-            weights=[side.weight for side in self.sides],
-            k=1
-        )[0]
+        picked = choices(self.sides, weights=[side.weight for side in self.sides], k=1)[
+            0
+        ]
 
         return picked

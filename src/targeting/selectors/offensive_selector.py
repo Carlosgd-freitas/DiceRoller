@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from random import random
+from typing import TYPE_CHECKING, List
+
 from src.base.keywords import Keyword
-from typing import List, TYPE_CHECKING
 from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    
+
 
 class OffensiveSelector(Selector):
     """
@@ -36,7 +37,7 @@ class OffensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -85,7 +86,7 @@ class OffensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -134,7 +135,7 @@ class OffensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -162,14 +163,14 @@ class OffensiveSelector(Selector):
                 method="FIRST",
                 sort_function=(lambda x: x.hp),
                 alive=True,
-                keyword_blacklist=[Keyword.ABSORB, Keyword.BLOCK]
+                keyword_blacklist=[Keyword.ABSORB, Keyword.BLOCK],
             )
 
             if len(targets) < k:
                 targets.extend(
                     filter(
                         enemies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="FIRST",
                         sort_function=(lambda x: x.hp),
                         alive=True,

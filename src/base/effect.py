@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING
-from abc import ABC, abstractmethod
-from src.base.triggers import Trigger
+
 from src.base.keywords import Keyword, color_keyword
+from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
     from src.base.entity import Entity

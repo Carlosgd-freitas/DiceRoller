@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from random import random
+from typing import TYPE_CHECKING, List
+
 from src.base.keywords import Keyword
-from typing import List, TYPE_CHECKING
 from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    
+
 
 class BuffSelector(Selector):
     """
@@ -35,7 +36,7 @@ class BuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -57,7 +58,7 @@ class BuffSelector(Selector):
             targets.extend(
                 filter(
                     allies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
@@ -85,7 +86,7 @@ class BuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -108,7 +109,7 @@ class BuffSelector(Selector):
                 targets.extend(
                     filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="RANDOM",
                         alive=True,
                         local_id_blacklist=[target.local_id for target in targets],
@@ -118,21 +119,21 @@ class BuffSelector(Selector):
 
             else:
                 targets.extend(
-                    targets = filter(
+                    targets=filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="RANDOM",
                         alive=True,
                         local_id_blacklist=[target.local_id for target in targets],
                         keyword_whitelist=[main_keyword],
                     )
                 )
-        
+
         if len(targets) < k:
             targets.extend(
                 filter(
                     allies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
@@ -160,7 +161,7 @@ class BuffSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -183,7 +184,7 @@ class BuffSelector(Selector):
                 targets.extend(
                     filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="RANDOM",
                         alive=True,
                         local_id_blacklist=[target.local_id for target in targets],
@@ -193,21 +194,21 @@ class BuffSelector(Selector):
 
             else:
                 targets.extend(
-                    targets = filter(
+                    targets=filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="RANDOM",
                         alive=True,
                         local_id_blacklist=[target.local_id for target in targets],
                         keyword_whitelist=[main_keyword],
                     )
                 )
-        
+
         if len(targets) < k:
             targets.extend(
                 filter(
                     allies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                     local_id_blacklist=[target.local_id for target in targets],

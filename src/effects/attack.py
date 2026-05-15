@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.base.keywords import Keyword
+
 from src.base.effect import Effect, EffectType
+from src.base.keywords import Keyword
 from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
@@ -49,12 +50,7 @@ class AttackEffect(Effect):
     ) -> None:
         target.remove_effect(Keyword.SLEEP)
 
-        damage = calculate_damage(
-            self,
-            source,
-            target,
-            consider_block=True
-        )
+        damage = calculate_damage(self, source, target, consider_block=True)
 
         target.hp -= damage
         target.equalize_stats()

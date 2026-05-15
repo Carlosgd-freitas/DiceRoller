@@ -1,13 +1,14 @@
 """Tests for targe filtering methods."""
 
 from pytest import fixture
-from src.base.monster import Monster
+
 from src.base.keywords import Keyword
+from src.base.monster import Monster
+from src.combat.manager import CombatManager
 from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
 from src.targeting.filters import filter
 from tests.utils import assert_conditions
-from src.combat.manager import CombatManager
 
 
 @fixture
@@ -63,7 +64,6 @@ def test_filter_first(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 1,
-
         filtered[0].local_id == "MONSTER_0",
     ]
 
@@ -80,14 +80,12 @@ def test_filter_last(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 3,
-
         filtered[0].local_id == "MONSTER_4",
         filtered[1].local_id == "MONSTER_3",
         filtered[2].local_id == "MONSTER_2",
     ]
 
     assert_conditions(conditions)
-
 
 
 def test_filter_alive(combat_manager: CombatManager):
@@ -100,10 +98,8 @@ def test_filter_alive(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 2,
-
         filtered[0].local_id == "MONSTER_1",
         filtered[0].hp == 1,
-
         filtered[1].local_id == "MONSTER_2",
         filtered[1].hp == 10,
     ]
@@ -122,10 +118,8 @@ def test_filter_hurt(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 2,
-
         filtered[0].local_id == "MONSTER_3",
         filtered[0].hp == 100,
-
         filtered[1].local_id == "MONSTER_2",
         filtered[1].hp == 10,
     ]
@@ -144,7 +138,6 @@ def test_filter_lowest_hp(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 1,
-
         filtered[0].local_id == "MONSTER_0",
         filtered[0].hp == 0,
     ]
@@ -163,7 +156,6 @@ def test_filter_highest_hp(combat_manager: CombatManager):
 
     conditions = [
         len(filtered) == 1,
-
         filtered[0].local_id == "MONSTER_4",
         filtered[0].hp == 200,
     ]
@@ -183,12 +175,11 @@ def test_filter_with_effect(combat_manager: CombatManager):
         k=2,
         method="FIRST",
         alive=False,
-        keyword_whitelist=[Keyword.BURN]
+        keyword_whitelist=[Keyword.BURN],
     )
 
     conditions = [
         len(filtered) == 1,
-
         filtered[0].local_id == "MONSTER_1",
     ]
 
@@ -207,12 +198,11 @@ def test_filter_without_effect(combat_manager: CombatManager):
         k=10,
         method="FIRST",
         alive=False,
-        keyword_blacklist=[Keyword.STUN]
+        keyword_blacklist=[Keyword.STUN],
     )
 
     conditions = [
         len(filtered) == 4,
-
         filtered[0].local_id == "MONSTER_0",
         filtered[1].local_id == "MONSTER_1",
         filtered[2].local_id == "MONSTER_3",

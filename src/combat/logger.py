@@ -1,7 +1,7 @@
 """Combat Logger module."""
 
 
-class CombatLogger():
+class CombatLogger:
     """
     Combat Logger class.
     """

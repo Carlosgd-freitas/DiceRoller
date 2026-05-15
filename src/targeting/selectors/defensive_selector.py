@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from random import random
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+
 from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
     from src.base.keywords import Keyword
-    
+    from src.base.monster import Monster
+
 
 class DefensiveSelector(Selector):
     """
@@ -35,7 +36,7 @@ class DefensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -57,7 +58,7 @@ class DefensiveSelector(Selector):
             targets.extend(
                 filter(
                     allies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="RANDOM",
                     alive=True,
                 )
@@ -84,7 +85,7 @@ class DefensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -107,7 +108,7 @@ class DefensiveSelector(Selector):
                 targets.extend(
                     filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="RANDOM",
                         alive=True,
                     )
@@ -117,7 +118,7 @@ class DefensiveSelector(Selector):
                 targets.extend(
                     filter(
                         allies,
-                        k=k-len(targets),
+                        k=k - len(targets),
                         method="FIRST",
                         sort_function=(lambda x: x.hp),
                         alive=True,
@@ -144,7 +145,7 @@ class DefensiveSelector(Selector):
 
         :param allies: The source monster's allies.
         :type allies: List[Monster]
-        
+
         :param enemies: The source monster's enemies.
         :type enemies: List[Monster]
 
@@ -166,7 +167,7 @@ class DefensiveSelector(Selector):
             targets.extend(
                 filter(
                     allies,
-                    k=k-len(targets),
+                    k=k - len(targets),
                     method="FIRST",
                     sort_function=(lambda x: x.hp),
                     alive=True,
