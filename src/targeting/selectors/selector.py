@@ -23,7 +23,7 @@ class Selector(ABC):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria.
 
@@ -55,7 +55,7 @@ class Selector(ABC):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria.
 
@@ -87,7 +87,7 @@ class Selector(ABC):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria.
 

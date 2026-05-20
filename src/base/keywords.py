@@ -15,6 +15,7 @@ class Keyword(Enum):
     BLOCK = "BLOCK"
     BURN = "BURN"
     CLEANSE = "CLEANSE"
+    CONFUSE = "CONFUSE"
     COUNTER = "COUNTER"
     CURSE = "CURSE"
     DODGE = "DODGE"
@@ -54,14 +55,16 @@ def color_keyword(keyword: Keyword) -> str:
     elif keyword in [Keyword.BLEED, Keyword.HEMORRAGY]:
         foreground_color = Color.BURGUNDY
         intensity = "DIM"
+    elif keyword in [Keyword.BLIND, Keyword.COUNTER, Keyword.STUN]:
+        foreground_color = Color.GRAY
     elif keyword in [Keyword.BLOCK, Keyword.DODGE]:
         foreground_color = Color.BLUE
     elif keyword in [Keyword.BURN, Keyword.SCORCH]:
         foreground_color = Color.RED
     elif keyword == Keyword.CLEANSE:
         foreground_color = Color.AERO
-    elif keyword in [Keyword.BLIND, Keyword.COUNTER, Keyword.STUN]:
-        foreground_color = Color.GRAY
+    elif keyword == [Keyword.CONFUSE, Keyword.TAUNT]:
+        foreground_color = Color.HOT_PINK
     elif keyword in [Keyword.CURSE, Keyword.HEX]:
         foreground_color = Color.VIOLET
     elif keyword in [Keyword.FORTIFY, Keyword.HASTE, Keyword.STRENGTHEN]:
@@ -81,8 +84,6 @@ def color_keyword(keyword: Keyword) -> str:
     elif keyword == Keyword.SLEEP:
         foreground_color = Color.METALLIC_BLUE
         intensity = "DIM"
-    elif keyword == Keyword.TAUNT:
-        foreground_color = Color.HOT_PINK
     elif keyword == Keyword.THORNS:
         foreground_color = Color.OLIVE
     else:

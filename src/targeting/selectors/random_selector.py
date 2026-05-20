@@ -48,7 +48,7 @@ class RandomSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
         Offensive type effects:
@@ -87,7 +87,7 @@ class RandomSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         Offensive type effects:
@@ -126,7 +126,7 @@ class RandomSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         Offensive type effects:

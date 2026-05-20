@@ -25,7 +25,7 @@ class DebuffSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
         debuff type effects:
@@ -63,7 +63,7 @@ class DebuffSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         debuff type effects:
@@ -126,7 +126,7 @@ class DebuffSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         debuff type effects:

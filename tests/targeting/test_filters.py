@@ -1,9 +1,8 @@
-"""Tests for targe filtering methods."""
+"""Tests for target filtering methods."""
 
-from pytest import fixture
+from typing import Dict
 
 from src.base.keywords import Keyword
-from src.base.monster import Monster
 from src.combat.manager import CombatManager
 from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
@@ -11,50 +10,9 @@ from src.targeting.filters import filter
 from tests.utils import assert_conditions
 
 
-@fixture
-def combat_manager():
-    monster_0 = Monster(
-        local_id="MONSTER_0",
-        hp=0,
-        max_hp=200,
-    )
+def test_filter_first(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
-    monster_1 = Monster(
-        local_id="MONSTER_1",
-        hp=1,
-        max_hp=200,
-    )
-
-    monster_2 = Monster(
-        local_id="MONSTER_2",
-        hp=10,
-        max_hp=200,
-    )
-
-    monster_3 = Monster(
-        local_id="MONSTER_3",
-        hp=100,
-        max_hp=200,
-    )
-
-    monster_4 = Monster(
-        local_id="MONSTER_4",
-        hp=200,
-        max_hp=200,
-    )
-
-    combat_manager = CombatManager(
-        teams=[
-            [monster_0, monster_1, monster_2],
-            [monster_3, monster_4],
-        ],
-        order_strategy="SET",
-    )
-
-    return combat_manager
-
-
-def test_filter_first(combat_manager: CombatManager):
     filtered = filter(
         combat_manager.order,
         k=1,
@@ -70,7 +28,9 @@ def test_filter_first(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_last(combat_manager: CombatManager):
+def test_filter_last(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     filtered = filter(
         combat_manager.order,
         k=3,
@@ -88,7 +48,9 @@ def test_filter_last(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_alive(combat_manager: CombatManager):
+def test_filter_alive(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     filtered = filter(
         combat_manager.order,
         k=2,
@@ -107,7 +69,9 @@ def test_filter_alive(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_hurt(combat_manager: CombatManager):
+def test_filter_hurt(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     filtered = filter(
         combat_manager.order,
         k=2,
@@ -127,7 +91,9 @@ def test_filter_hurt(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_lowest_hp(combat_manager: CombatManager):
+def test_filter_lowest_hp(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     filtered = filter(
         combat_manager.order,
         k=1,
@@ -145,7 +111,9 @@ def test_filter_lowest_hp(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_highest_hp(combat_manager: CombatManager):
+def test_filter_highest_hp(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     filtered = filter(
         combat_manager.order,
         k=1,
@@ -163,7 +131,9 @@ def test_filter_highest_hp(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_with_effect(combat_manager: CombatManager):
+def test_filter_with_effect(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
 
@@ -186,7 +156,9 @@ def test_filter_with_effect(combat_manager: CombatManager):
     assert_conditions(conditions)
 
 
-def test_filter_without_effect(combat_manager: CombatManager):
+def test_filter_without_effect(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
 

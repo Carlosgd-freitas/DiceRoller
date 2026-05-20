@@ -102,7 +102,7 @@ def filter(
     # Method picking
     if len(filtered) > 0:
         if method == "RANDOM":
-            filtered = choices(filtered, k)
+            filtered = choices(filtered, k=k)
         else:
             if method == "LAST":
                 filtered.reverse()

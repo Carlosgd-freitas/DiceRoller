@@ -25,7 +25,7 @@ class DefensiveSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
         defensive type effects:
@@ -73,7 +73,7 @@ class DefensiveSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         defensive type effects:
@@ -134,7 +134,7 @@ class DefensiveSelector(Selector):
         enemies: List[Monster],
         k: int,
         main_keyword: Keyword,
-    ):
+    ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         defensive type effects:

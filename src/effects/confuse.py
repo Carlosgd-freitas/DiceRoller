@@ -1,4 +1,4 @@
-"""Curse effect module."""
+"""Confuse effect module."""
 
 from __future__ import annotations
 
@@ -6,17 +6,17 @@ from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
-from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class CurseEffect(Effect):
+class ConfuseEffect(Effect):
     """
-    Curse Effect.
+    Confuse Effect.
 
-    Will reduce the target's HP by the effect value.
+    This is a debuff which makes the target to target randomly when using dice or
+    skills.
     """
 
     def __init__(
@@ -27,12 +27,12 @@ class CurseEffect(Effect):
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.CURSE,
+            Keyword.CONFUSE,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.DETERIORATION,
+            EffectType.DEBUFF,
         )
 
     def on_apply(
@@ -47,13 +47,4 @@ class CurseEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> None:
-        damage = calculate_damage(
-            self,
-            source,
-            target,
-        )
-
-        target.hp -= damage
-        target.equalize_stats()
-
         return

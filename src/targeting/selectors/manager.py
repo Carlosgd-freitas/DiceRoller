@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.difficulties import Difficulty
 from src.base.effect import EffectType
+from src.base.keywords import Keyword
 from src.targeting.selectors.buff_selector import BuffSelector
 from src.targeting.selectors.debuff_selector import DebuffSelector
 from src.targeting.selectors.defensive_selector import DefensiveSelector
 from src.targeting.selectors.offensive_selector import OffensiveSelector
 from src.targeting.selectors.random_selector import RandomSelector
+from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
@@ -19,6 +22,7 @@ if TYPE_CHECKING:
 
 class SelectorManager:
     def get_targets(
+        self,
         side: Side,
         source: Monster,
         allies: List[Monster] = None,
@@ -52,35 +56,53 @@ class SelectorManager:
         :rtype: List[Monster]
         """
 
+        selector: Selector = None
+
         # Determining the main properties
         main_keyword = None
         main_effect_type = None
         main_count = 0
 
-        for effect_type, keywords in side.get_effects_summary():
+        for effect_type, keywords in side.get_effects_summary().items():
             if len(keywords) > main_count:
                 main_keyword = keywords[0]
                 main_effect_type = effect_type
                 main_count = len(keywords)
 
-        # Determining Selector
-        if main_effect_type == EffectType.OFFENSIVE.value:
-            selector = OffensiveSelector()
-
-        elif main_effect_type in [
-            EffectType.DEFENSIVE.value,
-            EffectType.RESTORATION.value,
-        ]:
-            selector = DefensiveSelector()
-
-        elif main_effect_type == EffectType.BUFF.value:
-            selector = BuffSelector()
-
-        elif main_effect_type == EffectType.DEBUFF.value:
-            selector = DebuffSelector()
-
-        else:
+        # Confuse check
+        confused = source.get_effect(Keyword.CONFUSE)
+        if confused and random() < confused.value:
             selector = RandomSelector()
+
+        # Curse Effect
+        for effect in side.effects:
+            if effect.keyword == Keyword.CURSE:
+                selector = DefensiveSelector()
+                break
+
+        if not selector:
+
+            # Determining Selector
+            if main_effect_type in [
+                EffectType.DETERIORATION.value,
+                EffectType.OFFENSIVE.value,
+            ]:
+                selector = OffensiveSelector()
+
+            elif main_effect_type in [
+                EffectType.DEFENSIVE.value,
+                EffectType.RESTORATION.value,
+            ]:
+                selector = DefensiveSelector()
+
+            elif main_effect_type == EffectType.BUFF.value:
+                selector = BuffSelector()
+
+            elif main_effect_type == EffectType.DEBUFF.value:
+                selector = DebuffSelector()
+
+            else:
+                selector = RandomSelector()
 
         # Using get targets strategy
         if difficulty == Difficulty.EASY:

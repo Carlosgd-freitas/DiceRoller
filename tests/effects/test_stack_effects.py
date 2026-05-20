@@ -1,6 +1,7 @@
 """Tests for stacking effects."""
 
 from math import isclose
+from typing import Dict
 
 from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
@@ -11,9 +12,9 @@ from src.effects.stun import StunEffect
 from tests.utils import assert_conditions
 
 
-def test_stack_effect_new(effect_processing):
-    combat_manager: CombatManager = effect_processing["combat_manager"]
-    monster = combat_manager.order[0]
+def test_stack_effect_new(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster = combat_manager.order[1]
 
     effect = NothingEffect(
         value=1,
@@ -39,9 +40,9 @@ def test_stack_effect_new(effect_processing):
     assert_conditions(conditions)
 
 
-def test_stack_effect_add(effect_processing):
-    combat_manager: CombatManager = effect_processing["combat_manager"]
-    monster = combat_manager.order[0]
+def test_stack_effect_add(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster = combat_manager.order[1]
 
     effect_0 = NothingEffect(
         value=1,
@@ -81,9 +82,9 @@ def test_stack_effect_add(effect_processing):
     assert_conditions(conditions)
 
 
-def test_stack_effect_overwrite(effect_processing):
-    combat_manager: CombatManager = effect_processing["combat_manager"]
-    monster = combat_manager.order[0]
+def test_stack_effect_overwrite(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster = combat_manager.order[1]
 
     effect_0 = NothingEffect(
         value=1,
@@ -123,9 +124,9 @@ def test_stack_effect_overwrite(effect_processing):
     assert_conditions(conditions)
 
 
-def test_stack_effect_remove(effect_processing):
-    combat_manager: CombatManager = effect_processing["combat_manager"]
-    monster = combat_manager.order[0]
+def test_stack_effect_remove(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster = combat_manager.order[1]
 
     effect_freeze = FreezeEffect(
         value=1,
