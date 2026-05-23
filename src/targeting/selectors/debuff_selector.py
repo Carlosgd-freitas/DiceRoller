@@ -6,7 +6,6 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
-from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -49,11 +48,9 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        return filter(
+        return self._get_targets_random(
             enemies,
             k=k,
-            method="RANDOM",
-            alive=True,
         )
 
     def get_targets_normal(
@@ -89,30 +86,24 @@ class DebuffSelector(Selector):
         :rtype: List[Monster]
         """
         if random() < 0.5:
-            targets = filter(
+            targets = self._get_targets_without_effects(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
-                keyword_blacklist=[main_keyword],
+                effects=[main_keyword],
             )
 
         else:
-            targets = filter(
+            targets = self._get_targets_with_effects(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
-                keyword_whitelist=[main_keyword],
+                effects=[main_keyword],
             )
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     enemies,
                     k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
                 )
             )
@@ -152,30 +143,24 @@ class DebuffSelector(Selector):
         :rtype: List[Monster]
         """
         if random() < 0.5:
-            targets = filter(
+            targets = self._get_targets_without_effects(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
-                keyword_blacklist=[main_keyword],
+                effects=[main_keyword],
             )
 
         else:
-            targets = filter(
+            targets = self._get_targets_with_effects(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
-                keyword_whitelist=[main_keyword],
+                effects=[main_keyword],
             )
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     enemies,
                     k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
                 )
             )

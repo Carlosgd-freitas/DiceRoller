@@ -6,7 +6,6 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
-from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -29,8 +28,8 @@ class OffensiveSelector(Selector):
         """
         Returns a list of target monsters based on EASY difficulty criteria for
         offensive type effects:
-        * 20% -> random alive enemies
-        * 80% -> alive enemies with most hp
+        * 50% -> random alive enemies
+        * 50% -> alive enemies with most hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -50,21 +49,16 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        if random() < 0.2:
-            return filter(
+        if random() < 0.5:
+            return self._get_targets_random(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
             )
 
         else:
-            return filter(
+            return self._get_targets_highest_hp(
                 enemies,
                 k=k,
-                method="LAST",
-                sort_function=(lambda x: x.hp),
-                alive=True,
             )
 
     def get_targets_normal(
@@ -78,8 +72,8 @@ class OffensiveSelector(Selector):
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         offensive type effects:
-        * 20% -> random alive enemies
-        * 80% -> alive enemies with least hp
+        * 30% -> random alive enemies
+        * 70% -> alive enemies with least effective hp and hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -99,21 +93,16 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        if random() < 0.2:
-            return filter(
+        if random() < 0.3:
+            return self._get_targets_random(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
             )
 
         else:
-            return filter(
+            return self._get_targets_lowest_hp(
                 enemies,
                 k=k,
-                method="FIRST",
-                sort_function=(lambda x: x.hp),
-                alive=True,
             )
 
     def get_targets_hard(
@@ -127,8 +116,8 @@ class OffensiveSelector(Selector):
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         offensive type effects:
-        * 20% -> random alive enemies
-        * 80% -> alive enemies with least hp, wihout Block or Absorb
+        * 10% -> random alive enemies
+        * 90% -> alive enemies with least effective hp and hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -148,34 +137,14 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        if random() < 0.2:
-            return filter(
+        if random() < 0.1:
+            return self._get_targets_random(
                 enemies,
                 k=k,
-                method="RANDOM",
-                alive=True,
             )
 
         else:
-            targets = filter(
+            return self._get_targets_lowest_hp(
                 enemies,
                 k=k,
-                method="FIRST",
-                sort_function=(lambda x: x.hp),
-                alive=True,
-                keyword_blacklist=[Keyword.ABSORB, Keyword.BLOCK],
             )
-
-            if len(targets) < k:
-                targets.extend(
-                    filter(
-                        enemies,
-                        k=k - len(targets),
-                        method="FIRST",
-                        sort_function=(lambda x: x.hp),
-                        alive=True,
-                        local_id_blacklist=[target.local_id for target in targets],
-                    )
-                )
-
-            return targets

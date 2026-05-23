@@ -6,7 +6,6 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
-from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -49,19 +48,16 @@ class BuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
-                    local_id_blacklist=[target.local_id for target in targets],
                 )
             )
 
@@ -99,7 +95,7 @@ class BuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
@@ -107,35 +103,27 @@ class BuffSelector(Selector):
         if len(targets) < k:
             if random() < 0.5:
                 targets.extend(
-                    filter(
+                    self._get_targets_without_effects(
                         allies,
                         k=k - len(targets),
-                        method="RANDOM",
-                        alive=True,
-                        local_id_blacklist=[target.local_id for target in targets],
-                        keyword_blacklist=[main_keyword],
+                        effects=[main_keyword],
                     )
                 )
 
             else:
                 targets.extend(
-                    targets=filter(
+                    self._get_targets_with_effects(
                         allies,
                         k=k - len(targets),
-                        method="RANDOM",
-                        alive=True,
-                        local_id_blacklist=[target.local_id for target in targets],
-                        keyword_whitelist=[main_keyword],
+                        effects=[main_keyword],
                     )
                 )
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
                 )
             )
@@ -174,7 +162,7 @@ class BuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
@@ -182,35 +170,27 @@ class BuffSelector(Selector):
         if len(targets) < k:
             if random() < 0.5:
                 targets.extend(
-                    filter(
+                    self._get_targets_without_effects(
                         allies,
                         k=k - len(targets),
-                        method="RANDOM",
-                        alive=True,
-                        local_id_blacklist=[target.local_id for target in targets],
-                        keyword_blacklist=[main_keyword],
+                        effects=[main_keyword],
                     )
                 )
 
             else:
                 targets.extend(
-                    targets=filter(
+                    self._get_targets_with_effects(
                         allies,
                         k=k - len(targets),
-                        method="RANDOM",
-                        alive=True,
-                        local_id_blacklist=[target.local_id for target in targets],
-                        keyword_whitelist=[main_keyword],
+                        effects=[main_keyword],
                     )
                 )
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
                     local_id_blacklist=[target.local_id for target in targets],
                 )
             )

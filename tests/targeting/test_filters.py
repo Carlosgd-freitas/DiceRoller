@@ -98,7 +98,7 @@ def test_filter_lowest_hp(managers: Dict):
         combat_manager.order,
         k=1,
         method="FIRST",
-        sort_function=(lambda x: x.hp),
+        sort_functions=[lambda x: x.hp],
         alive=False,
     )
 
@@ -118,7 +118,7 @@ def test_filter_highest_hp(managers: Dict):
         combat_manager.order,
         k=1,
         method="LAST",
-        sort_function=(lambda x: x.hp),
+        sort_functions=[lambda x: x.hp],
         alive=False,
     )
 

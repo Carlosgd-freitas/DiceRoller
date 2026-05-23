@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from random import choices
+from random import sample
 from typing import TYPE_CHECKING, Callable, List, Literal
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ def filter(
     entities: List[Entity],
     k: int = 1,
     method: Literal["FIRST", "LAST", "RANDOM"] = "RANDOM",
-    sort_function: Callable = None,
+    sort_functions: List[Callable] = None,
     alive: bool = True,
     hurt: bool = False,
     local_id_blacklist: List[str] = None,
@@ -34,8 +34,8 @@ def filter(
     "RANDOM".
     :type method: Literal["FIRST", "LAST", "RANDOM"]
 
-    :param sort_function: A function to sort the list of entities.
-    :type sort_function: Callable
+    :param sort_functions: A list of functions to sort the list of entities.
+    :type sort_functions: List[Callable]
 
     :param alive: Whether to consider only alive entities (hp > 0). Default value is
     True.
@@ -60,6 +60,7 @@ def filter(
     :return: A list of entities which meets the criteria.
     :rtype: List[Entity]
     """
+    sort_functions = [] if sort_functions is None else sort_functions
     local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
     keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
     keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
@@ -67,7 +68,7 @@ def filter(
     filtered = entities.copy()
 
     # Sorting
-    if sort_function:
+    for sort_function in reversed(sort_functions):
         filtered.sort(key=sort_function)
 
     # Entity attribute conditions
@@ -80,7 +81,7 @@ def filter(
     # Whitelist and blacklist conditions
     to_remove = []
 
-    for index, entity in enumerate(entities):
+    for index, entity in enumerate(filtered):
 
         if entity.local_id in local_id_blacklist:
             to_remove.append(index)
@@ -96,13 +97,13 @@ def filter(
 
     if to_remove:
         filtered = [
-            entity for index, entity in enumerate(entities) if index not in to_remove
+            entity for index, entity in enumerate(filtered) if index not in to_remove
         ]
 
     # Method picking
     if len(filtered) > 0:
         if method == "RANDOM":
-            filtered = choices(filtered, k=k)
+            filtered = sample(filtered, k=min(k, len(filtered)))
         else:
             if method == "LAST":
                 filtered.reverse()

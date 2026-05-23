@@ -1,4 +1,4 @@
-"""Pierce effect module."""
+"""Thorns effect module."""
 
 from __future__ import annotations
 
@@ -6,18 +6,17 @@ from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
-from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class PierceEffect(Effect):
+class ThornsEffect(Effect):
     """
-    Pierce Effect.
+    Thorns Effect.
 
-    Will reduce the target's HP by the effect value and remove Sleep from it. Ignores
-    Block.
+    When the target is attacked, the monster who attacked it will have their HP reduced
+    by the effect value.
     """
 
     def __init__(
@@ -28,12 +27,12 @@ class PierceEffect(Effect):
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.PIERCE,
+            Keyword.THORNS,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.OFFENSIVE,
+            EffectType.BUFF,
         )
 
     def on_apply(
@@ -48,20 +47,4 @@ class PierceEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> None:
-        target.remove_effect(Keyword.SLEEP)
-
-        damage = calculate_damage(
-            self,
-            source,
-            target,
-        )
-
-        target.hp -= damage
-        target.equalize_stats()
-
-        thorns = target.get_effect(Keyword.THORNS)
-        if thorns:
-            source.hp -= thorns.value
-        source.equalize_stats()
-
         return

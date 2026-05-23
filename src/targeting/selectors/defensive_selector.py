@@ -5,7 +5,6 @@ from __future__ import annotations
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -49,18 +48,16 @@ class DefensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_random(
                     allies,
-                    k=k - len(targets),
-                    method="RANDOM",
-                    alive=True,
+                    k=k,
                 )
             )
 
@@ -77,8 +74,8 @@ class DefensiveSelector(Selector):
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         defensive type effects:
-        * 20% -> self + (k-1) random, alive allies
-        * 80% -> self + (k-1) alive allies with least hp
+        * 30% -> self + (k-1) random, alive allies
+        * 70% -> self + (k-1) alive allies with least hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -98,30 +95,25 @@ class DefensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
 
         if len(targets) < k:
-            if random() < 0.2:
+            if random() < 0.3:
                 targets.extend(
-                    filter(
+                    self._get_targets_random(
                         allies,
                         k=k - len(targets),
-                        method="RANDOM",
-                        alive=True,
                     )
                 )
 
             else:
                 targets.extend(
-                    filter(
+                    self._get_targets_lowest_hp(
                         allies,
                         k=k - len(targets),
-                        method="FIRST",
-                        sort_function=(lambda x: x.hp),
-                        alive=True,
                     )
                 )
 
@@ -158,19 +150,16 @@ class DefensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets = []
+        targets: List[Monster] = []
 
         if len(targets) < k:
             targets.append(source)
 
         if len(targets) < k:
             targets.extend(
-                filter(
+                self._get_targets_lowest_hp(
                     allies,
                     k=k - len(targets),
-                    method="FIRST",
-                    sort_function=(lambda x: x.hp),
-                    alive=True,
                 )
             )
 

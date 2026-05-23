@@ -239,3 +239,19 @@ class Entity:
                 self.get_effect(Keyword.STUN),
             ]
         )
+
+    def get_effective_hp(self) -> int:
+        """
+        Returns the entity' effective hp, taking any blocking effects into account.
+
+        :return: The effective hp.
+        :rtype: int
+        """
+        effective_hp = self.hp
+
+        for keyword in [Keyword.ABSORB, Keyword.BLOCK]:
+            effect = self.get_effect(keyword)
+            if effect:
+                effective_hp += effect.value
+
+        return effective_hp

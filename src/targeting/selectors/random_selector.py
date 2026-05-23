@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
-from src.targeting.filters import filter
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -16,30 +15,6 @@ class RandomSelector(Selector):
     """
     Selects monster targets randomly.
     """
-
-    def _get_targets_default(
-        self,
-        source: Monster,
-        allies: List[Monster],
-        enemies: List[Monster],
-        k: int,
-        main_keyword: Keyword,
-    ):
-        """Private, utility function for other functions of the class."""
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
-        if enemies:
-            monsters.extend(enemies)
-
-        return filter(
-            monsters,
-            k=k,
-            method="RANDOM",
-            alive=True,
-        )
 
     def get_targets_easy(
         self,
@@ -72,12 +47,17 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        return self._get_targets_default(
-            source=source,
-            allies=allies,
-            enemies=enemies,
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            monsters.extend(enemies)
+
+        return self._get_targets_random(
+            monsters=monsters,
             k=k,
-            main_keyword=main_keyword,
         )
 
     def get_targets_normal(
@@ -111,12 +91,17 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        return self._get_targets_default(
-            source=source,
-            allies=allies,
-            enemies=enemies,
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            monsters.extend(enemies)
+
+        return self._get_targets_random(
+            monsters=monsters,
             k=k,
-            main_keyword=main_keyword,
         )
 
     def get_targets_hard(
@@ -150,10 +135,15 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        return self._get_targets_default(
-            source=source,
-            allies=allies,
-            enemies=enemies,
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            monsters.extend(enemies)
+
+        return self._get_targets_random(
+            monsters=monsters,
             k=k,
-            main_keyword=main_keyword,
         )
