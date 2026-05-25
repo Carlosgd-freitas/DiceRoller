@@ -43,8 +43,8 @@ class HealEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         if target.hp > 0:
             target.hp += self.value

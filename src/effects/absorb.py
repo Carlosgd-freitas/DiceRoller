@@ -33,6 +33,8 @@ class AbsorbEffect(Effect):
             decay,
             accuracy,
             EffectType.DEFENSIVE,
+            None,
+            True,
         )
 
     def on_apply(
@@ -44,7 +46,7 @@ class AbsorbEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

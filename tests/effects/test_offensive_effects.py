@@ -16,7 +16,7 @@ def test_keyword_attack(managers: Dict):
 
     effect = AttackEffect(6)
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         effect,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -36,9 +36,13 @@ def test_keyword_drain(managers: Dict):
     drain_effect = DrainEffect(3)
     block_effect = BlockEffect(1)
 
-    combat_manager.order[2].apply_effect(block_effect)
+    combat_manager.execute_effect(
+        block_effect,
+        source=combat_manager.order[2],
+        target=combat_manager.order[2],
+    )
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         drain_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -61,9 +65,13 @@ def test_keyword_pierce(managers: Dict):
     pierce_effect = PierceEffect(2)
     block_effect = BlockEffect(6)
 
-    combat_manager.order[2].apply_effect(block_effect)
+    combat_manager.execute_effect(
+        block_effect,
+        source=combat_manager.order[2],
+        target=combat_manager.order[2],
+    )
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         pierce_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[2],

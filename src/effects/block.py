@@ -32,6 +32,8 @@ class BlockEffect(Effect):
             decay,
             accuracy,
             EffectType.DEFENSIVE,
+            None,
+            True,
         )
 
     def on_apply(
@@ -43,7 +45,7 @@ class BlockEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

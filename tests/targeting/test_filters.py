@@ -6,14 +6,14 @@ from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
 from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
-from src.targeting.filters import filter
+from src.targeting.filters import filter_entities
 from tests.utils import assert_conditions
 
 
 def test_filter_first(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=1,
         method="FIRST",
@@ -31,7 +31,7 @@ def test_filter_first(managers: Dict):
 def test_filter_last(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=3,
         method="LAST",
@@ -51,7 +51,7 @@ def test_filter_last(managers: Dict):
 def test_filter_alive(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=2,
         method="FIRST",
@@ -72,7 +72,7 @@ def test_filter_alive(managers: Dict):
 def test_filter_hurt(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=2,
         method="LAST",
@@ -94,7 +94,7 @@ def test_filter_hurt(managers: Dict):
 def test_filter_lowest_hp(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=1,
         method="FIRST",
@@ -114,7 +114,7 @@ def test_filter_lowest_hp(managers: Dict):
 def test_filter_highest_hp(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=1,
         method="LAST",
@@ -140,7 +140,7 @@ def test_filter_with_effect(managers: Dict):
     combat_manager.order[1].apply_effect(effect_burn)
     combat_manager.order[2].apply_effect(effect_stun)
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=2,
         method="FIRST",
@@ -165,7 +165,7 @@ def test_filter_without_effect(managers: Dict):
     combat_manager.order[1].apply_effect(effect_burn)
     combat_manager.order[2].apply_effect(effect_stun)
 
-    filtered = filter(
+    filtered = filter_entities(
         combat_manager.order,
         k=10,
         method="FIRST",

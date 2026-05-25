@@ -44,8 +44,8 @@ class CurseEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         damage = calculate_damage(
             self,

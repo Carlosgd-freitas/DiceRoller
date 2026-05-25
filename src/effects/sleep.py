@@ -33,6 +33,8 @@ class SleepEffect(Effect):
             decay,
             accuracy,
             EffectType.DEBUFF,
+            None,
+            True,
         )
 
     def on_apply(
@@ -44,7 +46,7 @@ class SleepEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

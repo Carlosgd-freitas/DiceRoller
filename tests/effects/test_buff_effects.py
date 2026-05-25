@@ -17,7 +17,11 @@ def test_keyword_thorns(managers: Dict):
     attack_effect = AttackEffect(4)
     thorns_effect = ThornsEffect(4, duration=1)
 
-    combat_manager.order[2].apply_effect(thorns_effect)
+    combat_manager.execute_effect(
+        thorns_effect,
+        source=combat_manager.order[2],
+        target=combat_manager.order[2],
+    )
 
     conditions = [
         combat_manager.order[2].local_id == "MONSTER_2",
@@ -28,7 +32,7 @@ def test_keyword_thorns(managers: Dict):
         combat_manager.order[3].get_effect(Keyword.THORNS) is None,
     ]
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         attack_effect,
         source=combat_manager.order[3],
         target=combat_manager.order[2],
@@ -46,7 +50,7 @@ def test_keyword_thorns(managers: Dict):
 
     combat_manager.end_turn()
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         attack_effect,
         source=combat_manager.order[3],
         target=combat_manager.order[2],

@@ -105,9 +105,24 @@ class Entity:
             self.hp = self.max_hp
         return
 
-    def get_effect(self, keyword: Keyword) -> Effect:
+    def has_effect(self, keyword: Keyword) -> bool:
         """
-        Returns an effect from the entity based on a keyword.
+        Returns if the entity is currently under the effect.
+
+        :param keyword: A keyword.
+        :type keyword: Keyword
+
+        :return: If the entity has the effect.
+        :rtype: bool
+        """
+        for effect in self.effects:
+            if effect.keyword == keyword:
+                return True
+        return False
+
+    def get_effect(self, keyword: Keyword) -> Effect | None:
+        """
+        Returns an effect from the entity.
 
         :param keyword: A keyword.
         :type keyword: Keyword
@@ -164,6 +179,7 @@ class Entity:
         value of the existing effect will be overwritten by the new effect for that
         parameter.
         """
+        new_effect = deepcopy(effect)
         current_effect = self.get_effect(effect.keyword)
 
         # Stack existing effect
@@ -175,7 +191,7 @@ class Entity:
                 ("accuracy", stack_accuracy),
             ]:
                 current_value = getattr(current_effect, parameter)
-                new_value = getattr(effect, parameter)
+                new_value = getattr(new_effect, parameter)
 
                 if method == "overwrite":
                     setattr(
@@ -194,14 +210,19 @@ class Entity:
                         current_value + new_value,
                     )
 
+            current_effect.on_apply(
+                source,
+                self,
+            )
+
         # Add new effect
         else:
-            self.effects.append(deepcopy(effect))
+            self.effects.append(new_effect)
 
-        effect.on_apply(
-            source,
-            self,
-        )
+            new_effect.on_apply(
+                source,
+                self,
+            )
 
         return None
 

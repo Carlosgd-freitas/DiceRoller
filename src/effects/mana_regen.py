@@ -35,6 +35,7 @@ class ManaRegenEffect(Effect):
             accuracy,
             EffectType.RESTORATION,
             Trigger.TURN_START,
+            True,
         )
 
     def on_apply(
@@ -46,8 +47,8 @@ class ManaRegenEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         if target.hp > 0:
             target.mana += self.value

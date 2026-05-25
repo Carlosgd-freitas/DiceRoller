@@ -35,6 +35,7 @@ class RegenEffect(Effect):
             accuracy,
             EffectType.RESTORATION,
             Trigger.TURN_START,
+            True,
         )
 
     def on_apply(
@@ -46,8 +47,8 @@ class RegenEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         if target.hp > 0:
             target.hp += self.value

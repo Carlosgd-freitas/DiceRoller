@@ -36,6 +36,7 @@ class BleedEffect(Effect):
             accuracy,
             EffectType.DEBUFF,
             Trigger.ROLL,
+            True,
         )
 
     def on_apply(
@@ -47,8 +48,8 @@ class BleedEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         damage = calculate_damage(
             self,

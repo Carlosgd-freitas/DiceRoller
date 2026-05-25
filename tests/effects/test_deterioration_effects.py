@@ -14,9 +14,13 @@ def test_keyword_curse(managers: Dict):
     curse_effect = CurseEffect(6)
     block_effect = BlockEffect(6)
 
-    combat_manager.order[1].apply_effect(block_effect)
+    combat_manager.execute_effect(
+        block_effect,
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
+    )
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         curse_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[1],

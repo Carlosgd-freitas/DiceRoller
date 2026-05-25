@@ -33,6 +33,8 @@ class FreezeEffect(Effect):
             decay,
             accuracy,
             EffectType.DEBUFF,
+            None,
+            True,
         )
 
     def on_apply(
@@ -45,7 +47,7 @@ class FreezeEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

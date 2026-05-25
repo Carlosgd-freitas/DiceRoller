@@ -43,8 +43,8 @@ class ManaEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         if target.hp > 0:
             target.mana += self.value

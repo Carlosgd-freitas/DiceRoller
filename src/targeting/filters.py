@@ -10,14 +10,14 @@ if TYPE_CHECKING:
     from src.base.keywords import Keyword
 
 
-def filter(
+def filter_entities(
     entities: List[Entity],
     k: int = 1,
     method: Literal["FIRST", "LAST", "RANDOM"] = "RANDOM",
     sort_functions: List[Callable] = None,
     alive: bool = True,
     hurt: bool = False,
-    local_id_blacklist: List[str] = None,
+    exclude: List[str] = None,
     keyword_whitelist: List[Keyword] = None,
     keyword_blacklist: List[Keyword] = None,
 ) -> List[Entity]:
@@ -45,9 +45,9 @@ def filter(
     False.
     :type hurt: bool
 
-    :param local_id_blacklist: Only entities without any of the specified local_id will
+    :param exclude: Only entities without any of the specified local_id will
     be returned.
-    :type local_id_blacklist: List[str]
+    :type exclude: List[str]
 
     :param keyword_whitelist: Only entities under all effects in this list will be
     returned.
@@ -61,7 +61,7 @@ def filter(
     :rtype: List[Entity]
     """
     sort_functions = [] if sort_functions is None else sort_functions
-    local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
+    exclude = [] if exclude is None else exclude
     keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
     keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
 
@@ -83,7 +83,7 @@ def filter(
 
     for index, entity in enumerate(filtered):
 
-        if entity.local_id in local_id_blacklist:
+        if entity.local_id in exclude:
             to_remove.append(index)
             continue
 

@@ -16,7 +16,7 @@ def test_keyword_heal(managers: Dict):
 
     effect = HealEffect(6)
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         effect,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -40,7 +40,7 @@ def test_keyword_mana(managers: Dict):
         combat_manager.order[1].mana == 0,
     ]
 
-    combat_manager.activate_effect(
+    combat_manager.execute_effect(
         effect,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -65,7 +65,11 @@ def test_keyword_mana_regen(managers: Dict):
         duration=1,
     )
 
-    combat_manager.order[2].apply_effect(effect)
+    combat_manager.execute_effect(
+        effect,
+        source=combat_manager.order[2],
+        target=combat_manager.order[2],
+    )
 
     conditions = [
         combat_manager.order[2].local_id == "MONSTER_2",
@@ -102,7 +106,11 @@ def test_keyword_regen(managers: Dict):
         duration=1,
     )
 
-    combat_manager.order[2].apply_effect(effect)
+    combat_manager.execute_effect(
+        effect,
+        source=combat_manager.order[2],
+        target=combat_manager.order[2],
+    )
 
     conditions = [
         combat_manager.order[2].local_id == "MONSTER_2",

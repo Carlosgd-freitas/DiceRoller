@@ -36,6 +36,7 @@ class PoisonEffect(Effect):
             accuracy,
             EffectType.DEBUFF,
             Trigger.TURN_START,
+            True,
         )
 
     def on_apply(
@@ -47,8 +48,8 @@ class PoisonEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         damage = calculate_damage(
             self,

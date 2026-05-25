@@ -32,6 +32,8 @@ class BlindEffect(Effect):
             decay,
             accuracy,
             EffectType.DEBUFF,
+            None,
+            True,
         )
 
     def on_apply(
@@ -43,7 +45,7 @@ class BlindEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

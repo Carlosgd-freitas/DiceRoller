@@ -33,6 +33,8 @@ class ThornsEffect(Effect):
             decay,
             accuracy,
             EffectType.BUFF,
+            None,
+            True,
         )
 
     def on_apply(
@@ -44,7 +46,7 @@ class ThornsEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         return

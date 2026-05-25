@@ -124,7 +124,7 @@ class BuffSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    local_id_blacklist=[target.local_id for target in targets],
+                    exclude=[target.local_id for target in targets],
                 )
             )
 
@@ -191,7 +191,7 @@ class BuffSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    local_id_blacklist=[target.local_id for target in targets],
+                    exclude=[target.local_id for target in targets],
                 )
             )
 

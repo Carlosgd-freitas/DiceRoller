@@ -228,7 +228,7 @@ class CombatManager:
 
         return teams_status
 
-    def activate_effect(
+    def execute_effect(
         self,
         effect: Effect,
         source: Entity,
@@ -237,8 +237,8 @@ class CombatManager:
         check_accuracy: bool = True,
     ) -> bool:
         """
-        Activates an Effect while taking the source and target Entities' effects on
-        consideration.
+        Executes an Effect through a series of checks. If the Effect is persistent, it
+        will be applied to the target.
 
         :param effect: An Effect.
         :type effect: Effect
@@ -274,7 +274,19 @@ class CombatManager:
             if random() >= accuracy:
                 return False
 
-        effect.activate(source, target)
+        # Persistent effects
+        if effect.persistent:
+            target.apply_effect(
+                effect,
+                source=source,
+            )
+
+        # Instant effects
+        else:
+            effect.activate(
+                source=source,
+                target=target,
+            )
 
         return True
 
@@ -296,12 +308,8 @@ class CombatManager:
             rolled.append(dice.roll())
 
             for effect in rolling_effects:
-                self.activate_effect(
-                    effect,
-                    None,
-                    entity,
-                    check_can_act=False,
-                    check_accuracy=False,
+                effect.activate(
+                    target=entity,
                 )
 
         return rolled
@@ -327,12 +335,8 @@ class CombatManager:
 
         for effect in self.current_monster.effects:
             if effect.trigger == Trigger.TURN_START:
-                self.activate_effect(
-                    effect,
-                    None,
-                    self.current_monster,
-                    check_can_act=False,
-                    check_accuracy=False,
+                effect.activate(
+                    target=self.current_monster,
                 )
 
         return
@@ -354,19 +358,13 @@ class CombatManager:
                     difficulty=self.current_monster.difficulty,
                 )
 
-                targets_ids = [target.local_id for target in targets]
-
-                for target_id in targets_ids:
-
-                    for monster in self.order:
-                        if monster.local_id == target_id:
-                            for effect in side.effects:
-                                self.activate_effect(
-                                    effect=effect,
-                                    source=self.current_monster,
-                                    target=monster,
-                                )
-                            break
+                for target in targets:
+                    for effect in side.effects:
+                        self.execute_effect(
+                            effect=effect,
+                            source=self.current_monster,
+                            target=target,
+                        )
 
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError
@@ -389,12 +387,8 @@ class CombatManager:
         # Procesing effects on turn end
         for effect in self.current_monster.effects:
             if effect.trigger == Trigger.TURN_END:
-                self.activate_effect(
-                    effect,
-                    None,
-                    self.current_monster,
-                    check_can_act=False,
-                    check_accuracy=False,
+                effect.activate(
+                    target=self.current_monster,
                 )
 
         # Decaying and removing effects

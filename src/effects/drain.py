@@ -45,8 +45,8 @@ class DrainEffect(Effect):
 
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         target.remove_effect(Keyword.SLEEP)
 

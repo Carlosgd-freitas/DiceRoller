@@ -43,20 +43,18 @@ class Effect(ABC):
     Effect's value instead. Default value is 0.
     :vartype decay: float
 
-    :var accuracy: Effect's chance of being applied, in interval [0, 1]. Default value is
-    1 (100%).
+    :var accuracy: Effect's chance of being applied, in interval [0, 1]. Default value
+    is 1 (100%).
     :vartype accuracy: float
 
-    :var type: Effect's type. By default, this value will depend on keyword.
+    :var type: Effect's type.
     :vartype type: EffectType
 
-    :var trigger: Effect's triggering condition. By default, this value will depend on
-    keyword.
+    :var trigger: Effect's triggering condition.
     :vartype trigger: Trigger
 
-    :var incompatible: Effect's incompatible keywords, which will be removed if this Effect
-    is added to an Entity. By default, this value will depend on keyword.
-    :vartype incompatible: List[Keyword]
+    :var persistent: If the Effect is persistent or instant. Default value is False.
+    :vartype persistent: bool
     """
 
     def __init__(
@@ -68,6 +66,7 @@ class Effect(ABC):
         accuracy: float = 1,
         type: EffectType = None,
         trigger: Trigger = None,
+        persistent: bool = False,
     ):
         self.keyword = keyword
         self.value = value
@@ -76,6 +75,7 @@ class Effect(ABC):
         self.accuracy = accuracy
         self.type = type
         self.trigger = trigger
+        self.persistent = persistent
 
     def __str__(self) -> str:
         _str = color_keyword(self.keyword)
@@ -105,16 +105,16 @@ class Effect(ABC):
     @abstractmethod
     def activate(
         self,
-        source: Entity,
         target: Entity,
+        source: Entity | None = None,
     ) -> None:
         """
         What the Effect will done when activated.
 
-        :param source: The Entity object where the effect is from.
-        :type source: Entity
-
         :param target: An Entity object which the effect will be applied.
         :type target: Entity
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
         """
         raise NotImplementedError

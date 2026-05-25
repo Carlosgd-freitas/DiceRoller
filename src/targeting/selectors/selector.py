@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List
 
-from src.targeting.filters import filter
+from src.targeting.filters import filter_entities
 
 if TYPE_CHECKING:
     from src.base.keywords import Keyword
@@ -117,32 +117,32 @@ class Selector(ABC):
         self,
         monsters: List[Monster],
         k: int,
-        local_id_blacklist: List[str] = None,
+        exclude: List[str] = None,
     ):
         """
         Private method to be used by other methods. Returns k alive random monsters.
         """
-        local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
-        return filter(
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
             alive=True,
-            local_id_blacklist=local_id_blacklist,
+            exclude=exclude,
         )
 
     def _get_targets_highest_hp(
         self,
         monsters: List[Monster],
         k: int,
-        local_id_blacklist: List[str] = None,
+        exclude: List[str] = None,
     ):
         """
         Private method to be used by other methods. Returns k alive monsters with most
         effective hp and hp.
         """
-        local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
-        return filter(
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
             monsters,
             k=k,
             method="FIRST",
@@ -151,21 +151,21 @@ class Selector(ABC):
                 (lambda entity: -entity.hp),
             ],
             alive=True,
-            local_id_blacklist=local_id_blacklist,
+            exclude=exclude,
         )
 
     def _get_targets_lowest_hp(
         self,
         monsters: List[Monster],
         k: int,
-        local_id_blacklist: List[str] = None,
+        exclude: List[str] = None,
     ):
         """
         Private method to be used by other methods. Returns k alive monsters with least
         effective hp and hp.
         """
-        local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
-        return filter(
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
             monsters,
             k=k,
             method="FIRST",
@@ -174,7 +174,7 @@ class Selector(ABC):
                 (lambda entity: entity.hp),
             ],
             alive=True,
-            local_id_blacklist=local_id_blacklist,
+            exclude=exclude,
         )
 
     def _get_targets_with_effects(
@@ -182,20 +182,20 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effects: List[Keyword],
-        local_id_blacklist: List[str] = None,
+        exclude: List[str] = None,
     ):
         """
         Private method to be used by other methods. Returns k alive random monsters
         with effects.
         """
-        local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
-        return filter(
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
             alive=True,
             keyword_whitelist=effects,
-            local_id_blacklist=local_id_blacklist,
+            exclude=exclude,
         )
 
     def _get_targets_without_effects(
@@ -203,18 +203,18 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effects: List[Keyword],
-        local_id_blacklist: List[str] = None,
+        exclude: List[str] = None,
     ):
         """
         Private method to be used by other methods. Returns k alive random monsters
         without effects.
         """
-        local_id_blacklist = [] if local_id_blacklist is None else local_id_blacklist
-        return filter(
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
             alive=True,
             keyword_blacklist=effects,
-            local_id_blacklist=local_id_blacklist,
+            exclude=exclude,
         )
