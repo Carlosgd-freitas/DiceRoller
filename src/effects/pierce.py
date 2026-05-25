@@ -54,14 +54,10 @@ class PierceEffect(Effect):
             self,
             source,
             target,
+            consider_block=False,
         )
 
         target.hp -= damage
         target.equalize_stats()
-
-        thorns = target.get_effect(Keyword.THORNS)
-        if thorns:
-            source.hp -= thorns.value
-        source.equalize_stats()
 
         return

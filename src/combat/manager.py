@@ -3,7 +3,7 @@
 from random import random, shuffle
 from typing import Dict, List, Literal
 
-from src.base.effect import Effect
+from src.base.effect import Effect, EffectType
 from src.base.entity import Entity
 from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
@@ -287,6 +287,15 @@ class CombatManager:
                 source=source,
                 target=target,
             )
+
+        # Procesing effects on being attacked
+        if effect.type == EffectType.OFFENSIVE:
+            for target_effect in target.effects:
+                if target_effect.trigger == Trigger.BEING_ATTACKED:
+                    target_effect.activate(
+                        source=target,
+                        target=source,
+                    )
 
         return True
 

@@ -58,9 +58,4 @@ class DrainEffect(Effect):
         source.hp += damage
         source.equalize_stats()
 
-        thorns = target.get_effect(Keyword.THORNS)
-        if thorns:
-            source.hp -= thorns.value
-        source.equalize_stats()
-
         return

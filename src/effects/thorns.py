@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
+from src.base.triggers import Trigger
+from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -33,7 +35,7 @@ class ThornsEffect(Effect):
             decay,
             accuracy,
             EffectType.BUFF,
-            None,
+            Trigger.BEING_ATTACKED,
             True,
         )
 
@@ -49,4 +51,9 @@ class ThornsEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> None:
+        damage = calculate_damage(self, source, target, consider_block=True)
+
+        target.hp -= damage
+        target.equalize_stats()
+
         return
