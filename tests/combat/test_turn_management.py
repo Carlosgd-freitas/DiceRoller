@@ -37,13 +37,13 @@ def combat_manager():
 
 
 def test_next_turn(combat_manager: CombatManager):
-    turn_0_monster_id = combat_manager.current_monster_id
+    turn_0_monster_id = combat_manager.current_monster.local_id
 
     combat_manager.next_turn()
-    turn_1_monster_id = combat_manager.current_monster_id
+    turn_1_monster_id = combat_manager.current_monster.local_id
 
     combat_manager.next_turn()
-    turn_2_monster_id = combat_manager.current_monster_id
+    turn_2_monster_id = combat_manager.current_monster.local_id
 
     conditions = [
         turn_0_monster_id == "MONSTER_2",

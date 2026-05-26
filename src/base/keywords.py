@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from src.base.color import Color, color_string
+from src.base.color import Color, ColorParams
 
 
 class Keyword(Enum):
@@ -45,7 +45,7 @@ class Keyword(Enum):
     WEAKEN = "WEAKEN"
 
 
-def color_keyword(keyword: Keyword) -> str:
+def get_keyword_color(keyword: Keyword) -> ColorParams:
     intensity = "BRIGHT"
 
     if keyword in [Keyword.ABSORB, Keyword.DRAIN, Keyword.REGEN]:
@@ -89,8 +89,7 @@ def color_keyword(keyword: Keyword) -> str:
     else:
         foreground_color = None
 
-    return color_string(
-        keyword.value,
-        foreground_color=foreground_color,
-        intensity=intensity,
-    )
+    return {
+        "foreground_color": foreground_color,
+        "intensity": intensity,
+    }

@@ -4,7 +4,7 @@ Needs a previously executed colorama.init() to work.
 """
 
 from enum import Enum
-from typing import Literal, Tuple
+from typing import Literal, Tuple, TypedDict
 
 
 class ANSICode(Enum):
@@ -84,6 +84,19 @@ class Color(Enum):
     HOT_PINK = (252, 3, 152)
     RUBY = (224, 17, 95)
     PINK = (255, 153, 204)
+
+
+class ColorParams(TypedDict):
+    """Color parameters."""
+
+    foreground_color: Tuple[int, int, int] | Color
+    background_color: Tuple[int, int, int] | Color
+    intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"]
+    italic: bool
+    underlined: bool
+    inverted: bool
+    concealed: bool
+    strikethrough: bool
 
 
 def get_color_code(color: Tuple[int, int, int] | Color) -> str:

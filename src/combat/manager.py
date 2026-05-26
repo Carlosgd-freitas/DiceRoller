@@ -1,7 +1,7 @@
 """Combat Manager module."""
 
 from random import random, shuffle
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, TypedDict
 
 from src.base.effect import Effect, EffectType
 from src.base.entity import Entity
@@ -9,8 +9,14 @@ from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
 from src.base.side import Side
 from src.base.triggers import Trigger
-from src.combat.logger import CombatLogger
+from src.logger.logger import Logger
 from src.targeting.selectors.manager import SelectorManager
+
+
+class CombatResult(TypedDict):
+    ALIVE: List[List[Monster]]
+    DEFEATED: List[List[Monster]]
+    status: Literal["DRAW", "ONGOING", "WINNER"]
 
 
 class CombatManager:
@@ -27,9 +33,11 @@ class CombatManager:
     :var order_strategy: How the turn order will be decided. Default value is "FASTER".
     :vartype order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"]
 
-    :var current_monster_id: The current monster which turn will be taken. A monster's
-    local_id can be passed to be defined as the current monster. Default value is None.
-    :vartype current_monster_id: str
+    :var logging: If the combat will be logged. Default value is True.
+    :vartype logging: bool
+
+    :var language: What language will be logged. Default value is "EN-US".
+    :vartype language: Literal["EN-US", "PT-BR"]
 
     **Order strategies**
     * ``FASTER``: monsters act from highest to lowest speed
@@ -43,13 +51,17 @@ class CombatManager:
         teams: List[List[Monster]] = None,
         team_names: List[str] = None,
         order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"] = "FASTER",
-        current_monster_id: str = None,
+        logging: bool = True,
+        language: Literal["EN-US", "PT-BR"] = "EN-US",
     ):
         self.round: int = 0
         self.turn: int = 0
 
         self.selector_manager = SelectorManager()
-        self.logger = CombatLogger()
+        self.logger = Logger(
+            enabled=logging,
+            language=language,
+        )
 
         teams = [] if teams is None else teams
         team_names = [] if team_names is None else team_names
@@ -73,11 +85,6 @@ class CombatManager:
 
         self.order_strategy = order_strategy
         self.order = self._set_order()
-        # Reminder + ToDo: Dead monsters are not deleted from order, their actions just don't
-        # take place.
-
-        self.current_monster_id = current_monster_id
-        self.current_monster = self.get_monster(self.current_monster_id)
 
     def _set_order(
         self,
@@ -191,7 +198,7 @@ class CombatManager:
 
         return status
 
-    def get_combat_result(self) -> Dict:
+    def get_combat_result(self) -> CombatResult:
         """
         Returns the current result of the combat.
 
@@ -227,6 +234,53 @@ class CombatManager:
             teams_status["status"] = "ONGOING"
 
         return teams_status
+
+    def add_monster(
+        self,
+        monster: Monster,
+        team_name: str,
+    ) -> None:
+        monster.team_name = team_name
+
+        for team in self.teams:
+            if team[0].team_name == team_name:
+                team.append(monster)
+                break
+        else:
+            self.teams.append([monster])
+
+        self.order = self._set_order()
+
+        return
+
+    def remove_monster(
+        self,
+        monster: Monster,
+    ) -> None:
+        empty_teams = []
+
+        for team in self.teams:
+            if monster in team:
+                team.remove(monster)
+
+            if not team:
+                empty_teams.append(team)
+
+        for team in empty_teams:
+            self.teams.remove(team)
+
+        if monster in self.order:
+            self.order.remove(monster)
+
+        return
+
+    def check_deaths(self) -> None:
+        for monster in self.order[:]:
+            if monster.hp <= 0:
+                self.logger.log(key="death", name=monster.name)
+                self.remove_monster(monster)
+
+        return
 
     def execute_effect(
         self,
@@ -276,17 +330,34 @@ class CombatManager:
 
         # Persistent effects
         if effect.persistent:
-            target.apply_effect(
+            effect_data = target.apply_effect(
                 effect,
                 source=source,
             )
 
         # Instant effects
         else:
-            effect.activate(
+            effect_data = effect.activate(
                 source=source,
                 target=target,
             )
+
+        # Logging effects
+        if effect_data is None:
+            effect_data = {}
+
+        key = effect.keyword.value.lower()
+
+        if source == target:
+            key += "_self"
+
+        self.logger.log(
+            key=key,
+            source=source.name,
+            target=target.name,
+            value=effect.value,
+            damage=effect_data.get("damage"),
+        )
 
         # Procesing effects on being attacked
         if effect.type == EffectType.OFFENSIVE:
@@ -323,10 +394,25 @@ class CombatManager:
 
         return rolled
 
+    def process_trigger(
+        self,
+        trigger: Trigger,
+        target: Monster,
+        source: Monster | None = None,
+    ) -> None:
+        if not target:
+            return
+
+        for effect in target.effects[:]:
+            if effect.trigger == trigger:
+                effect.activate(
+                    target=target,
+                    source=source,
+                )
+
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
-        self.current_monster_id = self.order[0].local_id
-        self.current_monster = self.get_monster(self.current_monster_id)
+        self.current_monster = self.order[0]
         return
 
     def start_round(self) -> None:
@@ -342,38 +428,44 @@ class CombatManager:
         """
         self.turn += 1
 
-        for effect in self.current_monster.effects:
-            if effect.trigger == Trigger.TURN_START:
-                effect.activate(
-                    target=self.current_monster,
-                )
+        # Procesing effects on turn start
+        self.process_trigger(
+            Trigger.TURN_START,
+            target=self.current_monster,
+        )
 
         return
 
+    def take_action(
+        self,
+        source: Monster,
+    ) -> None:
+        sides = self.roll(source)
+
+        allies = self.get_team(source, "ALLIES")
+        enemies = self.get_team(source, "ENEMIES")
+
+        for side in sides:
+            targets = self.selector_manager.get_targets(
+                side=side,
+                source=source,
+                allies=allies,
+                enemies=enemies,
+                k=1,
+                difficulty=source.difficulty,
+            )
+
+            for target in targets:
+                for effect in side.effects:
+                    self.execute_effect(
+                        effect=effect,
+                        source=source,
+                        target=target,
+                    )
+
     def take_turn(self) -> None:
-        """The current monster takes its turn."""
         if self.current_monster.control_type == ControlType.AI:
-            sides = self.current_monster.roll()
-            allies = self.get_team(self.current_monster, "ALLIES")
-            enemies = self.get_team(self.current_monster, "ENEMIES")
-
-            for side in sides:
-                targets: List[Monster] = SelectorManager.get_targets(
-                    side=side,
-                    source=self.current_monster,
-                    allies=allies,
-                    enemies=enemies,
-                    k=1,
-                    difficulty=self.current_monster.difficulty,
-                )
-
-                for target in targets:
-                    for effect in side.effects:
-                        self.execute_effect(
-                            effect=effect,
-                            source=self.current_monster,
-                            target=target,
-                        )
+            self.take_action(self.current_monster)
 
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError
@@ -394,11 +486,10 @@ class CombatManager:
         monster
         """
         # Procesing effects on turn end
-        for effect in self.current_monster.effects:
-            if effect.trigger == Trigger.TURN_END:
-                effect.activate(
-                    target=self.current_monster,
-                )
+        self.process_trigger(
+            Trigger.TURN_END,
+            target=self.current_monster,
+        )
 
         # Decaying and removing effects
         idx_removed_effects = []
@@ -430,7 +521,7 @@ class CombatManager:
 
         idx_monster: int = None
         for idx, monster in enumerate(self.order):
-            if monster.local_id == self.current_monster_id:
+            if monster == self.current_monster:
                 idx_monster = idx
                 break
 
@@ -440,8 +531,7 @@ class CombatManager:
             monster = self.order[idx_monster % len(self.order)]
 
             if monster.hp > 0:
-                self.current_monster_id = monster.local_id
-                self.current_monster = self.get_monster(self.current_monster_id)
+                self.current_monster = monster
                 break
 
         return
@@ -453,3 +543,49 @@ class CombatManager:
     def end_combat(self) -> None:
         """End combat between teams of monsters."""
         return
+
+    def run(self) -> Dict:
+        """
+        Runs combat until only one team remains alive.
+        """
+        self.start_combat()
+        self.check_deaths()
+
+        while self.get_combat_result()["status"] == "ONGOING":
+            self.start_round()
+            self.check_deaths()
+
+            self.logger.log_round(self.round)
+            self.logger.log_teams(self.teams)
+
+            for monster in self.order:
+                self.current_monster = monster
+
+                self.start_turn()
+                self.check_deaths()
+
+                if monster.hp > 0:
+                    self.logger.log(key="turn", name=self.current_monster.name)
+                    self.take_turn()
+                    self.check_deaths()
+
+                self.end_turn()
+                self.check_deaths()
+
+                combat_result = self.get_combat_result()
+                if combat_result["status"] == "DRAW":
+                    self.logger.log(key="draw")
+                    break
+
+                elif combat_result["status"] == "WINNER":
+                    self.logger.log(
+                        key="winner", team_name=combat_result["ALIVE"][0][0].team_name
+                    )
+                    break
+
+            self.end_round()
+            self.check_deaths()
+
+        self.end_combat()
+
+        return self.get_combat_result()

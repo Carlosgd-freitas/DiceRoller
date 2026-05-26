@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
-from src.base.keywords import Keyword, color_keyword
+from src.base.color import color_string
+from src.base.keywords import Keyword, get_keyword_color
 from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
@@ -78,7 +79,13 @@ class Effect(ABC):
         self.persistent = persistent
 
     def __str__(self) -> str:
-        _str = color_keyword(self.keyword)
+        color_params = get_keyword_color(self.keyword)
+
+        _str = color_string(
+            string=self.keyword.value,
+            foreground_color=color_params["foreground_color"],
+            intensity=color_params["intensity"],
+        )
 
         if self.value:
             _str += f" {self.value}"
@@ -90,7 +97,7 @@ class Effect(ABC):
         self,
         source: Entity,
         target: Entity,
-    ) -> None:
+    ) -> Dict:
         """
         What the Effect will do when being applied to an Entity.
 
@@ -107,7 +114,7 @@ class Effect(ABC):
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> None:
+    ) -> Dict:
         """
         What the Effect will done when activated.
 

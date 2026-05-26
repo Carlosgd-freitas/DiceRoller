@@ -47,6 +47,7 @@ def managers() -> Dict:
             [monster_3, monster_4],
         ],
         order_strategy="SET",
+        logging=False,
     )
 
     combat_manager.start_combat()

@@ -11,6 +11,8 @@ class Slime(Monster):
     """
 
     def __init__(self, **kwargs):
+        name = kwargs.pop("name", "Slime")
+
         attacking_sides = []
         blocking_sides = []
 
@@ -23,6 +25,7 @@ class Slime(Monster):
 
         super().__init__(
             global_id="MONSTER_0",
+            name=name,
             dice=[
                 dice_0,
                 dice_1,
