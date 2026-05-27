@@ -2,7 +2,6 @@ from colorama import init
 
 from src.combat.manager import CombatManager
 from src.monsters.slime import Slime
-from src.targeting.selectors.manager import SelectorManager
 
 init()
 
@@ -27,10 +26,8 @@ combat_manager = CombatManager(
         "Blue Team",
     ],
     order_strategy="SET",
-    language="PT-BR",
+    language="EN-US",
 )
-
-selector_manager = SelectorManager()
 
 # ----------------------------
 

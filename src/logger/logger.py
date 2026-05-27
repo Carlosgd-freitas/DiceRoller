@@ -2,25 +2,39 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List, Literal
 
-from src.base.color import Color, color_string
+from src.base.color import color_string
 from src.base.keywords import get_keyword_color
-from src.logger.languages.en_us import MESSAGES as EN_US
-from src.logger.languages.pt_br import MESSAGES as PT_BR
+from src.logger.languages import en_us, pt_br
 
 if TYPE_CHECKING:
+    from src.base.effect import Effect
     from src.base.monster import Monster
 
 LANGUAGES = {
-    "EN-US": EN_US,
-    "PT-BR": PT_BR,
+    "EN-US": en_us,
+    "PT-BR": pt_br,
 }
+
+type LoggingCategory = Literal[
+    "ACTIONS",
+    "ATTRIBUTES",
+    "COMBAT",
+    "EFFECTS_RESOLVING",
+    "KEYWORDS",
+]
 
 
 class Logger:
     """
     Logger class.
+
+    :var enabled: If the Logger will log the messages. Default value is True.
+    :vartype enabled: bool
+
+    :var language: What language will be logged. Default value is "EN-US".
+    :vartype language: Literal["EN-US", "PT-BR"]
     """
 
     def __init__(
@@ -33,51 +47,184 @@ class Logger:
 
     def get_message(
         self,
+        category: LoggingCategory,
         key: str,
         **kwargs,
-    ) -> str:
-        message: str = LANGUAGES[self.language][key]
+    ) -> str | None:
+        """
+        Gets a message from a language module.
 
-        return message.format(**kwargs)
+        :param category: The message category.
+        :type category: LoggingCategory
+
+        :param key: The message key.
+        :type key: str
+
+        :return: A message.
+        :rtype: str
+        """
+        language_module = LANGUAGES[self.language]
+        messages: Dict = getattr(language_module, category)
+        message: str = messages.get(key)
+
+        if message:
+            message = message.format(**kwargs)
+
+        return message
 
     def log(
         self,
         message: str = None,
+        category: LoggingCategory = None,
         key: str = None,
         end: str = "\n",
         **kwargs,
     ) -> None:
+        """
+        Logs a message in the output.
+
+        :param message: If a message is passed as a parameter, it will be logged
+        directly.
+        :type message: str
+
+        :param category: The message category from a language module.
+        :type category: LoggingCategory
+
+        :param key: The message key from a language module.
+        :type key: str
+
+        :param end: What will be printed at the end of the message. Default value is
+        \\n.
+        :type end: str
+        """
         if not self.enabled:
             return
 
-        if key:
-            message: str = self.get_message(key, **kwargs)
+        if category and key:
+            message: str = self.get_message(category, key, **kwargs)
 
         print(message, end=end)
 
         return
 
     def log_round(self, round: int):
+        """
+        Logs the round start.
+
+        :param round: The round number.
+        :type round: int
+        """
         self.log(message="\n╔═══════════════╗")
         self.log(
+            category="COMBAT",
             key="round",
             round=round,
         )
         self.log(message="╚═══════════════╝")
 
+    def log_effect_resolving(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect resolving.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+        """
+        color_data = get_keyword_color(effect.keyword)
+        foreground_color = color_data["foreground_color"]
+        intensity = color_data["intensity"]
+
+        keyword = effect.keyword.value.lower()
+
+        action = color_string(
+            self.get_message(
+                category="ACTIONS",
+                key=keyword,
+            ),
+            foreground_color=foreground_color,
+            intensity=intensity,
+        )
+
+        keyword = color_string(
+            self.get_message(
+                category="KEYWORDS",
+                key=keyword,
+            ),
+            foreground_color=foreground_color,
+            intensity=intensity,
+        )
+
+        if kwargs.get("attribute"):
+            kwargs["attribute"] = self.get_message(
+                category="ATTRIBUTES",
+                key=kwargs["attribute"],
+            )
+
+        kwargs.update(
+            {
+                "action": action,
+                "duration": effect.duration,
+                "keyword": keyword,
+                "source": source,
+                "target": target,
+                "value": effect.value,
+            }
+        )
+
+        key = effect.type.value.lower()
+        if source == target:
+            key += "_self"
+
+        self.log(
+            category="EFFECTS_RESOLVING",
+            key=key,
+            **kwargs,
+        )
+
+        return
+
     def log_monster(self, monster: Monster):
+        """
+        Logs a Monster in combat.
+
+        :param monster: A monster.
+        :type monster: Monster
+        """
         # Name
         self.log(message=f"> {monster.name} - ", end="")
 
         # HP
         self.log(
-            message=color_string(
-                "HP",
-                foreground_color=Color.RED,
+            message=self.get_message(
+                category="ATTRIBUTES",
+                key="hp",
             ),
             end="",
         )
         self.log(message=f": {monster.hp}/{monster.max_hp}", end="")
+
+        # Mana
+        if monster.mana > 0:
+            self.log(message=" - ", end="")
+            self.log(
+                message=self.get_message(
+                    category="ATTRIBUTES",
+                    key="mana",
+                ),
+                end="",
+            )
+            self.log(message=f": {monster.mana}", end="")
 
         # Effects
         for effect in monster.effects:
@@ -86,7 +233,7 @@ class Logger:
             color_data = get_keyword_color(effect.keyword)
 
             effect_keyword = self.get_message(
-                key="status_" + effect.keyword.value.lower()
+                category="KEYWORDS", key=effect.keyword.value.lower()
             )
             effect_keyword = color_string(
                 effect_keyword,
@@ -101,12 +248,21 @@ class Logger:
         self.log("")
 
     def log_teams(self, teams: List[List[Monster]]):
+        """
+        Logs teams of Monsters in combat. Only alive monsters (hp > 0) will be logged.
+
+        :param teams: A list where each element is a list of monsters.
+        :type teams: List[List[Monster]]
+        """
         for team_index, team in enumerate(teams):
             team_name = team[0].team_name
-            self.log(key="team", index=team_index + 1, team_name=team_name)
+            self.log(
+                category="COMBAT", key="team", index=team_index + 1, team_name=team_name
+            )
 
             for monster in team:
-                self.log_monster(monster)
+                if monster.hp > 0:
+                    self.log_monster(monster)
 
             if team_index < len(teams) - 1:
                 self.log(message="")

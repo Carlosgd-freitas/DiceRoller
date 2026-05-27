@@ -277,7 +277,7 @@ class CombatManager:
     def check_deaths(self) -> None:
         for monster in self.order[:]:
             if monster.hp <= 0:
-                self.logger.log(key="death", name=monster.name)
+                self.logger.log(category="COMBAT", key="death", name=monster.name)
                 self.remove_monster(monster)
 
         return
@@ -342,20 +342,15 @@ class CombatManager:
                 target=target,
             )
 
-        # Logging effects
+        # Logging effects resolving
         if effect_data is None:
             effect_data = {}
 
-        key = effect.keyword.value.lower()
-
-        if source == target:
-            key += "_self"
-
-        self.logger.log(
-            key=key,
+        self.logger.log_effect_resolving(
+            effect=effect,
             source=source.name,
             target=target.name,
-            value=effect.value,
+            attribute=effect_data.get("attribute"),
             damage=effect_data.get("damage"),
         )
 
@@ -565,7 +560,9 @@ class CombatManager:
                 self.check_deaths()
 
                 if monster.hp > 0:
-                    self.logger.log(key="turn", name=self.current_monster.name)
+                    self.logger.log(
+                        category="COMBAT", key="turn", name=self.current_monster.name
+                    )
                     self.take_turn()
                     self.check_deaths()
 
@@ -574,12 +571,14 @@ class CombatManager:
 
                 combat_result = self.get_combat_result()
                 if combat_result["status"] == "DRAW":
-                    self.logger.log(key="draw")
+                    self.logger.log(category="COMBAT", key="draw")
                     break
 
                 elif combat_result["status"] == "WINNER":
                     self.logger.log(
-                        key="winner", team_name=combat_result["ALIVE"][0][0].team_name
+                        category="COMBAT",
+                        key="winner",
+                        team_name=combat_result["ALIVE"][0][0].team_name,
                     )
                     break
 

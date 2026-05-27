@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
@@ -43,15 +43,15 @@ class BurnEffect(Effect):
         self,
         source: Entity,
         target: Entity,
-    ) -> None:
+    ) -> Dict:
         target.remove_effect(Keyword.FREEZE)
-        return
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> None:
+    ) -> Dict:
         damage = calculate_damage(
             self,
             source,
@@ -61,4 +61,6 @@ class BurnEffect(Effect):
         target.hp -= damage
         target.equalize_stats()
 
-        return
+        return {
+            "damage": damage,
+        }

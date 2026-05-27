@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
@@ -41,13 +41,13 @@ class FreezeEffect(Effect):
         self,
         source: Entity,
         target: Entity,
-    ) -> None:
+    ) -> Dict:
         target.remove_effect(Keyword.BURN)
-        return
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> None:
-        return
+    ) -> Dict:
+        return {}
