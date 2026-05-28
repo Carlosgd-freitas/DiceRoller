@@ -119,8 +119,8 @@ def test_get_team_status_team(combat_manager: CombatManager):
     assert all(conditions)
 
 
-def test_get_combat_result_winner(combat_manager: CombatManager):
-    result = combat_manager.get_combat_result()
+def test_get_combat_status_winner(combat_manager: CombatManager):
+    result = combat_manager.get_combat_status()
 
     conditions = [
         result["status"] == "WINNER",
@@ -133,10 +133,10 @@ def test_get_combat_result_winner(combat_manager: CombatManager):
     assert all(conditions)
 
 
-def test_get_combat_result_draw(combat_manager: CombatManager):
+def test_get_combat_status_draw(combat_manager: CombatManager):
     combat_manager.order[0].hp = 0
 
-    result = combat_manager.get_combat_result()
+    result = combat_manager.get_combat_status()
 
     conditions = [
         result["status"] == "DRAW",
@@ -149,10 +149,10 @@ def test_get_combat_result_draw(combat_manager: CombatManager):
     assert all(conditions)
 
 
-def test_get_combat_result_ongoing(combat_manager: CombatManager):
+def test_get_combat_status_ongoing(combat_manager: CombatManager):
     combat_manager.order[2].hp = 10
 
-    result = combat_manager.get_combat_result()
+    result = combat_manager.get_combat_status()
 
     conditions = [
         result["status"] == "ONGOING",

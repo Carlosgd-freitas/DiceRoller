@@ -106,6 +106,9 @@ class Effect(ABC):
 
         :param target: An Entity object which the effect will be applied.
         :type target: Entity
+
+        :return: A dictionary containing data for logging.
+        :rtype: Dict
         """
         raise NotImplementedError
 
@@ -123,5 +126,8 @@ class Effect(ABC):
 
         :param source: The Entity object where the effect is from.
         :type source: Entity
+
+        :return: A dictionary containing data for logging.
+        :rtype: Dict
         """
         raise NotImplementedError

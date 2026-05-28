@@ -21,8 +21,10 @@ type LoggingCategory = Literal[
     "ACTIONS",
     "ATTRIBUTES",
     "COMBAT",
-    "EFFECTS_RESOLVING",
+    "EFFECT_ACTIVATION",
+    "EFFECT_EXECUTION",
     "KEYWORDS",
+    "STATUS",
 ]
 
 
@@ -44,6 +46,58 @@ class Logger:
     ):
         self.enabled = enabled
         self.language = language
+
+    def _update_log_parameters(
+        self,
+        effect: Effect = None,
+        source: Monster = None,
+        target: Monster = None,
+        **kwargs,
+    ) -> None:
+        """
+        Private method to be used by other methods. Updates the log parameters with
+        effect, source, target and the data that can be derived from that.
+        """
+        if kwargs.get("attribute"):
+            kwargs["attribute"] = self.get_message(
+                category="ATTRIBUTES",
+                key=kwargs["attribute"],
+            )
+
+        if source:
+            kwargs["source"] = source.name
+
+        if target:
+            kwargs["target"] = target.name
+
+        color_data = get_keyword_color(effect.keyword)
+        foreground_color = color_data["foreground_color"]
+        intensity = color_data["intensity"]
+
+        keyword = effect.keyword.value.lower()
+
+        for parameter, category in [
+            ("action", "ACTIONS"),
+            ("status", "STATUS"),
+            ("keyword", "KEYWORDS"),
+        ]:
+            kwargs[parameter] = color_string(
+                self.get_message(
+                    category=category,
+                    key=keyword,
+                ),
+                foreground_color=foreground_color,
+                intensity=intensity,
+            )
+
+        kwargs.update(
+            {
+                "duration": effect.duration,
+                "value": effect.value,
+            }
+        )
+
+        return kwargs
 
     def get_message(
         self,
@@ -107,6 +161,48 @@ class Logger:
 
         return
 
+    def log_effect(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION"],
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+
+        :param category: What category of logging will be done.
+        :type category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION"]
+        """
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        if category == "EFFECT_ACTIVATION":
+            key = effect.keyword.value.lower()
+
+        elif category == "EFFECT_EXECUTION":
+            key = effect.type.value.lower()
+
+            if (source) and (target) and (source == target):
+                key += "_self"
+
+        self.log(
+            category=category,
+            key=key,
+            **kwargs,
+        )
+
+        return
+
     def log_round(self, round: int):
         """
         Logs the round start.
@@ -121,78 +217,6 @@ class Logger:
             round=round,
         )
         self.log(message="╚═══════════════╝")
-
-    def log_effect_resolving(
-        self,
-        effect: Effect,
-        source: Monster,
-        target: Monster,
-        **kwargs,
-    ) -> None:
-        """
-        Logs an effect resolving.
-
-        :param effect: An Effect.
-        :type effect: Effect
-
-        :param source: The Entity object where the effect is from.
-        :type source: Entity
-
-        :param target: An Entity object which the effect will be applied.
-        :type target: Entity
-        """
-        color_data = get_keyword_color(effect.keyword)
-        foreground_color = color_data["foreground_color"]
-        intensity = color_data["intensity"]
-
-        keyword = effect.keyword.value.lower()
-
-        action = color_string(
-            self.get_message(
-                category="ACTIONS",
-                key=keyword,
-            ),
-            foreground_color=foreground_color,
-            intensity=intensity,
-        )
-
-        keyword = color_string(
-            self.get_message(
-                category="KEYWORDS",
-                key=keyword,
-            ),
-            foreground_color=foreground_color,
-            intensity=intensity,
-        )
-
-        if kwargs.get("attribute"):
-            kwargs["attribute"] = self.get_message(
-                category="ATTRIBUTES",
-                key=kwargs["attribute"],
-            )
-
-        kwargs.update(
-            {
-                "action": action,
-                "duration": effect.duration,
-                "keyword": keyword,
-                "source": source,
-                "target": target,
-                "value": effect.value,
-            }
-        )
-
-        key = effect.type.value.lower()
-        if source == target:
-            key += "_self"
-
-        self.log(
-            category="EFFECTS_RESOLVING",
-            key=key,
-            **kwargs,
-        )
-
-        return
 
     def log_monster(self, monster: Monster):
         """

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, List, Literal
+from typing import TYPE_CHECKING, Dict, List, Literal
 from uuid import uuid4
 
 from src.base.keywords import Keyword
@@ -143,7 +143,7 @@ class Entity:
         stack_duration: stack_method = "overwrite",
         stack_decay: stack_method = "overwrite",
         stack_accuracy: stack_method = "overwrite",
-    ) -> None:
+    ) -> Dict:
         """
         Add an effect to the Entity, also stacking it by the stacking parameters if the
         Entity already has an effect with that same keyword. Effects with incompatible
@@ -178,6 +178,9 @@ class Entity:
         * ``overwrite``: if the monster has an existing effect with the same Keyword, the
         value of the existing effect will be overwritten by the new effect for that
         parameter.
+
+        :return: A dictionary containing .on_apply() data for logging.
+        :rtype: Dict
         """
         new_effect = deepcopy(effect)
         current_effect = self.get_effect(effect.keyword)
@@ -210,7 +213,7 @@ class Entity:
                         current_value + new_value,
                     )
 
-            current_effect.on_apply(
+            effect_data = current_effect.on_apply(
                 source,
                 self,
             )
@@ -219,12 +222,12 @@ class Entity:
         else:
             self.effects.append(new_effect)
 
-            new_effect.on_apply(
+            effect_data = new_effect.on_apply(
                 source,
                 self,
             )
 
-        return None
+        return effect_data
 
     def remove_effect(
         self,

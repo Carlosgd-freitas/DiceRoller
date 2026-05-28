@@ -108,6 +108,79 @@ combat_manager = CombatManager(
 
 # ----------------------------
 
+print("===== Effect Execution =====")
+
 combat_manager.start_combat()
 combat_manager.start_turn()
 combat_manager.take_turn()
+combat_manager.end_turn()
+
+combat_manager.current_monster.effects = []
+
+combat_manager.next_turn()
+combat_manager.current_monster.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Activation: Act Disabling =====")
+
+for effect in [
+    FreezeEffect(1),
+    SleepEffect(1),
+    StunEffect(1),
+]:
+    combat_manager.current_monster.effects = []
+    combat_manager.current_monster.apply_effect(effect)
+
+    combat_manager.take_turn()
+
+# ----------------------------
+
+print("\n===== Effect Activation: Being Attacked =====")
+
+for effect in [ThornsEffect(1)]:
+    combat_manager.current_monster.effects = []
+    combat_manager.current_monster.apply_effect(effect)
+
+    combat_manager.execute_effect(
+        AttackEffect(1),
+        source=monster_a,
+        target=combat_manager.current_monster,
+    )
+
+# ----------------------------
+
+print("\n===== Effect Activation: Dice Roll =====")
+
+combat_manager.current_monster.dice = [
+    Dice(sides=[Side(effects=[AttackEffect(1)])]),
+]
+
+for effect in [
+    BleedEffect(1),
+]:
+    combat_manager.current_monster.effects = []
+    combat_manager.current_monster.apply_effect(effect)
+
+    combat_manager.start_turn()
+    combat_manager.take_turn()
+
+combat_manager.current_monster.dice = []
+
+# ----------------------------
+
+print("\n===== Effect Activation: Turn Start =====")
+
+combat_manager.current_monster.effects = []
+
+for effect in [
+    BurnEffect(1),
+    ManaRegenEffect(1),
+    PoisonEffect(1),
+    RegenEffect(1),
+]:
+    combat_manager.current_monster.apply_effect(effect)
+
+combat_manager.start_turn()
+
+# ----------------------------

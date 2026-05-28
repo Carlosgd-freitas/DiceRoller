@@ -13,7 +13,7 @@ from src.logger.logger import Logger
 from src.targeting.selectors.manager import SelectorManager
 
 
-class CombatResult(TypedDict):
+class CombatStatus(TypedDict):
     ALIVE: List[List[Monster]]
     DEFEATED: List[List[Monster]]
     status: Literal["DRAW", "ONGOING", "WINNER"]
@@ -198,12 +198,12 @@ class CombatManager:
 
         return status
 
-    def get_combat_result(self) -> CombatResult:
+    def get_combat_status(self) -> CombatStatus:
         """
-        Returns the current result of the combat.
+        Returns the current status of the combat.
 
-        :return: Team status
-        :rtype: Dict
+        :return: The current combat status.
+        :rtype: CombatStatus
 
         **Return keys**
         * ``ALIVE``: a list of teams (list of monsters) with at least one monster with
@@ -240,6 +240,12 @@ class CombatManager:
         monster: Monster,
         team_name: str,
     ) -> None:
+        """
+        Adds a monster to combat.
+
+        :param monster: The monster which will be added to combat.
+        :type monster: Monster
+        """
         monster.team_name = team_name
 
         for team in self.teams:
@@ -257,6 +263,12 @@ class CombatManager:
         self,
         monster: Monster,
     ) -> None:
+        """
+        Removes a monster from combat.
+
+        :param monster: The monster which will be removed from combat.
+        :type monster: Monster
+        """
         empty_teams = []
 
         for team in self.teams:
@@ -275,12 +287,89 @@ class CombatManager:
         return
 
     def check_deaths(self) -> None:
+        """
+        Checks and remove any dead monsters from combat.
+        """
         for monster in self.order[:]:
             if monster.hp <= 0:
                 self.logger.log(category="COMBAT", key="death", name=monster.name)
                 self.remove_monster(monster)
 
         return
+
+    def process_trigger(
+        self,
+        trigger: Trigger,
+        target: Monster,
+        source: Monster | None = None,
+    ) -> None:
+        """
+        Activates all effects of a target monster that have the specified trigger type.
+        The following triggers will invert the target and source monsters on
+        activation:
+        * BEING_ATTACKED
+
+        :param trigger: A trigger.
+        :type trigger: Trigger
+
+        :param target: The monster which will have their effects activated.
+        :type target: Monster
+
+        :param source: An optional monster responsible for the effect being triggered.
+        :type source: Monster
+        """
+        if not target:
+            return
+
+        for effect in target.effects[:]:
+
+            # Invert target and source monsters
+            if trigger == Trigger.BEING_ATTACKED:
+                aux = target
+                target = source
+                source = aux
+
+            if effect.trigger == trigger:
+                effect_data = effect.activate(
+                    target=target,
+                    source=source,
+                )
+
+                # Logging triggered effect
+                self.logger.log_effect(
+                    effect=effect,
+                    source=source,
+                    target=target,
+                    category="EFFECT_ACTIVATION",
+                    attribute=effect_data.get("attribute"),
+                    damage=effect_data.get("damage"),
+                )
+
+        return
+
+    def roll(self, entity: Entity) -> List[Side]:
+        """
+        Rolls all Entity's dice and returns the rolled Sides. The entity will be
+        affected by Effects that triggers on dice roll.
+
+        :param entity: An Entity.
+        :type entity: Entity
+
+        :return: A list containing the rolled Sides.
+        :rtype: List[Side]
+        """
+        rolled = []
+
+        for dice in entity.dice:
+            rolled.append(dice.roll())
+
+            # Procesing effects on dice roll
+            self.process_trigger(
+                Trigger.ROLL,
+                target=entity,
+            )
+
+        return rolled
 
     def execute_effect(
         self,
@@ -310,6 +399,9 @@ class CombatManager:
         :param check_accuracy: If True, an accuracy check will be done before
         trying do activate the Effect. Default value is True.
         :type check_accuracy: bool
+
+        :return: If the effect was executed.
+        :rtype: bool
         """
         # Check can act
         if (check_can_act) and (not source.can_act()):
@@ -326,6 +418,11 @@ class CombatManager:
                 accuracy -= blinded.value
 
             if random() >= accuracy:
+                self.logger.log(
+                    category="COMBAT",
+                    key="miss",
+                    name=source.name,
+                )
                 return False
 
         # Persistent effects
@@ -342,68 +439,25 @@ class CombatManager:
                 target=target,
             )
 
-        # Logging effects resolving
-        if effect_data is None:
-            effect_data = {}
-
-        self.logger.log_effect_resolving(
+        # Log effect execution
+        self.logger.log_effect(
             effect=effect,
-            source=source.name,
-            target=target.name,
+            source=source,
+            target=target,
+            category="EFFECT_EXECUTION",
             attribute=effect_data.get("attribute"),
             damage=effect_data.get("damage"),
         )
 
         # Procesing effects on being attacked
         if effect.type == EffectType.OFFENSIVE:
-            for target_effect in target.effects:
-                if target_effect.trigger == Trigger.BEING_ATTACKED:
-                    target_effect.activate(
-                        source=target,
-                        target=source,
-                    )
+            self.process_trigger(
+                Trigger.BEING_ATTACKED,
+                source=source,
+                target=target,
+            )
 
         return True
-
-    def roll(self, entity: Entity) -> List[Side]:
-        """
-        Rolls all Entity's dice and returns the rolled Sides. The entity will be
-        affected by Effects that triggers on dice roll.
-
-        :param entity: An Entity.
-        :type entity: Entity
-        """
-        rolled = []
-
-        rolling_effects = [
-            effect for effect in entity.effects if effect.trigger == Trigger.ROLL
-        ]
-
-        for dice in entity.dice:
-            rolled.append(dice.roll())
-
-            for effect in rolling_effects:
-                effect.activate(
-                    target=entity,
-                )
-
-        return rolled
-
-    def process_trigger(
-        self,
-        trigger: Trigger,
-        target: Monster,
-        source: Monster | None = None,
-    ) -> None:
-        if not target:
-            return
-
-        for effect in target.effects[:]:
-            if effect.trigger == trigger:
-                effect.activate(
-                    target=target,
-                    source=source,
-                )
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
@@ -433,39 +487,73 @@ class CombatManager:
 
     def take_action(
         self,
-        source: Monster,
+        monster: Monster,
     ) -> None:
-        sides = self.roll(source)
+        """
+        Takes action automatically for a monster:
+        * Their dice will be rolled
+        * Each rolled side will have their targets determined
+        * Each effect of the rolled side will be applied onto every target
 
-        allies = self.get_team(source, "ALLIES")
-        enemies = self.get_team(source, "ENEMIES")
+        :param monster: The monster which will have its actions taken.
+        :type monster: Monster
+        """
+        sides = self.roll(monster)
+
+        allies = self.get_team(monster, "ALLIES")
+        enemies = self.get_team(monster, "ENEMIES")
 
         for side in sides:
             targets = self.selector_manager.get_targets(
                 side=side,
-                source=source,
+                source=monster,
                 allies=allies,
                 enemies=enemies,
                 k=1,
-                difficulty=source.difficulty,
+                difficulty=monster.difficulty,
             )
 
             for target in targets:
                 for effect in side.effects:
                     self.execute_effect(
                         effect=effect,
-                        source=source,
+                        source=monster,
                         target=target,
                     )
 
-    def take_turn(self) -> None:
+        return
+
+    def take_turn(self) -> bool:
+        """
+        The current monster takes its turn, based on its control type. If the monster
+        is under any FREEZE, SLEEP or STUN effects, it won't take its turn.
+
+        :return: If the turn was taken.
+        :rtype: bool
+        """
+        for keyword in [
+            Keyword.FREEZE,
+            Keyword.SLEEP,
+            Keyword.STUN,
+        ]:
+            effect = self.current_monster.get_effect(keyword)
+
+            if effect:
+                self.logger.log_effect(
+                    effect=effect,
+                    source=None,
+                    target=self.current_monster,
+                    category="EFFECT_ACTIVATION",
+                )
+                return False
+
         if self.current_monster.control_type == ControlType.AI:
             self.take_action(self.current_monster)
 
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError
 
-        return
+        return True
 
     def end_turn(self) -> Dict:
         """
@@ -546,7 +634,7 @@ class CombatManager:
         self.start_combat()
         self.check_deaths()
 
-        while self.get_combat_result()["status"] == "ONGOING":
+        while self.get_combat_status()["status"] == "ONGOING":
             self.start_round()
             self.check_deaths()
 
@@ -569,16 +657,16 @@ class CombatManager:
                 self.end_turn()
                 self.check_deaths()
 
-                combat_result = self.get_combat_result()
-                if combat_result["status"] == "DRAW":
+                combat_status = self.get_combat_status()
+                if combat_status["status"] == "DRAW":
                     self.logger.log(category="COMBAT", key="draw")
                     break
 
-                elif combat_result["status"] == "WINNER":
+                elif combat_status["status"] == "WINNER":
                     self.logger.log(
                         category="COMBAT",
                         key="winner",
-                        team_name=combat_result["ALIVE"][0][0].team_name,
+                        team_name=combat_status["ALIVE"][0][0].team_name,
                     )
                     break
 
@@ -587,4 +675,4 @@ class CombatManager:
 
         self.end_combat()
 
-        return self.get_combat_result()
+        return self.get_combat_status()
