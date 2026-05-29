@@ -66,8 +66,8 @@ def test_get_targets_with_effects(managers: Dict):
     selector = RandomSelector()
     effect = StunEffect(duration=1)
 
+    combat_manager.order[0].apply_effect(effect)
     combat_manager.order[1].apply_effect(effect)
-    combat_manager.order[2].apply_effect(effect)
 
     targets = selector._get_targets_with_effects(
         combat_manager.order, k=2, effects=[Keyword.STUN]
@@ -88,8 +88,8 @@ def test_get_targets_without_effects(managers: Dict):
     selector = RandomSelector()
     effect = StunEffect(duration=1)
 
+    combat_manager.order[0].apply_effect(effect)
     combat_manager.order[1].apply_effect(effect)
-    combat_manager.order[2].apply_effect(effect)
 
     targets = selector._get_targets_without_effects(
         combat_manager.order, k=2, effects=[Keyword.STUN]

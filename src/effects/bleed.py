@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
-from src.base.effect import Effect, EffectType
+from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
 from src.base.triggers import Trigger
 from src.processors.damage import calculate_damage
@@ -43,14 +43,14 @@ class BleedEffect(Effect):
         self,
         source: Entity,
         target: Entity,
-    ) -> Dict:
+    ) -> EffectData:
         return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> Dict:
+    ) -> EffectData:
         damage = calculate_damage(
             self,
             source,

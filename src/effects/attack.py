@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
-from src.base.effect import Effect, EffectType
+from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
 from src.processors.damage import calculate_damage
 
@@ -40,15 +40,19 @@ class AttackEffect(Effect):
         self,
         source: Entity,
         target: Entity,
-    ) -> Dict:
+    ) -> EffectData:
         return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> Dict:
-        target.remove_effect(Keyword.SLEEP)
+    ) -> EffectData:
+        removed_effects = []
+
+        sleep = target.remove_effect(Keyword.SLEEP)
+        if sleep:
+            removed_effects.append(sleep)
 
         damage = calculate_damage(self, source, target, consider_block=True)
 
@@ -57,4 +61,5 @@ class AttackEffect(Effect):
 
         return {
             "damage": damage,
+            "removed_effects": removed_effects,
         }

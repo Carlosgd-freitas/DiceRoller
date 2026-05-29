@@ -18,13 +18,13 @@ def test_keyword_attack(managers: Dict):
 
     combat_manager.execute_effect(
         effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        combat_manager.order[2].hp == 4,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        combat_manager.order[1].hp == 4,
     ]
 
     assert_conditions(conditions)
@@ -38,22 +38,22 @@ def test_keyword_drain(managers: Dict):
 
     combat_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     combat_manager.execute_effect(
         drain_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        combat_manager.order[2].hp == 8,
-        combat_manager.order[2].get_effect(Keyword.BLOCK) is None,
-        combat_manager.order[1].local_id == "MONSTER_1",
-        combat_manager.order[1].hp == 3,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        combat_manager.order[1].hp == 8,
+        combat_manager.order[1].get_effect(Keyword.BLOCK) is None,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        combat_manager.order[0].hp == 3,
     ]
 
     assert_conditions(conditions)
@@ -67,21 +67,21 @@ def test_keyword_pierce(managers: Dict):
 
     combat_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     combat_manager.execute_effect(
         pierce_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        combat_manager.order[2].hp == 8,
-        combat_manager.order[2].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
-        combat_manager.order[2].get_effect(Keyword.BLOCK).value == 6,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        combat_manager.order[1].hp == 8,
+        combat_manager.order[1].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+        combat_manager.order[1].get_effect(Keyword.BLOCK).value == 6,
     ]
 
     assert_conditions(conditions)

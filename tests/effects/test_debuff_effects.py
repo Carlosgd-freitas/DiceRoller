@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 def test_keyword_bleed(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    combat_manager.current_monster = combat_manager.order[2]
+    combat_manager.current_monster = combat_manager.order[1]
 
     effect_bleed = BleedEffect(
         value=1,
@@ -38,7 +38,7 @@ def test_keyword_bleed(managers: Dict):
     effect_attack_2 = AttackEffect(2)
     effect_attack_3 = AttackEffect(3)
 
-    combat_manager.order[2].dice = [
+    combat_manager.order[1].dice = [
         Dice(sides=[Side([effect_attack_1])]),
         Dice(sides=[Side([effect_attack_2])]),
         Dice(sides=[Side([effect_attack_3])]),
@@ -46,24 +46,24 @@ def test_keyword_bleed(managers: Dict):
 
     combat_manager.execute_effect(
         effect_bleed,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 1,
-        combat_manager.order[2].get_effect(Keyword.BLEED).keyword == Keyword.BLEED,
-        combat_manager.order[2].get_effect(Keyword.BLEED).value == 1,
-        combat_manager.order[2].get_effect(Keyword.BLEED).duration == 1,
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[3].local_id == "MONSTER_3",
-        len(combat_manager.order[3].effects) == 0,
-        combat_manager.order[3].get_effect(Keyword.BLEED) is None,
-        combat_manager.order[3].hp == 100,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.BLEED).keyword == Keyword.BLEED,
+        combat_manager.order[1].get_effect(Keyword.BLEED).value == 1,
+        combat_manager.order[1].get_effect(Keyword.BLEED).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[2].local_id == "MONSTER_3",
+        len(combat_manager.order[2].effects) == 0,
+        combat_manager.order[2].get_effect(Keyword.BLEED) is None,
+        combat_manager.order[2].hp == 100,
     ]
 
-    rolled = combat_manager.roll(combat_manager.order[2])
+    rolled = combat_manager.roll(combat_manager.order[1])
 
     conditions.extend(
         [
@@ -71,8 +71,8 @@ def test_keyword_bleed(managers: Dict):
             rolled[0].effects[0].value == 1,
             rolled[1].effects[0].value == 2,
             rolled[2].effects[0].value == 3,
-            combat_manager.order[2].hp == 7,
-            combat_manager.order[3].hp == 100,
+            combat_manager.order[1].hp == 7,
+            combat_manager.order[2].hp == 100,
         ]
     )
 
@@ -82,10 +82,10 @@ def test_keyword_bleed(managers: Dict):
 
     conditions.extend(
         [
-            len(combat_manager.order[2].effects) == 0,
-            combat_manager.order[2].get_effect(Keyword.BLEED) is None,
-            combat_manager.order[2].hp == 7,
-            combat_manager.order[3].hp == 100,
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.BLEED) is None,
+            combat_manager.order[1].hp == 7,
+            combat_manager.order[2].hp == 100,
         ]
     )
 
@@ -94,8 +94,6 @@ def test_keyword_bleed(managers: Dict):
 
 def test_keyword_blind(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
-
-    combat_manager.current_monster = combat_manager.order[1]
 
     effect_blind = BlindEffect(
         value=1,
@@ -106,39 +104,39 @@ def test_keyword_blind(managers: Dict):
 
     combat_manager.execute_effect(
         effect_blind,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_1",
-        len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
-        combat_manager.order[1].get_effect(Keyword.BLIND).value == 1,
-        combat_manager.order[1].get_effect(Keyword.BLIND).duration == 1,
-        combat_manager.order[1].hp == 1,
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 0,
-        combat_manager.order[2].get_effect(Keyword.BLIND) is None,
-        combat_manager.order[2].hp == 10,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
+        combat_manager.order[0].get_effect(Keyword.BLIND).value == 1,
+        combat_manager.order[0].get_effect(Keyword.BLIND).duration == 1,
+        combat_manager.order[0].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.BLIND) is None,
+        combat_manager.order[1].hp == 10,
     ]
 
     combat_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     combat_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            combat_manager.order[1].hp == 3,
-            combat_manager.order[2].hp == 10,
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 10,
         ]
     )
 
@@ -146,22 +144,22 @@ def test_keyword_blind(managers: Dict):
 
     combat_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     combat_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            len(combat_manager.order[1].effects) == 0,
-            combat_manager.order[1].get_effect(Keyword.BLIND) is None,
-            combat_manager.order[1].hp == 5,
-            combat_manager.order[2].hp == 8,
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.BLIND) is None,
+            combat_manager.order[0].hp == 5,
+            combat_manager.order[1].hp == 8,
         ]
     )
 
@@ -171,7 +169,7 @@ def test_keyword_blind(managers: Dict):
 def test_keyword_burn(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    combat_manager.current_monster = combat_manager.order[2]
+    combat_manager.current_monster = combat_manager.order[1]
 
     effect_burn = BurnEffect(
         value=2,
@@ -183,39 +181,39 @@ def test_keyword_burn(managers: Dict):
 
     combat_manager.execute_effect(
         effect_burn,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 1,
-        combat_manager.order[2].get_effect(Keyword.BURN).keyword == Keyword.BURN,
-        combat_manager.order[2].get_effect(Keyword.BURN).value == 2,
-        combat_manager.order[2].get_effect(Keyword.BURN).duration == 1,
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[1].local_id == "MONSTER_1",
-        len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.BURN) is None,
-        combat_manager.order[1].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.BURN).keyword == Keyword.BURN,
+        combat_manager.order[1].get_effect(Keyword.BURN).value == 2,
+        combat_manager.order[1].get_effect(Keyword.BURN).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 0,
+        combat_manager.order[0].get_effect(Keyword.BURN) is None,
+        combat_manager.order[0].hp == 1,
     ]
 
     combat_manager.start_turn()
 
     combat_manager.execute_effect(
         effect_freeze,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            len(combat_manager.order[2].effects) == 1,
-            combat_manager.order[2].get_effect(Keyword.BURN) is None,
-            combat_manager.order[2].get_effect(Keyword.FREEZE).keyword
+            len(combat_manager.order[1].effects) == 1,
+            combat_manager.order[1].get_effect(Keyword.BURN) is None,
+            combat_manager.order[1].get_effect(Keyword.FREEZE).keyword
             == Keyword.FREEZE,
-            combat_manager.order[2].hp == 8,
-            combat_manager.order[1].hp == 1,
+            combat_manager.order[1].hp == 8,
+            combat_manager.order[0].hp == 1,
         ]
     )
 
@@ -226,8 +224,6 @@ def test_keyword_confuse(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector_manager: SelectorManager = managers["selector_manager"]
 
-    combat_manager.current_monster = combat_manager.order[1]
-
     effect_confuse = ConfuseEffect(
         value=1,
         duration=1,
@@ -237,24 +233,24 @@ def test_keyword_confuse(managers: Dict):
 
     combat_manager.execute_effect(
         effect_confuse,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_1",
-        len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.CONFUSE).keyword == Keyword.CONFUSE,
-        combat_manager.order[1].get_effect(Keyword.CONFUSE).value == 1,
-        combat_manager.order[1].get_effect(Keyword.CONFUSE).duration == 1,
-        combat_manager.order[1].hp == 1,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.CONFUSE).keyword == Keyword.CONFUSE,
+        combat_manager.order[0].get_effect(Keyword.CONFUSE).value == 1,
+        combat_manager.order[0].get_effect(Keyword.CONFUSE).duration == 1,
+        combat_manager.order[0].hp == 1,
     ]
 
     targets: List[Monster] = selector_manager.get_targets(
         side=side,
-        source=combat_manager.order[1],
-        allies=[combat_manager.order[2]],
-        enemies=[combat_manager.order[3]],
+        source=combat_manager.order[0],
+        allies=[combat_manager.order[1]],
+        enemies=[combat_manager.order[2]],
     )
 
     conditions.extend(
@@ -268,9 +264,9 @@ def test_keyword_confuse(managers: Dict):
 
     targets: List[Monster] = selector_manager.get_targets(
         side=side,
-        source=combat_manager.order[1],
-        allies=[combat_manager.order[2]],
-        enemies=[combat_manager.order[3]],
+        source=combat_manager.order[0],
+        allies=[combat_manager.order[1]],
+        enemies=[combat_manager.order[2]],
     )
 
     conditions.extend(
@@ -298,66 +294,66 @@ def test_keyword_freeze(managers: Dict):
 
     combat_manager.execute_effect(
         effect_freeze,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 1,
-        combat_manager.order[2].get_effect(Keyword.FREEZE).keyword == Keyword.FREEZE,
-        combat_manager.order[2].get_effect(Keyword.FREEZE).duration == 1,
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[3].local_id == "MONSTER_3",
-        len(combat_manager.order[3].effects) == 0,
-        combat_manager.order[3].get_effect(Keyword.FREEZE) is None,
-        combat_manager.order[3].hp == 100,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.FREEZE).keyword == Keyword.FREEZE,
+        combat_manager.order[1].get_effect(Keyword.FREEZE).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[2].local_id == "MONSTER_3",
+        len(combat_manager.order[2].effects) == 0,
+        combat_manager.order[2].get_effect(Keyword.FREEZE) is None,
+        combat_manager.order[2].hp == 100,
     ]
 
     combat_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     combat_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[2],
-        target=combat_manager.order[3],
+        source=combat_manager.order[1],
+        target=combat_manager.order[2],
     )
 
     conditions.extend(
         [
-            combat_manager.order[2].hp == 10,
-            combat_manager.order[3].hp == 100,
+            combat_manager.order[1].hp == 10,
+            combat_manager.order[2].hp == 100,
         ]
     )
 
     combat_manager.execute_effect(
         effect_burn,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     combat_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     combat_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[2],
-        target=combat_manager.order[3],
+        source=combat_manager.order[1],
+        target=combat_manager.order[2],
     )
 
     conditions.extend(
         [
-            len(combat_manager.order[2].effects) == 1,
-            combat_manager.order[2].get_effect(Keyword.FREEZE) is None,
-            combat_manager.order[2].get_effect(Keyword.BURN).keyword == Keyword.BURN,
-            combat_manager.order[2].hp == 12,
-            combat_manager.order[3].hp == 98,
+            len(combat_manager.order[1].effects) == 1,
+            combat_manager.order[1].get_effect(Keyword.FREEZE) is None,
+            combat_manager.order[1].get_effect(Keyword.BURN).keyword == Keyword.BURN,
+            combat_manager.order[1].hp == 12,
+            combat_manager.order[2].hp == 98,
         ]
     )
 
@@ -367,7 +363,7 @@ def test_keyword_freeze(managers: Dict):
 def test_keyword_poison(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    combat_manager.current_monster = combat_manager.order[2]
+    combat_manager.current_monster = combat_manager.order[1]
 
     effect_poison = PoisonEffect(
         value=3,
@@ -376,21 +372,21 @@ def test_keyword_poison(managers: Dict):
 
     combat_manager.execute_effect(
         effect_poison,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 1,
-        combat_manager.order[2].get_effect(Keyword.POISON).keyword == Keyword.POISON,
-        combat_manager.order[2].get_effect(Keyword.POISON).value == 3,
-        combat_manager.order[2].get_effect(Keyword.POISON).duration == 1,
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[1].local_id == "MONSTER_1",
-        len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.POISON) is None,
-        combat_manager.order[1].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.POISON).keyword == Keyword.POISON,
+        combat_manager.order[1].get_effect(Keyword.POISON).value == 3,
+        combat_manager.order[1].get_effect(Keyword.POISON).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 0,
+        combat_manager.order[0].get_effect(Keyword.POISON) is None,
+        combat_manager.order[0].hp == 1,
     ]
 
     combat_manager.start_turn()
@@ -399,10 +395,10 @@ def test_keyword_poison(managers: Dict):
 
     conditions.extend(
         [
-            len(combat_manager.order[2].effects) == 0,
-            combat_manager.order[2].get_effect(Keyword.POISON) is None,
-            combat_manager.order[2].hp == 7,
-            combat_manager.order[1].hp == 1,
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.POISON) is None,
+            combat_manager.order[1].hp == 7,
+            combat_manager.order[0].hp == 1,
         ]
     )
 
@@ -412,7 +408,7 @@ def test_keyword_poison(managers: Dict):
 def test_keyword_sleep(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    combat_manager.current_monster = combat_manager.order[2]
+    combat_manager.current_monster = combat_manager.order[1]
 
     effect_sleep = SleepEffect(
         duration=1,
@@ -422,106 +418,20 @@ def test_keyword_sleep(managers: Dict):
 
     combat_manager.execute_effect(
         effect_sleep,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
-    )
-
-    conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        len(combat_manager.order[2].effects) == 1,
-        combat_manager.order[2].get_effect(Keyword.SLEEP).keyword == Keyword.SLEEP,
-        combat_manager.order[2].get_effect(Keyword.SLEEP).duration == 1,
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[3].local_id == "MONSTER_3",
-        len(combat_manager.order[3].effects) == 0,
-        combat_manager.order[3].get_effect(Keyword.SLEEP) is None,
-        combat_manager.order[3].hp == 100,
-    ]
-
-    combat_manager.execute_effect(
-        effect_heal,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
-    )
-
-    combat_manager.execute_effect(
-        effect_attack,
-        source=combat_manager.order[2],
-        target=combat_manager.order[3],
-    )
-
-    conditions.extend(
-        [
-            combat_manager.order[2].hp == 10,
-            combat_manager.order[3].hp == 100,
-        ]
-    )
-
-    combat_manager.execute_effect(
-        effect_attack,
-        source=combat_manager.order[3],
-        target=combat_manager.order[2],
-    )
-
-    conditions.extend(
-        [
-            len(combat_manager.order[2].effects) == 0,
-            combat_manager.order[2].get_effect(Keyword.SLEEP) is None,
-            combat_manager.order[2].hp == 8,
-        ]
-    )
-
-    combat_manager.execute_effect(
-        effect_heal,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
-    )
-
-    combat_manager.execute_effect(
-        effect_attack,
-        source=combat_manager.order[2],
-        target=combat_manager.order[3],
-    )
-
-    conditions.extend(
-        [
-            len(combat_manager.order[2].effects) == 0,
-            combat_manager.order[2].get_effect(Keyword.SLEEP) is None,
-            combat_manager.order[2].hp == 10,
-            combat_manager.order[3].hp == 98,
-        ]
-    )
-
-    assert_conditions(conditions)
-
-
-def test_keyword_stun(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-
-    combat_manager.current_monster = combat_manager.order[1]
-
-    effect_stun = StunEffect(
-        duration=1,
-    )
-    effect_attack = AttackEffect(2)
-    effect_heal = HealEffect(2)
-
-    combat_manager.execute_effect(
-        effect_stun,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_1",
+        combat_manager.order[1].local_id == "MONSTER_2",
         len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.STUN).keyword == Keyword.STUN,
-        combat_manager.order[1].get_effect(Keyword.STUN).duration == 1,
-        combat_manager.order[1].hp == 1,
-        combat_manager.order[2].local_id == "MONSTER_2",
+        combat_manager.order[1].get_effect(Keyword.SLEEP).keyword == Keyword.SLEEP,
+        combat_manager.order[1].get_effect(Keyword.SLEEP).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[2].local_id == "MONSTER_3",
         len(combat_manager.order[2].effects) == 0,
-        combat_manager.order[2].get_effect(Keyword.STUN) is None,
-        combat_manager.order[2].hp == 10,
+        combat_manager.order[2].get_effect(Keyword.SLEEP) is None,
+        combat_manager.order[2].hp == 100,
     ]
 
     combat_manager.execute_effect(
@@ -538,12 +448,24 @@ def test_keyword_stun(managers: Dict):
 
     conditions.extend(
         [
-            combat_manager.order[1].hp == 1,
-            combat_manager.order[2].hp == 10,
+            combat_manager.order[1].hp == 10,
+            combat_manager.order[2].hp == 100,
         ]
     )
 
-    combat_manager.end_turn()
+    combat_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[2],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.SLEEP) is None,
+            combat_manager.order[1].hp == 8,
+        ]
+    )
 
     combat_manager.execute_effect(
         effect_heal,
@@ -560,9 +482,81 @@ def test_keyword_stun(managers: Dict):
     conditions.extend(
         [
             len(combat_manager.order[1].effects) == 0,
-            combat_manager.order[1].get_effect(Keyword.STUN) is None,
-            combat_manager.order[1].hp == 3,
-            combat_manager.order[2].hp == 8,
+            combat_manager.order[1].get_effect(Keyword.SLEEP) is None,
+            combat_manager.order[1].hp == 10,
+            combat_manager.order[2].hp == 98,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_stun(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    effect_stun = StunEffect(
+        duration=1,
+    )
+    effect_attack = AttackEffect(2)
+    effect_heal = HealEffect(2)
+
+    combat_manager.execute_effect(
+        effect_stun,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    conditions = [
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.STUN).keyword == Keyword.STUN,
+        combat_manager.order[0].get_effect(Keyword.STUN).duration == 1,
+        combat_manager.order[0].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.STUN) is None,
+        combat_manager.order[1].hp == 10,
+    ]
+
+    combat_manager.execute_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 1,
+            combat_manager.order[1].hp == 10,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.execute_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.STUN) is None,
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 8,
         ]
     )
 

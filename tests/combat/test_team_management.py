@@ -1,114 +1,87 @@
 """Tests for combat team management."""
 
-from pytest import fixture
+from typing import Dict
 
-from src.base.monster import Monster
 from src.combat.manager import CombatManager
+from tests.utils import assert_conditions
 
 
-@fixture
-def combat_manager():
-    monster_0 = Monster(
-        local_id="MONSTER_0",
-        hp=10,
-    )
-    monster_1 = Monster(
-        local_id="MONSTER_1",
-        hp=0,
-    )
-    monster_2 = Monster(
-        local_id="MONSTER_2",
-        hp=0,
-    )
+def test_get_team_self(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
-    teams = [[monster_0, monster_1], [monster_2]]
-
-    combat_manager = CombatManager(
-        teams=teams,
-        order_strategy="SET",
-    )
-
-    return combat_manager
-
-
-def test_get_team_self(combat_manager: CombatManager):
-    monster_local_ids = []
-
-    for monster in combat_manager.order:
-        team = combat_manager.get_team(monster)
-
-        for team_monster in team:
-            monster_local_ids.append(team_monster.local_id)
+    team = combat_manager.get_team(combat_manager.teams[0][0])
 
     conditions = [
-        len(monster_local_ids) == 5,
-        monster_local_ids[0] == "MONSTER_0",
-        monster_local_ids[1] == "MONSTER_1",
-        monster_local_ids[2] == "MONSTER_0",
-        monster_local_ids[3] == "MONSTER_1",
-        monster_local_ids[4] == "MONSTER_2",
+        len(team) == 3,
+        team[0].local_id == "MONSTER_0",
+        team[1].local_id == "MONSTER_1",
+        team[2].local_id == "MONSTER_2",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_team_allies(combat_manager: CombatManager):
-    monster_local_ids = []
+def test_get_team_allies(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
-    for monster in combat_manager.order:
-        team = combat_manager.get_team(monster, "ALLIES")
-
-        for team_monster in team:
-            monster_local_ids.append(team_monster.local_id)
+    team = combat_manager.get_team(combat_manager.teams[0][0], "ALLIES")
 
     conditions = [
-        len(monster_local_ids) == 2,
-        monster_local_ids[0] == "MONSTER_1",
-        monster_local_ids[1] == "MONSTER_0",
+        len(team) == 2,
+        team[0].local_id == "MONSTER_1",
+        team[1].local_id == "MONSTER_2",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_team_enemies(combat_manager: CombatManager):
-    monster_local_ids = []
+def test_get_team_enemies(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
-    for monster in combat_manager.order:
-        team = combat_manager.get_team(monster, "ENEMIES")
-
-        for team_monster in team:
-            monster_local_ids.append(team_monster.local_id)
+    team = combat_manager.get_team(combat_manager.teams[0][0], "ENEMIES")
 
     conditions = [
-        len(monster_local_ids) == 4,
-        monster_local_ids[0] == "MONSTER_2",
-        monster_local_ids[1] == "MONSTER_2",
-        monster_local_ids[2] == "MONSTER_0",
-        monster_local_ids[3] == "MONSTER_1",
+        len(team) == 2,
+        team[0].local_id == "MONSTER_3",
+        team[1].local_id == "MONSTER_4",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_team_status_monster(combat_manager: CombatManager):
+def test_get_team_status_monster(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
     teams_status = []
 
-    for monster in combat_manager.order:
-        teams_status.append(combat_manager.get_team_status(monster=monster))
+    for idx, team in enumerate(combat_manager.teams):
+        for monster in team:
+            if idx == 1:
+                monster.hp = 0
+
+    for team in combat_manager.teams:
+        for monster in team:
+            teams_status.append(combat_manager.get_team_status(monster=monster))
 
     conditions = [
         teams_status[0] == "ALIVE",
         teams_status[1] == "ALIVE",
-        teams_status[2] == "DEFEATED",
+        teams_status[2] == "ALIVE",
+        teams_status[3] == "DEFEATED",
+        teams_status[4] == "DEFEATED",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_team_status_team(combat_manager: CombatManager):
+def test_get_team_status_team(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
     teams_status = []
 
-    for team in combat_manager.teams:
+    for idx, team in enumerate(combat_manager.teams):
+        for monster in team:
+            if idx == 1:
+                monster.hp = 0
+
         teams_status.append(combat_manager.get_team_status(team=team))
 
     conditions = [
@@ -116,25 +89,36 @@ def test_get_team_status_team(combat_manager: CombatManager):
         teams_status[1] == "DEFEATED",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_combat_status_winner(combat_manager: CombatManager):
+def test_get_combat_status_winner(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    for idx, team in enumerate(combat_manager.teams):
+        for monster in team:
+            if idx == 1:
+                monster.hp = 0
+
     result = combat_manager.get_combat_status()
 
     conditions = [
         result["status"] == "WINNER",
         len(result["ALIVE"]) == 1,
-        len(result["ALIVE"][0]) == 2,
+        len(result["ALIVE"][0]) == 3,
         len(result["DEFEATED"]) == 1,
-        len(result["DEFEATED"][0]) == 1,
+        len(result["DEFEATED"][0]) == 2,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_combat_status_draw(combat_manager: CombatManager):
-    combat_manager.order[0].hp = 0
+def test_get_combat_status_draw(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    for team in combat_manager.teams:
+        for monster in team:
+            monster.hp = 0
 
     result = combat_manager.get_combat_status()
 
@@ -142,24 +126,24 @@ def test_get_combat_status_draw(combat_manager: CombatManager):
         result["status"] == "DRAW",
         len(result["ALIVE"]) == 0,
         len(result["DEFEATED"]) == 2,
-        len(result["DEFEATED"][0]) == 2,
-        len(result["DEFEATED"][1]) == 1,
+        len(result["DEFEATED"][0]) == 3,
+        len(result["DEFEATED"][1]) == 2,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
-def test_get_combat_status_ongoing(combat_manager: CombatManager):
-    combat_manager.order[2].hp = 10
+def test_get_combat_status_ongoing(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
     result = combat_manager.get_combat_status()
 
     conditions = [
         result["status"] == "ONGOING",
         len(result["ALIVE"]) == 2,
-        len(result["ALIVE"][0]) == 2,
-        len(result["ALIVE"][1]) == 1,
+        len(result["ALIVE"][0]) == 3,
+        len(result["ALIVE"][1]) == 2,
         len(result["DEFEATED"]) == 0,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)

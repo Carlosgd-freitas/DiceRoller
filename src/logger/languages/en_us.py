@@ -50,6 +50,12 @@ EFFECT_EXECUTION = {
     "restoration_self": "{source} restored {value} {attribute} of itself through {keyword}.",
 }
 
+EFFECT_REMOVAL = {
+    "burn": "{target} had its {removed_keyword} put out by the effect of {keyword}.",
+    "freeze": "{target} thawed from its {removed_keyword} by the effect of {keyword}.",
+    "sleep": "{target} woke up from its {removed_keyword} by the effect of {keyword}.",
+}
+
 KEYWORDS = {
     "absorb": "ABOSRB",
     "attack": "ATTACK",

@@ -16,19 +16,19 @@ def test_keyword_curse(managers: Dict):
 
     combat_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     combat_manager.execute_effect(
         curse_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_1",
-        combat_manager.order[1].hp == 0,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        combat_manager.order[0].hp == 0,
     ]
 
     assert_conditions(conditions)

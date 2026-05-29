@@ -23,6 +23,7 @@ type LoggingCategory = Literal[
     "COMBAT",
     "EFFECT_ACTIVATION",
     "EFFECT_EXECUTION",
+    "EFFECT_REMOVAL",
     "KEYWORDS",
     "STATUS",
 ]
@@ -85,6 +86,22 @@ class Logger:
                 self.get_message(
                     category=category,
                     key=keyword,
+                ),
+                foreground_color=foreground_color,
+                intensity=intensity,
+            )
+
+        if kwargs.get("removed_effect"):
+            removed_effect: Effect = kwargs["removed_effect"]
+
+            color_data = get_keyword_color(removed_effect.keyword)
+            foreground_color = color_data["foreground_color"]
+            intensity = color_data["intensity"]
+
+            kwargs["removed_keyword"] = color_string(
+                self.get_message(
+                    category=category,
+                    key=removed_effect.keyword.value.lower(),
                 ),
                 foreground_color=foreground_color,
                 intensity=intensity,
@@ -166,7 +183,7 @@ class Logger:
         effect: Effect,
         source: Monster,
         target: Monster,
-        category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION"],
+        category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION", "EFFECT_REMOVAL"],
         **kwargs,
     ) -> None:
         """
@@ -182,10 +199,9 @@ class Logger:
         :type target: Entity
 
         :param category: What category of logging will be done.
-        :type category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION"]
+        :type category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION",
+            "EFFECT_REMOVAL"]
         """
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
         if category == "EFFECT_ACTIVATION":
             key = effect.keyword.value.lower()
 
@@ -194,6 +210,12 @@ class Logger:
 
             if (source) and (target) and (source == target):
                 key += "_self"
+
+        elif category == "EFFECT_REMOVAL":
+            removed_effect: Effect = kwargs["removed_effect"]
+            key = removed_effect.keyword.value.lower()
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         self.log(
             category=category,

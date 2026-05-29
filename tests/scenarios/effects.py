@@ -72,8 +72,8 @@ restoration_effects = [
 
 monster_a = Monster(
     name="Monster A",
-    hp=50,
-    max_hp=100,
+    hp=100,
+    max_hp=200,
     dice=[
         Dice(sides=[Side(effects=buff_effects)]),
         Dice(sides=[Side(effects=curse_effects)]),
@@ -87,8 +87,8 @@ monster_a = Monster(
 
 monster_b = Monster(
     name="Monster B",
-    hp=50,
-    max_hp=100,
+    hp=100,
+    max_hp=200,
 )
 
 # ----------------------------
@@ -103,7 +103,7 @@ combat_manager = CombatManager(
         "Blue Team",
     ],
     order_strategy="SET",
-    language="EN-US",
+    language="PT-BR",
 )
 
 # ----------------------------
@@ -119,6 +119,39 @@ combat_manager.current_monster.effects = []
 
 combat_manager.next_turn()
 combat_manager.current_monster.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Removal =====")
+
+removal_sets = [
+    (
+        BurnEffect(1, duration=1),
+        [FreezeEffect(1, duration=1)],
+    ),
+    (
+        FreezeEffect(1, duration=1),
+        [BurnEffect(1, duration=1)],
+    ),
+    (
+        SleepEffect(1, duration=1),
+        [
+            AttackEffect(1),
+            DrainEffect(1),
+            PierceEffect(1),
+        ],
+    ),
+]
+
+for removed, removers in removal_sets:
+    for remover in removers:
+        combat_manager.current_monster.effects = [removed]
+
+        combat_manager.execute_effect(
+            effect=remover,
+            source=monster_a,
+            target=monster_b,
+        )
 
 # ----------------------------
 

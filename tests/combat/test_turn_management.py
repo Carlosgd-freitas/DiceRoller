@@ -1,54 +1,30 @@
 """Tests for combat turn management."""
 
-from pytest import fixture
+from typing import Dict
 
-from src.base.monster import Monster
-from src.combat.manager import CombatManager
+from src.combat.manager import CombatManager, OrderStrategy
+from tests.utils import assert_conditions
 
 
-@fixture
-def combat_manager():
-    monster_0 = Monster(
-        local_id="MONSTER_0",
-        hp=10,
-        speed=5,
-    )
-    monster_1 = Monster(
-        local_id="MONSTER_1",
-        hp=0,
-        speed=1,
-    )
-    monster_2 = Monster(
-        local_id="MONSTER_2",
-        hp=10,
-        speed=10,
-    )
+def test_next_turn(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
 
-    teams = [[monster_0, monster_1], [monster_2]]
-
-    combat_manager = CombatManager(
-        teams=teams,
-        order_strategy="FASTER",
-    )
-
+    combat_manager.order_strategy = OrderStrategy.FASTER
     combat_manager.start_combat()
 
-    return combat_manager
+    turns_monster_id = []
 
-
-def test_next_turn(combat_manager: CombatManager):
-    turn_0_monster_id = combat_manager.current_monster.local_id
-
-    combat_manager.next_turn()
-    turn_1_monster_id = combat_manager.current_monster.local_id
-
-    combat_manager.next_turn()
-    turn_2_monster_id = combat_manager.current_monster.local_id
+    for _ in range(5):
+        turn_monster_id = combat_manager.current_monster.local_id
+        turns_monster_id.append(turn_monster_id)
+        combat_manager.next_turn()
 
     conditions = [
-        turn_0_monster_id == "MONSTER_2",
-        turn_1_monster_id == "MONSTER_0",
-        turn_2_monster_id == "MONSTER_2",
+        turns_monster_id[0] == "MONSTER_3",
+        turns_monster_id[1] == "MONSTER_1",
+        turns_monster_id[2] == "MONSTER_2",
+        turns_monster_id[3] == "MONSTER_4",
+        turns_monster_id[4] == "MONSTER_3",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)

@@ -19,45 +19,45 @@ def test_keyword_absorb(managers: Dict):
 
     combat_manager.execute_effect(
         absorb_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[2].get_effect(Keyword.ABSORB).keyword == Keyword.ABSORB,
-        combat_manager.order[2].get_effect(Keyword.ABSORB).value == 6,
-        combat_manager.order[1].get_effect(Keyword.ABSORB) is None,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[1].get_effect(Keyword.ABSORB).keyword == Keyword.ABSORB,
+        combat_manager.order[1].get_effect(Keyword.ABSORB).value == 6,
+        combat_manager.order[0].get_effect(Keyword.ABSORB) is None,
     ]
 
     combat_manager.execute_effect(
         attack_effect_1,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            combat_manager.order[2].local_id == "MONSTER_2",
-            combat_manager.order[2].hp == 13,
-            combat_manager.order[2].get_effect(Keyword.ABSORB).keyword
+            combat_manager.order[1].local_id == "MONSTER_2",
+            combat_manager.order[1].hp == 13,
+            combat_manager.order[1].get_effect(Keyword.ABSORB).keyword
             == Keyword.ABSORB,
-            combat_manager.order[2].get_effect(Keyword.ABSORB).value == 3,
+            combat_manager.order[1].get_effect(Keyword.ABSORB).value == 3,
         ]
     )
 
     combat_manager.execute_effect(
         attack_effect_2,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            combat_manager.order[2].local_id == "MONSTER_2",
-            combat_manager.order[2].hp == 15,
-            combat_manager.order[2].get_effect(Keyword.ABSORB) is None,
+            combat_manager.order[1].local_id == "MONSTER_2",
+            combat_manager.order[1].hp == 15,
+            combat_manager.order[1].get_effect(Keyword.ABSORB) is None,
         ]
     )
 
@@ -73,44 +73,44 @@ def test_keyword_block(managers: Dict):
 
     combat_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[2],
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
     )
 
     conditions = [
-        combat_manager.order[2].local_id == "MONSTER_2",
-        combat_manager.order[2].hp == 10,
-        combat_manager.order[2].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
-        combat_manager.order[2].get_effect(Keyword.BLOCK).value == 6,
-        combat_manager.order[1].get_effect(Keyword.BLOCK) is None,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[1].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+        combat_manager.order[1].get_effect(Keyword.BLOCK).value == 6,
+        combat_manager.order[0].get_effect(Keyword.BLOCK) is None,
     ]
 
     combat_manager.execute_effect(
         attack_effect_1,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            combat_manager.order[2].local_id == "MONSTER_2",
-            combat_manager.order[2].hp == 10,
-            combat_manager.order[2].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
-            combat_manager.order[2].get_effect(Keyword.BLOCK).value == 3,
+            combat_manager.order[1].local_id == "MONSTER_2",
+            combat_manager.order[1].hp == 10,
+            combat_manager.order[1].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+            combat_manager.order[1].get_effect(Keyword.BLOCK).value == 3,
         ]
     )
 
     combat_manager.execute_effect(
         attack_effect_2,
-        source=combat_manager.order[1],
-        target=combat_manager.order[2],
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
     )
 
     conditions.extend(
         [
-            combat_manager.order[2].local_id == "MONSTER_2",
-            combat_manager.order[2].hp == 9,
-            combat_manager.order[2].get_effect(Keyword.BLOCK) is None,
+            combat_manager.order[1].local_id == "MONSTER_2",
+            combat_manager.order[1].hp == 9,
+            combat_manager.order[1].get_effect(Keyword.BLOCK) is None,
         ]
     )
 

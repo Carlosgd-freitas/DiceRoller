@@ -87,7 +87,36 @@ class Color(Enum):
 
 
 class ColorParams(TypedDict):
-    """Color parameters."""
+    """
+    Parameters for coloring a string.
+
+    :var foreground_color: color that will be used on the string itself. Default value
+    is the terminal's foreground color.
+    :vartype foreground_color: Tuple[int, int, int] | Color
+
+    :var background_color: color that will be used on the background. Default value
+    is the terminal's background color.
+    :vartype background_color: Tuple[int, int, int] | Color
+
+    :var intensity: intensity of the string itself, which can be 'BRIGHT', 'DIM',
+    'SLOW_BLINK' or 'RAPID_BLINK'. Default value is None.
+    :vartype intensity: Literal["BRIGHT", "DIM", "SLOW_BLINK", "RAPID_BLINK"]
+
+    :var italic: if the text will be in italic or not. Default value is False.
+    :vartype italic: bool
+
+    :var underlined: if the text will be in underlined or not. Default value is False.
+    :vartype underlined: bool
+
+    :var inverted: if the text will be in inverted or not. Default value is False.
+    :vartype inverted: bool
+
+    :var concealed: if the text will be in concealed or not. Default value is False.
+    :vartype concealed: bool
+
+    :var strikethrough: if the text will be in strikethrough or not. Default value is False.
+    :vartype strikethrough: bool
+    """
 
     foreground_color: Tuple[int, int, int] | Color
     background_color: Tuple[int, int, int] | Color

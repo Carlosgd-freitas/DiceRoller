@@ -1,5 +1,6 @@
 """Combat Manager module."""
 
+from enum import Enum
 from random import random, shuffle
 from typing import Dict, List, Literal, TypedDict
 
@@ -13,7 +14,41 @@ from src.logger.logger import Logger
 from src.targeting.selectors.manager import SelectorManager
 
 
+class OrderStrategy(Enum):
+    """
+    Strategy when definining monsters turn order in combat.
+
+    * ``FASTER``: monsters act from highest to lowest speed
+    * ``SET``: monsters act in the order they are provided
+    * ``SHUFFLE``: monsters act in random order
+    * ``SLOWER``: monsters act from lowest to highest speed
+    """
+
+    FASTER = "FASTER"
+    SET = "SET"
+    SHUFFLE = "SHUFFLE"
+    SLOWER = "SLOWER"
+
+
 class CombatStatus(TypedDict):
+    """
+    The combat's status.
+
+    :var ALIVE: a list of teams with at least on monster with hp > 0.
+    :vartype ALIVE: List[List[Monster]]
+
+    :var DEFEATED: a list of teams with with all monsters with hp = 0.
+    :vartype DEFEATED: List[List[Monster]]
+
+    :var status: current combat status:
+    :vartype status: Literal["DRAW", "ONGOING", "WINNER"]
+
+    **Status:**
+    * `"DRAW"`: the combat only has defeated teams
+    * `"ONGOING"`: the combat may still continue
+    * `"WINNER"`: the combat has only one alive team
+    """
+
     ALIVE: List[List[Monster]]
     DEFEATED: List[List[Monster]]
     status: Literal["DRAW", "ONGOING", "WINNER"]
@@ -30,27 +65,22 @@ class CombatManager:
     length as 'teams' parameter.
     :vartype team_names: str
 
-    :var order_strategy: How the turn order will be decided. Default value is "FASTER".
-    :vartype order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"]
+    :var order_strategy: Strategy when definining monsters turn order in combat.
+    Default value is OrderStrategy.FASTER.
+    :vartype order_strategy: OrderStrategy
 
     :var logging: If the combat will be logged. Default value is True.
     :vartype logging: bool
 
     :var language: What language will be logged. Default value is "EN-US".
     :vartype language: Literal["EN-US", "PT-BR"]
-
-    **Order strategies**
-    * ``FASTER``: monsters act from highest to lowest speed
-    * ``SET``: monsters act in the order they are provided
-    * ``SHUFFLE``: monsters act in random order
-    * ``SLOWER``: monsters act from lowest to highest speed
     """
 
     def __init__(
         self,
         teams: List[List[Monster]] = None,
         team_names: List[str] = None,
-        order_strategy: Literal["FASTER", "SET", "SHUFFLE", "SLOWER"] = "FASTER",
+        order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
         language: Literal["EN-US", "PT-BR"] = "EN-US",
     ):
@@ -84,7 +114,7 @@ class CombatManager:
         self.teams = teams
 
         self.order_strategy = order_strategy
-        self.order = self._set_order()
+        self.order = []
 
     def _set_order(
         self,
@@ -95,15 +125,17 @@ class CombatManager:
         :return: A list of monsters.
         :rtype: List[Monster]
         """
-        order: List[Monster] = [monster for team in self.teams for monster in team]
+        order: List[Monster] = [
+            monster for team in self.teams for monster in team if monster.hp > 0
+        ]
 
-        if self.order_strategy == "FASTER":
+        if self.order_strategy == OrderStrategy.FASTER:
             order.sort(key=lambda x: x.speed, reverse=True)
 
-        elif self.order_strategy == "SLOWER":
+        elif self.order_strategy == OrderStrategy.SLOWER:
             order.sort(key=lambda x: x.speed)
 
-        elif self.order_strategy == "SHUFFLE":
+        elif self.order_strategy == OrderStrategy.SHUFFLE:
             shuffle(order)
 
         return order
@@ -204,16 +236,6 @@ class CombatManager:
 
         :return: The current combat status.
         :rtype: CombatStatus
-
-        **Return keys**
-        * ``ALIVE``: a list of teams (list of monsters) with at least one monster with
-        hp > 0
-        * ``DEFEATED``: a list of teams (list of monsters) with all monsters with
-        hp = 0
-        * ``status``: current combat result:
-          * "DRAW": the combat only has defeated teams
-          * "ONGOING": the combat may still continue
-          * "WINNER": the combat has only one alive team
         """
         teams_status = {
             "ALIVE": [],
@@ -449,6 +471,16 @@ class CombatManager:
             damage=effect_data.get("damage"),
         )
 
+        # Log effect removals
+        for removed_effect in effect_data.get("removed_effects", []):
+            self.logger.log_effect(
+                effect=effect,
+                source=source,
+                target=target,
+                category="EFFECT_REMOVAL",
+                removed_effect=removed_effect,
+            )
+
         # Procesing effects on being attacked
         if effect.type == EffectType.OFFENSIVE:
             self.process_trigger(
@@ -461,6 +493,7 @@ class CombatManager:
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
+        self.order = self._set_order()
         self.current_monster = self.order[0]
         return
 

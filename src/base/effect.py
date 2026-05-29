@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, List, TypedDict
 
 from src.base.color import color_string
 from src.base.keywords import Keyword, get_keyword_color
@@ -12,6 +12,25 @@ from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
+
+
+class EffectData(TypedDict):
+    """
+    Data when applying or activating an Effect.
+
+    :var attribute: Attribute of a Monster that was affected.
+    :vartype attribute: str
+
+    :var damage: Damage done to a Monster.
+    :vartype damage: int
+
+    :var removed_effects: A list of effects that were removed on effect apply.
+    :vartype removed_effects: List[Effect]
+    """
+
+    attribute: str
+    damage: int
+    removed_effects: List[Effect]
 
 
 class EffectType(Enum):
@@ -97,7 +116,7 @@ class Effect(ABC):
         self,
         source: Entity,
         target: Entity,
-    ) -> Dict:
+    ) -> EffectData:
         """
         What the Effect will do when being applied to an Entity.
 
@@ -107,7 +126,7 @@ class Effect(ABC):
         :param target: An Entity object which the effect will be applied.
         :type target: Entity
 
-        :return: A dictionary containing data for logging.
+        :return: A dictionary containing data after the effect was applied.
         :rtype: Dict
         """
         raise NotImplementedError
@@ -117,7 +136,7 @@ class Effect(ABC):
         self,
         target: Entity,
         source: Entity | None = None,
-    ) -> Dict:
+    ) -> EffectData:
         """
         What the Effect will done when activated.
 
@@ -127,7 +146,7 @@ class Effect(ABC):
         :param source: The Entity object where the effect is from.
         :type source: Entity
 
-        :return: A dictionary containing data for logging.
+        :return: A dictionary containing data after the effect was activated.
         :rtype: Dict
         """
         raise NotImplementedError

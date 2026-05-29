@@ -24,12 +24,12 @@ COMBAT = {
 EFFECT_ACTIVATION = {
     "bleed": "{target} recebeu {damage} de dano de {keyword}.",
     "burn": "{target} recebeu {damage} de dano de {keyword}.",
-    "freeze": "{target} não pode agir porque estava {status}.",
+    "freeze": "{target} não pôde agir porque estava {status}.",
     "poison": "{target} recebeu {damage} de dano de {keyword}.",
     "mana_regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
     "regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
-    "sleep": "{target} não pode agir porque estava {status}.",
-    "stun": "{target} não pode agir porque estava {status}.",
+    "sleep": "{target} não pôde agir porque estava {status}.",
+    "stun": "{target} não pôde agir porque estava {status}.",
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
 }
 
@@ -50,6 +50,12 @@ EFFECT_EXECUTION = {
     "restoration_self": "{source} restaurou {value} de {attribute} de si mesmo através de {keyword}.",
 }
 
+EFFECT_REMOVAL = {
+    "burn": "{target} teve sua {removed_keyword} apagada pelo efeito de {keyword}.",
+    "freeze": "{target} teve seu {removed_keyword} derretido pelo efeito de {keyword}.",
+    "sleep": "{target} acordou de seu {removed_keyword} pelo efeito de {keyword}.",
+}
+
 KEYWORDS = {
     "absorb": "ABSORÇÃO",
     "attack": "ATAQUE",
@@ -59,13 +65,13 @@ KEYWORDS = {
     "burn": "QUEIMADURA",
     "confuse": "CONFUSÃO",
     "curse": "MALDIÇÃO",
-    "drain": "DRENAGEM",
+    "drain": "DRENAR",
     "freeze": "CONGELAMENTO",
     "heal": "CURA",
     "mana_regen": "REGENERAÇÃO DE MANA",
     "mana": "MANA",
     "nothing": "NADA",
-    "pierce": "PERFURANTE",
+    "pierce": "PERFURAR",
     "poison": "ENVENENAMENTO",
     "regen": "REGENERAÇÃO",
     "sleep": "SONO",

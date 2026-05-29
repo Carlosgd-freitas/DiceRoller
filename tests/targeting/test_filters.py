@@ -13,6 +13,8 @@ from tests.utils import assert_conditions
 def test_filter_first(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
+    combat_manager.order[0].hp = 0
+
     filtered = filter_entities(
         combat_manager.order,
         k=1,
@@ -22,7 +24,7 @@ def test_filter_first(managers: Dict):
 
     conditions = [
         len(filtered) == 1,
-        filtered[0].local_id == "MONSTER_0",
+        filtered[0].local_id == "MONSTER_1",
     ]
 
     assert_conditions(conditions)
@@ -94,6 +96,8 @@ def test_filter_hurt(managers: Dict):
 def test_filter_lowest_hp(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
+    combat_manager.order[0].hp = 0
+
     filtered = filter_entities(
         combat_manager.order,
         k=1,
@@ -104,7 +108,7 @@ def test_filter_lowest_hp(managers: Dict):
 
     conditions = [
         len(filtered) == 1,
-        filtered[0].local_id == "MONSTER_0",
+        filtered[0].local_id == "MONSTER_1",
         filtered[0].hp == 0,
     ]
 
@@ -137,8 +141,8 @@ def test_filter_with_effect(managers: Dict):
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
 
-    combat_manager.order[1].apply_effect(effect_burn)
-    combat_manager.order[2].apply_effect(effect_stun)
+    combat_manager.order[0].apply_effect(effect_burn)
+    combat_manager.order[1].apply_effect(effect_stun)
 
     filtered = filter_entities(
         combat_manager.order,
@@ -162,8 +166,8 @@ def test_filter_without_effect(managers: Dict):
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
 
-    combat_manager.order[1].apply_effect(effect_burn)
-    combat_manager.order[2].apply_effect(effect_stun)
+    combat_manager.order[0].apply_effect(effect_burn)
+    combat_manager.order[1].apply_effect(effect_stun)
 
     filtered = filter_entities(
         combat_manager.order,
@@ -174,11 +178,10 @@ def test_filter_without_effect(managers: Dict):
     )
 
     conditions = [
-        len(filtered) == 4,
-        filtered[0].local_id == "MONSTER_0",
-        filtered[1].local_id == "MONSTER_1",
-        filtered[2].local_id == "MONSTER_3",
-        filtered[3].local_id == "MONSTER_4",
+        len(filtered) == 3,
+        filtered[0].local_id == "MONSTER_1",
+        filtered[1].local_id == "MONSTER_3",
+        filtered[2].local_id == "MONSTER_4",
     ]
 
     assert_conditions(conditions)

@@ -5,7 +5,7 @@ from typing import Dict
 from pytest import fixture
 
 from src.base.monster import Monster
-from src.combat.manager import CombatManager
+from src.combat.manager import CombatManager, OrderStrategy
 from src.targeting.selectors.manager import SelectorManager
 
 
@@ -15,30 +15,35 @@ def managers() -> Dict:
         local_id="MONSTER_0",
         hp=0,
         max_hp=200,
+        speed=0,
     )
 
     monster_1 = Monster(
         local_id="MONSTER_1",
         hp=1,
         max_hp=200,
+        speed=5,
     )
 
     monster_2 = Monster(
         local_id="MONSTER_2",
         hp=10,
         max_hp=200,
+        speed=1,
     )
 
     monster_3 = Monster(
         local_id="MONSTER_3",
         hp=100,
         max_hp=200,
+        speed=10,
     )
 
     monster_4 = Monster(
         local_id="MONSTER_4",
         hp=200,
         max_hp=200,
+        speed=1,
     )
 
     combat_manager = CombatManager(
@@ -46,7 +51,7 @@ def managers() -> Dict:
             [monster_0, monster_1, monster_2],
             [monster_3, monster_4],
         ],
-        order_strategy="SET",
+        order_strategy=OrderStrategy.SET,
         logging=False,
     )
 
