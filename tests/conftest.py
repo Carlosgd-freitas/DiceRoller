@@ -6,7 +6,6 @@ from pytest import fixture
 
 from src.base.monster import Monster
 from src.combat.manager import CombatManager, OrderStrategy
-from src.targeting.selectors.manager import SelectorManager
 
 
 @fixture()
@@ -51,24 +50,32 @@ def managers() -> Dict:
         speed=1,
     )
 
+    teams = [
+        [monster_0, monster_1, monster_2],
+        [monster_3, monster_4],
+    ]
+
+    team_names = [
+        "Team Red",
+        "Team Blue",
+    ]
+
     combat_manager = CombatManager(
-        teams=[
-            [monster_0, monster_1, monster_2],
-            [monster_3, monster_4],
-        ],
-        team_names=[
-            "Team Red",
-            "Team Blue",
-        ],
+        teams=teams,
+        team_names=team_names,
         order_strategy=OrderStrategy.SET,
         logging=False,
     )
 
     combat_manager.start_combat()
 
-    selector_manager = SelectorManager()
-
     return {
+        # Variables
+        "teams": teams,
+        "team_names": team_names,
+        # Managers
         "combat_manager": combat_manager,
-        "selector_manager": selector_manager,
+        "effect_manager": combat_manager.effect_manager,
+        "selector_manager": combat_manager.selector_manager,
+        "suffix_manager": combat_manager.suffix_manager,
     }

@@ -1,12 +1,99 @@
 """Tests for buff effects processing."""
 
-from typing import Dict
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
-from src.combat.manager import CombatManager
 from src.effects.attack import AttackEffect
+from src.effects.mana_regen import ManaRegenEffect
+from src.effects.regen import RegenEffect
 from src.effects.thorns import ThornsEffect
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.combat.manager import CombatManager
+
+
+def test_keyword_mana_regen(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    combat_manager.current_monster = combat_manager.order[1]
+
+    effect = ManaRegenEffect(
+        value=1,
+        duration=1,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect,
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
+    )
+
+    conditions = [
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).keyword
+        == Keyword.MANA_REGEN,
+        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).value == 1,
+        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).duration == 1,
+        combat_manager.order[1].mana == 0,
+    ]
+
+    combat_manager.start_turn()
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.MANA_REGEN) is None,
+            combat_manager.order[1].mana == 1,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_regen(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    combat_manager.current_monster = combat_manager.order[1]
+
+    effect = RegenEffect(
+        value=1,
+        duration=1,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect,
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
+    )
+
+    conditions = [
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.REGEN).keyword == Keyword.REGEN,
+        combat_manager.order[1].get_effect(Keyword.REGEN).value == 1,
+        combat_manager.order[1].get_effect(Keyword.REGEN).duration == 1,
+        combat_manager.order[1].hp == 10,
+    ]
+
+    combat_manager.start_turn()
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.REGEN) is None,
+            combat_manager.order[1].hp == 11,
+        ]
+    )
+
+    assert_conditions(conditions)
 
 
 def test_keyword_thorns(managers: Dict):
@@ -17,7 +104,7 @@ def test_keyword_thorns(managers: Dict):
     attack_effect = AttackEffect(4)
     thorns_effect = ThornsEffect(4, duration=1)
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         thorns_effect,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -32,7 +119,7 @@ def test_keyword_thorns(managers: Dict):
         combat_manager.order[2].get_effect(Keyword.THORNS) is None,
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         attack_effect,
         source=combat_manager.order[2],
         target=combat_manager.order[1],
@@ -50,7 +137,7 @@ def test_keyword_thorns(managers: Dict):
 
     combat_manager.end_turn()
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         attack_effect,
         source=combat_manager.order[2],
         target=combat_manager.order[1],

@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Dict, List
 from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.side import Side
-from src.combat.manager import CombatManager
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
@@ -18,11 +17,12 @@ from src.effects.heal import HealEffect
 from src.effects.poison import PoisonEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
-from src.targeting.selectors.manager import SelectorManager
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
+    from src.combat.manager import CombatManager
+    from src.targeting.selectors.manager import SelectorManager
 
 
 def test_keyword_bleed(managers: Dict):
@@ -44,7 +44,7 @@ def test_keyword_bleed(managers: Dict):
         Dice(sides=[Side([effect_attack_3])]),
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_bleed,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -63,7 +63,7 @@ def test_keyword_bleed(managers: Dict):
         combat_manager.order[2].hp == 100,
     ]
 
-    rolled = combat_manager.roll(combat_manager.order[1])
+    rolled = combat_manager.effect_manager.roll(combat_manager.order[1])
 
     conditions.extend(
         [
@@ -102,7 +102,7 @@ def test_keyword_blind(managers: Dict):
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_blind,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
@@ -121,13 +121,13 @@ def test_keyword_blind(managers: Dict):
         combat_manager.order[1].hp == 10,
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -142,13 +142,13 @@ def test_keyword_blind(managers: Dict):
 
     combat_manager.end_turn()
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -179,7 +179,7 @@ def test_keyword_burn(managers: Dict):
         duration=1,
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_burn,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -200,7 +200,7 @@ def test_keyword_burn(managers: Dict):
 
     combat_manager.start_turn()
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_freeze,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -231,7 +231,7 @@ def test_keyword_confuse(managers: Dict):
     effect_attack = AttackEffect(1)
     side = Side(effects=[effect_attack])
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_confuse,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
@@ -292,7 +292,7 @@ def test_keyword_freeze(managers: Dict):
         duration=1,
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_freeze,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -310,13 +310,13 @@ def test_keyword_freeze(managers: Dict):
         combat_manager.order[2].hp == 100,
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -329,19 +329,19 @@ def test_keyword_freeze(managers: Dict):
         ]
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_burn,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -370,7 +370,7 @@ def test_keyword_poison(managers: Dict):
         duration=1,
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_poison,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -416,7 +416,7 @@ def test_keyword_sleep(managers: Dict):
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_sleep,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
@@ -434,13 +434,13 @@ def test_keyword_sleep(managers: Dict):
         combat_manager.order[2].hp == 100,
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -453,7 +453,7 @@ def test_keyword_sleep(managers: Dict):
         ]
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[2],
         target=combat_manager.order[1],
@@ -467,13 +467,13 @@ def test_keyword_sleep(managers: Dict):
         ]
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[1],
         target=combat_manager.order[1],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[1],
         target=combat_manager.order[2],
@@ -500,7 +500,7 @@ def test_keyword_stun(managers: Dict):
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_stun,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
@@ -518,13 +518,13 @@ def test_keyword_stun(managers: Dict):
         combat_manager.order[1].hp == 10,
     ]
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],
@@ -539,13 +539,13 @@ def test_keyword_stun(managers: Dict):
 
     combat_manager.end_turn()
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_heal,
         source=combat_manager.order[0],
         target=combat_manager.order[0],
     )
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         effect_attack,
         source=combat_manager.order[0],
         target=combat_manager.order[1],

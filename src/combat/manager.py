@@ -1,16 +1,15 @@
 """Combat Manager module."""
 
 from enum import Enum
-from random import random, shuffle
-from typing import Dict, List, Literal, Tuple, TypedDict
+from random import shuffle
+from typing import Dict, List, Literal, TypedDict
 
-from src.base.effect import Effect, EffectType
-from src.base.entity import Entity
 from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
-from src.base.side import Side
 from src.base.triggers import Trigger
-from src.logger.logger import Logger
+from src.combat.effects import EffectManager
+from src.combat.suffixes import SuffixManager
+from src.logger.combat_logger import CombatLogger
 from src.targeting.selectors.manager import SelectorManager
 
 
@@ -84,15 +83,16 @@ class CombatManager:
         logging: bool = True,
         language: Literal["EN-US", "PT-BR"] = "EN-US",
     ):
-        self.round: int = 0
-        self.turn: int = 0
-
-        self.selector_manager = SelectorManager()
-        self.logger = Logger(
+        # Logger
+        self.logger = CombatLogger(
             enabled=logging,
             language=language,
         )
 
+        # Effect Management
+        self.effect_manager = EffectManager(logger=self.logger)
+
+        # Team Management
         teams = [] if teams is None else teams
         team_names = [] if team_names is None else team_names
 
@@ -113,11 +113,18 @@ class CombatManager:
 
         self.teams = teams
 
+        # Turn Management
+        self.round: int = 0
+        self.turn: int = 0
         self.order_strategy = order_strategy
         self.order = []
 
-        self.suffixes = {}
-        self.add_suffixes()
+        # Suffix Management
+        self.suffix_manager = SuffixManager()
+        self.suffix_manager.add_suffixes(self.teams)
+
+        # Target Selection Management
+        self.selector_manager = SelectorManager()
 
     def _set_order(
         self,
@@ -129,7 +136,7 @@ class CombatManager:
         :rtype: List[Monster]
         """
         order: List[Monster] = [
-            monster for team in self.teams for monster in team if monster.hp > 0
+            monster for team in self.teams for monster in team if monster.is_alive()
         ]
 
         if self.order_strategy == OrderStrategy.FASTER:
@@ -142,112 +149,6 @@ class CombatManager:
             shuffle(order)
 
         return order
-
-    def count_names(self) -> Dict:
-        """
-        Returns a dictionary where each key is a name of a monster in combat and each
-        value is the count of the monsters with this same name.
-        """
-        names = {}
-
-        for team in self.teams:
-            for monster in team:
-
-                if monster.name not in names:
-                    names[monster.name] = 1
-                else:
-                    names[monster.name] += 1
-
-        return names
-
-    def increase_character(self, character: str) -> Tuple[str, bool]:
-        """
-        Increases character by one:
-        * If the character is not 'Z', returns the next character in the alphabet and
-        False as a carry value.
-        * If the character is 'Z', returns 'A' and True as a carry value.
-
-        :param character: A single character.
-        :type character: str
-
-        :return: A (x, y) tuple where x is the increased character and y is a carry
-        value.
-        :rtype: Tuple[str, bool]
-        """
-        if len(character) != 1:
-            raise ValueError("character length is not 1.")
-
-        if character == "Z":
-            return "A", True
-
-        else:
-            return chr(ord(character) + 1), False
-
-    def increase_suffix(self, suffix: str) -> str:
-        """
-        Increases a suffix by one:
-        * The last character in the suffix will be increased by one
-        * If any character increase "carries over", than the character before that will
-        also be increased by one
-
-        Examples:
-        * `increase_suffix("A")` = `"B"`
-        * `increase_suffix("Z")` = `"AA"`
-        * `increase_suffix("AZ")` = `"BA"`
-
-        :param suffix: A monster suffix.
-        :type suffix: str
-
-        :return: The increased suffix.
-        :rtype: str
-        """
-        if not suffix:
-            return
-
-        new_suffix = ""
-
-        suffix: List[str] = [char for char in suffix]
-        carry = True
-
-        for char in reversed(suffix):
-            if carry:
-                new_char, carry = self.increase_character(char)
-                new_suffix += new_char
-
-            else:
-                new_suffix += char
-
-        new_suffix = "".join(reversed(new_suffix))
-        if carry:
-            new_suffix = "A" + new_suffix
-
-        return new_suffix
-
-    def add_suffixes(self):
-        """
-        Add suffixes to monsters to differentiate them in combat.
-        """
-        names = self.count_names()
-
-        for team in self.teams:
-            for monster in team:
-                if monster.name is None:
-                    continue
-
-                # Updating combat suffixes
-                if (monster.name not in self.suffixes) and (names[monster.name] > 1):
-                    self.suffixes[monster.name] = "A"
-
-                elif names[monster.name] > 1:
-                    self.suffixes[monster.name] = self.increase_suffix(
-                        self.suffixes[monster.name]
-                    )
-
-                # Setting monster suffix
-                if (monster.suffix is None) and (monster.name in self.suffixes):
-                    monster.suffix = self.suffixes[monster.name]
-
-        return None
 
     def get_monster(self, monster_local_id: str) -> Monster:
         """
@@ -333,7 +234,7 @@ class CombatManager:
             team = self.get_team(monster)
 
         for team_monster in team:
-            if team_monster.hp > 0:
+            if team_monster.is_alive():
                 status = "ALIVE"
                 break
 
@@ -387,7 +288,7 @@ class CombatManager:
             self.teams.append([monster])
 
         self.order = self._set_order()
-        self.add_suffixes()
+        self.suffix_manager.add_suffixes(self.teams)
 
         return
 
@@ -423,178 +324,11 @@ class CombatManager:
         Checks and remove any dead monsters from combat.
         """
         for monster in self.order[:]:
-            if monster.hp <= 0:
+            if not monster.is_alive():
                 self.logger.log(category="COMBAT", key="death", name=monster.name)
                 self.remove_monster(monster)
 
         return
-
-    def process_trigger(
-        self,
-        trigger: Trigger,
-        target: Monster,
-        source: Monster | None = None,
-    ) -> None:
-        """
-        Activates all effects of a target monster that have the specified trigger type.
-        The following triggers will invert the target and source monsters on
-        activation:
-        * BEING_ATTACKED
-
-        :param trigger: A trigger.
-        :type trigger: Trigger
-
-        :param target: The monster which will have their effects activated.
-        :type target: Monster
-
-        :param source: An optional monster responsible for the effect being triggered.
-        :type source: Monster
-        """
-        if not target:
-            return
-
-        for effect in target.effects[:]:
-
-            # Invert target and source monsters
-            if trigger == Trigger.BEING_ATTACKED:
-                aux = target
-                target = source
-                source = aux
-
-            if effect.trigger == trigger:
-                effect_data = effect.activate(
-                    target=target,
-                    source=source,
-                )
-
-                # Logging triggered effect
-                self.logger.log_effect_activation(
-                    effect=effect,
-                    source=source,
-                    target=target,
-                    **effect_data,
-                )
-
-        return
-
-    def roll(self, entity: Entity) -> List[Side]:
-        """
-        Rolls all Entity's dice and returns the rolled Sides. The entity will be
-        affected by Effects that triggers on dice roll.
-
-        :param entity: An Entity.
-        :type entity: Entity
-
-        :return: A list containing the rolled Sides.
-        :rtype: List[Side]
-        """
-        rolled = []
-
-        for dice in entity.dice:
-            rolled.append(dice.roll())
-
-            # Procesing effects on dice roll
-            self.process_trigger(
-                Trigger.ROLL,
-                target=entity,
-            )
-
-        return rolled
-
-    def execute_effect(
-        self,
-        effect: Effect,
-        source: Entity,
-        target: Entity,
-        check_can_act: bool = True,
-        check_accuracy: bool = True,
-    ) -> bool:
-        """
-        Executes an Effect through a series of checks. If the Effect is persistent, it
-        will be applied to the target.
-
-        :param effect: An Effect.
-        :type effect: Effect
-
-        :param source: The Entity object where the effect is from.
-        :type source: Entity
-
-        :param target: An Entity object which the effect will be applied.
-        :type target: Entity
-
-        :param check_can_act: If True, a check if the source can act will be done
-        before trying do activate the Effect. Default value is True.
-        :type check_can_act: bool
-
-        :param check_accuracy: If True, an accuracy check will be done before
-        trying do activate the Effect. Default value is True.
-        :type check_accuracy: bool
-
-        :return: If the effect was executed.
-        :rtype: bool
-        """
-        # Check can act
-        if (check_can_act) and (not source.can_act()):
-            return False
-
-        # Check accuracy
-        if check_accuracy:
-            accuracy = effect.accuracy
-
-            # Blind check
-            blinded = source.get_effect(Keyword.BLIND)
-
-            if blinded and source != target:
-                accuracy -= blinded.value
-
-            if random() >= accuracy:
-                self.logger.log(
-                    category="COMBAT",
-                    key="miss",
-                    name=source.name,
-                )
-                return False
-
-        # Persistent effects
-        if effect.persistent:
-            effect_data = target.apply_effect(
-                effect,
-                source=source,
-            )
-
-        # Instant effects
-        else:
-            effect_data = effect.activate(
-                source=source,
-                target=target,
-            )
-
-        # Log effect execution
-        self.logger.log_effect_execution(
-            effect=effect,
-            source=source,
-            target=target,
-            **effect_data,
-        )
-
-        # Log effect removals
-        for removed_effect in effect_data.get("removed_effects", []):
-            self.logger.log_effect_removal(
-                effect=effect,
-                source=source,
-                target=target,
-                removed_effect=removed_effect,
-            )
-
-        # Procesing effects on being attacked
-        if effect.type == EffectType.OFFENSIVE:
-            self.process_trigger(
-                Trigger.BEING_ATTACKED,
-                source=source,
-                target=target,
-            )
-
-        return True
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
@@ -616,7 +350,7 @@ class CombatManager:
         self.turn += 1
 
         # Procesing effects on turn start
-        self.process_trigger(
+        self.effect_manager.process_trigger(
             Trigger.TURN_START,
             target=self.current_monster,
         )
@@ -636,7 +370,7 @@ class CombatManager:
         :param monster: The monster which will have its actions taken.
         :type monster: Monster
         """
-        sides = self.roll(monster)
+        sides = self.effect_manager.roll(monster)
 
         allies = self.get_team(monster, "ALLIES")
         enemies = self.get_team(monster, "ENEMIES")
@@ -653,7 +387,7 @@ class CombatManager:
 
             for target in targets:
                 for effect in side.effects:
-                    self.execute_effect(
+                    self.effect_manager.execute_effect(
                         effect=effect,
                         source=monster,
                         target=target,
@@ -706,7 +440,7 @@ class CombatManager:
         monster
         """
         # Procesing effects on turn end
-        self.process_trigger(
+        self.effect_manager.process_trigger(
             Trigger.TURN_END,
             target=self.current_monster,
         )
@@ -784,7 +518,7 @@ class CombatManager:
                 self.start_turn()
                 self.check_deaths()
 
-                if monster.hp > 0:
+                if monster.is_alive():
                     self.logger.log(
                         category="COMBAT", key="turn", name=self.current_monster.name
                     )

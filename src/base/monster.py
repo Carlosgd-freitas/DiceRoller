@@ -55,3 +55,12 @@ class Monster(Entity):
         self.difficulty = difficulty
         self.team_name = team_name
         self.suffix = suffix
+
+    def is_alive(self) -> bool:
+        """
+        Returns if the monster is alive or not.
+
+        :return: If the Monster is alive or not.
+        :rtype: bool
+        """
+        return self.hp > 0

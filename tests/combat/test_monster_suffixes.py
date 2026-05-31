@@ -1,28 +1,32 @@
 """Tests for monster suffixes."""
 
-from typing import Dict
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict
 
 from src.base.monster import Monster
-from src.combat.manager import CombatManager
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.combat.manager import CombatManager, SuffixManager
 
 
 def test_increase_suffix(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+    suffix_manager: SuffixManager = managers["suffix_manager"]
 
     conditions = [
-        combat_manager.increase_suffix("A") == "B",
-        combat_manager.increase_suffix("B") == "C",
-        combat_manager.increase_suffix("Z") == "AA",
-        combat_manager.increase_suffix("AA") == "AB",
-        combat_manager.increase_suffix("AB") == "AC",
-        combat_manager.increase_suffix("AZ") == "BA",
-        combat_manager.increase_suffix("BA") == "BB",
-        combat_manager.increase_suffix("BB") == "BC",
-        combat_manager.increase_suffix("BZ") == "CA",
-        combat_manager.increase_suffix("ZA") == "ZB",
-        combat_manager.increase_suffix("ZB") == "ZC",
-        combat_manager.increase_suffix("ZZ") == "AAA",
+        suffix_manager.increase_suffix("A") == "B",
+        suffix_manager.increase_suffix("B") == "C",
+        suffix_manager.increase_suffix("Z") == "AA",
+        suffix_manager.increase_suffix("AA") == "AB",
+        suffix_manager.increase_suffix("AB") == "AC",
+        suffix_manager.increase_suffix("AZ") == "BA",
+        suffix_manager.increase_suffix("BA") == "BB",
+        suffix_manager.increase_suffix("BB") == "BC",
+        suffix_manager.increase_suffix("BZ") == "CA",
+        suffix_manager.increase_suffix("ZA") == "ZB",
+        suffix_manager.increase_suffix("ZB") == "ZC",
+        suffix_manager.increase_suffix("ZZ") == "AAA",
     ]
 
     assert_conditions(conditions)
@@ -44,6 +48,7 @@ def test_monster_suffixes_none(managers: Dict):
 
 def test_monster_suffixes_simple(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    suffix_manager: SuffixManager = managers["suffix_manager"]
 
     team_0 = [
         Monster(name="Red"),
@@ -58,7 +63,7 @@ def test_monster_suffixes_simple(managers: Dict):
 
     combat_manager.teams = [team_0, team_1]
 
-    combat_manager.add_suffixes()
+    suffix_manager.add_suffixes(combat_manager.teams)
 
     conditions = [
         combat_manager.teams[0][0].suffix == "A",

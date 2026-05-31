@@ -147,7 +147,7 @@ for removed, removers in removal_sets:
     for remover in removers:
         combat_manager.current_monster.effects = [removed]
 
-        combat_manager.execute_effect(
+        combat_manager.effect_manager.execute_effect(
             effect=remover,
             source=monster_a,
             target=monster_b,
@@ -175,7 +175,7 @@ for effect in [ThornsEffect(1)]:
     combat_manager.current_monster.effects = []
     combat_manager.current_monster.apply_effect(effect)
 
-    combat_manager.execute_effect(
+    combat_manager.effect_manager.execute_effect(
         AttackEffect(1),
         source=monster_a,
         target=combat_manager.current_monster,

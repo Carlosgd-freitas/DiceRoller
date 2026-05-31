@@ -1,87 +1,98 @@
 """Tests for offensive effects processing."""
 
-from typing import Dict
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
-from src.combat.manager import CombatManager
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.drain import DrainEffect
 from src.effects.pierce import PierceEffect
 from tests.utils import assert_conditions
 
+if TYPE_CHECKING:
+    from src.base.monster import Monster
+    from src.combat.effects import EffectManager
+
 
 def test_keyword_attack(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+    effect_manager: EffectManager = managers["effect_manager"]
+    monster_1: Monster = managers["teams"][0][1]
+    monster_2: Monster = managers["teams"][0][2]
 
     effect = AttackEffect(6)
 
-    combat_manager.execute_effect(
+    effect_manager.execute_effect(
         effect,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        combat_manager.order[1].hp == 4,
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 4,
     ]
 
     assert_conditions(conditions)
 
 
 def test_keyword_drain(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+    effect_manager: EffectManager = managers["effect_manager"]
+    monster_1: Monster = managers["teams"][0][1]
+    monster_2: Monster = managers["teams"][0][2]
 
     drain_effect = DrainEffect(3)
     block_effect = BlockEffect(1)
 
-    combat_manager.execute_effect(
+    effect_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=monster_2,
+        target=monster_2,
     )
 
-    combat_manager.execute_effect(
+    effect_manager.execute_effect(
         drain_effect,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        combat_manager.order[1].hp == 8,
-        combat_manager.order[1].get_effect(Keyword.BLOCK) is None,
-        combat_manager.order[0].local_id == "MONSTER_1",
-        combat_manager.order[0].hp == 3,
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 8,
+        monster_2.get_effect(Keyword.BLOCK) is None,
+        monster_1.local_id == "MONSTER_1",
+        monster_1.hp == 3,
     ]
 
     assert_conditions(conditions)
 
 
 def test_keyword_pierce(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+    effect_manager: EffectManager = managers["effect_manager"]
+    monster_1: Monster = managers["teams"][0][1]
+    monster_2: Monster = managers["teams"][0][2]
 
     pierce_effect = PierceEffect(2)
     block_effect = BlockEffect(6)
 
-    combat_manager.execute_effect(
+    effect_manager.execute_effect(
         block_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=monster_2,
+        target=monster_2,
     )
 
-    combat_manager.execute_effect(
+    effect_manager.execute_effect(
         pierce_effect,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        combat_manager.order[1].hp == 8,
-        combat_manager.order[1].get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
-        combat_manager.order[1].get_effect(Keyword.BLOCK).value == 6,
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 8,
+        monster_2.get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+        monster_2.get_effect(Keyword.BLOCK).value == 6,
     ]
 
     assert_conditions(conditions)
