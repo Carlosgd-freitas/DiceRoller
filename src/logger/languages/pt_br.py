@@ -1,7 +1,9 @@
 from src.base.color import Color, color_string
 
 ACTIONS = {
+    "absorb": "ABSORVIDO",
     "attack": "ATACOU",
+    "block": "BLOQUEADO",
     "drain": "DRENOU",
     "pierce": "PERFUROU",
 }
@@ -19,6 +21,17 @@ COMBAT = {
     "team": color_string("Time #{index}: {team_name}", intensity="BRIGHT"),
     "turn": "\n> Turno: {name} <\n",
     "winner": "\nO time {team_name} é o vencedor!",
+}
+
+DAMAGE = {
+    # Part 1: Base message
+    "base": "{source} {action} {target}.",
+    "base_self": "{source} {action} a si mesmo.",
+    # Part 2: Defensive messages
+    "absorb": "{absorbed_damage} de dano foi {action}.",
+    "block": "{blocked_damage} de dano foi {action}.",
+    # Part 3: Damage message
+    "damage": "{damage} de dano foi infligido.",
 }
 
 EFFECT_ACTIVATION = {
@@ -44,8 +57,6 @@ EFFECT_EXECUTION = {
     "deterioration_self": "{source} deteriorou {value} {attribute} de si mesmo através de {keyword}.",
     "nothing": "Nada aconteceu.",
     "nothing_self": "Nada aconteceu.",
-    "offensive": "{source} {action} {target} e causou {damage} de dano.",
-    "offensive_self": "{source} se {action} e causou {damage} de dano.",
     "restoration": "{source} restaurou {value} de {attribute} de {target} através de {keyword}.",
     "restoration_self": "{source} restaurou {value} de {attribute} de si mesmo através de {keyword}.",
 }

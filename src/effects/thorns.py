@@ -51,11 +51,9 @@ class ThornsEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage = calculate_damage(self, source, target, consider_block=True)
+        damage_data = calculate_damage(self, source, target, consider_block=True)
 
-        target.hp -= damage
+        target.hp -= damage_data["damage"]
         target.equalize_stats()
 
-        return {
-            "damage": damage,
-        }
+        return damage_data

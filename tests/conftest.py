@@ -13,6 +13,7 @@ from src.targeting.selectors.manager import SelectorManager
 def managers() -> Dict:
     monster_0 = Monster(
         local_id="MONSTER_0",
+        name="Red",
         hp=0,
         max_hp=200,
         speed=0,
@@ -20,6 +21,7 @@ def managers() -> Dict:
 
     monster_1 = Monster(
         local_id="MONSTER_1",
+        name="Green",
         hp=1,
         max_hp=200,
         speed=5,
@@ -27,6 +29,7 @@ def managers() -> Dict:
 
     monster_2 = Monster(
         local_id="MONSTER_2",
+        name="Yellow",
         hp=10,
         max_hp=200,
         speed=1,
@@ -34,6 +37,7 @@ def managers() -> Dict:
 
     monster_3 = Monster(
         local_id="MONSTER_3",
+        name="Blue",
         hp=100,
         max_hp=200,
         speed=10,
@@ -41,6 +45,7 @@ def managers() -> Dict:
 
     monster_4 = Monster(
         local_id="MONSTER_4",
+        name="Purple",
         hp=200,
         max_hp=200,
         speed=1,
@@ -50,6 +55,10 @@ def managers() -> Dict:
         teams=[
             [monster_0, monster_1, monster_2],
             [monster_3, monster_4],
+        ],
+        team_names=[
+            "Team Red",
+            "Team Blue",
         ],
         order_strategy=OrderStrategy.SET,
         logging=False,

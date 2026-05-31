@@ -59,15 +59,13 @@ class BurnEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage = calculate_damage(
+        damage_data = calculate_damage(
             self,
             source,
             target,
         )
 
-        target.hp -= damage
+        target.hp -= damage_data["damage"]
         target.equalize_stats()
 
-        return {
-            "damage": damage,
-        }
+        return damage_data

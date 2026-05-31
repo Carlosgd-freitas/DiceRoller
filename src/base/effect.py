@@ -18,8 +18,14 @@ class EffectData(TypedDict):
     """
     Data when applying or activating an Effect.
 
+    :var absorbed_damage: Damage that was absorbed by a Monster.
+    :vartype absorbed_damage: int
+
     :var attribute: Attribute of a Monster that was affected.
     :vartype attribute: str
+
+    :var blocked_damage: Damage that was blocked by a Monster.
+    :vartype blocked_damage: int
 
     :var damage: Damage done to a Monster.
     :vartype damage: int
@@ -28,7 +34,9 @@ class EffectData(TypedDict):
     :vartype removed_effects: List[Effect]
     """
 
+    absorbed_damage: int
     attribute: str
+    blocked_damage: int
     damage: int
     removed_effects: List[Effect]
 

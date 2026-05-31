@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import color_string
-from src.base.keywords import get_keyword_color
+from src.base.keywords import Keyword, get_keyword_color
 from src.logger.languages import en_us, pt_br
 
 if TYPE_CHECKING:
@@ -21,6 +21,7 @@ type LoggingCategory = Literal[
     "ACTIONS",
     "ATTRIBUTES",
     "COMBAT",
+    "DAMAGE",
     "EFFECT_ACTIVATION",
     "EFFECT_EXECUTION",
     "EFFECT_REMOVAL",
@@ -48,74 +49,6 @@ class Logger:
         self.enabled = enabled
         self.language = language
 
-    def _update_log_parameters(
-        self,
-        effect: Effect = None,
-        source: Monster = None,
-        target: Monster = None,
-        **kwargs,
-    ) -> None:
-        """
-        Private method to be used by other methods. Updates the log parameters with
-        effect, source, target and the data that can be derived from that.
-        """
-        if kwargs.get("attribute"):
-            kwargs["attribute"] = self.get_message(
-                category="ATTRIBUTES",
-                key=kwargs["attribute"],
-            )
-
-        if source:
-            kwargs["source"] = source.name
-
-        if target:
-            kwargs["target"] = target.name
-
-        color_data = get_keyword_color(effect.keyword)
-        foreground_color = color_data["foreground_color"]
-        intensity = color_data["intensity"]
-
-        keyword = effect.keyword.value.lower()
-
-        for parameter, category in [
-            ("action", "ACTIONS"),
-            ("status", "STATUS"),
-            ("keyword", "KEYWORDS"),
-        ]:
-            kwargs[parameter] = color_string(
-                self.get_message(
-                    category=category,
-                    key=keyword,
-                ),
-                foreground_color=foreground_color,
-                intensity=intensity,
-            )
-
-        if kwargs.get("removed_effect"):
-            removed_effect: Effect = kwargs["removed_effect"]
-
-            color_data = get_keyword_color(removed_effect.keyword)
-            foreground_color = color_data["foreground_color"]
-            intensity = color_data["intensity"]
-
-            kwargs["removed_keyword"] = color_string(
-                self.get_message(
-                    category=category,
-                    key=removed_effect.keyword.value.lower(),
-                ),
-                foreground_color=foreground_color,
-                intensity=intensity,
-            )
-
-        kwargs.update(
-            {
-                "duration": effect.duration,
-                "value": effect.value,
-            }
-        )
-
-        return kwargs
-
     def get_message(
         self,
         category: LoggingCategory,
@@ -142,6 +75,76 @@ class Logger:
             message = message.format(**kwargs)
 
         return message
+
+    def _get_colored_message(
+        self,
+        category: str,
+        keyword: Keyword,
+    ) -> str | None:
+        """
+        Returns a colored message based on a Keyword.
+        """
+        color_data = get_keyword_color(keyword)
+
+        message = color_string(
+            self.get_message(
+                category=category,
+                key=keyword.value.lower(),
+            ),
+            **color_data,
+        )
+
+        return message
+
+    def _update_log_parameters(
+        self,
+        effect: Effect = None,
+        source: Monster = None,
+        target: Monster = None,
+        **kwargs,
+    ) -> Dict:
+        """
+        Updates the log parameters with effect, source, target and the data that can be
+        derived from that.
+        """
+        if kwargs.get("attribute"):
+            kwargs["attribute"] = self.get_message(
+                category="ATTRIBUTES",
+                key=kwargs["attribute"],
+            )
+
+        if source:
+            kwargs["source"] = source.name
+
+        if target:
+            kwargs["target"] = target.name
+
+        for parameter, category in [
+            ("action", "ACTIONS"),
+            ("status", "STATUS"),
+            ("keyword", "KEYWORDS"),
+        ]:
+            kwargs[parameter] = self._get_colored_message(
+                category=category,
+                keyword=effect.keyword,
+            )
+
+        if kwargs.get("removed_effect"):
+            removed_effect: Effect = kwargs["removed_effect"]
+
+            kwargs["removed_keyword"] = self._get_colored_message(
+                category="KEYWORDS",
+                keyword=removed_effect.keyword,
+            )
+
+        kwargs.update(
+            {
+                "duration": effect.duration,
+                "value": effect.value,
+            }
+        )
+
+        return kwargs
 
     def log(
         self,
@@ -178,47 +181,165 @@ class Logger:
 
         return
 
-    def log_effect(
+    def _log_damage_calculation(
         self,
         effect: Effect,
         source: Monster,
         target: Monster,
-        category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION", "EFFECT_REMOVAL"],
         **kwargs,
     ) -> None:
         """
-        Logs an effect.
+        Logs multiple messages for damage calculation:
+        * Base message: how the damage was done
+        * Defensive messages: which deffensive effects took place
+        * Damage message: how the damage was recieved
+        """
+        # Part 1: Base message
+        key = "base"
+        if source == target:
+            key += "_self"
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        self.log(category="DAMAGE", key=key, end=" ", **kwargs)
+
+        # Part 2: Defensive messages
+        if kwargs.get("absorbed_damage"):
+            defensive_action = self._get_colored_message(
+                category="ACTIONS",
+                keyword=Keyword.ABSORB,
+            )
+
+            self.log(
+                category="DAMAGE",
+                key="absorb",
+                end=" ",
+                absorbed_damage=kwargs["absorbed_damage"],
+                action=defensive_action,
+            )
+
+        if kwargs.get("blocked_damage"):
+            defensive_action = self._get_colored_message(
+                category="ACTIONS",
+                keyword=Keyword.BLOCK,
+            )
+
+            self.log(
+                category="DAMAGE",
+                key="block",
+                end=" ",
+                blocked_damage=kwargs["blocked_damage"],
+                action=defensive_action,
+            )
+
+        # Part 3: Damage message
+        self.log(
+            category="DAMAGE",
+            key="damage",
+            **kwargs,
+        )
+
+        return
+
+    def log_effect_activation(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect activation.
 
         :param effect: An Effect.
         :type effect: Effect
 
-        :param source: The Entity object where the effect is from.
-        :type source: Entity
+        :param source: The Monster which activated the effect.
+        :type source: Monster
 
-        :param target: An Entity object which the effect will be applied.
-        :type target: Entity
-
-        :param category: What category of logging will be done.
-        :type category: Literal["EFFECT_ACTIVATION", "EFFECT_EXECUTION",
-            "EFFECT_REMOVAL"]
+        :param target: The Monster targeted by the effect activation.
+        :type target: Monster
         """
-        if category == "EFFECT_ACTIVATION":
-            key = effect.keyword.value.lower()
-
-        elif category == "EFFECT_EXECUTION":
-            key = effect.type.value.lower()
-
-            if (source) and (target) and (source == target):
-                key += "_self"
-
-        elif category == "EFFECT_REMOVAL":
-            removed_effect: Effect = kwargs["removed_effect"]
-            key = removed_effect.keyword.value.lower()
+        key = effect.keyword.value.lower()
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         self.log(
-            category=category,
+            category="EFFECT_ACTIVATION",
+            key=key,
+            **kwargs,
+        )
+
+        return
+
+    def log_effect_execution(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect execution.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Monster which executed the effect.
+        :type source: Monster
+
+        :param target: The Monster targeted by the effect execution.
+        :type target: Monster
+        """
+        key = effect.type.value.lower()
+
+        if key == "offensive":
+            return self._log_damage_calculation(
+                effect,
+                source,
+                target,
+                **kwargs,
+            )
+
+        if (source) and (target) and (source == target):
+            key += "_self"
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        self.log(
+            category="EFFECT_EXECUTION",
+            key=key,
+            **kwargs,
+        )
+
+        return
+
+    def log_effect_removal(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect removal.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Monster which removed the effect.
+        :type source: Monster
+
+        :param target: The Monster which had the effect removed.
+        :type target: Monster
+        """
+        removed_effect: Effect = kwargs["removed_effect"]
+        key = removed_effect.keyword.value.lower()
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        self.log(
+            category="EFFECT_REMOVAL",
             key=key,
             **kwargs,
         )
@@ -248,7 +369,13 @@ class Logger:
         :type monster: Monster
         """
         # Name
-        self.log(message=f"> {monster.name} - ", end="")
+        self.log(message=f"> {monster.name}", end="")
+
+        # Suffix
+        if monster.suffix:
+            self.log(message=f" {monster.suffix}", end="")
+
+        self.log(message=" - ", end="")
 
         # HP
         self.log(

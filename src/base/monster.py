@@ -35,6 +35,9 @@ class Monster(Entity):
 
     :var team_name: Monster's team name.
     :vartype team_name: str
+
+    :var suffix: Monster's name suffix (e.g. Slime 'A').
+    :vartype suffix: str
     """
 
     def __init__(
@@ -43,6 +46,7 @@ class Monster(Entity):
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
         team_name: str = None,
+        suffix: str = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -50,3 +54,4 @@ class Monster(Entity):
         self.control_type = control_type
         self.difficulty = difficulty
         self.team_name = team_name
+        self.suffix = suffix

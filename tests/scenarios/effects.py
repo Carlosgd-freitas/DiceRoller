@@ -103,7 +103,7 @@ combat_manager = CombatManager(
         "Blue Team",
     ],
     order_strategy="SET",
-    language="PT-BR",
+    language="EN-US",
 )
 
 # ----------------------------

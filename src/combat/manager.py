@@ -2,7 +2,7 @@
 
 from enum import Enum
 from random import random, shuffle
-from typing import Dict, List, Literal, TypedDict
+from typing import Dict, List, Literal, Tuple, TypedDict
 
 from src.base.effect import Effect, EffectType
 from src.base.entity import Entity
@@ -116,6 +116,9 @@ class CombatManager:
         self.order_strategy = order_strategy
         self.order = []
 
+        self.suffixes = {}
+        self.add_suffixes()
+
     def _set_order(
         self,
     ) -> List[Monster]:
@@ -139,6 +142,112 @@ class CombatManager:
             shuffle(order)
 
         return order
+
+    def count_names(self) -> Dict:
+        """
+        Returns a dictionary where each key is a name of a monster in combat and each
+        value is the count of the monsters with this same name.
+        """
+        names = {}
+
+        for team in self.teams:
+            for monster in team:
+
+                if monster.name not in names:
+                    names[monster.name] = 1
+                else:
+                    names[monster.name] += 1
+
+        return names
+
+    def increase_character(self, character: str) -> Tuple[str, bool]:
+        """
+        Increases character by one:
+        * If the character is not 'Z', returns the next character in the alphabet and
+        False as a carry value.
+        * If the character is 'Z', returns 'A' and True as a carry value.
+
+        :param character: A single character.
+        :type character: str
+
+        :return: A (x, y) tuple where x is the increased character and y is a carry
+        value.
+        :rtype: Tuple[str, bool]
+        """
+        if len(character) != 1:
+            raise ValueError("character length is not 1.")
+
+        if character == "Z":
+            return "A", True
+
+        else:
+            return chr(ord(character) + 1), False
+
+    def increase_suffix(self, suffix: str) -> str:
+        """
+        Increases a suffix by one:
+        * The last character in the suffix will be increased by one
+        * If any character increase "carries over", than the character before that will
+        also be increased by one
+
+        Examples:
+        * `increase_suffix("A")` = `"B"`
+        * `increase_suffix("Z")` = `"AA"`
+        * `increase_suffix("AZ")` = `"BA"`
+
+        :param suffix: A monster suffix.
+        :type suffix: str
+
+        :return: The increased suffix.
+        :rtype: str
+        """
+        if not suffix:
+            return
+
+        new_suffix = ""
+
+        suffix: List[str] = [char for char in suffix]
+        carry = True
+
+        for char in reversed(suffix):
+            if carry:
+                new_char, carry = self.increase_character(char)
+                new_suffix += new_char
+
+            else:
+                new_suffix += char
+
+        new_suffix = "".join(reversed(new_suffix))
+        if carry:
+            new_suffix = "A" + new_suffix
+
+        return new_suffix
+
+    def add_suffixes(self):
+        """
+        Add suffixes to monsters to differentiate them in combat.
+        """
+        names = self.count_names()
+
+        for team in self.teams:
+            for monster in team:
+                if monster.name is None:
+                    continue
+
+                # Updating combat suffixes
+                if (monster.name not in self.suffixes) and (names[monster.name] > 1):
+                    self.suffixes[monster.name] = "A"
+
+                elif names[monster.name] > 1:
+                    self.suffixes[monster.name] = self.increase_suffix(
+                        self.suffixes[monster.name]
+                    )
+
+                # Setting monster suffix
+                if (monster.suffix is None) and (monster.name in self.suffixes):
+                    monster.suffix = self.suffixes[monster.name]
+
+        return None
 
     def get_monster(self, monster_local_id: str) -> Monster:
         """
@@ -278,6 +387,7 @@ class CombatManager:
             self.teams.append([monster])
 
         self.order = self._set_order()
+        self.add_suffixes()
 
         return
 
@@ -358,13 +468,11 @@ class CombatManager:
                 )
 
                 # Logging triggered effect
-                self.logger.log_effect(
+                self.logger.log_effect_activation(
                     effect=effect,
                     source=source,
                     target=target,
-                    category="EFFECT_ACTIVATION",
-                    attribute=effect_data.get("attribute"),
-                    damage=effect_data.get("damage"),
+                    **effect_data,
                 )
 
         return
@@ -462,22 +570,19 @@ class CombatManager:
             )
 
         # Log effect execution
-        self.logger.log_effect(
+        self.logger.log_effect_execution(
             effect=effect,
             source=source,
             target=target,
-            category="EFFECT_EXECUTION",
-            attribute=effect_data.get("attribute"),
-            damage=effect_data.get("damage"),
+            **effect_data,
         )
 
         # Log effect removals
         for removed_effect in effect_data.get("removed_effects", []):
-            self.logger.log_effect(
+            self.logger.log_effect_removal(
                 effect=effect,
                 source=source,
                 target=target,
-                category="EFFECT_REMOVAL",
                 removed_effect=removed_effect,
             )
 
@@ -572,11 +677,10 @@ class CombatManager:
             effect = self.current_monster.get_effect(keyword)
 
             if effect:
-                self.logger.log_effect(
+                self.logger.log_effect_activation(
                     effect=effect,
                     source=None,
                     target=self.current_monster,
-                    category="EFFECT_ACTIVATION",
                 )
                 return False
 

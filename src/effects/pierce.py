@@ -54,17 +54,17 @@ class PierceEffect(Effect):
         if sleep:
             removed_effects.append(sleep)
 
-        damage = calculate_damage(
+        damage_data = calculate_damage(
             self,
             source,
             target,
             consider_block=False,
         )
 
-        target.hp -= damage
+        target.hp -= damage_data["damage"]
         target.equalize_stats()
 
         return {
-            "damage": damage,
+            **damage_data,
             "removed_effects": removed_effects,
         }

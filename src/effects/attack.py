@@ -54,12 +54,12 @@ class AttackEffect(Effect):
         if sleep:
             removed_effects.append(sleep)
 
-        damage = calculate_damage(self, source, target, consider_block=True)
+        damage_data = calculate_damage(self, source, target, consider_block=True)
 
-        target.hp -= damage
+        target.hp -= damage_data["damage"]
         target.equalize_stats()
 
         return {
-            "damage": damage,
+            **damage_data,
             "removed_effects": removed_effects,
         }

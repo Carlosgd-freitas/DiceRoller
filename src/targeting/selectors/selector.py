@@ -120,7 +120,7 @@ class Selector(ABC):
         exclude: List[str] = None,
     ):
         """
-        Private method to be used by other methods. Returns k alive random monsters.
+        Returns k alive random monsters.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -138,8 +138,7 @@ class Selector(ABC):
         exclude: List[str] = None,
     ):
         """
-        Private method to be used by other methods. Returns k alive monsters with most
-        effective hp and hp.
+        Returns k alive monsters with most effective hp and hp.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -161,8 +160,7 @@ class Selector(ABC):
         exclude: List[str] = None,
     ):
         """
-        Private method to be used by other methods. Returns k alive monsters with least
-        effective hp and hp.
+        Returns k alive monsters with least effective hp and hp.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -185,8 +183,7 @@ class Selector(ABC):
         exclude: List[str] = None,
     ):
         """
-        Private method to be used by other methods. Returns k alive random monsters
-        with effects.
+        Returns k alive random monsters with effects.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -206,8 +203,7 @@ class Selector(ABC):
         exclude: List[str] = None,
     ):
         """
-        Private method to be used by other methods. Returns k alive random monsters
-        without effects.
+        Returns k alive random monsters without effects.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(

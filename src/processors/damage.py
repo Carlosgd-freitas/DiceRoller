@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from src.base.keywords import Keyword
 
@@ -11,12 +11,36 @@ if TYPE_CHECKING:
     from src.base.monster import Entity
 
 
+class DamageData(TypedDict):
+    """
+    Data when calculating damage.
+
+    :var absorbed_damage: Damage that was absorbed by a Monster.
+    :vartype absorbed_damage: int
+
+    :var blocked_damage: Damage that was blocked by a Monster.
+    :vartype blocked_damage: int
+
+    :var damage: Damage done to a Monster.
+    :vartype damage: int
+
+    :var total_blocked_damage: Total damage that was blocked by a Monster's defensive
+    Effects.
+    :vartype total_blocked_damage: int
+    """
+
+    absorbed_damage: int
+    blocked_damage: int
+    damage: int
+    total_blocked_damage: int
+
+
 def calculate_damage(
     effect: Effect,
     source: Entity,
     target: Entity,
     consider_block: bool = False,
-) -> int:
+) -> DamageData:
     """
     Calculate damage which will be done to a target.
 
@@ -37,18 +61,20 @@ def calculate_damage(
     :rtype: int
     """
     damage = effect.value
+    absorbed_damage = 0
+    blocked_damage = 0
 
     if consider_block:
         # Absorb
         absorbing = target.get_effect(Keyword.ABSORB)
 
-        if absorbing:
-            min_value = min(damage, absorbing.value)
+        if (damage > 0) and (absorbing):
+            absorbed_damage = min(damage, absorbing.value)
 
-            damage -= min_value
-            absorbing.value -= min_value
+            damage -= absorbed_damage
+            absorbing.value -= absorbed_damage
 
-            target.hp += min_value
+            target.hp += absorbed_damage
             target.equalize_stats()
 
             if absorbing.value <= 0:
@@ -57,11 +83,11 @@ def calculate_damage(
         # Block
         blocking = target.get_effect(Keyword.BLOCK)
 
-        if blocking:
-            min_value = min(damage, blocking.value)
+        if (damage > 0) and (blocking):
+            blocked_damage = min(damage, blocking.value)
 
-            damage -= min_value
-            blocking.value -= min_value
+            damage -= blocked_damage
+            blocking.value -= blocked_damage
 
             if blocking.value <= 0:
                 target.effects.remove(blocking)
@@ -69,4 +95,11 @@ def calculate_damage(
     if damage < 0:
         damage = 0
 
-    return damage
+    total_blocked_damage = absorbed_damage + blocked_damage
+
+    return {
+        "absorbed_damage": absorbed_damage,
+        "blocked_damage": blocked_damage,
+        "damage": damage,
+        "total_blocked_damage": total_blocked_damage,
+    }
