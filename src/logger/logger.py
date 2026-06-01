@@ -18,6 +18,7 @@ type LoggingCategory = Literal[
     "COMBAT",
     "DAMAGE",
     "EFFECT_ACTIVATION",
+    "EFFECT_DESCRIPTION",
     "EFFECT_EXECUTION",
     "EFFECT_REMOVAL",
     "KEYWORDS",
@@ -73,7 +74,7 @@ class Logger:
 
     def get_colored_message(
         self,
-        category: str,
+        category: LoggingCategory,
         keyword: Keyword,
     ) -> str | None:
         """

@@ -20,10 +20,7 @@ def test_keyword_mana_regen(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect = ManaRegenEffect(
-        value=1,
-        duration=1,
-    )
+    effect = ManaRegenEffect(1)
 
     combat_manager.effect_manager.execute_effect(
         effect,
@@ -61,10 +58,7 @@ def test_keyword_regen(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect = RegenEffect(
-        value=1,
-        duration=1,
-    )
+    effect = RegenEffect(1)
 
     combat_manager.effect_manager.execute_effect(
         effect,

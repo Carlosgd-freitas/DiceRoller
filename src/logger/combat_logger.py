@@ -254,12 +254,40 @@ class CombatLogger(Logger):
         )
         self.log(message="╚═══════════════╝")
 
-    def log_monster(self, monster: Monster):
+    def log_turn_start(self, monster: Monster):
+        """
+        Logs a Monster's turn start in combat.
+
+        :param monster: A monster.
+        :type monster: Monster
+        """
+        turn = self.get_message(
+            category="COMBAT",
+            key="turn",
+        )
+
+        self.log(
+            message=(
+                color_string(f"\n> {turn}: ", intensity="BRIGHT")
+                + color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
+                + "\n"
+            )
+        )
+
+    def log_monster(
+        self,
+        monster: Monster,
+        effect_limit: int = 6,
+    ):
         """
         Logs a Monster in combat.
 
         :param monster: A monster.
         :type monster: Monster
+
+        :param effect_limit: The limit of effects that will be logged. Default value
+        is 6.
+        :type effect_limit: int
         """
         # Name
         self.log(message=f"> {monster.name}", end="")
@@ -284,32 +312,56 @@ class CombatLogger(Logger):
         if monster.mana > 0:
             self.log(message=" - ", end="")
             self.log(
-                message=self.get_message(
-                    category="ATTRIBUTES",
-                    key="mana",
+                message=self.get_colored_message(
+                    category="KEYWORDS",
+                    keyword=Keyword.MANA,
                 ),
                 end="",
             )
             self.log(message=f": {monster.mana}", end="")
 
         # Effects
-        for effect in monster.effects:
-            self.log(message=" - ", end="")
+        for idx, effect in enumerate(monster.effects):
+            if idx == 0:
+                self.log(message=" [ ", end="")
+            else:
+                self.log(message=" - ", end="")
 
-            color_data = get_keyword_color(effect.keyword)
+            if idx < effect_limit:
+                color_data = get_keyword_color(effect.keyword)
 
-            effect_keyword = self.get_message(
-                category="KEYWORDS", key=effect.keyword.value.lower()
-            )
-            effect_keyword = color_string(
-                effect_keyword,
-                foreground_color=color_data["foreground_color"],
-                intensity=color_data["intensity"],
-            )
+                effect_keyword = self.get_message(
+                    category="KEYWORDS", key=effect.keyword.value.lower()
+                )
+                effect_keyword = color_string(
+                    effect_keyword,
+                    foreground_color=color_data["foreground_color"],
+                    intensity=color_data["intensity"],
+                )
 
-            self.log(message=effect_keyword, end="")
+                self.log(message=effect_keyword, end="")
 
-            self.log(message=f" {effect.value}", end="")
+                self.log(message=f" {effect.value}", end="")
+
+            else:
+                effects_remaining = len(monster.effects) - effect_limit
+
+                message = self.get_message(
+                    category="ATTRIBUTES",
+                    key="effects",
+                ).capitalize()
+
+                message = color_string(
+                    f"+{effects_remaining} {message}...",
+                    intensity="BRIGHT",
+                )
+                self.log(message=message, end="")
+
+                self.log(message=" ]", end="")
+                break
+
+            if idx == len(monster.effects) - 1:
+                self.log(message=" ]", end="")
 
         self.log("")
 
@@ -330,5 +382,4 @@ class CombatLogger(Logger):
                 if monster.hp > 0:
                     self.log_monster(monster)
 
-            if team_index < len(teams) - 1:
-                self.log(message="")
+            self.log(message="")

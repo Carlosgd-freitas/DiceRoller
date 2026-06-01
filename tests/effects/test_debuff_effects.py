@@ -30,10 +30,7 @@ def test_keyword_bleed(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_bleed = BleedEffect(
-        value=1,
-        duration=1,
-    )
+    effect_bleed = BleedEffect(1)
     effect_attack_1 = AttackEffect(1)
     effect_attack_2 = AttackEffect(2)
     effect_attack_3 = AttackEffect(3)
@@ -95,10 +92,7 @@ def test_keyword_bleed(managers: Dict):
 def test_keyword_blind(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_blind = BlindEffect(
-        value=1,
-        duration=1,
-    )
+    effect_blind = BlindEffect(1)
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
 
@@ -171,13 +165,8 @@ def test_keyword_burn(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_burn = BurnEffect(
-        value=2,
-        duration=1,
-    )
-    effect_freeze = FreezeEffect(
-        duration=1,
-    )
+    effect_burn = BurnEffect(2)
+    effect_freeze = FreezeEffect()
 
     combat_manager.effect_manager.execute_effect(
         effect_burn,
@@ -224,10 +213,7 @@ def test_keyword_confuse(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector_manager: SelectorManager = managers["selector_manager"]
 
-    effect_confuse = ConfuseEffect(
-        value=1,
-        duration=1,
-    )
+    effect_confuse = ConfuseEffect(1)
     effect_attack = AttackEffect(1)
     side = Side(effects=[effect_attack])
 
@@ -282,15 +268,10 @@ def test_keyword_confuse(managers: Dict):
 def test_keyword_freeze(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_freeze = FreezeEffect(
-        duration=1,
-    )
+    effect_freeze = FreezeEffect()
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
-    effect_burn = BurnEffect(
-        value=2,
-        duration=1,
-    )
+    effect_burn = BurnEffect(2)
 
     combat_manager.effect_manager.execute_effect(
         effect_freeze,
@@ -365,10 +346,7 @@ def test_keyword_poison(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_poison = PoisonEffect(
-        value=3,
-        duration=1,
-    )
+    effect_poison = PoisonEffect(3)
 
     combat_manager.effect_manager.execute_effect(
         effect_poison,
@@ -410,9 +388,7 @@ def test_keyword_sleep(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_sleep = SleepEffect(
-        duration=1,
-    )
+    effect_sleep = SleepEffect()
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
@@ -494,9 +470,7 @@ def test_keyword_sleep(managers: Dict):
 def test_keyword_stun(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_stun = StunEffect(
-        duration=1,
-    )
+    effect_stun = StunEffect()
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 

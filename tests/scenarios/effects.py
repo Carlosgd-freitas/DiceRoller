@@ -28,9 +28,9 @@ from src.effects.thorns import ThornsEffect
 init()
 
 buff_effects = [
-    ManaRegenEffect(1, duration=1),
-    RegenEffect(1, duration=1),
-    ThornsEffect(1, duration=1),
+    ManaRegenEffect(1),
+    RegenEffect(1),
+    ThornsEffect(1),
 ]
 
 curse_effects = [
@@ -38,14 +38,14 @@ curse_effects = [
 ]
 
 debuff_effects = [
-    BleedEffect(1, duration=1),
-    BlindEffect(1, duration=1),
-    BurnEffect(1, duration=1),
-    ConfuseEffect(1, duration=1),
-    FreezeEffect(1, duration=1),
-    PoisonEffect(1, duration=1),
-    SleepEffect(1, duration=1),
-    StunEffect(1, duration=1),
+    BleedEffect(1),
+    BlindEffect(1),
+    BurnEffect(1),
+    ConfuseEffect(1),
+    FreezeEffect(1),
+    PoisonEffect(1),
+    SleepEffect(1),
+    StunEffect(1),
 ]
 
 defensive_effects = [
@@ -111,9 +111,37 @@ combat_manager = CombatManager(
 print("===== Effect Execution =====")
 
 combat_manager.start_combat()
+
+combat_manager.logger.log(message="\n[Start Combat]")
+combat_manager.logger.log_monster(combat_manager.order[0])
+combat_manager.logger.log_monster(combat_manager.order[1])
+
+# ----
+
 combat_manager.start_turn()
+
+combat_manager.logger.log(message="\n[Start Turn]")
+combat_manager.logger.log_monster(combat_manager.order[0])
+combat_manager.logger.log_monster(combat_manager.order[1])
+combat_manager.logger.log(message="")
+
+# ----
+
 combat_manager.take_turn()
+
+combat_manager.logger.log(message="\n[Take Turn]")
+combat_manager.logger.log_monster(combat_manager.order[0])
+combat_manager.logger.log_monster(combat_manager.order[1])
+
+# ----
+
 combat_manager.end_turn()
+
+combat_manager.logger.log(message="\n[End Turn]")
+combat_manager.logger.log_monster(combat_manager.order[0])
+combat_manager.logger.log_monster(combat_manager.order[1])
+
+# ----
 
 combat_manager.current_monster.effects = []
 
@@ -126,15 +154,15 @@ print("\n===== Effect Removal =====")
 
 removal_sets = [
     (
-        BurnEffect(1, duration=1),
-        [FreezeEffect(1, duration=1)],
+        BurnEffect(1),
+        [FreezeEffect(1)],
     ),
     (
-        FreezeEffect(1, duration=1),
-        [BurnEffect(1, duration=1)],
+        FreezeEffect(1),
+        [BurnEffect(1)],
     ),
     (
-        SleepEffect(1, duration=1),
+        SleepEffect(1),
         [
             AttackEffect(1),
             DrainEffect(1),
@@ -217,3 +245,12 @@ for effect in [
 combat_manager.start_turn()
 
 # ----------------------------
+
+print("\n===== Effect Limit =====")
+
+combat_manager.current_monster.effects = []
+
+for _ in range(10):
+    combat_manager.current_monster.effects.append(RegenEffect(1))
+
+combat_manager.logger.log_monster(combat_manager.current_monster)

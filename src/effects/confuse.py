@@ -22,7 +22,7 @@ class ConfuseEffect(Effect):
     def __init__(
         self,
         value: float = 0,
-        duration: int = 0,
+        duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
     ):

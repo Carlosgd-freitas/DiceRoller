@@ -510,18 +510,17 @@ class CombatManager:
             self.check_deaths()
 
             self.logger.log_round(self.round)
-            self.logger.log_teams(self.teams)
 
             for monster in self.order:
                 self.current_monster = monster
+
+                self.logger.log_turn_start(self.current_monster)
+                self.logger.log_teams(self.teams)
 
                 self.start_turn()
                 self.check_deaths()
 
                 if monster.is_alive():
-                    self.logger.log(
-                        category="COMBAT", key="turn", name=self.current_monster.name
-                    )
                     self.take_turn()
                     self.check_deaths()
 

@@ -1,4 +1,5 @@
 from src.base.color import Color, color_string
+from src.base.keywords import Keyword, get_keyword_color
 
 ACTIONS = {
     "absorb": "ABSORVIDO",
@@ -9,8 +10,13 @@ ACTIONS = {
 }
 
 ATTRIBUTES = {
+    "effects": "efeitos",
     "hp": color_string("HP", foreground_color=Color.RED),
-    "mana": color_string("MANA", foreground_color=Color.BLUE),
+    "mana": color_string(
+        "MANA",
+        foreground_color=get_keyword_color(Keyword.MANA)["foreground_color"],
+        intensity=get_keyword_color(Keyword.MANA)["intensity"],
+    ),
 }
 
 COMBAT = {
@@ -19,7 +25,7 @@ COMBAT = {
     "miss": "{name} errou o alvo!",
     "round": "║ Rodada #{round:<5} ║",
     "team": color_string("Time #{index}: {team_name}", intensity="BRIGHT"),
-    "turn": "\n> Turno: {name} <\n",
+    "turn": "Turno",
     "winner": "\nO time {team_name} é o vencedor!",
 }
 
@@ -44,6 +50,29 @@ EFFECT_ACTIVATION = {
     "sleep": "{target} não pôde agir porque estava {status}.",
     "stun": "{target} não pôde agir porque estava {status}.",
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
+}
+
+EFFECT_DESCRIPTION = {
+    "absorb": "Reduz até {value} de dano recebido. Qualquer dano bloqueado restaura {hp}.",
+    "attack": "Inflige {value} de dano.",
+    "bleed": "Inflige {value} de dano toda vez que o alvo rola um dado.",
+    "blind": "Aumenta a chance de erro dos dados e habilidades do alvo em {value_perc}%.",
+    "block": "Reduz até {value} de dano recebido.",
+    "burn": "Inflige {value} de dano em todo início de turno. Remove {FREEZE}.",
+    "confuse": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
+    "curse": "Inflige {value} de dano a si mesmo. Ignora efeitos defensivos.",
+    "drain": "Inflige {value} de dano. Qualquer dano infligido restaura {hp}.",
+    "freeze": "Impede que o alvo aja. Remove {BURN}.",
+    "heal": "Restaura {value} {hp}.",
+    "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
+    "mana": "Aumenta {mana} em {value}.",
+    "nothing": "Não faz nada.",
+    "pierce": "Inflige {value} de dano. Ignora efeitos defensivos.",
+    "poison": "Inflige {value} de dano em todo início de turno.",
+    "regen": "Restaura {value} {hp} em todo início de turno.",
+    "sleep": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
+    "stun": "Impede que o alvo aja.",
+    "thorns": "Quando atacado diretamente, inflige {damage} de dano ao atacante.",
 }
 
 EFFECT_EXECUTION = {

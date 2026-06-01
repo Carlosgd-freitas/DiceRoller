@@ -64,7 +64,7 @@ def test_get_targets_highest_hp(managers: Dict):
 def test_get_targets_with_effects(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector = RandomSelector()
-    effect = StunEffect(duration=1)
+    effect = StunEffect()
 
     combat_manager.order[0].apply_effect(effect)
     combat_manager.order[1].apply_effect(effect)
@@ -86,7 +86,7 @@ def test_get_targets_with_effects(managers: Dict):
 def test_get_targets_without_effects(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector = RandomSelector()
-    effect = StunEffect(duration=1)
+    effect = StunEffect()
 
     combat_manager.order[0].apply_effect(effect)
     combat_manager.order[1].apply_effect(effect)

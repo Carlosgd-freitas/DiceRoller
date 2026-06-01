@@ -88,7 +88,7 @@ class EffectManager:
     ) -> bool:
         """
         Executes an Effect through a series of checks. If the Effect is persistent, it
-        will be applied to the target.
+        will be applied to the target. Otherwise, it will be activated on the target.
 
         :param effect: An Effect.
         :type effect: Effect
