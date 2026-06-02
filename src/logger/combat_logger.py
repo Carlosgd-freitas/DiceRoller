@@ -11,6 +11,7 @@ from src.logger.logger import Logger
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.monster import Monster
+    from src.combat.team import Team
 
 
 class CombatLogger(Logger):
@@ -44,8 +45,14 @@ class CombatLogger(Logger):
         if source:
             kwargs["source"] = source.name
 
+            if source.suffix:
+                kwargs["source"] += " " + source.suffix
+
         if target:
             kwargs["target"] = target.name
+
+            if target.suffix:
+                kwargs["target"] += " " + target.suffix
 
         for parameter, category in [
             ("action", "ACTIONS"),
@@ -266,13 +273,15 @@ class CombatLogger(Logger):
             key="turn",
         )
 
-        self.log(
-            message=(
-                color_string(f"\n> {turn}: ", intensity="BRIGHT")
-                + color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
-                + "\n"
+        message = color_string(f"\n> {turn}: ", intensity="BRIGHT")
+        message += color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
+        if monster.suffix:
+            message += color_string(
+                f" {monster.suffix}", intensity="BRIGHT", underlined=True
             )
-        )
+
+        self.log(message=message)
+        self.log(message="")
 
     def log_monster(
         self,
@@ -365,21 +374,20 @@ class CombatLogger(Logger):
 
         self.log("")
 
-    def log_teams(self, teams: List[List[Monster]]):
+    def log_teams(self, teams: List[Team]):
         """
-        Logs teams of Monsters in combat. Only alive monsters (hp > 0) will be logged.
+        Logs teams of monsters in combat. Only alive monsters will be logged.
 
-        :param teams: A list where each element is a list of monsters.
-        :type teams: List[List[Monster]]
+        :param teams: Teams of monsters.
+        :type teams: List[Team]
         """
         for team_index, team in enumerate(teams):
-            team_name = team[0].team_name
             self.log(
-                category="COMBAT", key="team", index=team_index + 1, team_name=team_name
+                category="COMBAT", key="team", index=team_index + 1, team_name=team.name
             )
 
-            for monster in team:
-                if monster.hp > 0:
+            for monster in team.members:
+                if monster.is_alive():
                     self.log_monster(monster)
 
             self.log(message="")

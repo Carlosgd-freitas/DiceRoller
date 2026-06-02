@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 
 def test_keyword_attack(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["teams"][0][1]
-    monster_2: Monster = managers["teams"][0][2]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
 
     effect = AttackEffect(6)
 
@@ -39,8 +39,8 @@ def test_keyword_attack(managers: Dict):
 
 def test_keyword_drain(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["teams"][0][1]
-    monster_2: Monster = managers["teams"][0][2]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
 
     drain_effect = DrainEffect(3)
     block_effect = BlockEffect(1)
@@ -70,8 +70,8 @@ def test_keyword_drain(managers: Dict):
 
 def test_keyword_pierce(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["teams"][0][1]
-    monster_2: Monster = managers["teams"][0][2]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
 
     pierce_effect = PierceEffect(2)
     block_effect = BlockEffect(6)

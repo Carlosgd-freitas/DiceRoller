@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 def test_keyword_absorb(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["teams"][0][1]
-    monster_2: Monster = managers["teams"][0][2]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
 
     attack_effect_1 = AttackEffect(3)
     attack_effect_2 = AttackEffect(4)
@@ -72,8 +72,8 @@ def test_keyword_absorb(managers: Dict):
 
 def test_keyword_block(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["teams"][0][1]
-    monster_2: Monster = managers["teams"][0][2]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
 
     attack_effect_1 = AttackEffect(3)
     attack_effect_2 = AttackEffect(4)

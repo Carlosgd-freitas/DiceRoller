@@ -1,8 +1,10 @@
 """Combat Manager module."""
 
+from __future__ import annotations
+
 from enum import Enum
 from random import shuffle
-from typing import Dict, List, Literal, TypedDict
+from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict
 
 from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
@@ -11,6 +13,9 @@ from src.combat.effects import EffectManager
 from src.combat.suffixes import SuffixManager
 from src.logger.combat_logger import CombatLogger
 from src.targeting.selectors.manager import SelectorManager
+
+if TYPE_CHECKING:
+    from src.combat.team import Team
 
 
 class OrderStrategy(Enum):
@@ -33,13 +38,13 @@ class CombatStatus(TypedDict):
     """
     The combat's status.
 
-    :var ALIVE: a list of teams with at least on monster with hp > 0.
-    :vartype ALIVE: List[List[Monster]]
+    :var ALIVE: a list of teams with at least one alive monster.
+    :vartype ALIVE: List[Team]
 
-    :var DEFEATED: a list of teams with with all monsters with hp = 0.
-    :vartype DEFEATED: List[List[Monster]]
+    :var DEFEATED: a list of teams with with all dead monsters.
+    :vartype DEFEATED: List[Team]
 
-    :var status: current combat status:
+    :var status: current combat status.
     :vartype status: Literal["DRAW", "ONGOING", "WINNER"]
 
     **Status:**
@@ -48,8 +53,8 @@ class CombatStatus(TypedDict):
     * `"WINNER"`: the combat has only one alive team
     """
 
-    ALIVE: List[List[Monster]]
-    DEFEATED: List[List[Monster]]
+    ALIVE: List[Team]
+    DEFEATED: List[Team]
     status: Literal["DRAW", "ONGOING", "WINNER"]
 
 
@@ -58,11 +63,7 @@ class CombatManager:
     Combat Manager class.
 
     :var teams: Teams of characters or monsters that will fight each other.
-    :vartype teams: List[List[Monster]]
-
-    :var team_names: Teams of team names. If passed as a parameter, must have the same
-    length as 'teams' parameter.
-    :vartype team_names: str
+    :vartype teams: List[Team]
 
     :var order_strategy: Strategy when definining monsters turn order in combat.
     Default value is OrderStrategy.FASTER.
@@ -77,8 +78,7 @@ class CombatManager:
 
     def __init__(
         self,
-        teams: List[List[Monster]] = None,
-        team_names: List[str] = None,
+        teams: List[Team] = None,
         order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
         language: Literal["EN-US", "PT-BR"] = "EN-US",
@@ -93,31 +93,14 @@ class CombatManager:
         self.effect_manager = EffectManager(logger=self.logger)
 
         # Team Management
-        teams = [] if teams is None else teams
-        team_names = [] if team_names is None else team_names
-
-        if (teams) and (team_names) and (len(teams) != len(team_names)):
-            raise AssertionError(
-                "Parameters 'team' and 'team_names' must have the same length"
-            )
-
-        for idx, team in enumerate(teams):
-            if team_names:
-                team_name = team_names[idx]
-            else:
-                team_name = f"TEAM_{idx}"
-
-            for monster in team:
-                if monster.team_name is None:
-                    monster.team_name = team_name
-
-        self.teams = teams
+        self.teams = [] if teams is None else teams
 
         # Turn Management
-        self.round: int = 0
-        self.turn: int = 0
+        self.round: int = 1
+        self.turn: int = 1
         self.order_strategy = order_strategy
-        self.order = []
+        self.order: List[Monster] = []
+        self.current_monster: Monster = None
 
         # Suffix Management
         self.suffix_manager = SuffixManager()
@@ -126,17 +109,18 @@ class CombatManager:
         # Target Selection Management
         self.selector_manager = SelectorManager()
 
-    def _set_order(
-        self,
-    ) -> List[Monster]:
+    def get_turn_order(self) -> List[Monster]:
         """
-        Returns the order in which characters and monsters will take action.
+        Returns the order in which monsters will take action.
 
         :return: A list of monsters.
         :rtype: List[Monster]
         """
         order: List[Monster] = [
-            monster for team in self.teams for monster in team if monster.is_alive()
+            monster
+            for team in self.teams
+            for monster in team.members
+            if monster.is_alive()
         ]
 
         if self.order_strategy == OrderStrategy.FASTER:
@@ -150,95 +134,72 @@ class CombatManager:
 
         return order
 
-    def get_monster(self, monster_local_id: str) -> Monster:
-        """
-        Get a monster in the turn order.
-
-        :param monster_local_id: Monster's unique local identifier.
-        :type monster_local_id: str
-
-        :return: A monster in the turn order.
-        :rtype: Monster
-        """
-        if not monster_local_id:
-            return None
-
-        for monster in self.order:
-            if monster.local_id == monster_local_id:
-                return monster
-        return None
-
     def get_team(
         self,
-        monster: Monster = None,
-        type: Literal["ALLIES", "ENEMIES", "SELF"] = "SELF",
+        member: Monster = None,
+        name: str = None,
+    ) -> Team:
+        """
+        Returns a team.
+
+        :param member: A member of the team.
+        :type member: Monster
+
+        :param name: The name of the team.
+        :type name: str
+
+        :return: A team.
+        :rtype: Team
+        """
+        for team in self.teams:
+            if (name) and (team.name == name):
+                return team
+
+            elif (member) and (member in team.members):
+                return team
+
+        return
+
+    def get_allies(
+        self,
+        monster: Monster,
     ) -> List[Monster]:
         """
-        Get a list of monsters from the same team, relative to a monster.
+        Returns all allies of a monster.
 
-        :param type: A type of team. Default value is "SELF".
-        :type type: Literal["ALLIES", "ENEMIES", "SELF"]
-
-        :param monster: The monster which the relative team will be returned.
+        :param monster: A monster.
         :type monster: Monster
 
-        **Team types**
-        * ``ALLIES``: all monsters from the same team, excluding itself
-        * ``ENEMIES``: all monsters from different teams
-        * ``SELF``: all monsters from the same team, including itself
-
-        :return: A list of monsters.
+        :return: A list of monster allies.
         :rtype: List[Monster]
         """
-        selected: List[Monster] = []
+        team = self.get_team(member=monster)
+
+        return [
+            team_monster for team_monster in team.members if team_monster != monster
+        ]
+
+    def get_enemies(
+        self,
+        monster: Monster,
+    ) -> List[Monster]:
+        """
+        Returns all enemies of a monster.
+
+        :param monster: A monster.
+        :type monster: Monster
+
+        :return: A list of monster enemies.
+        :rtype: List[Monster]
+        """
+        enemies = []
+        monster_team = self.get_team(member=monster)
 
         for team in self.teams:
-            if (type == "SELF") and (team[0].team_name == monster.team_name):
-                return [team_monster for team_monster in team]
+            if team != monster_team:
+                enemies.extend(team.members)
 
-            elif (type == "ALLIES") and (team[0].team_name == monster.team_name):
-                return [
-                    team_monster
-                    for team_monster in team
-                    if team_monster.local_id != monster.local_id
-                ]
-
-            elif (type == "ENEMIES") and (team[0].team_name != monster.team_name):
-                selected.extend([team_monster for team_monster in team])
-
-        return selected
-
-    def get_team_status(
-        self,
-        monster: Monster = None,
-        team: List[Monster] = None,
-    ) -> Literal["ALIVE", "DEFEATED"]:
-        """
-        Returns the liveness status of a list of monsters:
-        * ``ALIVE``: if at least one monster has their hp > 0
-        * ``DEFEATED``: if all monsters have their hp = 0
-        If a monster is passed, its team's liveness status will be returned.
-
-        :param team: A monster.
-        :type team: Monster
-
-        :param team: A list of monsters.
-        :type team: List[Monster]
-
-        :return: Team status.
-        :rtype: Literal["ALIVE", "DEFEATED"]
-        """
-        status: str = "DEFEATED"
-
-        if (monster) and (not team):
-            team = self.get_team(monster)
-
-        for team_monster in team:
-            if team_monster.is_alive():
-                status = "ALIVE"
-                break
-
-        return status
+        return enemies
 
     def get_combat_status(self) -> CombatStatus:
         """
@@ -253,8 +214,8 @@ class CombatManager:
         }
 
         for team in self.teams:
-            team_status = self.get_team_status(team=team)
-            teams_status[team_status].append(team)
+            team.status = team.get_status()
+            teams_status[team.status].append(team)
 
         if len(teams_status["ALIVE"]) == 0:
             teams_status["status"] = "DRAW"
@@ -267,27 +228,50 @@ class CombatManager:
 
         return teams_status
 
+    def check_combat_status(self) -> None:
+        """
+        Checks and returns the current combat status. If the combat is over, an
+        appropiate message will be logged.
+        """
+        combat_status = self.get_combat_status()
+
+        if combat_status["status"] == "DRAW":
+            self.logger.log(category="COMBAT", key="draw")
+
+        elif combat_status["status"] == "WINNER":
+            self.logger.log(
+                category="COMBAT",
+                key="winner",
+                team_name=combat_status["ALIVE"][0].name,
+            )
+
+        return combat_status
+
     def add_monster(
         self,
         monster: Monster,
-        team_name: str,
+        team: Team = None,
+        team_name: str = None,
     ) -> None:
         """
         Adds a monster to combat.
 
         :param monster: The monster which will be added to combat.
         :type monster: Monster
+
+        :param team: The team that the monster will be added to.
+        :type team: Team
+
+        :param team_name: The name of the team that the monster will be added to.
+        :type team_name: str
         """
-        monster.team_name = team_name
+        for self_team in self.teams:
+            if (team_name) and (self_team.name == team_name):
+                self_team.members.append(monster)
 
-        for team in self.teams:
-            if team[0].team_name == team_name:
-                team.append(monster)
-                break
-        else:
-            self.teams.append([monster])
+            elif (team) and (self_team == team):
+                self_team.members.append(monster)
 
-        self.order = self._set_order()
         self.suffix_manager.add_suffixes(self.teams)
 
         return
@@ -302,44 +286,33 @@ class CombatManager:
         :param monster: The monster which will be removed from combat.
         :type monster: Monster
         """
-        empty_teams = []
-
         for team in self.teams:
-            if monster in team:
-                team.remove(monster)
-
-            if not team:
-                empty_teams.append(team)
-
-        for team in empty_teams:
-            self.teams.remove(team)
-
-        if monster in self.order:
-            self.order.remove(monster)
+            if monster in team.members:
+                team.members.remove(monster)
 
         return
 
     def check_deaths(self) -> None:
         """
-        Checks and remove any dead monsters from combat.
+        Checks deaths from monsters in combat and logs their deaths.
         """
         for monster in self.order[:]:
             if not monster.is_alive():
+                team = self.get_team(member=monster)
+                team.status = team.get_status()
+
                 self.logger.log(category="COMBAT", key="death", name=monster.name)
-                self.remove_monster(monster)
 
         return
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
-        self.order = self._set_order()
+        self.order = self.get_turn_order()
         self.current_monster = self.order[0]
         return
 
     def start_round(self) -> None:
         """Start the current round."""
-        self.round += 1
-        self.turn = 0
         return
 
     def start_turn(self) -> None:
@@ -347,8 +320,6 @@ class CombatManager:
         Start the current monster's turn. The entity will be affected by Effects that
         triggers on turn start.
         """
-        self.turn += 1
-
         # Procesing effects on turn start
         self.effect_manager.process_trigger(
             Trigger.TURN_START,
@@ -372,8 +343,8 @@ class CombatManager:
         """
         sides = self.effect_manager.roll(monster)
 
-        allies = self.get_team(monster, "ALLIES")
-        enemies = self.get_team(monster, "ENEMIES")
+        allies = self.get_allies(monster)
+        enemies = self.get_enemies(monster)
 
         for side in sides:
             targets = self.selector_manager.get_targets(
@@ -466,6 +437,8 @@ class CombatManager:
             if idx not in idx_removed_effects
         ]
 
+        self.turn += 1
+
         return {
             "removed_effects": removed_effects,
         }
@@ -473,25 +446,26 @@ class CombatManager:
     def next_turn(self) -> None:
         """Sets up the next turn in the turn order."""
 
+        # Getting the current monster
         idx_monster: int = None
         for idx, monster in enumerate(self.order):
             if monster == self.current_monster:
                 idx_monster = idx
                 break
 
-        while True:
-            idx_monster += 1
+        # Getting the next monster
+        if idx_monster + 1 < len(self.order):
+            self.current_monster = self.order[idx_monster + 1]
 
-            monster = self.order[idx_monster % len(self.order)]
-
-            if monster.hp > 0:
-                self.current_monster = monster
-                break
+        else:  # Round end -> Remaking the turn order
+            self.order = self.get_turn_order()
+            self.current_monster = self.order[0]
 
         return
 
     def end_round(self) -> None:
         """End the current round."""
+        self.round += 1
         return
 
     def end_combat(self) -> None:
@@ -502,47 +476,65 @@ class CombatManager:
         """
         Runs combat until only one team remains alive.
         """
+        # Combat Start
         self.start_combat()
         self.check_deaths()
+        combat_status = self.check_combat_status()
 
-        while self.get_combat_status()["status"] == "ONGOING":
+        while combat_status["status"] == "ONGOING":
+            # Round Start
+            self.logger.log_round(self.round)
+
             self.start_round()
             self.check_deaths()
 
-            self.logger.log_round(self.round)
+            combat_status = self.check_combat_status()
+            if combat_status["status"] != "ONGOING":
+                break
 
+            self.order = self.get_turn_order()
             for monster in self.order:
+                # Setup
                 self.current_monster = monster
 
+                # Turn Start
                 self.logger.log_turn_start(self.current_monster)
                 self.logger.log_teams(self.teams)
 
                 self.start_turn()
                 self.check_deaths()
 
+                combat_status = self.check_combat_status()
+                if combat_status["status"] != "ONGOING":
+                    break
+
+                # Turn Action
                 if monster.is_alive():
                     self.take_turn()
                     self.check_deaths()
 
-                self.end_turn()
+                    combat_status = self.check_combat_status()
+                    if combat_status["status"] != "ONGOING":
+                        break
+
+                # Turn End
+                if combat_status["status"] == "ONGOING":
+                    self.end_turn()
+                    self.check_deaths()
+
+                    combat_status = self.check_combat_status()
+                    if combat_status["status"] != "ONGOING":
+                        break
+
+            # Round End
+            if combat_status["status"] == "ONGOING":
+                self.end_round()
                 self.check_deaths()
 
-                combat_status = self.get_combat_status()
-                if combat_status["status"] == "DRAW":
-                    self.logger.log(category="COMBAT", key="draw")
+                combat_status = self.check_combat_status()
+                if combat_status["status"] != "ONGOING":
                     break
-
-                elif combat_status["status"] == "WINNER":
-                    self.logger.log(
-                        category="COMBAT",
-                        key="winner",
-                        team_name=combat_status["ALIVE"][0][0].team_name,
-                    )
-                    break
-
-            self.end_round()
-            self.check_deaths()
 
         self.end_combat()
 
-        return self.get_combat_status()
+        return combat_status

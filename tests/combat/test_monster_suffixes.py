@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.monster import Monster
+from src.combat.team import Team
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -36,11 +37,11 @@ def test_monster_suffixes_none(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
     conditions = [
-        combat_manager.teams[0][0].suffix is None,
-        combat_manager.teams[0][1].suffix is None,
-        combat_manager.teams[0][2].suffix is None,
-        combat_manager.teams[1][0].suffix is None,
-        combat_manager.teams[1][1].suffix is None,
+        combat_manager.teams[0].members[0].suffix is None,
+        combat_manager.teams[0].members[1].suffix is None,
+        combat_manager.teams[0].members[2].suffix is None,
+        combat_manager.teams[1].members[0].suffix is None,
+        combat_manager.teams[1].members[1].suffix is None,
     ]
 
     assert_conditions(conditions)
@@ -50,27 +51,31 @@ def test_monster_suffixes_simple(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     suffix_manager: SuffixManager = managers["suffix_manager"]
 
-    team_0 = [
-        Monster(name="Red"),
-        Monster(name="Red"),
-        Monster(name="Red"),
-    ]
+    team_0 = Team(
+        members=[
+            Monster(name="Red"),
+            Monster(name="Red"),
+            Monster(name="Red"),
+        ]
+    )
 
-    team_1 = [
-        Monster(name="Blue"),
-        Monster(name="Blue"),
-    ]
+    team_1 = Team(
+        members=[
+            Monster(name="Blue"),
+            Monster(name="Blue"),
+        ]
+    )
 
     combat_manager.teams = [team_0, team_1]
 
     suffix_manager.add_suffixes(combat_manager.teams)
 
     conditions = [
-        combat_manager.teams[0][0].suffix == "A",
-        combat_manager.teams[0][1].suffix == "B",
-        combat_manager.teams[0][2].suffix == "C",
-        combat_manager.teams[1][0].suffix == "A",
-        combat_manager.teams[1][1].suffix == "B",
+        combat_manager.teams[0].members[0].suffix == "A",
+        combat_manager.teams[0].members[1].suffix == "B",
+        combat_manager.teams[0].members[2].suffix == "C",
+        combat_manager.teams[1].members[0].suffix == "A",
+        combat_manager.teams[1].members[1].suffix == "B",
     ]
 
     assert_conditions(conditions)
@@ -85,23 +90,23 @@ def test_monster_suffixes_add_monster(managers: Dict):
     )
 
     conditions = [
-        combat_manager.teams[0][0].suffix is None,
-        combat_manager.teams[0][1].suffix is None,
-        combat_manager.teams[0][2].suffix is None,
-        combat_manager.teams[1][0].suffix is None,
-        combat_manager.teams[1][1].suffix is None,
+        combat_manager.teams[0].members[0].suffix is None,
+        combat_manager.teams[0].members[1].suffix is None,
+        combat_manager.teams[0].members[2].suffix is None,
+        combat_manager.teams[1].members[0].suffix is None,
+        combat_manager.teams[1].members[1].suffix is None,
     ]
 
     combat_manager.add_monster(monster=monster, team_name="Team Blue")
 
     conditions.extend(
         [
-            combat_manager.teams[0][0].suffix == "A",
-            combat_manager.teams[0][1].suffix is None,
-            combat_manager.teams[0][2].suffix is None,
-            combat_manager.teams[1][0].suffix is None,
-            combat_manager.teams[1][1].suffix is None,
-            combat_manager.teams[1][2].suffix == "B",
+            combat_manager.teams[0].members[0].suffix == "A",
+            combat_manager.teams[0].members[1].suffix is None,
+            combat_manager.teams[0].members[2].suffix is None,
+            combat_manager.teams[1].members[0].suffix is None,
+            combat_manager.teams[1].members[1].suffix is None,
+            combat_manager.teams[1].members[2].suffix == "B",
         ]
     )
 
@@ -112,7 +117,7 @@ def test_monster_suffixes_remove_monster(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
     combat_manager.remove_monster(
-        monster=combat_manager.teams[0][0],
+        monster=combat_manager.teams[0].members[0],
     )
 
     monster = Monster(
@@ -123,11 +128,11 @@ def test_monster_suffixes_remove_monster(managers: Dict):
     combat_manager.add_monster(monster=monster, team_name="Team Blue")
 
     conditions = [
-        combat_manager.teams[0][0].suffix is None,
-        combat_manager.teams[0][1].suffix is None,
-        combat_manager.teams[1][0].suffix is None,
-        combat_manager.teams[1][1].suffix is None,
-        combat_manager.teams[1][2].suffix is None,
+        combat_manager.teams[0].members[0].suffix is None,
+        combat_manager.teams[0].members[1].suffix is None,
+        combat_manager.teams[1].members[0].suffix is None,
+        combat_manager.teams[1].members[1].suffix is None,
+        combat_manager.teams[1].members[2].suffix is None,
     ]
 
     assert_conditions(conditions)

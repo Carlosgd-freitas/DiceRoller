@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 def test_keyword_curse(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["teams"][0][1]
+    monster: Monster = managers["teams"][0].members[1]
 
     curse_effect = CurseEffect(6)
     block_effect = BlockEffect(6)

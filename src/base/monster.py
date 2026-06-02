@@ -33,9 +33,6 @@ class Monster(Entity):
     it's actions. Default is NORMAL.
     :vartype difficulty: Difficulty
 
-    :var team_name: Monster's team name.
-    :vartype team_name: str
-
     :var suffix: Monster's name suffix (e.g. Slime 'A').
     :vartype suffix: str
     """
@@ -45,7 +42,6 @@ class Monster(Entity):
         skills: List[Skill] = None,
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
-        team_name: str = None,
         suffix: str = None,
         **kwargs,
     ):
@@ -53,7 +49,6 @@ class Monster(Entity):
         self.skills = [] if skills is None else skills
         self.control_type = control_type
         self.difficulty = difficulty
-        self.team_name = team_name
         self.suffix = suffix
 
     def is_alive(self) -> bool:

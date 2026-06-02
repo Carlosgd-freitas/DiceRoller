@@ -4,6 +4,7 @@ from src.base.dice import Dice
 from src.base.monster import Monster
 from src.base.side import Side
 from src.combat.manager import CombatManager
+from src.combat.team import Team
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
@@ -26,6 +27,8 @@ from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
 
 init()
+
+# ----------------------------
 
 buff_effects = [
     ManaRegenEffect(1),
@@ -71,7 +74,7 @@ restoration_effects = [
 # ----------------------------
 
 monster_a = Monster(
-    name="Monster A",
+    name="Monster",
     hp=100,
     max_hp=200,
     dice=[
@@ -85,22 +88,28 @@ monster_a = Monster(
     ],
 )
 
+team_a = Team(
+    name="Red Team",
+    members=[monster_a],
+)
+
 monster_b = Monster(
-    name="Monster B",
+    name="Monster",
     hp=100,
     max_hp=200,
+)
+
+team_b = Team(
+    name="Blue Team",
+    members=[monster_b],
 )
 
 # ----------------------------
 
 combat_manager = CombatManager(
     teams=[
-        [monster_a],
-        [monster_b],
-    ],
-    team_names=[
-        "Red Team",
-        "Blue Team",
+        team_a,
+        team_b,
     ],
     order_strategy="SET",
     language="EN-US",

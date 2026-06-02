@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 def test_keyword_heal(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["teams"][0][1]
+    monster: Monster = managers["teams"][0].members[1]
 
     effect = HealEffect(6)
 
@@ -41,7 +41,7 @@ def test_keyword_heal(managers: Dict):
 
 def test_keyword_mana(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["teams"][0][1]
+    monster: Monster = managers["teams"][0].members[1]
 
     effect = ManaEffect(2)
 

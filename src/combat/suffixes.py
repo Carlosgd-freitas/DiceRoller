@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
+    from src.combat.team import Team
 
 
 class SuffixManager:
@@ -16,12 +16,12 @@ class SuffixManager:
     def __init__(self):
         self.suffixes = {}
 
-    def count_names(self, teams: List[List[Monster]]) -> Dict:
+    def count_names(self, teams: List[Team]) -> Dict:
         """
         Counts the names of teams of monsters.
 
         :var teams: Teams of monsters.
-        :vartype teams: List[List[Monster]]
+        :vartype teams: List[Team]
 
         :return: A dictionary where each key is a name of a monster in combat and each
         value is the count of the monsters with this same name.
@@ -30,7 +30,7 @@ class SuffixManager:
         names = {}
 
         for team in teams:
-            for monster in team:
+            for monster in team.members:
 
                 if monster.name not in names:
                     names[monster.name] = 1
@@ -102,17 +102,17 @@ class SuffixManager:
 
         return new_suffix
 
-    def add_suffixes(self, teams: List[List[Monster]]) -> None:
+    def add_suffixes(self, teams: List[Team]) -> None:
         """
         Add suffixes to monsters to differentiate them in combat.
 
-        :var teams: Teams of monsters that will fight each other.
-        :vartype teams: List[List[Monster]]
+        :var teams: Teams of monsters.
+        :vartype teams: List[Team]
         """
         names = self.count_names(teams)
 
         for team in teams:
-            for monster in team:
+            for monster in team.members:
                 if monster.name is None:
                     continue
 

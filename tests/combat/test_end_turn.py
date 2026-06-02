@@ -1,11 +1,15 @@
 """Tests for combat turn management."""
 
-from copy import deepcopy
-from typing import Dict
+from __future__ import annotations
 
-from src.combat.manager import CombatManager
+from copy import deepcopy
+from typing import TYPE_CHECKING, Dict
+
 from src.effects.nothing import NothingEffect
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.combat.manager import CombatManager
 
 
 def test_end_turn_decay_effects(managers: Dict):
