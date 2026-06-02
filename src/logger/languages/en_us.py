@@ -2,7 +2,7 @@ from src.base.color import Color, color_string
 from src.base.keywords import Keyword, get_keyword_color
 
 ACTIONS = {
-    "absorb": "ABOSRBED",
+    "absorb": "ABSORBED",
     "attack": "ATTACKED",
     "block": "BLOCKED",
     "drain": "DRAINED",
@@ -97,7 +97,7 @@ EFFECT_REMOVAL = {
 }
 
 KEYWORDS = {
-    "absorb": "ABOSRB",
+    "absorb": "ABSORB",
     "attack": "ATTACK",
     "bleed": "BLEED",
     "blind": "BLIND",
