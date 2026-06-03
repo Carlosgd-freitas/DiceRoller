@@ -15,7 +15,7 @@ def filter_entities(
     k: int = 1,
     method: Literal["FIRST", "LAST", "RANDOM"] = "RANDOM",
     sort_functions: List[Callable] = None,
-    alive: bool = True,
+    life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
     hurt: bool = False,
     exclude: List[str] = None,
     keyword_whitelist: List[Keyword] = None,
@@ -37,9 +37,9 @@ def filter_entities(
     :param sort_functions: A list of functions to sort the list of entities.
     :type sort_functions: List[Callable]
 
-    :param alive: Whether to consider only alive entities (hp > 0). Default value is
-    True.
-    :type alive: bool
+    :param life_state: Whether to consider only alive, dead or any type of entities.
+    Default value is "ALIVE".
+    :type life_state: Literal["ALIVE", "DEAD", "ANY"]
 
     :param hurt: Whether to consider only hurt entities (hp < max_hp). Default value is
     False.
@@ -72,8 +72,10 @@ def filter_entities(
         filtered.sort(key=sort_function)
 
     # Entity attribute conditions
-    if alive:
-        filtered = [entity for entity in filtered if entity.hp > 0]
+    if life_state == "ALIVE":
+        filtered = [entity for entity in filtered if entity.is_alive()]
+    elif life_state == "DEAD":
+        filtered = [entity for entity in filtered if not entity.is_alive()]
 
     if hurt:
         filtered = [entity for entity in filtered if entity.hp < entity.max_hp]

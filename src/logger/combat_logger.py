@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import ceil
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import color_string
@@ -36,12 +37,7 @@ class CombatLogger(Logger):
         Updates the log parameters with effect, source, target and the data that can be
         derived from that.
         """
-        if kwargs.get("attribute"):
-            kwargs["attribute"] = self.get_message(
-                category="ATTRIBUTES",
-                key=kwargs["attribute"],
-            )
-
+        # Source and target monsters
         if source:
             kwargs["source"] = source.name
 
@@ -54,6 +50,7 @@ class CombatLogger(Logger):
             if target.suffix:
                 kwargs["target"] += " " + target.suffix
 
+        # Keyword variations
         for parameter, category in [
             ("action", "ACTIONS"),
             ("status", "STATUS"),
@@ -64,6 +61,7 @@ class CombatLogger(Logger):
                 keyword=effect.keyword,
             )
 
+        # Removed effect
         if kwargs.get("removed_effect"):
             removed_effect: Effect = kwargs["removed_effect"]
 
@@ -72,10 +70,22 @@ class CombatLogger(Logger):
                 keyword=removed_effect.keyword,
             )
 
+        # Specific attribute
+        if kwargs.get("attribute"):
+            kwargs["attribute"] = self.get_message(
+                category="ATTRIBUTES",
+                key=kwargs["attribute"],
+            )
+
         kwargs.update(
             {
+                # Effect parameters
                 "duration": effect.duration,
                 "value": effect.value,
+                "value_perc": ceil(effect.value * 100),
+                # General attributes
+                "hp": self.get_message(category="ATTRIBUTES", key="hp"),
+                "mana": self.get_message(category="ATTRIBUTES", key="mana"),
             }
         )
 
@@ -191,16 +201,51 @@ class CombatLogger(Logger):
         :param target: The Monster targeted by the effect execution.
         :type target: Monster
         """
-        key = effect.type.value.lower()
+        # Determining logging key
+        if effect.keyword in [Keyword.REVIVE]:
+            key = effect.keyword.value.lower()
+        else:
+            key = effect.type.value.lower()
 
+        # Logging failed effect execution
+        if kwargs.get("fail"):
+            kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+            if (source) and (target) and (source == target):
+                key += "_self"
+
+            self.log(
+                category="EFFECT_EXECUTION_FAIL",
+                key=key,
+                end="",
+                **kwargs,
+            )
+            self.log(message=" ", end="")
+
+            key = kwargs["fail"]
+            if (source) and (target) and (source == target):
+                key += "_self"
+
+            self.log(
+                category="FAILS",
+                key=key,
+                **kwargs,
+            )
+
+            return
+
+        # Logging offensive type effect execution
         if key == "offensive":
-            return self._log_damage_calculation(
+            self._log_damage_calculation(
                 effect,
                 source,
                 target,
                 **kwargs,
             )
 
+            return
+
+        # Logging other effect executions
         if (source) and (target) and (source == target):
             key += "_self"
 

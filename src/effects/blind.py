@@ -41,11 +41,23 @@ class BlindEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }

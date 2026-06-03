@@ -30,6 +30,9 @@ class EffectData(TypedDict):
     :var damage: Damage done to a Monster.
     :vartype damage: int
 
+    :var fail: The cause of the effect failing.
+    :vartype fail: str
+
     :var removed_effects: A list of effects that were removed on effect apply.
     :vartype removed_effects: List[Effect]
     """
@@ -38,6 +41,7 @@ class EffectData(TypedDict):
     attribute: str
     blocked_damage: int
     damage: int
+    fail: str
     removed_effects: List[Effect]
 
 

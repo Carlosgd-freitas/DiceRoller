@@ -48,23 +48,30 @@ class PierceEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
+        damage_data = {}
+        fail = None
         removed_effects = []
 
-        sleep = target.remove_effect(Keyword.SLEEP)
-        if sleep:
-            removed_effects.append(sleep)
+        if target.is_alive():
+            sleep = target.remove_effect(Keyword.SLEEP)
+            if sleep:
+                removed_effects.append(sleep)
 
-        damage_data = calculate_damage(
-            self,
-            source,
-            target,
-            consider_block=False,
-        )
+            damage_data = calculate_damage(
+                self,
+                source,
+                target,
+                consider_block=False,
+            )
 
-        target.hp -= damage_data["damage"]
-        target.equalize_stats()
+            target.hp -= damage_data["damage"]
+            target.equalize_stats()
+
+        else:
+            fail = "dead"
 
         return {
             **damage_data,
+            "fail": fail,
             "removed_effects": removed_effects,
         }

@@ -13,6 +13,7 @@ from src.targeting.selectors.debuff_selector import DebuffSelector
 from src.targeting.selectors.defensive_selector import DefensiveSelector
 from src.targeting.selectors.offensive_selector import OffensiveSelector
 from src.targeting.selectors.random_selector import RandomSelector
+from src.targeting.selectors.revive_selector import ReviveSelector
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -74,10 +75,14 @@ class SelectorManager:
         if confused and random() < confused.value:
             selector = RandomSelector()
 
-        # Curse Effect
+        # Specific Keywords
         for effect in side.effects:
             if effect.keyword == Keyword.CURSE:
                 selector = DefensiveSelector()
+                break
+
+            elif effect.keyword == Keyword.REVIVE:
+                selector = ReviveSelector()
                 break
 
         if not selector:

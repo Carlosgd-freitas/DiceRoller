@@ -20,7 +20,9 @@ type LoggingCategory = Literal[
     "EFFECT_ACTIVATION",
     "EFFECT_DESCRIPTION",
     "EFFECT_EXECUTION",
+    "EFFECT_EXECUTION_FAIL",
     "EFFECT_REMOVAL",
+    "FAILS",
     "KEYWORDS",
     "STATUS",
 ]

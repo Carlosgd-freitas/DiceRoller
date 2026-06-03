@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Literal
 
 from src.targeting.filters import filter_entities
 
@@ -117,17 +117,18 @@ class Selector(ABC):
         self,
         monsters: List[Monster],
         k: int,
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
     ):
         """
-        Returns k alive random monsters.
+        Returns k random monsters.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
-            alive=True,
+            life_state=life_state,
             exclude=exclude,
         )
 
@@ -135,10 +136,11 @@ class Selector(ABC):
         self,
         monsters: List[Monster],
         k: int,
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
     ):
         """
-        Returns k alive monsters with most effective hp and hp.
+        Returns k monsters with most effective hp and hp.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -149,7 +151,7 @@ class Selector(ABC):
                 (lambda entity: -entity.get_effective_hp()),
                 (lambda entity: -entity.hp),
             ],
-            alive=True,
+            life_state=life_state,
             exclude=exclude,
         )
 
@@ -157,10 +159,11 @@ class Selector(ABC):
         self,
         monsters: List[Monster],
         k: int,
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
     ):
         """
-        Returns k alive monsters with least effective hp and hp.
+        Returns k monsters with least effective hp and hp.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
@@ -171,7 +174,51 @@ class Selector(ABC):
                 (lambda entity: entity.get_effective_hp()),
                 (lambda entity: entity.hp),
             ],
-            alive=True,
+            life_state=life_state,
+            exclude=exclude,
+        )
+
+    def _get_targets_highest_max_hp(
+        self,
+        monsters: List[Monster],
+        k: int,
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
+        exclude: List[str] = None,
+    ):
+        """
+        Returns k monsters with most max hp.
+        """
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
+            monsters,
+            k=k,
+            method="FIRST",
+            sort_functions=[
+                (lambda entity: -entity.max_hp),
+            ],
+            life_state=life_state,
+            exclude=exclude,
+        )
+
+    def _get_targets_lowest_max_hp(
+        self,
+        monsters: List[Monster],
+        k: int,
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
+        exclude: List[str] = None,
+    ):
+        """
+        Returns k monsters with least max hp.
+        """
+        exclude = [] if exclude is None else exclude
+        return filter_entities(
+            monsters,
+            k=k,
+            method="FIRST",
+            sort_functions=[
+                (lambda entity: entity.max_hp),
+            ],
+            life_state=life_state,
             exclude=exclude,
         )
 
@@ -180,17 +227,18 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effects: List[Keyword],
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
     ):
         """
-        Returns k alive random monsters with effects.
+        Returns k random monsters with effects.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
-            alive=True,
+            life_state=life_state,
             keyword_whitelist=effects,
             exclude=exclude,
         )
@@ -200,17 +248,18 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effects: List[Keyword],
+        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
     ):
         """
-        Returns k alive random monsters without effects.
+        Returns k random monsters without effects.
         """
         exclude = [] if exclude is None else exclude
         return filter_entities(
             monsters,
             k=k,
             method="RANDOM",
-            alive=True,
+            life_state=life_state,
             keyword_blacklist=effects,
             exclude=exclude,
         )

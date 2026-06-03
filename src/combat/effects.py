@@ -125,10 +125,8 @@ class EffectManager:
                 accuracy -= blinded.value
 
             if random() >= accuracy:
-                self.logger.log(
-                    category="COMBAT",
-                    key="miss",
-                    name=source.name,
+                self.logger.log_effect_execution(
+                    effect=effect, source=source, target=target, fail="miss"
                 )
                 return False
 

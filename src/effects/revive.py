@@ -1,7 +1,8 @@
-"""Heal effect module."""
+"""Revive effect module."""
 
 from __future__ import annotations
 
+from math import ceil
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -11,11 +12,12 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class HealEffect(Effect):
+class ReviveEffect(Effect):
     """
-    Heal Effect.
+    Revive Effect.
 
-    If the target is alive, increases its HP by the effect value.
+    Increases the target's HP by (value * 100)% of it's max HP, rounding up, but only
+    if it is dead.
     """
 
     def __init__(
@@ -26,7 +28,7 @@ class HealEffect(Effect):
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.HEAL,
+            Keyword.REVIVE,
             value,
             duration,
             decay,
@@ -48,12 +50,11 @@ class HealEffect(Effect):
     ) -> EffectData:
         fail = None
 
-        if target.is_alive():
-            target.hp += self.value
+        if not target.is_alive():
+            target.hp += ceil(target.max_hp * self.value)
             target.equalize_stats()
-
         else:
-            fail = "dead"
+            fail = "alive"
 
         return {
             "attribute": "hp",

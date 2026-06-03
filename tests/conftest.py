@@ -15,7 +15,7 @@ def managers() -> Dict:
         local_id="MONSTER_0",
         name="Red",
         hp=0,
-        max_hp=200,
+        max_hp=100,
         speed=0,
     )
 
@@ -23,7 +23,7 @@ def managers() -> Dict:
         local_id="MONSTER_1",
         name="Green",
         hp=1,
-        max_hp=200,
+        max_hp=125,
         speed=5,
     )
 
@@ -31,7 +31,7 @@ def managers() -> Dict:
         local_id="MONSTER_2",
         name="Yellow",
         hp=10,
-        max_hp=200,
+        max_hp=150,
         speed=1,
     )
 
@@ -39,7 +39,7 @@ def managers() -> Dict:
         local_id="MONSTER_3",
         name="Blue",
         hp=100,
-        max_hp=200,
+        max_hp=175,
         speed=10,
     )
 
@@ -62,6 +62,7 @@ def managers() -> Dict:
     )
 
     teams = [team_0, team_1]
+    monsters = [monster for team in teams for monster in team.members]
 
     combat_manager = CombatManager(
         teams=teams,
@@ -73,6 +74,7 @@ def managers() -> Dict:
 
     return {
         # Variables
+        "monsters": monsters,
         "teams": teams,
         # Managers
         "combat_manager": combat_manager,

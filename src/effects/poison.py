@@ -44,20 +44,36 @@ class PoisonEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = calculate_damage(
-            self,
-            source,
-            target,
-        )
+        damage_data = {}
+        fail = None
 
-        target.hp -= damage_data["damage"]
-        target.equalize_stats()
+        if target.is_alive():
+            damage_data = calculate_damage(
+                self,
+                source,
+                target,
+            )
 
-        return damage_data
+            target.hp -= damage_data["damage"]
+            target.equalize_stats()
+
+        else:
+            fail = "dead"
+
+        return {
+            **damage_data,
+            "fail": fail,
+        }

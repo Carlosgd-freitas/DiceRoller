@@ -41,7 +41,13 @@ class BlockEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,

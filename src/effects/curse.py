@@ -47,16 +47,24 @@ class CurseEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = calculate_damage(
-            self,
-            source,
-            target,
-        )
+        damage_data = {}
+        fail = None
 
-        target.hp -= damage_data["damage"]
-        target.equalize_stats()
+        if target.is_alive():
+            damage_data = calculate_damage(
+                self,
+                source,
+                target,
+            )
+
+            target.hp -= damage_data["damage"]
+            target.equalize_stats()
+
+        else:
+            fail = "dead"
 
         return {
             **damage_data,
             "attribute": "hp",
+            "fail": fail,
         }

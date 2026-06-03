@@ -42,13 +42,19 @@ class FreezeEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
+        fail = None
         removed_effects = []
 
-        burn = target.remove_effect(Keyword.BURN)
-        if burn:
-            removed_effects.append(burn)
+        if target.is_alive():
+            burn = target.remove_effect(Keyword.BURN)
+            if burn:
+                removed_effects.append(burn)
+
+        else:
+            fail = "dead"
 
         return {
+            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -57,4 +63,10 @@ class FreezeEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }

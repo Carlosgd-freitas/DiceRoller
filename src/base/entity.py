@@ -85,6 +85,15 @@ class Entity:
         self.dice = [] if dice is None else dice
         self.effects = [] if effects is None else effects
 
+    def is_alive(self) -> bool:
+        """
+        Returns if the monster is alive or not.
+
+        :return: If the Monster is alive or not.
+        :rtype: bool
+        """
+        return self.hp > 0
+
     def roll(self) -> List[Side]:
         """
         Randomly returns list of sides; one for each of this Entity's dice.

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Dict
 
 from src.effects.heal import HealEffect
 from src.effects.mana import ManaEffect
+from src.effects.revive import ReviveEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -59,6 +60,35 @@ def test_keyword_mana(managers: Dict):
     conditions.extend(
         [
             monster.mana == 2,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_revive(managers: Dict):
+    effect_manager: EffectManager = managers["effect_manager"]
+    monster_0: Monster = managers["teams"][0].members[0]
+    monster_1: Monster = managers["teams"][0].members[1]
+
+    effect = ReviveEffect(0.25)
+
+    conditions = [
+        monster_0.local_id == "MONSTER_0",
+        monster_0.hp == 0,
+        not monster_0.is_alive(),
+    ]
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_1,
+        target=monster_0,
+    )
+
+    conditions.extend(
+        [
+            monster_0.hp == 25,
+            monster_0.is_alive(),
         ]
     )
 

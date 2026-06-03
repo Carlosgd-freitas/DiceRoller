@@ -294,7 +294,8 @@ class CombatManager:
 
     def check_deaths(self) -> None:
         """
-        Checks deaths from monsters in combat and logs their deaths.
+        Checks deaths from monsters in combat and logs their deaths. Dead monsters will
+        be affected by Effects that triggers on death.
         """
         for monster in self.order[:]:
             if not monster.is_alive():
@@ -302,6 +303,15 @@ class CombatManager:
                 team.status = team.get_status()
 
                 self.logger.log(category="COMBAT", key="death", name=monster.name)
+
+                # Cleaning monster effects
+                monster.effects = []
+
+                # Procesing effects on death
+                self.effect_manager.process_trigger(
+                    Trigger.DEATH,
+                    target=monster,
+                )
 
         return
 

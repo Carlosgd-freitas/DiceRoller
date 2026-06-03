@@ -22,6 +22,7 @@ from src.effects.nothing import NothingEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
+from src.effects.revive import ReviveEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
@@ -30,17 +31,12 @@ init()
 
 # ----------------------------
 
-buff_effects = [
+all_effects = [
+    # Buffs
     ManaRegenEffect(1),
     RegenEffect(1),
     ThornsEffect(1),
-]
-
-curse_effects = [
-    CurseEffect(1),
-]
-
-debuff_effects = [
+    # Debuff
     BleedEffect(1),
     BlindEffect(1),
     BurnEffect(1),
@@ -49,26 +45,21 @@ debuff_effects = [
     PoisonEffect(1),
     SleepEffect(1),
     StunEffect(1),
-]
-
-defensive_effects = [
+    # Defensive
     AbsorbEffect(1),
     BlockEffect(1),
-]
-
-nothing_effects = [
-    NothingEffect(1),
-]
-
-offensive_effects = [
+    # Deterioration
+    CurseEffect(1),
+    # Nothing
+    NothingEffect(),
+    # Offensive
     AttackEffect(1),
     DrainEffect(1),
     PierceEffect(1),
-]
-
-restoration_effects = [
+    # Restoration
     HealEffect(1),
     ManaEffect(1),
+    ReviveEffect(0.25),
 ]
 
 # ----------------------------
@@ -77,15 +68,6 @@ monster_a = Monster(
     name="Monster",
     hp=100,
     max_hp=200,
-    dice=[
-        Dice(sides=[Side(effects=buff_effects)]),
-        Dice(sides=[Side(effects=curse_effects)]),
-        Dice(sides=[Side(effects=debuff_effects)]),
-        Dice(sides=[Side(effects=defensive_effects)]),
-        Dice(sides=[Side(effects=nothing_effects)]),
-        Dice(sides=[Side(effects=offensive_effects)]),
-        Dice(sides=[Side(effects=restoration_effects)]),
-    ],
 )
 
 team_a = Team(
@@ -115,47 +97,77 @@ combat_manager = CombatManager(
     language="EN-US",
 )
 
-# ----------------------------
-
-print("===== Effect Execution =====")
-
 combat_manager.start_combat()
 
-combat_manager.logger.log(message="\n[Start Combat]")
-combat_manager.logger.log_monster(combat_manager.order[0])
-combat_manager.logger.log_monster(combat_manager.order[1])
+# ----------------------------
 
-# ----
+print("===== Effect Execution: Target another alive monster =====")
 
-combat_manager.start_turn()
+for effect in all_effects:
+    combat_manager.effect_manager.execute_effect(
+        effect=effect,
+        source=monster_a,
+        target=monster_b,
+    )
 
-combat_manager.logger.log(message="\n[Start Turn]")
-combat_manager.logger.log_monster(combat_manager.order[0])
-combat_manager.logger.log_monster(combat_manager.order[1])
-combat_manager.logger.log(message="")
+    monster_b.effects = []
 
-# ----
+# ----------------------------
 
-combat_manager.take_turn()
+print("\n===== Effect Execution: Target alive self =====")
 
-combat_manager.logger.log(message="\n[Take Turn]")
-combat_manager.logger.log_monster(combat_manager.order[0])
-combat_manager.logger.log_monster(combat_manager.order[1])
+for effect in all_effects:
+    combat_manager.effect_manager.execute_effect(
+        effect=effect,
+        source=monster_a,
+        target=monster_a,
+    )
 
-# ----
+    monster_a.effects = []
 
-combat_manager.end_turn()
+# ----------------------------
 
-combat_manager.logger.log(message="\n[End Turn]")
-combat_manager.logger.log_monster(combat_manager.order[0])
-combat_manager.logger.log_monster(combat_manager.order[1])
+print("\n===== Effect Execution: Target another dead monster =====")
 
-# ----
+for effect in all_effects:
+    monster_b.hp = 0
 
-combat_manager.current_monster.effects = []
+    combat_manager.effect_manager.execute_effect(
+        effect=effect, source=monster_a, target=monster_b
+    )
 
-combat_manager.next_turn()
-combat_manager.current_monster.effects = []
+    monster_b.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: Target dead self =====")
+
+for effect in all_effects:
+    monster_a.hp = 0
+
+    combat_manager.effect_manager.execute_effect(
+        effect=effect, source=monster_a, target=monster_a
+    )
+
+    monster_a.effects = []
+
+monster_a.hp = 100
+monster_b.hp = 100
+
+# ----------------------------
+
+print("\n===== Effect Execution: Target missing =====")
+
+for effect in all_effects:
+    monster_a.effects = [BlindEffect(1)]
+
+    combat_manager.effect_manager.execute_effect(
+        effect=effect,
+        source=monster_a,
+        target=monster_b,
+    )
+
+monster_a.effects = []
 
 # ----------------------------
 
@@ -182,7 +194,7 @@ removal_sets = [
 
 for removed, removers in removal_sets:
     for remover in removers:
-        combat_manager.current_monster.effects = [removed]
+        monster_b.effects = [removed]
 
         combat_manager.effect_manager.execute_effect(
             effect=remover,
@@ -194,29 +206,33 @@ for removed, removers in removal_sets:
 
 print("\n===== Effect Activation: Act Disabling =====")
 
+combat_manager.current_monster = monster_a
+
 for effect in [
     FreezeEffect(1),
     SleepEffect(1),
     StunEffect(1),
 ]:
-    combat_manager.current_monster.effects = []
-    combat_manager.current_monster.apply_effect(effect)
+    monster_a.effects = [effect]
 
     combat_manager.take_turn()
+
+monster_a.effects = []
 
 # ----------------------------
 
 print("\n===== Effect Activation: Being Attacked =====")
 
 for effect in [ThornsEffect(1)]:
-    combat_manager.current_monster.effects = []
-    combat_manager.current_monster.apply_effect(effect)
+    monster_b.effects = [effect]
 
     combat_manager.effect_manager.execute_effect(
         AttackEffect(1),
         source=monster_a,
-        target=combat_manager.current_monster,
+        target=monster_b,
     )
+
+monster_b.effects = []
 
 # ----------------------------
 

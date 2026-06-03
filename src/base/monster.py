@@ -50,12 +50,3 @@ class Monster(Entity):
         self.control_type = control_type
         self.difficulty = difficulty
         self.suffix = suffix
-
-    def is_alive(self) -> bool:
-        """
-        Returns if the monster is alive or not.
-
-        :return: If the Monster is alive or not.
-        :rtype: bool
-        """
-        return self.hp > 0

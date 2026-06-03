@@ -7,6 +7,7 @@ ACTIONS = {
     "block": "BLOQUEADO",
     "drain": "DRENOU",
     "pierce": "PERFUROU",
+    "revive": "REVIVEU",
 }
 
 ATTRIBUTES = {
@@ -22,7 +23,6 @@ ATTRIBUTES = {
 COMBAT = {
     "death": "{name} morreu!",
     "draw": "É um empate!",
-    "miss": "{name} errou o alvo!",
     "round": "║ Rodada #{round:<5} ║",
     "team": color_string("Time #{index}: {team_name}", intensity="BRIGHT"),
     "turn": "Turno",
@@ -32,7 +32,7 @@ COMBAT = {
 DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",
-    "base_self": "{source} {action} a si mesmo.",
+    "base_self": "{source} se {action}.",
     # Part 2: Defensive messages
     "absorb": "{absorbed_damage} de dano foi {action}.",
     "block": "{blocked_damage} de dano foi {action}.",
@@ -70,12 +70,17 @@ EFFECT_DESCRIPTION = {
     "pierce": "Inflige {value} de dano. Ignora efeitos defensivos.",
     "poison": "Inflige {value} de dano em todo início de turno.",
     "regen": "Restaura {value} {hp} em todo início de turno.",
+    "revive": "Revive um alvo morto e o cura em {value_perc}% de seu HP máximo.",
     "sleep": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
     "stun": "Impede que o alvo aja.",
     "thorns": "Quando atacado diretamente, inflige {damage} de dano ao atacante.",
 }
 
 EFFECT_EXECUTION = {
+    # Effect keywords
+    "revive": "{source} {action} {target}. {target} foi curado em {value_perc}% de seu {hp} máximo.",
+    "revive_self": "{source} {action} a si mesmo e se curou em {value_perc}% de seu {hp} máximo.",
+    # Effect types
     "buff": "{source} fortaleceu {target} com {keyword} por {duration} turnos.",
     "buff_self": "{source} se fortaleceu com {keyword} por {duration} turnos.",
     "debuff": "{source} enfraqueceu {target} com {keyword} por {duration} turnos.",
@@ -90,15 +95,45 @@ EFFECT_EXECUTION = {
     "restoration_self": "{source} restaurou {value} de {attribute} de si mesmo através de {keyword}.",
 }
 
+EFFECT_EXECUTION_FAIL = {
+    # Effect keywords
+    "revive": "{source} tentou {keyword} {target}, mas",
+    "revive_self": "{source} tentou se {keyword}, mas",
+    # Effect types
+    "buff": "{source} tentou fortalecer {target} com {keyword}, mas",
+    "buff_self": "{source} tentou se fortalecer com {keyword}, mas",
+    "debuff": "{source} tentou enfraquecer {target} com {keyword}, mas",
+    "debuff_self": "{source} tentou se enfraquecer com {keyword}, mas",
+    "defensive": "{source} tentou proteger {target} com {keyword}, mas",
+    "defensive_self": "{source} tentou se proteger com {keyword}, mas",
+    "deterioration": "{source} tentou deteriorar {target} com {keyword}, mas",
+    "deterioration_self": "{source} tentou se deteriorar com {keyword}, mas",
+    "nothing": "Nada aconteceria, mas {source}",
+    "nothing_self": "Nada aconteceria, mas {source}",
+    "offensive": "{source} tentou {keyword} {target}, mas",
+    "offensive_self": "{source} tentou se {keyword}, mas",
+    "restoration": "{source} tentou restaurar {target} com {keyword}, mas",
+    "restoration_self": "{source} tentou se restaurar com {keyword}, mas",
+}
+
 EFFECT_REMOVAL = {
     "burn": "{target} teve sua {removed_keyword} apagada pelo efeito de {keyword}.",
     "freeze": "{target} teve seu {removed_keyword} derretido pelo efeito de {keyword}.",
     "sleep": "{target} acordou de seu {removed_keyword} pelo efeito de {keyword}.",
 }
 
+FAILS = {
+    "alive": "{target} estava vivo.",
+    "alive_self": "estava vivo.",
+    "dead": "{target} estava morto.",
+    "dead_self": "estava morto.",
+    "miss": "errou o alvo.",
+    "miss_self": "se errou.",
+}
+
 KEYWORDS = {
     "absorb": "ABSORÇÃO",
-    "attack": "ATAQUE",
+    "attack": "ATACAR",
     "bleed": "SANGRAMENTO",
     "blind": "CEGUEIRA",
     "block": "BLOQUEIO",
@@ -114,6 +149,7 @@ KEYWORDS = {
     "pierce": "PERFURAR",
     "poison": "ENVENENAMENTO",
     "regen": "REGENERAÇÃO",
+    "revive": "REVIVER",
     "sleep": "SONO",
     "stun": "ATORDOAMENTO",
     "thorns": "ESPINHOS",

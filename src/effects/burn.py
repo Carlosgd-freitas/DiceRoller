@@ -44,13 +44,19 @@ class BurnEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
+        fail = None
         removed_effects = []
 
-        freeze = target.remove_effect(Keyword.FREEZE)
-        if freeze:
-            removed_effects.append(freeze)
+        if target.is_alive():
+            freeze = target.remove_effect(Keyword.FREEZE)
+            if freeze:
+                removed_effects.append(freeze)
+
+        else:
+            fail = "dead"
 
         return {
+            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -59,13 +65,23 @@ class BurnEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = calculate_damage(
-            self,
-            source,
-            target,
-        )
+        damage_data = {}
+        fail = None
 
-        target.hp -= damage_data["damage"]
-        target.equalize_stats()
+        if target.is_alive():
+            damage_data = calculate_damage(
+                self,
+                source,
+                target,
+            )
 
-        return damage_data
+            target.hp -= damage_data["damage"]
+            target.equalize_stats()
+
+        else:
+            fail = "dead"
+
+        return {
+            **damage_data,
+            "fail": fail,
+        }

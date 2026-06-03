@@ -16,8 +16,8 @@ class RegenEffect(Effect):
     """
     Regen Effect.
 
-    Will increase the target's HP by the effect value at the start of each of the
-    target's turn.
+    If the target is alive, increases its HP by the effect value at the start of each
+    of the target's turn.
     """
 
     def __init__(
@@ -43,17 +43,28 @@ class RegenEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        if target.hp > 0:
+        fail = None
+
+        if target.is_alive():
             target.hp += self.value
-        target.equalize_stats()
+            target.equalize_stats()
+        else:
+            fail = "dead"
 
         return {
             "attribute": "hp",
+            "fail": fail,
         }

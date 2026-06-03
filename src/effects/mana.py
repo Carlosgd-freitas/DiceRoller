@@ -15,7 +15,7 @@ class ManaEffect(Effect):
     """
     Mana Effect.
 
-    Will increase the target's mana by the effect value.
+    If the target is alive, increases its mana by the effect value.
     """
 
     def __init__(
@@ -46,9 +46,14 @@ class ManaEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        if target.hp > 0:
+        fail = None
+
+        if target.is_alive():
             target.mana += self.value
+        else:
+            fail = "dead"
 
         return {
             "attribute": "mana",
+            "fail": fail,
         }
