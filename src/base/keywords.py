@@ -16,7 +16,9 @@ class Keyword(Enum):
     BURN = "BURN"
     CONFUSE = "CONFUSE"
     CURSE = "CURSE"
+    DOOM = "DOOM"
     DRAIN = "DRAIN"
+    EXECUTE = "EXECUTE"
     FREEZE = "FREEZE"
     HEAL = "HEAL"
     MANA = "MANA"
@@ -32,6 +34,7 @@ class Keyword(Enum):
 
 
 def get_keyword_color(keyword: Keyword) -> ColorParams:
+    background_color = None
     intensity = "BRIGHT"
 
     if keyword in [Keyword.ABSORB, Keyword.DRAIN, Keyword.REGEN]:
@@ -49,8 +52,12 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = Color.RED
     elif keyword in [Keyword.CONFUSE]:
         foreground_color = Color.HOT_PINK
-    elif keyword in [Keyword.CURSE]:
+    elif keyword in [Keyword.CURSE, Keyword.DOOM]:
         foreground_color = Color.VIOLET
+    elif keyword in [Keyword.EXECUTE]:
+        background_color = Color.GRAY
+        foreground_color = Color.BLACK
+        intensity = "BRIGHT"
     elif keyword in [Keyword.FREEZE]:
         foreground_color = Color.SKY_BLUE
     elif keyword in [Keyword.HEAL]:
@@ -70,6 +77,7 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = None
 
     return {
+        "background_color": background_color,
         "foreground_color": foreground_color,
         "intensity": intensity,
     }

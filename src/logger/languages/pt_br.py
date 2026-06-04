@@ -6,6 +6,7 @@ ACTIONS = {
     "attack": "ATACOU",
     "block": "BLOQUEADO",
     "drain": "DRENOU",
+    "execute": "EXECUTOU",
     "pierce": "PERFUROU",
     "revive": "REVIVEU",
 }
@@ -43,6 +44,7 @@ DAMAGE = {
 EFFECT_ACTIVATION = {
     "bleed": "{target} recebeu {damage} de dano de {keyword}.",
     "burn": "{target} recebeu {damage} de dano de {keyword}.",
+    "doom": "{target} encontrou seu fim pela {keyword}.",
     "freeze": "{target} não pôde agir porque estava {status}.",
     "poison": "{target} recebeu {damage} de dano de {keyword}.",
     "mana_regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
@@ -61,7 +63,9 @@ EFFECT_DESCRIPTION = {
     "burn": "Inflige {value} de dano em todo início de turno. Remove {FREEZE}.",
     "confuse": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
     "curse": "Inflige {value} de dano a si mesmo. Ignora efeitos defensivos.",
+    "doom": "Mata o alvo após {duration} turnos.",
     "drain": "Inflige {value} de dano. Qualquer dano infligido restaura {hp}.",
+    "execute": "Mata o alvo se seu {hp} for menor ou igul a {value_perc}% de seu {hp} máximo.",
     "freeze": "Impede que o alvo aja. Remove {BURN}.",
     "heal": "Restaura {value} {hp}.",
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
@@ -70,7 +74,7 @@ EFFECT_DESCRIPTION = {
     "pierce": "Inflige {value} de dano. Ignora efeitos defensivos.",
     "poison": "Inflige {value} de dano em todo início de turno.",
     "regen": "Restaura {value} {hp} em todo início de turno.",
-    "revive": "Revive um alvo morto e o cura em {value_perc}% de seu HP máximo.",
+    "revive": "Revive um alvo morto e o cura em {value_perc}% de seu {hp} máximo.",
     "sleep": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
     "stun": "Impede que o alvo aja.",
     "thorns": "Quando atacado diretamente, inflige {damage} de dano ao atacante.",
@@ -78,6 +82,8 @@ EFFECT_DESCRIPTION = {
 
 EFFECT_EXECUTION = {
     # Effect keywords
+    "execute": "{source} {action} {target}.",
+    "execute_self": "{source} se {action}.",
     "revive": "{source} {action} {target}. {target} foi curado em {value_perc}% de seu {hp} máximo.",
     "revive_self": "{source} {action} a si mesmo e se curou em {value_perc}% de seu {hp} máximo.",
     # Effect types
@@ -97,6 +103,8 @@ EFFECT_EXECUTION = {
 
 EFFECT_EXECUTION_FAIL = {
     # Effect keywords
+    "execute": "{source} tentou {keyword} {target}, mas",
+    "execute_self": "{source} tentou se {keyword}, mas",
     "revive": "{source} tentou {keyword} {target}, mas",
     "revive_self": "{source} tentou se {keyword}, mas",
     # Effect types
@@ -127,6 +135,8 @@ FAILS = {
     "alive_self": "estava vivo.",
     "dead": "{target} estava morto.",
     "dead_self": "estava morto.",
+    "default": "falhou.",
+    "default_self": "falhou.",
     "miss": "errou o alvo.",
     "miss_self": "se errou.",
 }
@@ -140,7 +150,9 @@ KEYWORDS = {
     "burn": "QUEIMADURA",
     "confuse": "CONFUSÃO",
     "curse": "MALDIÇÃO",
+    "doom": "CONDENAÇÃO",
     "drain": "DRENAR",
+    "execute": "EXECUTAR",
     "freeze": "CONGELAMENTO",
     "heal": "CURA",
     "mana_regen": "REGENERAÇÃO DE MANA",

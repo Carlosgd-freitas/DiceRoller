@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Dict
 
 from src.effects.block import BlockEffect
 from src.effects.curse import CurseEffect
+from src.effects.execute import ExecuteEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -36,5 +37,40 @@ def test_keyword_curse(managers: Dict):
         monster.local_id == "MONSTER_1",
         monster.hp == 0,
     ]
+
+    assert_conditions(conditions)
+
+
+def test_keyword_execute(managers: Dict):
+    effect_manager: EffectManager = managers["effect_manager"]
+    monster_0: Monster = managers["monsters"][0]
+    monster_4: Monster = managers["monsters"][4]
+
+    execute_effect = ExecuteEffect(0.5)
+
+    effect_manager.execute_effect(
+        execute_effect,
+        source=monster_0,
+        target=monster_4,
+    )
+
+    conditions = [
+        monster_4.local_id == "MONSTER_4",
+        monster_4.hp == 200,
+    ]
+
+    monster_4.hp = 100
+
+    effect_manager.execute_effect(
+        execute_effect,
+        source=monster_0,
+        target=monster_4,
+    )
+
+    conditions.extend(
+        [
+            monster_4.hp == 0,
+        ]
+    )
 
     assert_conditions(conditions)

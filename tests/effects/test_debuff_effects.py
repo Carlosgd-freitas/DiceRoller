@@ -12,6 +12,7 @@ from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
 from src.effects.burn import BurnEffect
 from src.effects.confuse import ConfuseEffect
+from src.effects.doom import DoomEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
 from src.effects.poison import PoisonEffect
@@ -259,6 +260,59 @@ def test_keyword_confuse(managers: Dict):
         [
             len(targets) == 1,
             targets[0].local_id == "MONSTER_3",
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_doom(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    effect_doom = DoomEffect(duration=3)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_doom,
+        source=combat_manager.order[1],
+        target=combat_manager.order[0],
+    )
+
+    conditions = [
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.DOOM).keyword == Keyword.DOOM,
+        combat_manager.order[0].get_effect(Keyword.DOOM).duration == 3,
+        combat_manager.order[0].is_alive(),
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.DOOM) is None,
+        combat_manager.order[1].is_alive(),
+    ]
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            combat_manager.order[0].get_effect(Keyword.DOOM).keyword == Keyword.DOOM,
+            combat_manager.order[0].get_effect(Keyword.DOOM).duration == 2,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            combat_manager.order[0].get_effect(Keyword.DOOM).keyword == Keyword.DOOM,
+            combat_manager.order[0].get_effect(Keyword.DOOM).duration == 1,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            combat_manager.order[0].get_effect(Keyword.DOOM) is None,
+            not combat_manager.order[0].is_alive(),
         ]
     )
 

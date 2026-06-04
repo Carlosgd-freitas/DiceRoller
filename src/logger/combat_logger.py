@@ -202,37 +202,19 @@ class CombatLogger(Logger):
         :type target: Monster
         """
         # Determining logging key
-        if effect.keyword in [Keyword.REVIVE]:
+        if effect.keyword in [Keyword.EXECUTE, Keyword.REVIVE]:
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()
 
         # Logging failed effect execution
         if kwargs.get("fail"):
-            kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
-            if (source) and (target) and (source == target):
-                key += "_self"
-
-            self.log(
-                category="EFFECT_EXECUTION_FAIL",
-                key=key,
-                end="",
+            return self.log_effect_execution_fail(
+                effect=effect,
+                source=source,
+                target=target,
                 **kwargs,
             )
-            self.log(message=" ", end="")
-
-            key = kwargs["fail"]
-            if (source) and (target) and (source == target):
-                key += "_self"
-
-            self.log(
-                category="FAILS",
-                key=key,
-                **kwargs,
-            )
-
-            return
 
         # Logging offensive type effect execution
         if key == "offensive":
@@ -253,6 +235,58 @@ class CombatLogger(Logger):
 
         self.log(
             category="EFFECT_EXECUTION",
+            key=key,
+            **kwargs,
+        )
+
+        return
+
+    def log_effect_execution_fail(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect execution fail.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Monster which executed the effect.
+        :type source: Monster
+
+        :param target: The Monster targeted by the effect execution.
+        :type target: Monster
+        """
+        # Determining logging key
+        if effect.keyword in [Keyword.EXECUTE, Keyword.REVIVE]:
+            key = effect.keyword.value.lower()
+        else:
+            key = effect.type.value.lower()
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        if (source) and (target) and (source == target):
+            key += "_self"
+
+        # Logging fail base message
+        self.log(
+            category="EFFECT_EXECUTION_FAIL",
+            key=key,
+            end="",
+            **kwargs,
+        )
+        self.log(message=" ", end="")
+
+        # Logging fail cause
+        key = kwargs["fail"]
+        if (source) and (target) and (source == target):
+            key += "_self"
+
+        self.log(
+            category="FAILS",
             key=key,
             **kwargs,
         )

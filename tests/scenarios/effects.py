@@ -13,7 +13,9 @@ from src.effects.block import BlockEffect
 from src.effects.burn import BurnEffect
 from src.effects.confuse import ConfuseEffect
 from src.effects.curse import CurseEffect
+from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
+from src.effects.execute import ExecuteEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
 from src.effects.mana import ManaEffect
@@ -41,6 +43,7 @@ all_effects = [
     BlindEffect(1),
     BurnEffect(1),
     ConfuseEffect(1),
+    DoomEffect(1),
     FreezeEffect(1),
     PoisonEffect(1),
     SleepEffect(1),
@@ -50,6 +53,7 @@ all_effects = [
     BlockEffect(1),
     # Deterioration
     CurseEffect(1),
+    ExecuteEffect(0.5),
     # Nothing
     NothingEffect(),
     # Offensive
@@ -66,7 +70,7 @@ all_effects = [
 
 monster_a = Monster(
     name="Monster",
-    hp=100,
+    hp=150,
     max_hp=200,
 )
 
@@ -77,7 +81,7 @@ team_a = Team(
 
 monster_b = Monster(
     name="Monster",
-    hp=100,
+    hp=150,
     max_hp=200,
 )
 
@@ -151,8 +155,8 @@ for effect in all_effects:
 
     monster_a.effects = []
 
-monster_a.hp = 100
-monster_b.hp = 100
+monster_a.hp = 150
+monster_b.hp = 150
 
 # ----------------------------
 
@@ -168,6 +172,20 @@ for effect in all_effects:
     )
 
 monster_a.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: EXECUTE =====")
+
+monster_b.hp = 100
+
+combat_manager.effect_manager.execute_effect(
+    effect=ExecuteEffect(0.5),
+    source=monster_a,
+    target=monster_b,
+)
+
+monster_b.hp = 150
 
 # ----------------------------
 
@@ -268,6 +286,20 @@ for effect in [
     combat_manager.current_monster.apply_effect(effect)
 
 combat_manager.start_turn()
+
+# ----------------------------
+
+print("\n===== Effect Activation: Turn End =====")
+
+combat_manager.current_monster.effects = []
+
+for effect in [
+    DoomEffect(),
+]:
+    combat_manager.current_monster.apply_effect(effect)
+    combat_manager.end_turn()
+
+    combat_manager.current_monster.hp = 150
 
 # ----------------------------
 

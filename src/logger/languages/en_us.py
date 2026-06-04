@@ -6,6 +6,7 @@ ACTIONS = {
     "attack": "ATTACKED",
     "block": "BLOCKED",
     "drain": "DRAINED",
+    "execute": "EXECUTED",
     "pierce": "PIERCED",
     "revive": "REVIVED",
 }
@@ -43,6 +44,7 @@ DAMAGE = {
 EFFECT_ACTIVATION = {
     "bleed": "{target} took {damage} damage from {keyword}.",
     "burn": "{target} took {damage} damage from {keyword}.",
+    "doom": "{target} met its {keyword}.",
     "freeze": "{target} could not act because it was {status}.",
     "poison": "{target} took {damage} damage from {keyword}.",
     "mana_regen": "{target} restored {value} {attribute} of itself through {keyword}.",
@@ -61,7 +63,9 @@ EFFECT_DESCRIPTION = {
     "burn": "Deals {value} damage every turn start. Removes {FREEZE}.",
     "confuse": "Makes the target use their dice and skills randomly.",
     "curse": "Deals {value} damage to self. Ignores defensive effects.",
+    "doom": "Kills the target after {duration} turns.",
     "drain": "Deals {value} damage. Any dealt damage restores {hp}.",
+    "execute": "Kills the target if its' {hp} is less than or equal to {value_perc}% of it's max {hp}.",
     "freeze": "Makes target unable to act. Removes {BURN}.",
     "heal": "Restores {value} {hp}.",
     "mana_regen": "Increases {mana} by {value} every turn start.",
@@ -70,7 +74,7 @@ EFFECT_DESCRIPTION = {
     "pierce": "Deals {value} damage. Ignores defensive effects.",
     "poison": "Deals {value} damage every turn start.",
     "regen": "Restores {value} {hp} every turn start.",
-    "revive": "Revives a dead target and heals it by {value_perc}% of it's max HP.",
+    "revive": "Revives a dead target and heals it by {value_perc}% of it's max {hp}.",
     "sleep": "Makes target unable to act. Any direct damage will wake up the target.",
     "stun": "Makes target unable to act.",
     "thorns": "When attacked directly, deals {damage} damage to the attacker.",
@@ -78,6 +82,8 @@ EFFECT_DESCRIPTION = {
 
 EFFECT_EXECUTION = {
     # Effect keywords
+    "execute": "{source} {action} {target}.",
+    "execute_self": "{source} {action} itself.",
     "revive": "{source} {action} {target}. {target} was healed by {value_perc}% of its max {hp}.",
     "revive_self": "{source} {action} itself and was healed by {value_perc}% of its max {hp}.",
     # Effect types
@@ -97,6 +103,8 @@ EFFECT_EXECUTION = {
 
 EFFECT_EXECUTION_FAIL = {
     # Effect keywords
+    "execute": "{source} tried to {keyword} {target}, but",
+    "execute_self": "{source} tried to {keyword} itself, but",
     "revive": "{source} tried to {keyword} {target}, but",
     "revive_self": "{source} tried to {keyword} itself, but",
     # Effect types
@@ -127,6 +135,8 @@ FAILS = {
     "alive_self": "it was alive.",
     "dead": "{target} was dead.",
     "dead_self": "it was dead.",
+    "default": "failed.",
+    "default_self": "failed.",
     "miss": "missed the target.",
     "miss_self": "missed itself.",
 }
@@ -140,7 +150,9 @@ KEYWORDS = {
     "burn": "BURN",
     "confuse": "CONFUSE",
     "curse": "CURSE",
+    "doom": "DOOM",
     "drain": "DRAIN",
+    "execute": "EXECUTE",
     "freeze": "FREEZE",
     "heal": "HEAL",
     "mana_regen": "MANA REGEN",
