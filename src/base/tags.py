@@ -1,4 +1,4 @@
-"""Tag module."""
+"""Tags module."""
 
 from enum import Enum
 

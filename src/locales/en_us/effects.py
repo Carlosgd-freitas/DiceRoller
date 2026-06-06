@@ -1,6 +1,3 @@
-from src.base.color import Color, color_string
-from src.base.keywords import Keyword, get_keyword_color
-
 ACTIONS = {
     "absorb": "ABSORBED",
     "attack": "ATTACKED",
@@ -11,23 +8,17 @@ ACTIONS = {
     "revive": "REVIVED",
 }
 
-ATTRIBUTES = {
-    "effects": "effects",
-    "hp": color_string("HP", foreground_color=Color.RED),
-    "mana": color_string(
-        "MANA",
-        foreground_color=get_keyword_color(Keyword.MANA)["foreground_color"],
-        intensity=get_keyword_color(Keyword.MANA)["intensity"],
-    ),
-}
-
-COMBAT = {
-    "death": "{name} died!",
-    "draw": "It's a draw!",
-    "round": "║ Round #{round:<6} ║",
-    "team": color_string("Team #{index}: {team_name}", intensity="BRIGHT"),
-    "turn": "Turn",
-    "winner": "\nTeam {team_name} is the winner!",
+ACTIVATION = {
+    "bleed": "{target} took {damage} damage from {keyword}.",
+    "burn": "{target} took {damage} damage from {keyword}.",
+    "doom": "{target} met its {keyword}.",
+    "freeze": "{target} could not act because it was {status}.",
+    "poison": "{target} took {damage} damage from {keyword}.",
+    "mana_regen": "{target} restored {value} {attribute} of itself through {keyword}.",
+    "regen": "{target} restored {value} {attribute} of itself through {keyword}.",
+    "sleep": "{target} could not act because it was {status}.",
+    "stun": "{target} could not act because it was {status}.",
+    "thorns": "{target} took {damage} damage from {keyword}.",
 }
 
 DAMAGE = {
@@ -41,20 +32,7 @@ DAMAGE = {
     "damage": "{damage} damage was done.",
 }
 
-EFFECT_ACTIVATION = {
-    "bleed": "{target} took {damage} damage from {keyword}.",
-    "burn": "{target} took {damage} damage from {keyword}.",
-    "doom": "{target} met its {keyword}.",
-    "freeze": "{target} could not act because it was {status}.",
-    "poison": "{target} took {damage} damage from {keyword}.",
-    "mana_regen": "{target} restored {value} {attribute} of itself through {keyword}.",
-    "regen": "{target} restored {value} {attribute} of itself through {keyword}.",
-    "sleep": "{target} could not act because it was {status}.",
-    "stun": "{target} could not act because it was {status}.",
-    "thorns": "{target} took {damage} damage from {keyword}.",
-}
-
-EFFECT_DESCRIPTION = {
+DESCRIPTION = {
     "absorb": "Reduces up to {value} recieved damage. Any blocked damage restores {hp}.",
     "attack": "Deals {value} damage.",
     "bleed": "Deals {value} damage every time the target rolls a dice.",
@@ -80,7 +58,7 @@ EFFECT_DESCRIPTION = {
     "thorns": "When attacked directly, deals {damage} damage to the attacker.",
 }
 
-EFFECT_EXECUTION = {
+EXECUTION = {
     # Effect keywords
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} {action} itself.",
@@ -101,7 +79,7 @@ EFFECT_EXECUTION = {
     "restoration_self": "{source} restored {value} {attribute} of itself through {keyword}.",
 }
 
-EFFECT_EXECUTION_FAIL = {
+EXECUTION_FAIL = {
     # Effect keywords
     "execute": "{source} tried to {keyword} {target}, but",
     "execute_self": "{source} tried to {keyword} itself, but",
@@ -122,12 +100,6 @@ EFFECT_EXECUTION_FAIL = {
     "offensive_self": "{source} tried to {keyword} itself, but",
     "restoration": "{source} tried to restore {target} with {keyword}, mas",
     "restoration_self": "{source} tried to restore itself with {keyword}, mas",
-}
-
-EFFECT_REMOVAL = {
-    "burn": "{target} had its {removed_keyword} put out by the effect of {keyword}.",
-    "freeze": "{target} thawed from its {removed_keyword} by the effect of {keyword}.",
-    "sleep": "{target} woke up from its {removed_keyword} by the effect of {keyword}.",
 }
 
 FAILS = {
@@ -167,10 +139,26 @@ KEYWORDS = {
     "thorns": "THORNS",
 }
 
+REMOVAL = {
+    "burn": "{target} had its {removed_keyword} put out by the effect of {keyword}.",
+    "freeze": "{target} thawed from its {removed_keyword} by the effect of {keyword}.",
+    "sleep": "{target} woke up from its {removed_keyword} by the effect of {keyword}.",
+}
+
 STATUS = {
     "blind": "BLIND",
     "confuse": "CONFUSED",
     "freeze": "FROZEN",
     "sleep": "ASLEEP",
     "stun": "STUNNED",
+}
+
+TYPES = {
+    "BUFF": "BUFF",
+    "DEBUFF": "DEBUFF",
+    "DEFENSIVE": "DEFENSIVE",
+    "DETERIORATION": "DETERIORATION",
+    "NOTHING": "NOTHING",
+    "OFFENSIVE": "OFFENSIVE",
+    "RESTORATION": "RESTORATION",
 }

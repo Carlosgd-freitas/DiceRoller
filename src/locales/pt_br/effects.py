@@ -1,6 +1,3 @@
-from src.base.color import Color, color_string
-from src.base.keywords import Keyword, get_keyword_color
-
 ACTIONS = {
     "absorb": "ABSORVIDO",
     "attack": "ATACOU",
@@ -11,23 +8,17 @@ ACTIONS = {
     "revive": "REVIVEU",
 }
 
-ATTRIBUTES = {
-    "effects": "efeitos",
-    "hp": color_string("HP", foreground_color=Color.RED),
-    "mana": color_string(
-        "MANA",
-        foreground_color=get_keyword_color(Keyword.MANA)["foreground_color"],
-        intensity=get_keyword_color(Keyword.MANA)["intensity"],
-    ),
-}
-
-COMBAT = {
-    "death": "{name} morreu!",
-    "draw": "É um empate!",
-    "round": "║ Rodada #{round:<5} ║",
-    "team": color_string("Time #{index}: {team_name}", intensity="BRIGHT"),
-    "turn": "Turno",
-    "winner": "\nO time {team_name} é o vencedor!",
+ACTIVATION = {
+    "bleed": "{target} recebeu {damage} de dano de {keyword}.",
+    "burn": "{target} recebeu {damage} de dano de {keyword}.",
+    "doom": "{target} encontrou seu fim pela {keyword}.",
+    "freeze": "{target} não pôde agir porque estava {status}.",
+    "poison": "{target} recebeu {damage} de dano de {keyword}.",
+    "mana_regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
+    "regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
+    "sleep": "{target} não pôde agir porque estava {status}.",
+    "stun": "{target} não pôde agir porque estava {status}.",
+    "thorns": "{target} recebeu {damage} de dano de {keyword}.",
 }
 
 DAMAGE = {
@@ -41,20 +32,7 @@ DAMAGE = {
     "damage": "{damage} de dano foi infligido.",
 }
 
-EFFECT_ACTIVATION = {
-    "bleed": "{target} recebeu {damage} de dano de {keyword}.",
-    "burn": "{target} recebeu {damage} de dano de {keyword}.",
-    "doom": "{target} encontrou seu fim pela {keyword}.",
-    "freeze": "{target} não pôde agir porque estava {status}.",
-    "poison": "{target} recebeu {damage} de dano de {keyword}.",
-    "mana_regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
-    "regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
-    "sleep": "{target} não pôde agir porque estava {status}.",
-    "stun": "{target} não pôde agir porque estava {status}.",
-    "thorns": "{target} recebeu {damage} de dano de {keyword}.",
-}
-
-EFFECT_DESCRIPTION = {
+DESCRIPTION = {
     "absorb": "Reduz até {value} de dano recebido. Qualquer dano bloqueado restaura {hp}.",
     "attack": "Inflige {value} de dano.",
     "bleed": "Inflige {value} de dano toda vez que o alvo rola um dado.",
@@ -80,7 +58,7 @@ EFFECT_DESCRIPTION = {
     "thorns": "Quando atacado diretamente, inflige {damage} de dano ao atacante.",
 }
 
-EFFECT_EXECUTION = {
+EXECUTION = {
     # Effect keywords
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} se {action}.",
@@ -101,7 +79,7 @@ EFFECT_EXECUTION = {
     "restoration_self": "{source} restaurou {value} de {attribute} de si mesmo através de {keyword}.",
 }
 
-EFFECT_EXECUTION_FAIL = {
+EXECUTION_FAIL = {
     # Effect keywords
     "execute": "{source} tentou {keyword} {target}, mas",
     "execute_self": "{source} tentou se {keyword}, mas",
@@ -122,12 +100,6 @@ EFFECT_EXECUTION_FAIL = {
     "offensive_self": "{source} tentou se {keyword}, mas",
     "restoration": "{source} tentou restaurar {target} com {keyword}, mas",
     "restoration_self": "{source} tentou se restaurar com {keyword}, mas",
-}
-
-EFFECT_REMOVAL = {
-    "burn": "{target} teve sua {removed_keyword} apagada pelo efeito de {keyword}.",
-    "freeze": "{target} teve seu {removed_keyword} derretido pelo efeito de {keyword}.",
-    "sleep": "{target} acordou de seu {removed_keyword} pelo efeito de {keyword}.",
 }
 
 FAILS = {
@@ -167,10 +139,26 @@ KEYWORDS = {
     "thorns": "ESPINHOS",
 }
 
+REMOVAL = {
+    "burn": "{target} teve sua {removed_keyword} apagada pelo efeito de {keyword}.",
+    "freeze": "{target} teve seu {removed_keyword} derretido pelo efeito de {keyword}.",
+    "sleep": "{target} acordou de seu {removed_keyword} pelo efeito de {keyword}.",
+}
+
 STATUS = {
     "blind": "CEGO",
     "confuse": "CONFUSO",
     "freeze": "CONGELADO",
     "sleep": "DORMINDO",
     "stun": "ATORDOADO",
+}
+
+TYPES = {
+    "BUFF": "FORTALECIMENTO",
+    "DEBUFF": "ENFRAQUECIMENTO",
+    "DEFENSIVE": "DEFENSIVO",
+    "DETERIORATION": "DETERIORAÇÃO",
+    "NOTHING": "NADA",
+    "OFFENSIVE": "OFFENSIVO",
+    "RESTORATION": "RESTAURAÇÃO",
 }

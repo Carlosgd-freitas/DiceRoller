@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING, List
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
 from src.base.triggers import Trigger
-from src.logger.combat_logger import CombatLogger
+from src.logger.effects import EffectLogger
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
     from src.base.side import Side
-    from src.logger.combat_logger import CombatLogger
+    from src.logger.effects import EffectLogger
 
 
 class EffectManager:
@@ -21,12 +21,12 @@ class EffectManager:
     Effect Manager class.
 
     :var logger: A combat logger to log messages for effect management.
-    :vartype logger: CombatLogger
+    :vartype logger: EffectLogger
     """
 
     def __init__(
         self,
-        logger: CombatLogger,
+        logger: EffectLogger,
     ):
         self.logger = logger
 

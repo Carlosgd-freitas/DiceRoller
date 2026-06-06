@@ -11,7 +11,9 @@ from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
 from src.combat.suffixes import SuffixManager
-from src.logger.combat_logger import CombatLogger
+from src.locales.languages import Language
+from src.logger.combat import CombatLogger
+from src.logger.effects import EffectLogger
 from src.targeting.selectors.manager import SelectorManager
 
 if TYPE_CHECKING:
@@ -72,8 +74,8 @@ class CombatManager:
     :var logging: If the combat will be logged. Default value is True.
     :vartype logging: bool
 
-    :var language: What language will be logged. Default value is "EN-US".
-    :vartype language: Literal["EN-US", "PT-BR"]
+    :var language: What language will be logged. Default value is Language.EN_US.
+    :vartype language: Language
     """
 
     def __init__(
@@ -81,7 +83,7 @@ class CombatManager:
         teams: List[Team] = None,
         order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
-        language: Literal["EN-US", "PT-BR"] = "EN-US",
+        language: Language = Language.EN_US,
     ):
         # Logger
         self.logger = CombatLogger(
@@ -90,7 +92,11 @@ class CombatManager:
         )
 
         # Effect Management
-        self.effect_manager = EffectManager(logger=self.logger)
+        effect_logger = EffectLogger(
+            enabled=logging,
+            language=language,
+        )
+        self.effect_manager = EffectManager(logger=effect_logger)
 
         # Team Management
         self.teams = [] if teams is None else teams
@@ -108,6 +114,13 @@ class CombatManager:
 
         # Target Selection Management
         self.selector_manager = SelectorManager()
+
+    def change_language(self, language: Language):
+        """
+        .
+        """
+        self.logger.change_language(language)
+        self.effect_manager.logger.change_language(language)
 
     def get_turn_order(self) -> List[Monster]:
         """
@@ -236,11 +249,12 @@ class CombatManager:
         combat_status = self.get_combat_status()
 
         if combat_status["status"] == "DRAW":
-            self.logger.log(category="COMBAT", key="draw")
+            self.logger.log(namespace="combat", message_group="COMBAT", key="draw")
 
         elif combat_status["status"] == "WINNER":
             self.logger.log(
-                category="COMBAT",
+                namespace="combat",
+                message_group="COMBAT",
                 key="winner",
                 team_name=combat_status["ALIVE"][0].name,
             )
@@ -302,7 +316,12 @@ class CombatManager:
                 team = self.get_team(member=monster)
                 team.status = team.get_status()
 
-                self.logger.log(category="COMBAT", key="death", name=monster.name)
+                self.logger.log(
+                    namespace="combat",
+                    message_group="COMBAT",
+                    key="death",
+                    name=monster.name,
+                )
 
                 # Cleaning monster effects
                 monster.effects = []
@@ -392,7 +411,7 @@ class CombatManager:
             effect = self.current_monster.get_effect(keyword)
 
             if effect:
-                self.logger.log_effect_activation(
+                self.effect_manager.logger.log_effect_activation(
                     effect=effect,
                     source=None,
                     target=self.current_monster,

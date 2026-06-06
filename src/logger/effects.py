@@ -1,23 +1,21 @@
-"""Logger module."""
+"""Effect Logger module."""
 
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict
 
-from src.base.color import color_string
-from src.base.keywords import Keyword, get_keyword_color
+from src.base.keywords import Keyword
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.monster import Monster
-    from src.combat.team import Team
 
 
-class CombatLogger(Logger):
+class EffectLogger(Logger):
     """
-    CombatLogger class.
+    EffectLogger class.
     """
 
     def __init__(
@@ -57,7 +55,8 @@ class CombatLogger(Logger):
             ("keyword", "KEYWORDS"),
         ]:
             kwargs[parameter] = self.get_colored_message(
-                category=category,
+                namespace="effects",
+                message_group=category,
                 keyword=effect.keyword,
             )
 
@@ -66,14 +65,16 @@ class CombatLogger(Logger):
             removed_effect: Effect = kwargs["removed_effect"]
 
             kwargs["removed_keyword"] = self.get_colored_message(
-                category="KEYWORDS",
+                namespace="effects",
+                message_group="KEYWORDS",
                 keyword=removed_effect.keyword,
             )
 
         # Specific attribute
         if kwargs.get("attribute"):
             kwargs["attribute"] = self.get_message(
-                category="ATTRIBUTES",
+                namespace="base",
+                message_group="ATTRIBUTES",
                 key=kwargs["attribute"],
             )
 
@@ -84,8 +85,12 @@ class CombatLogger(Logger):
                 "value": effect.value,
                 "value_perc": ceil(effect.value * 100),
                 # General attributes
-                "hp": self.get_message(category="ATTRIBUTES", key="hp"),
-                "mana": self.get_message(category="ATTRIBUTES", key="mana"),
+                "hp": self.get_message(
+                    namespace="base", message_group="ATTRIBUTES", key="hp"
+                ),
+                "mana": self.get_message(
+                    namespace="base", message_group="ATTRIBUTES", key="mana"
+                ),
             }
         )
 
@@ -111,17 +116,21 @@ class CombatLogger(Logger):
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(category="DAMAGE", key=key, end=" ", **kwargs)
+        self.log(
+            namespace="effects", message_group="DAMAGE", key=key, end=" ", **kwargs
+        )
 
         # Part 2: Defensive messages
         if kwargs.get("absorbed_damage"):
             defensive_action = self.get_colored_message(
-                category="ACTIONS",
+                namespace="effects",
+                message_group="ACTIONS",
                 keyword=Keyword.ABSORB,
             )
 
             self.log(
-                category="DAMAGE",
+                namespace="effects",
+                message_group="DAMAGE",
                 key="absorb",
                 end=" ",
                 absorbed_damage=kwargs["absorbed_damage"],
@@ -130,12 +139,14 @@ class CombatLogger(Logger):
 
         if kwargs.get("blocked_damage"):
             defensive_action = self.get_colored_message(
-                category="ACTIONS",
+                namespace="effects",
+                message_group="ACTIONS",
                 keyword=Keyword.BLOCK,
             )
 
             self.log(
-                category="DAMAGE",
+                namespace="effects",
+                message_group="DAMAGE",
                 key="block",
                 end=" ",
                 blocked_damage=kwargs["blocked_damage"],
@@ -144,7 +155,8 @@ class CombatLogger(Logger):
 
         # Part 3: Damage message
         self.log(
-            category="DAMAGE",
+            namespace="effects",
+            message_group="DAMAGE",
             key="damage",
             **kwargs,
         )
@@ -175,7 +187,8 @@ class CombatLogger(Logger):
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         self.log(
-            category="EFFECT_ACTIVATION",
+            namespace="effects",
+            message_group="ACTIVATION",
             key=key,
             **kwargs,
         )
@@ -234,7 +247,8 @@ class CombatLogger(Logger):
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         self.log(
-            category="EFFECT_EXECUTION",
+            namespace="effects",
+            message_group="EXECUTION",
             key=key,
             **kwargs,
         )
@@ -273,7 +287,8 @@ class CombatLogger(Logger):
 
         # Logging fail base message
         self.log(
-            category="EFFECT_EXECUTION_FAIL",
+            namespace="effects",
+            message_group="EXECUTION_FAIL",
             key=key,
             end="",
             **kwargs,
@@ -286,7 +301,8 @@ class CombatLogger(Logger):
             key += "_self"
 
         self.log(
-            category="FAILS",
+            namespace="effects",
+            message_group="FAILS",
             key=key,
             **kwargs,
         )
@@ -318,155 +334,10 @@ class CombatLogger(Logger):
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         self.log(
-            category="EFFECT_REMOVAL",
+            namespace="effects",
+            message_group="REMOVAL",
             key=key,
             **kwargs,
         )
 
         return
-
-    def log_round(self, round: int):
-        """
-        Logs the round start.
-
-        :param round: The round number.
-        :type round: int
-        """
-        self.log(message="\n╔═══════════════╗")
-        self.log(
-            category="COMBAT",
-            key="round",
-            round=round,
-        )
-        self.log(message="╚═══════════════╝")
-
-    def log_turn_start(self, monster: Monster):
-        """
-        Logs a Monster's turn start in combat.
-
-        :param monster: A monster.
-        :type monster: Monster
-        """
-        turn = self.get_message(
-            category="COMBAT",
-            key="turn",
-        )
-
-        message = color_string(f"\n> {turn}: ", intensity="BRIGHT")
-        message += color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
-        if monster.suffix:
-            message += color_string(
-                f" {monster.suffix}", intensity="BRIGHT", underlined=True
-            )
-
-        self.log(message=message)
-        self.log(message="")
-
-    def log_monster(
-        self,
-        monster: Monster,
-        effect_limit: int = 6,
-    ):
-        """
-        Logs a Monster in combat.
-
-        :param monster: A monster.
-        :type monster: Monster
-
-        :param effect_limit: The limit of effects that will be logged. Default value
-        is 6.
-        :type effect_limit: int
-        """
-        # Name
-        self.log(message=f"> {monster.name}", end="")
-
-        # Suffix
-        if monster.suffix:
-            self.log(message=f" {monster.suffix}", end="")
-
-        self.log(message=" - ", end="")
-
-        # HP
-        self.log(
-            message=self.get_message(
-                category="ATTRIBUTES",
-                key="hp",
-            ),
-            end="",
-        )
-        self.log(message=f": {monster.hp}/{monster.max_hp}", end="")
-
-        # Mana
-        if monster.mana > 0:
-            self.log(message=" - ", end="")
-            self.log(
-                message=self.get_colored_message(
-                    category="KEYWORDS",
-                    keyword=Keyword.MANA,
-                ),
-                end="",
-            )
-            self.log(message=f": {monster.mana}", end="")
-
-        # Effects
-        for idx, effect in enumerate(monster.effects):
-            if idx == 0:
-                self.log(message=" [ ", end="")
-            else:
-                self.log(message=" - ", end="")
-
-            if idx < effect_limit:
-                color_data = get_keyword_color(effect.keyword)
-
-                effect_keyword = self.get_message(
-                    category="KEYWORDS", key=effect.keyword.value.lower()
-                )
-                effect_keyword = color_string(
-                    effect_keyword,
-                    foreground_color=color_data["foreground_color"],
-                    intensity=color_data["intensity"],
-                )
-
-                self.log(message=effect_keyword, end="")
-
-                self.log(message=f" {effect.value}", end="")
-
-            else:
-                effects_remaining = len(monster.effects) - effect_limit
-
-                message = self.get_message(
-                    category="ATTRIBUTES",
-                    key="effects",
-                ).capitalize()
-
-                message = color_string(
-                    f"+{effects_remaining} {message}...",
-                    intensity="BRIGHT",
-                )
-                self.log(message=message, end="")
-
-                self.log(message=" ]", end="")
-                break
-
-            if idx == len(monster.effects) - 1:
-                self.log(message=" ]", end="")
-
-        self.log("")
-
-    def log_teams(self, teams: List[Team]):
-        """
-        Logs teams of monsters in combat. Only alive monsters will be logged.
-
-        :param teams: Teams of monsters.
-        :type teams: List[Team]
-        """
-        for team_index, team in enumerate(teams):
-            self.log(
-                category="COMBAT", key="team", index=team_index + 1, team_name=team.name
-            )
-
-            for monster in team.members:
-                if monster.is_alive():
-                    self.log_monster(monster)
-
-            self.log(message="")

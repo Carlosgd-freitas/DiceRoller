@@ -10,6 +10,7 @@ from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.drain import DrainEffect
 from src.effects.pierce import PierceEffect
+from src.locales.languages import Language
 
 init()
 
@@ -71,7 +72,7 @@ combat_manager = CombatManager(
         team_b,
     ],
     order_strategy="SET",
-    language="EN-US",
+    language=Language.EN_US,
 )
 
 # ----------------------------

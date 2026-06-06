@@ -28,6 +28,7 @@ from src.effects.revive import ReviveEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
+from src.locales.languages import Language
 
 init()
 
@@ -98,7 +99,7 @@ combat_manager = CombatManager(
         team_b,
     ],
     order_strategy="SET",
-    language="EN-US",
+    language=Language.EN_US,
 )
 
 combat_manager.start_combat()
