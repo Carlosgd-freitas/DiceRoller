@@ -65,7 +65,7 @@ DESCRIPTION = {
     "revive": "Revives a dead target and heals it by {value_perc}% of it's max {hp}.",
     "sleep": "Makes target unable to act. Any direct damage will wake up the target.",
     "stun": "Makes target unable to act.",
-    "thorns": "When attacked directly, deals {damage} damage to the attacker.",
+    "thorns": "When attacked directly, deals {value} damage to the attacker.",
 }
 
 EXECUTION = {

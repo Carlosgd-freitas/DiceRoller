@@ -21,8 +21,11 @@ COMPENDIUM = {
 }
 
 WORDS = {
+    "accuracy": "accuracy",
     "area": "area",
     "areas": "areas",
+    "decay": "decay",
+    "duration": "duration",
     "item": "item",
     "items": "items",
     "effect": "effect",
@@ -31,4 +34,5 @@ WORDS = {
     "skills": "skills",
     "monster": "monster",
     "monsters": "monsters",
+    "value": "value",
 }

@@ -200,17 +200,15 @@ class Compendium(ABC):
         """
         Shows the current page.
         """
-        self.logger.log(message="\n╔═══════════════════════════════════════════╗")
-        self.logger.log(message="║ ", end="")
-
         message = self.logger.get_message(
             namespace="base", message_group="COMPENDIUM", key="page"
         )
         message = self.title + ": " + message + " " + str(self.page_number)
 
-        self.logger.log(message=f"{message:41}", end="")
-        self.logger.log(message=" ║\n", end="")
-        self.logger.log(message="╚═══════════════════════════════════════════╝\n")
+        self.logger.box_message(
+            message=message,
+            size=50,
+        )
 
         page_items = self.get_page_items()
         page_data = self.get_page_data(page_items)

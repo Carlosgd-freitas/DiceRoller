@@ -45,29 +45,29 @@ class EffectCompendium(Compendium):
         language: Language = Language.EN_US,
     ):
         items = [
-            AbsorbEffect(1),
-            AttackEffect(1),
-            BleedEffect(1),
-            BlindEffect(1),
-            BlockEffect(1),
-            BurnEffect(1),
-            ConfuseEffect(1),
-            CurseEffect(1),
-            DoomEffect(1),
-            DrainEffect(1),
-            ExecuteEffect(1),
-            FreezeEffect(1),
-            HealEffect(1),
-            ManaEffect(1),
-            ManaRegenEffect(1),
-            NothingEffect(1),
-            PierceEffect(1),
-            PoisonEffect(1),
-            RegenEffect(1),
-            ReviveEffect(1),
-            SleepEffect(1),
-            StunEffect(1),
-            ThornsEffect(1),
+            AbsorbEffect(),
+            AttackEffect(),
+            BleedEffect(),
+            BlindEffect(),
+            BlockEffect(),
+            BurnEffect(),
+            ConfuseEffect(),
+            CurseEffect(),
+            DoomEffect(),
+            DrainEffect(),
+            ExecuteEffect(),
+            FreezeEffect(),
+            HealEffect(),
+            ManaEffect(),
+            ManaRegenEffect(),
+            NothingEffect(),
+            PierceEffect(),
+            PoisonEffect(),
+            RegenEffect(),
+            ReviveEffect(),
+            SleepEffect(),
+            StunEffect(),
+            ThornsEffect(),
         ]
 
         logger = EffectLogger(language=language)
@@ -160,9 +160,6 @@ class EffectCompendium(Compendium):
         """
         item: Effect = self.items[self.item_number - 1]
 
-        self.logger.log(message="\n╔═══════════════════════════════════════════╗")
-        self.logger.log(message="║ ", end="")
-
         message = self.logger.get_message(
             namespace="effects",
             message_group="KEYWORDS",
@@ -170,9 +167,10 @@ class EffectCompendium(Compendium):
         )
         message = self.title + ": " + message
 
-        self.logger.log(message=f"{message:40}", end="")
-        self.logger.log(message=" ║\n", end="")
-        self.logger.log(message="╚═══════════════════════════════════════════╝\n")
+        self.logger.box_message(
+            message=message,
+            size=50,
+        )
 
         # Keyword
         message = self.logger.get_colored_message(
@@ -185,5 +183,6 @@ class EffectCompendium(Compendium):
         # Description
         self.logger.log_effect_description(
             effect=item,
+            params="name",
         )
         self.logger.log(message="")

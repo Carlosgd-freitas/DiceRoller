@@ -229,4 +229,59 @@ class Logger:
                 **kwargs,
             )
 
-        return input("> " + message + ": ")
+        if message:
+            message = "> " + message + ": "
+        else:
+            message = "> "
+
+        return input(message)
+
+    def box_message(
+        self,
+        message: str,
+        size: int,
+        alignment: Literal["left", "center", "right"] = "center",
+        isolate: bool = True,
+    ) -> None:
+        """
+        Logs a message inside a box.
+
+        :param message: A message.
+        :type message: str
+
+        :param size: The box size.
+        :type size: int
+
+        :param alignment: The message alignment. Default value is "left".
+        :type alignment: Literal["left", "center", "right"
+
+        :param isolate: If empty lines will be logged before and after the boxed
+        message. Default value is True.
+        :type isolate: bool
+        """
+        if not self.enabled:
+            return
+
+        if alignment == "left":
+            alignment = "<"
+        elif alignment == "center":
+            alignment = "^"
+        elif alignment == "right":
+            alignment = ">"
+
+        center_size = size - 2
+        message_size = size - 4
+
+        if isolate:
+            self.log(message="")
+
+        self.log(message="╔" + ("═" * center_size) + "╗")
+        self.log(message="║ ", end="")
+        self.log(message=f"{message:{alignment}{message_size}}", end="")
+        self.log(message=" ║\n", end="")
+        self.log(message="╚" + ("═" * center_size) + "╝")
+
+        if isolate:
+            self.log(message="")
+
+        return

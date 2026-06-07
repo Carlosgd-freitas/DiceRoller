@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, Literal
 
+from src.base.color import Color, color_string
 from src.base.keywords import Keyword
 from src.logger.logger import Logger
 
@@ -353,6 +354,7 @@ class EffectLogger(Logger):
     def log_effect_description(
         self,
         effect: Effect,
+        params: Literal["name", "value"] = "value",
         **kwargs,
     ) -> None:
         """
@@ -360,9 +362,32 @@ class EffectLogger(Logger):
 
         :param effect: An Effect.
         :type effect: Effect
+
+        :param params: If equal to "value", the effect's parameters values will be used to log.
+        If equal to "name", their names inside a <> will be used instead. Default value is "value".
+        :type params: Literal["name", "value"]
         """
-        key = effect.keyword.value.lower()
         kwargs = self._update_log_parameters(effect, **kwargs)
+
+        if params == "name":
+            for word, key in [
+                ("accuracy", "accuracy"),
+                ("decay", "decay"),
+                ("duration", "duration"),
+                ("value", "value"),
+                ("value", "value_perc"),
+            ]:
+                translated_word = self.get_message(
+                    namespace="base", message_group="WORDS", key=word
+                )
+
+                kwargs[key] = color_string(
+                    f"<{translated_word.upper()}>",
+                    foreground_color=Color.WHITE,
+                    intensity="BRIGHT",
+                )
+
+        key = effect.keyword.value.lower()
 
         self.log(
             namespace="effects",

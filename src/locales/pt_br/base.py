@@ -22,8 +22,11 @@ COMPENDIUM = {
 }
 
 WORDS = {
+    "accuracy": "precisão",
     "area": "área",
     "areas": "áreas",
+    "decay": "decaimento",
+    "duration": "duração",
     "item": "item",
     "items": "itens",
     "effect": "efeito",
@@ -32,4 +35,5 @@ WORDS = {
     "skills": "habilidades",
     "monster": "monstro",
     "monsters": "monstros",
+    "value": "valor",
 }
