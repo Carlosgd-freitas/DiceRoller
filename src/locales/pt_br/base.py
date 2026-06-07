@@ -1,3 +1,5 @@
+"""PT-BR base localization module."""
+
 from src.base.color import Color, color_string
 from src.base.keywords import Keyword, get_keyword_color
 
@@ -8,6 +10,15 @@ ATTRIBUTES = {
         foreground_color=get_keyword_color(Keyword.MANA)["foreground_color"],
         intensity=get_keyword_color(Keyword.MANA)["intensity"],
     ),
+}
+
+COMPENDIUM = {
+    "exit": "Sair",
+    "next_page": "Próxima Página",
+    "page": "Página",
+    "previous_page": "Página Anterior",
+    "return_to_pages": "Retornar",
+    "select_option": "Selecione uma opção",
 }
 
 WORDS = {

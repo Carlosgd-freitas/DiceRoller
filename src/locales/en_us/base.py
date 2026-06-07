@@ -1,3 +1,5 @@
+"""EN-US base localization module."""
+
 from src.base.color import Color, color_string
 from src.base.keywords import Keyword, get_keyword_color
 
@@ -7,6 +9,15 @@ ATTRIBUTES = {
         "MANA",
         **get_keyword_color(Keyword.MANA),
     ),
+}
+
+COMPENDIUM = {
+    "exit": "Exit",
+    "next_page": "Next Page",
+    "page": "Page",
+    "previous_page": "Previous Page",
+    "return_to_pages": "Return",
+    "select_option": "Select an option",
 }
 
 WORDS = {

@@ -1,3 +1,5 @@
+"""PT-BR localization for effects module."""
+
 ACTIONS = {
     "absorb": "ABSORVIDO",
     "attack": "ATACOU",
@@ -21,6 +23,14 @@ ACTIVATION = {
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
 }
 
+COMPENDIUM = {
+    "title": "Compêndio de Efeitos",
+    "next_item": "Próximo Efeito",
+    "previous_item": "Efeito Anterior",
+    "select_item": "Selecione um efeito (ou [0] para cancelar)",
+    "show_item_details": "Mostrar Detalhes do Efeito",
+}
+
 DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",
@@ -38,13 +48,13 @@ DESCRIPTION = {
     "bleed": "Inflige {value} de dano toda vez que o alvo rola um dado.",
     "blind": "Aumenta a chance de erro dos dados e habilidades do alvo em {value_perc}%.",
     "block": "Reduz até {value} de dano recebido.",
-    "burn": "Inflige {value} de dano em todo início de turno. Remove {FREEZE}.",
+    "burn": "Inflige {value} de dano em todo início de turno. Remove {freeze}.",
     "confuse": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
     "curse": "Inflige {value} de dano a si mesmo. Ignora efeitos defensivos.",
     "doom": "Mata o alvo após {duration} turnos.",
     "drain": "Inflige {value} de dano. Qualquer dano infligido restaura {hp}.",
     "execute": "Mata o alvo se seu {hp} for menor ou igul a {value_perc}% de seu {hp} máximo.",
-    "freeze": "Impede que o alvo aja. Remove {BURN}.",
+    "freeze": "Impede que o alvo aja. Remove {burn}.",
     "heal": "Restaura {value} {hp}.",
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
     "mana": "Aumenta {mana} em {value}.",
@@ -154,11 +164,11 @@ STATUS = {
 }
 
 TYPES = {
-    "BUFF": "FORTALECIMENTO",
-    "DEBUFF": "ENFRAQUECIMENTO",
-    "DEFENSIVE": "DEFENSIVO",
-    "DETERIORATION": "DETERIORAÇÃO",
-    "NOTHING": "NADA",
-    "OFFENSIVE": "OFFENSIVO",
-    "RESTORATION": "RESTAURAÇÃO",
+    "buff": "FORTALECIMENTO",
+    "debuff": "ENFRAQUECIMENTO",
+    "defensive": "DEFENSIVO",
+    "deterioration": "DETERIORAÇÃO",
+    "nothing": "NADA",
+    "offensive": "OFFENSIVO",
+    "restoration": "RESTAURAÇÃO",
 }

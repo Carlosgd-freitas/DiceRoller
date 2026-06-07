@@ -1,3 +1,5 @@
+"""EN-US localization for effects module."""
+
 ACTIONS = {
     "absorb": "ABSORBED",
     "attack": "ATTACKED",
@@ -32,19 +34,27 @@ DAMAGE = {
     "damage": "{damage} damage was done.",
 }
 
+COMPENDIUM = {
+    "title": "Effect Compendium",
+    "next_item": "Next Effect",
+    "previous_item": "Previous Effect",
+    "select_item": "Select an effect (or [0] to cancel)",
+    "show_item_details": "See Effect Details",
+}
+
 DESCRIPTION = {
     "absorb": "Reduces up to {value} recieved damage. Any blocked damage restores {hp}.",
     "attack": "Deals {value} damage.",
     "bleed": "Deals {value} damage every time the target rolls a dice.",
     "blind": "Increases the miss chance of target dice and skills by {value_perc}%.",
     "block": "Reduces up to {value} recieved damage.",
-    "burn": "Deals {value} damage every turn start. Removes {FREEZE}.",
+    "burn": "Deals {value} damage every turn start. Removes {freeze}.",
     "confuse": "Makes the target use their dice and skills randomly.",
     "curse": "Deals {value} damage to self. Ignores defensive effects.",
     "doom": "Kills the target after {duration} turns.",
     "drain": "Deals {value} damage. Any dealt damage restores {hp}.",
     "execute": "Kills the target if its' {hp} is less than or equal to {value_perc}% of it's max {hp}.",
-    "freeze": "Makes target unable to act. Removes {BURN}.",
+    "freeze": "Makes target unable to act. Removes {burn}.",
     "heal": "Restores {value} {hp}.",
     "mana_regen": "Increases {mana} by {value} every turn start.",
     "mana": "Increases {mana} by {value}.",
@@ -154,11 +164,11 @@ STATUS = {
 }
 
 TYPES = {
-    "BUFF": "BUFF",
-    "DEBUFF": "DEBUFF",
-    "DEFENSIVE": "DEFENSIVE",
-    "DETERIORATION": "DETERIORATION",
-    "NOTHING": "NOTHING",
-    "OFFENSIVE": "OFFENSIVE",
-    "RESTORATION": "RESTORATION",
+    "buff": "BUFF",
+    "debuff": "DEBUFF",
+    "defensive": "DEFENSIVE",
+    "deterioration": "DETERIORATION",
+    "nothing": "NOTHING",
+    "offensive": "OFFENSIVE",
+    "restoration": "RESTORATION",
 }

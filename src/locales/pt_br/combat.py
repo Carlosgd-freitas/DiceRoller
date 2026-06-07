@@ -1,3 +1,5 @@
+"""PT-BR localization for combat module."""
+
 from src.base.color import color_string
 
 COMBAT = {

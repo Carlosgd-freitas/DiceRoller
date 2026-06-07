@@ -48,7 +48,15 @@ class EffectLogger(Logger):
             if target.suffix:
                 kwargs["target"] += " " + target.suffix
 
-        # Keyword variations
+        # Keywords
+        for keyword in Keyword:
+            kwargs[keyword.name.lower()] = self.get_colored_message(
+                namespace="effects",
+                message_group="KEYWORDS",
+                keyword=keyword,
+            )
+
+        # Effect keyword variations
         for parameter, category in [
             ("action", "ACTIONS"),
             ("status", "STATUS"),
@@ -336,6 +344,29 @@ class EffectLogger(Logger):
         self.log(
             namespace="effects",
             message_group="REMOVAL",
+            key=key,
+            **kwargs,
+        )
+
+        return
+
+    def log_effect_description(
+        self,
+        effect: Effect,
+        **kwargs,
+    ) -> None:
+        """
+        Logs an effect description.
+
+        :param effect: An Effect.
+        :type effect: Effect
+        """
+        key = effect.keyword.value.lower()
+        kwargs = self._update_log_parameters(effect, **kwargs)
+
+        self.log(
+            namespace="effects",
+            message_group="DESCRIPTION",
             key=key,
             **kwargs,
         )

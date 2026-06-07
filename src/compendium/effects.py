@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
-from src.base.color import color_string
-from src.base.keywords import get_keyword_color
-from src.compendium.compendium import Compenidum, CompenidumOptionsMessages
+from src.compendium.compendium import Compendium, CompendiumOptionsMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
@@ -37,7 +35,7 @@ if TYPE_CHECKING:
     from src.base.effect import Effect
 
 
-class EffectCompenidum(Compenidum):
+class EffectCompendium(Compendium):
     """
     Effect Compendium class.
     """
@@ -72,51 +70,109 @@ class EffectCompenidum(Compenidum):
             ThornsEffect(1),
         ]
 
+        logger = EffectLogger(language=language)
+
+        title = logger.get_message(
+            namespace="effects", message_group="COMPENDIUM", key="title"
+        )
+
         super().__init__(
+            logger=logger,
+            title=title,
             items=items,
             page_headers=["#", "Name", "Type"],
             page_colalign=("right", "left", "left"),
-            logger=EffectLogger(language=language),
         )
 
-    def get_page_data(self, page_items: List[Effect]) -> List[List[Effect]]:
+    def sort(self):
         """."""
+        self.items.sort(key=lambda x: x.keyword.name)
+
+    def get_page_data(self, page_items: List) -> List[List]:
+        """
+        Returns tabulated data that will be used with `tabulate` package.
+
+        :var page_items: A Compendium page's items.
+        :vartype page_items: List
+
+        :return: A Compendium page's items structured as tabulated data.
+        :rtype: List[List]
+        """
         page_data = []
 
         for idx, item in enumerate(page_items):
-            keyword_color = get_keyword_color(item.keyword)
-            keyword = color_string(item.keyword.value, **keyword_color)
+            effect_keyword = self.logger.get_colored_message(
+                namespace="effects",
+                message_group="KEYWORDS",
+                keyword=item.keyword,
+            )
+
+            effect_type = self.logger.get_message(
+                namespace="effects", message_group="TYPES", key=item.type.value.lower()
+            )
 
             page_data.append(
                 [
                     f"[{idx+1}]",
-                    keyword,
-                    item.type.value.capitalize(),
+                    effect_keyword,
+                    effect_type,
                 ]
             )
 
         return page_data
 
-    def get_options_messages(self) -> CompenidumOptionsMessages:
-        """."""
-        return {
-            "exit": "Exit",
-            "next_item": "Next Effect",
-            "next_page": "Next Page",
-            "previous_item": "Previous Effectt",
-            "previous_page": "Previous Page",
-            "return_to_pages": "Return",
-            "show_item_details": "See Effect Details",
-        }
+    def get_options_messages(self) -> CompendiumOptionsMessages:
+        """
+        Return the messages that will be used on the Compendium's options.
+        """
+        options_messages = {}
+
+        for option in [
+            "exit",
+            "next_page",
+            "previous_page",
+            "return_to_pages",
+            "select_option",
+        ]:
+            options_messages[option] = self.logger.get_message(
+                namespace="base",
+                message_group="COMPENDIUM",
+                key=option,
+            )
+
+        for option in [
+            "next_item",
+            "previous_item",
+            "select_item",
+            "show_item_details",
+        ]:
+            options_messages[option] = self.logger.get_message(
+                namespace="effects",
+                message_group="COMPENDIUM",
+                key=option,
+            )
+
+        return options_messages
 
     def show_item(self):
-        """."""
+        """
+        Shows the current item.
+        """
         item: Effect = self.items[self.item_number - 1]
 
-        self.logger.log(message="\n╔══════════════════════════════════╗")
-        self.logger.log(message="║ Effect Compendium:               ║")
-        self.logger.log(message="║ Compêndio de Efeitos:            ║")
-        self.logger.log(message="╚══════════════════════════════════╝\n")
+        self.logger.log(message="\n╔═══════════════════════════════════════════╗")
+        self.logger.log(message="║ ", end="")
+
+        message = self.logger.get_message(
+            namespace="effects",
+            message_group="KEYWORDS",
+            key=item.keyword.value.lower(),
+        )
+        message = self.title + ": " + message
+
+        self.logger.log(message=f"{message:40}", end="")
+        self.logger.log(message=" ║\n", end="")
+        self.logger.log(message="╚═══════════════════════════════════════════╝\n")
 
         # Keyword
         message = self.logger.get_colored_message(
@@ -127,9 +183,7 @@ class EffectCompenidum(Compenidum):
         self.logger.log(message=message + "\n")
 
         # Description
-        self.logger.log(
-            namespace="effects",
-            message_group="DESCRIPTION",
-            key=item.keyword.name.lower(),
+        self.logger.log_effect_description(
+            effect=item,
         )
         self.logger.log(message="")
