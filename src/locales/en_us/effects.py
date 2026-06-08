@@ -23,6 +23,15 @@ ACTIVATION = {
     "thorns": "{target} took {damage} damage from {keyword}.",
 }
 
+COMPENDIUM = {
+    "item_not_found": "Effect was not found.",
+    "next_item": "Next Effect",
+    "previous_item": "Previous Effect",
+    "search_prompt": "Type an effect's name",
+    "select_item_prompt": "Select an effect (or [0] to cancel)",
+    "title": "Effect Compendium",
+}
+
 DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",
@@ -32,14 +41,6 @@ DAMAGE = {
     "block": "{blocked_damage} damage was {action}.",
     # Part 3: Damage message
     "damage": "{damage} damage was done.",
-}
-
-COMPENDIUM = {
-    "title": "Effect Compendium",
-    "next_item": "Next Effect",
-    "previous_item": "Previous Effect",
-    "select_item": "Select an effect (or [0] to cancel)",
-    "show_item_details": "See Effect Details",
 }
 
 DESCRIPTION = {

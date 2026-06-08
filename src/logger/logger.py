@@ -231,8 +231,6 @@ class Logger:
 
         if message:
             message = "> " + message + ": "
-        else:
-            message = "> "
 
         return input(message)
 

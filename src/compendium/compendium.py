@@ -21,6 +21,9 @@ class CompendiumOptionsMessages(TypedDict):
     :var exit: Message for the 'Exit' option.
     :vartype exit: str
 
+    :var item_not_found: 'Item not found' message.
+    :vartype item_not_found: str
+
     :var next_item: Message for the 'Next Item' option.
     :vartype next_item: str
 
@@ -36,25 +39,34 @@ class CompendiumOptionsMessages(TypedDict):
     :var return_to_pages: Message for the 'Return' option.
     :vartype return_to_pages: str
 
-    :var select_item: Message for the 'Select Item' input prompt.
-    :vartype select_item: str
+    :var search: Message for the 'Search' option.
+    :vartype search: str
 
-    :var select_option: Message for the 'Select Option' input prompt.
-    :vartype select_option: str
+    :var search_prompt: Message for the 'Search' input prompt.
+    :vartype search_prompt: str
 
-    :var show_item_details: Message for the 'Show Item Details' option.
-    :vartype show_item_details: str
+    :var select_item_prompt: Message for the 'Select Item' input prompt.
+    :vartype select_item_prompt: str
+
+    :var select_option_prompt: Message for the 'Select Option' input prompt.
+    :vartype select_option_prompt: str
+
+    :var show_details: Message for the 'Show Details' option.
+    :vartype show_details: str
     """
 
     exit: str
+    item_not_found: str
     next_item: str
     next_page: str
     previous_item: str
     previous_page: str
     return_to_pages: str
-    select_item: str
-    select_option: str
-    show_item_details: str
+    search: str
+    search_prompt: str
+    select_item_prompt: str
+    select_option_prompt: str
+    show_details: str
 
 
 class Compendium(ABC):
@@ -98,7 +110,6 @@ class Compendium(ABC):
         self.logger = logger
         self.title = title
         self.items = items
-        self.options_messages = self.get_options_messages()
 
         self.page_number = page_number
         self.page_size = page_size
@@ -111,14 +122,41 @@ class Compendium(ABC):
         self.page_colalign = page_colalign
 
         # Setup
-        self.sort()
+        self.level: Literal["ITEM", "PAGE"] = "PAGE"
+        self.options_messages = self.get_base_options_messages()
 
     @abstractmethod
-    def sort(self):
+    def _search(self, name: str) -> int | None:
         """
-        .
+        Searches an item by its name and returns its number if found.
+
+        :var name: The item's name.
+        :vartype name: str
+
+        :return: The found item's number.
+        :rtype: int
         """
         raise NotImplementedError
+
+    def search_item(self):
+        """
+        Prompts the user to type an item's name, and if the item is:
+        * found, switches the Compedium's level to "ITEM" and updates the current item
+        number
+        * not found, logs a message
+        """
+        name = self.logger.input(message=self.options_messages["search_prompt"])
+        item_number = self._search(name)
+
+        if item_number:
+            self.level = "ITEM"
+            self.item_number = item_number
+
+        else:
+            self.logger.log(message=self.options_messages["item_not_found"], end="")
+            self.logger.input(message="")
+
+        return
 
     def get_page_items(self):
         """
@@ -143,6 +181,29 @@ class Compendium(ABC):
         """
         raise NotImplementedError
 
+    def get_base_options_messages(self) -> CompendiumOptionsMessages:
+        """
+        Return base messages that will be used on the Compendium's options and prompts.
+        """
+        options_messages = {}
+
+        for option in [
+            "exit",
+            "next_page",
+            "previous_page",
+            "return_to_pages",
+            "search",
+            "select_option_prompt",
+            "show_details",
+        ]:
+            options_messages[option] = self.logger.get_message(
+                namespace="base",
+                message_group="COMPENDIUM",
+                key=option,
+            )
+
+        return options_messages
+
     @abstractmethod
     def get_options_messages(self) -> CompendiumOptionsMessages:
         """
@@ -154,7 +215,7 @@ class Compendium(ABC):
         """
         Shows the options based on what is being displayed.
 
-        :var level: What is being currently displayed.
+        :var level: What is being displayed.
         :vartype level: Literal["ITEM", "PAGE"]
         """
         if level == "ITEM":
@@ -169,6 +230,9 @@ class Compendium(ABC):
             if self.item_number == len(self.items):
                 message = color_string(message, foreground_color=Color.RED)
             self.logger.log(message=message)
+
+            # Search
+            self.logger.log(message=f"[3] {self.options_messages['search']}")
 
             # Return to Pages
             self.logger.log(
@@ -188,8 +252,11 @@ class Compendium(ABC):
                 message = color_string(message, foreground_color=Color.RED)
             self.logger.log(message=message)
 
+            # Search
+            self.logger.log(message=f"[3] {self.options_messages['search']}")
+
             # Show Item Details
-            self.logger.log(message=f"[3] {self.options_messages['show_item_details']}")
+            self.logger.log(message=f"[4] {self.options_messages['show_details']}")
 
             # Exit
             self.logger.log(message=f"\n[0] {self.options_messages['exit']}\n")
@@ -249,7 +316,6 @@ class Compendium(ABC):
         """
         if self.item_number < len(self.items):
             self.item_number += 1
-            self.page_number = ceil(self.item_number / self.page_size)
 
     def previous_item(self):
         """
@@ -257,7 +323,6 @@ class Compendium(ABC):
         """
         if self.item_number > 1:
             self.item_number -= 1
-            self.page_number = ceil(self.item_number / self.page_size)
 
     def select_item(self) -> int:
         """
@@ -275,7 +340,7 @@ class Compendium(ABC):
 
         while True:
             page_item_number = self.logger.input(
-                message=self.options_messages["select_item"]
+                message=self.options_messages["select_item_prompt"]
             )
 
             try:
@@ -292,22 +357,23 @@ class Compendium(ABC):
         """
         Opens the Compendium on current page.
         """
-        level = "PAGE"
-
         while True:
             # Showing content
-            if level == "PAGE":
+            if self.level == "PAGE":
                 self.show_page()
-            elif level == "ITEM":
+            elif self.level == "ITEM":
                 self.show_item()
+                self.page_number = ceil(self.item_number / self.page_size)
 
-            self.show_options(level=level)
+            self.show_options(level=self.level)
 
             # Player option input
-            option = self.logger.input(message=self.options_messages["select_option"])
+            option = self.logger.input(
+                message=self.options_messages["select_option_prompt"]
+            )
 
             # Option validation
-            if level == "PAGE":
+            if self.level == "PAGE":
                 if option == "0":
                     break
 
@@ -318,23 +384,29 @@ class Compendium(ABC):
                     self.next_page()
 
                 elif option == "3":
-                    level = "ITEM"
+                    self.search_item()
+
+                elif option == "4":
+                    self.level = "ITEM"
                     page_item_number = self.select_item()
                     self.item_number = (
                         (self.page_number - 1) * self.page_size
                     ) + page_item_number
 
                     if self.item_number == 0:
-                        level = "PAGE"
+                        self.level = "PAGE"
 
-            elif level == "ITEM":
+            elif self.level == "ITEM":
                 if option == "0":
-                    level = "PAGE"
+                    self.level = "PAGE"
 
                 elif option == "1":
                     self.previous_item()
 
                 elif option == "2":
                     self.next_item()
+
+                elif option == "3":
+                    self.search_item()
 
         return

@@ -24,11 +24,12 @@ ACTIVATION = {
 }
 
 COMPENDIUM = {
-    "title": "Compêndio de Efeitos",
+    "item_not_found": "Efeito não foi encontrado.",
     "next_item": "Próximo Efeito",
     "previous_item": "Efeito Anterior",
-    "select_item": "Selecione um efeito (ou [0] para cancelar)",
-    "show_item_details": "Mostrar Detalhes do Efeito",
+    "search_prompt": "Digite o nome de um efeito",
+    "select_item_prompt": "Selecione um efeito (ou [0] para cancelar)",
+    "title": "Compêndio de Efeitos",
 }
 
 DAMAGE = {

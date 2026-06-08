@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
+from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumOptionsMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -84,9 +85,31 @@ class EffectCompendium(Compendium):
             page_colalign=("right", "left", "left"),
         )
 
-    def sort(self):
-        """."""
-        self.items.sort(key=lambda x: x.keyword.name)
+        self.options_messages.update(self.get_options_messages())
+
+    def _search(self, name: str) -> int | None:
+        """
+        Searches an item by its name and returns its number if found.
+
+        :var name: The Effect's keyword.
+        :vartype name: str
+
+        :return: The found item's number.
+        :rtype: int
+        """
+        normalized_name = normalize(name)
+
+        for index, item in enumerate(self.items):
+            translated_item_name = self.logger.get_message(
+                namespace="effects",
+                message_group="KEYWORDS",
+                key=item.keyword.value.lower(),
+            )
+
+            if normalized_name == normalize(translated_item_name):
+                return index + 1
+
+        return
 
     def get_page_data(self, page_items: List) -> List[List]:
         """
@@ -123,28 +146,16 @@ class EffectCompendium(Compendium):
 
     def get_options_messages(self) -> CompendiumOptionsMessages:
         """
-        Return the messages that will be used on the Compendium's options.
+        Return the messages that will be used on the Compendium's options and prompts.
         """
         options_messages = {}
 
         for option in [
-            "exit",
-            "next_page",
-            "previous_page",
-            "return_to_pages",
-            "select_option",
-        ]:
-            options_messages[option] = self.logger.get_message(
-                namespace="base",
-                message_group="COMPENDIUM",
-                key=option,
-            )
-
-        for option in [
+            "item_not_found",
             "next_item",
             "previous_item",
-            "select_item",
-            "show_item_details",
+            "search_prompt",
+            "select_item_prompt",
         ]:
             options_messages[option] = self.logger.get_message(
                 namespace="effects",

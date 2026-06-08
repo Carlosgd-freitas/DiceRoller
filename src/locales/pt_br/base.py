@@ -7,8 +7,7 @@ ATTRIBUTES = {
     "hp": color_string("HP", foreground_color=Color.RED),
     "mana": color_string(
         "MANA",
-        foreground_color=get_keyword_color(Keyword.MANA)["foreground_color"],
-        intensity=get_keyword_color(Keyword.MANA)["intensity"],
+        **get_keyword_color(Keyword.MANA),
     ),
 }
 
@@ -18,7 +17,9 @@ COMPENDIUM = {
     "page": "Página",
     "previous_page": "Página Anterior",
     "return_to_pages": "Retornar",
-    "select_option": "Selecione uma opção",
+    "search": "Procurar",
+    "select_option_prompt": "Selecione uma opção",
+    "show_details": "Mostrar detalhes",
 }
 
 WORDS = {

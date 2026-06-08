@@ -17,7 +17,9 @@ COMPENDIUM = {
     "page": "Page",
     "previous_page": "Previous Page",
     "return_to_pages": "Return",
-    "select_option": "Select an option",
+    "search": "Search",
+    "select_option_prompt": "Select an option",
+    "show_details": "See Details",
 }
 
 WORDS = {
