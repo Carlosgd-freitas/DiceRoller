@@ -96,6 +96,10 @@ class Compendium(ABC):
     :vartype page_size: int
     """
 
+    # =========================================================================
+    # Initialization
+    # =========================================================================
+
     def __init__(
         self,
         logger: Logger,
@@ -124,6 +128,95 @@ class Compendium(ABC):
         # Setup
         self.level: Literal["ITEM", "PAGE"] = "PAGE"
         self.options_messages = self.get_base_options_messages()
+
+    def get_base_options_messages(self) -> CompendiumOptionsMessages:
+        """
+        Return base messages that will be used on the Compendium's options and prompts.
+        """
+        options_messages = {}
+
+        for option in [
+            "exit",
+            "next_page",
+            "previous_page",
+            "return_to_pages",
+            "search",
+            "select_option_prompt",
+            "show_details",
+        ]:
+            options_messages[option] = self.logger.get_message(
+                namespace="base",
+                message_group="COMPENDIUM",
+                key=option,
+            )
+
+        return options_messages
+
+    @abstractmethod
+    def get_options_messages(self) -> CompendiumOptionsMessages:
+        """
+        Returns the messages that will be used on the Compendium's options.
+        """
+        raise NotImplementedError
+
+    # =========================================================================
+    # Data access
+    # =========================================================================
+
+    @abstractmethod
+    def get_page_data(self, page_items: List) -> List[List]:
+        """
+        Returns tabulated data that will be used with `tabulate` package.
+
+        :var page_items: A Compendium page's items.
+        :vartype page_items: List
+
+        :return: A Compendium page's items structured as tabulated data.
+        :rtype: List[List]
+        """
+        raise NotImplementedError
+
+    def get_page_items(self):
+        """
+        Returns the items for the current page.
+        """
+        return self.items[
+            ((self.page_number - 1) * self.page_size) : (
+                self.page_number * self.page_size
+            )
+        ]
+
+    def next_item(self):
+        """
+        Setup for the next item.
+        """
+        if self.item_number < len(self.items):
+            self.item_number += 1
+
+    def next_page(self):
+        """
+        Setup for the next page.
+        """
+        if self.page_number < self.num_pages:
+            self.page_number += 1
+
+    def previous_item(self):
+        """
+        Setup for the previous item.
+        """
+        if self.item_number > 1:
+            self.item_number -= 1
+
+    def previous_page(self):
+        """
+        Setup for the previous page.
+        """
+        if self.page_number > 1:
+            self.page_number -= 1
+
+    # =========================================================================
+    # Options
+    # =========================================================================
 
     @abstractmethod
     def _search(self, name: str) -> int | None:
@@ -158,56 +251,43 @@ class Compendium(ABC):
 
         return
 
-    def get_page_items(self):
+    def select_item(self) -> int:
         """
-        Returns the items for the current page.
-        """
-        return self.items[
-            ((self.page_number - 1) * self.page_size) : (
-                self.page_number * self.page_size
-            )
-        ]
+        Prompts the user to select one of the Compendium page's items:
+        * if a valid index is selected, it will be returned.
+        * if an invalid index is selected, the prompt will repeat.
 
-    @abstractmethod
-    def get_page_data(self, page_items: List) -> List[List]:
-        """
-        Returns tabulated data that will be used with `tabulate` package.
+        A valid index is either 0 (which will cancel the operation) or an item index
+        that shows in the page.
 
-        :var page_items: A Compendium page's items.
-        :vartype page_items: List
-
-        :return: A Compendium page's items structured as tabulated data.
-        :rtype: List[List]
+        :return: The index of the selected item.
+        :rtype: int
         """
-        raise NotImplementedError
+        page_items = self.get_page_items()
 
-    def get_base_options_messages(self) -> CompendiumOptionsMessages:
-        """
-        Return base messages that will be used on the Compendium's options and prompts.
-        """
-        options_messages = {}
-
-        for option in [
-            "exit",
-            "next_page",
-            "previous_page",
-            "return_to_pages",
-            "search",
-            "select_option_prompt",
-            "show_details",
-        ]:
-            options_messages[option] = self.logger.get_message(
-                namespace="base",
-                message_group="COMPENDIUM",
-                key=option,
+        while True:
+            page_item_number = self.logger.input(
+                message=self.options_messages["select_item_prompt"]
             )
 
-        return options_messages
+            try:
+                page_item_number = int(page_item_number)
+                if page_item_number in range(0, len(page_items) + 1):
+                    break
+
+            except Exception:
+                continue
+
+        return page_item_number
+
+    # =========================================================================
+    # Rendering
+    # =========================================================================
 
     @abstractmethod
-    def get_options_messages(self) -> CompendiumOptionsMessages:
+    def show_item(self):
         """
-        Returns the messages that will be used on the Compendium's options.
+        Shows the current item.
         """
         raise NotImplementedError
 
@@ -288,70 +368,6 @@ class Compendium(ABC):
         )
 
         self.logger.log(message=table + "\n")
-
-    @abstractmethod
-    def show_item(self):
-        """
-        Shows the current item.
-        """
-        raise NotImplementedError
-
-    def next_page(self):
-        """
-        Setup for the next page.
-        """
-        if self.page_number < self.num_pages:
-            self.page_number += 1
-
-    def previous_page(self):
-        """
-        Setup for the previous page.
-        """
-        if self.page_number > 1:
-            self.page_number -= 1
-
-    def next_item(self):
-        """
-        Setup for the next item.
-        """
-        if self.item_number < len(self.items):
-            self.item_number += 1
-
-    def previous_item(self):
-        """
-        Setup for the previous item.
-        """
-        if self.item_number > 1:
-            self.item_number -= 1
-
-    def select_item(self) -> int:
-        """
-        Prompts the user to select one of the Compendium page's items:
-        * if a valid index is selected, it will be returned.
-        * if an invalid index is selected, the prompt will repeat.
-
-        A valid index is either 0 (which will cancel the operation) or an item index
-        that shows in the page.
-
-        :return: The index of the selected item.
-        :rtype: int
-        """
-        page_items = self.get_page_items()
-
-        while True:
-            page_item_number = self.logger.input(
-                message=self.options_messages["select_item_prompt"]
-            )
-
-            try:
-                page_item_number = int(page_item_number)
-                if page_item_number in range(0, len(page_items) + 1):
-                    break
-
-            except Exception:
-                continue
-
-        return page_item_number
 
     def open(self):
         """

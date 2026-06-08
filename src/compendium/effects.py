@@ -41,6 +41,10 @@ class EffectCompendium(Compendium):
     Effect Compendium class.
     """
 
+    # =========================================================================
+    # Initialization
+    # =========================================================================
+
     def __init__(
         self,
         language: Language = Language.EN_US,
@@ -87,29 +91,30 @@ class EffectCompendium(Compendium):
 
         self.options_messages.update(self.get_options_messages())
 
-    def _search(self, name: str) -> int | None:
+    def get_options_messages(self) -> CompendiumOptionsMessages:
         """
-        Searches an item by its name and returns its number if found.
-
-        :var name: The Effect's keyword.
-        :vartype name: str
-
-        :return: The found item's number.
-        :rtype: int
+        Return the messages that will be used on the Compendium's options and prompts.
         """
-        normalized_name = normalize(name)
+        options_messages = {}
 
-        for index, item in enumerate(self.items):
-            translated_item_name = self.logger.get_message(
+        for option in [
+            "item_not_found",
+            "next_item",
+            "previous_item",
+            "search_prompt",
+            "select_item_prompt",
+        ]:
+            options_messages[option] = self.logger.get_message(
                 namespace="effects",
-                message_group="KEYWORDS",
-                key=item.keyword.value.lower(),
+                message_group="COMPENDIUM",
+                key=option,
             )
 
-            if normalized_name == normalize(translated_item_name):
-                return index + 1
+        return options_messages
 
-        return
+    # =========================================================================
+    # Data access
+    # =========================================================================
 
     def get_page_data(self, page_items: List) -> List[List]:
         """
@@ -144,26 +149,37 @@ class EffectCompendium(Compendium):
 
         return page_data
 
-    def get_options_messages(self) -> CompendiumOptionsMessages:
-        """
-        Return the messages that will be used on the Compendium's options and prompts.
-        """
-        options_messages = {}
+    # =========================================================================
+    # Options
+    # =========================================================================
 
-        for option in [
-            "item_not_found",
-            "next_item",
-            "previous_item",
-            "search_prompt",
-            "select_item_prompt",
-        ]:
-            options_messages[option] = self.logger.get_message(
+    def _search(self, name: str) -> int | None:
+        """
+        Searches an item by its name and returns its number if found.
+
+        :var name: The Effect's keyword.
+        :vartype name: str
+
+        :return: The found item's number.
+        :rtype: int
+        """
+        normalized_name = normalize(name)
+
+        for index, item in enumerate(self.items):
+            translated_item_name = self.logger.get_message(
                 namespace="effects",
-                message_group="COMPENDIUM",
-                key=option,
+                message_group="KEYWORDS",
+                key=item.keyword.value.lower(),
             )
 
-        return options_messages
+            if normalized_name == normalize(translated_item_name):
+                return index + 1
+
+        return
+
+    # =========================================================================
+    # Rendering
+    # =========================================================================
 
     def show_item(self):
         """
