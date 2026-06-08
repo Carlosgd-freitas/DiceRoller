@@ -1,4 +1,4 @@
-"""Thorns effect module."""
+"""Invisible effect module."""
 
 from __future__ import annotations
 
@@ -6,36 +6,33 @@ from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
-from src.base.triggers import Trigger
-from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class ThornsEffect(Effect):
+class InvisibleEffect(Effect):
     """
-    Thorns Effect.
+    Invisible Effect.
 
-    When the target is attacked, the monster who attacked it will have their HP reduced
-    by the effect value.
+    This will avoid any direct damage that would be done to the target's HP.
     """
 
     def __init__(
         self,
         value: float = 0,
-        duration: int = 1,
+        duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.THORNS,
+            Keyword.INVISIBLE,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.BUFF,
-            Trigger.BEING_ATTACKED,
+            EffectType.DEFENSIVE,
+            None,
             True,
         )
 
@@ -57,21 +54,4 @@ class ThornsEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = {}
-        fail = None
-
-        if target.is_alive():
-            damage_data = calculate_damage(
-                self, source, target, consider_defensive=True
-            )
-
-            target.hp -= damage_data["damage"]
-            target.equalize_stats()
-
-        else:
-            fail = "dead"
-
-        return {
-            **damage_data,
-            "fail": fail,
-        }
+        return {}

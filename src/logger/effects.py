@@ -130,37 +130,28 @@ class EffectLogger(Logger):
         )
 
         # Part 2: Defensive messages
-        if kwargs.get("absorbed_damage"):
-            defensive_action = self.get_colored_message(
-                namespace="effects",
-                message_group="ACTIONS",
-                keyword=Keyword.ABSORB,
-            )
+        for key, keyword in [
+            ("absorbed_damage", Keyword.ABSORB),
+            ("avoided_damage", Keyword.INVISIBLE),
+            ("blocked_damage", Keyword.BLOCK),
+        ]:
+            if kwargs.get(key):
+                defensive_action = self.get_colored_message(
+                    namespace="effects",
+                    message_group="ACTIONS",
+                    keyword=keyword,
+                )
 
-            self.log(
-                namespace="effects",
-                message_group="DAMAGE",
-                key="absorb",
-                end=" ",
-                absorbed_damage=kwargs["absorbed_damage"],
-                action=defensive_action,
-            )
-
-        if kwargs.get("blocked_damage"):
-            defensive_action = self.get_colored_message(
-                namespace="effects",
-                message_group="ACTIONS",
-                keyword=Keyword.BLOCK,
-            )
-
-            self.log(
-                namespace="effects",
-                message_group="DAMAGE",
-                key="block",
-                end=" ",
-                blocked_damage=kwargs["blocked_damage"],
-                action=defensive_action,
-            )
+                self.log(
+                    namespace="effects",
+                    message_group="DAMAGE",
+                    key=keyword.name.lower(),
+                    end=" ",
+                    action=defensive_action,
+                    absorbed_damage=kwargs.get("absorbed_damage"),
+                    avoided_damage=kwargs.get("avoided_damage"),
+                    blocked_damage=kwargs.get("blocked_damage"),
+                )
 
         # Part 3: Damage message
         self.log(
@@ -224,7 +215,7 @@ class EffectLogger(Logger):
         :type target: Monster
         """
         # Determining logging key
-        if effect.keyword in [Keyword.EXECUTE, Keyword.REVIVE]:
+        if effect.keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.REVIVE]:
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()
@@ -284,7 +275,7 @@ class EffectLogger(Logger):
         :type target: Monster
         """
         # Determining logging key
-        if effect.keyword in [Keyword.EXECUTE, Keyword.REVIVE]:
+        if effect.keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.REVIVE]:
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()

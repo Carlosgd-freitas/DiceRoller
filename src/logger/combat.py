@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.base.color import color_string
+from src.base.keywords import Keyword
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
@@ -30,13 +31,17 @@ class CombatLogger(Logger):
         :param round: The round number.
         :type round: int
         """
-        self.log(message="\n╔═══════════════╗")
-        self.log(message="║ ", end="")
-        self.log(
-            namespace="combat", message_group="COMBAT", key="round", round=round, end=""
+        message = self.get_message(
+            namespace="combat",
+            message_group="COMBAT",
+            key="round",
         )
-        self.log(message=" ║\n", end="")
-        self.log(message="╚═══════════════╝")
+        message = message + " #" + str(round)
+
+        self.box_message(
+            message=message,
+            size=24,
+        )
 
     def log_turn_start(self, monster: Monster):
         """
@@ -126,7 +131,17 @@ class CombatLogger(Logger):
                     end="",
                 )
 
-                if effect.value:
+                if (
+                    effect.keyword
+                    in [
+                        Keyword.DOOM,
+                        Keyword.INVISIBLE,
+                    ]
+                    and effect.duration
+                ):
+                    self.log(message=f" {effect.duration}", end="")
+
+                elif effect.value:
                     self.log(message=f" {effect.value}", end="")
 
             else:

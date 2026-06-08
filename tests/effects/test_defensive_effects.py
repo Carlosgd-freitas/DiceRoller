@@ -8,11 +8,13 @@ from src.base.keywords import Keyword
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from src.effects.invisible import InvisibleEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
     from src.combat.effects import EffectManager
+    from src.combat.manager import CombatManager
 
 
 def test_keyword_absorb(managers: Dict):
@@ -119,6 +121,64 @@ def test_keyword_block(managers: Dict):
             monster_2.local_id == "MONSTER_2",
             monster_2.hp == 9,
             monster_2.get_effect(Keyword.BLOCK) is None,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_invisible(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
+
+    combat_manager.current_monster = monster_2
+
+    attack_effect_1 = AttackEffect(1)
+    attack_effect_99 = AttackEffect(99)
+    invisible_effect = InvisibleEffect(duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        invisible_effect,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    conditions = [
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 10,
+        monster_2.get_effect(Keyword.INVISIBLE).keyword == Keyword.INVISIBLE,
+        monster_2.get_effect(Keyword.INVISIBLE).duration == 1,
+        monster_1.get_effect(Keyword.INVISIBLE) is None,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_99,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.local_id == "MONSTER_2",
+            monster_2.hp == 10,
+            monster_2.get_effect(Keyword.INVISIBLE).keyword == Keyword.INVISIBLE,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_1,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.local_id == "MONSTER_2",
+            monster_2.hp == 9,
+            monster_2.get_effect(Keyword.INVISIBLE) is None,
         ]
     )
 

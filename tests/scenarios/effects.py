@@ -18,6 +18,7 @@ from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
+from src.effects.invisible import InvisibleEffect
 from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.nothing import NothingEffect
@@ -52,6 +53,7 @@ all_effects = [
     # Defensive
     AbsorbEffect(1),
     BlockEffect(1),
+    InvisibleEffect(1),
     # Deterioration
     CurseEffect(1),
     ExecuteEffect(0.5),
@@ -242,7 +244,7 @@ monster_a.effects = []
 
 print("\n===== Effect Activation: Being Attacked =====")
 
-for effect in [ThornsEffect(1)]:
+for effect in [AbsorbEffect(1), BlockEffect(1), InvisibleEffect(), ThornsEffect(1)]:
     monster_b.effects = [effect]
 
     combat_manager.effect_manager.execute_effect(
@@ -308,7 +310,12 @@ print("\n===== Effect Limit =====")
 
 combat_manager.current_monster.effects = []
 
-for _ in range(10):
-    combat_manager.current_monster.effects.append(RegenEffect(1))
+for i in range(10):
+    if i % 2 == 0:
+        effect = RegenEffect(value=1, duration=2)
+    else:
+        effect = InvisibleEffect(value=1, duration=2)
+
+    combat_manager.current_monster.effects.append(effect)
 
 combat_manager.logger.log_monster(combat_manager.current_monster)

@@ -18,28 +18,32 @@ class DamageData(TypedDict):
     :var absorbed_damage: Damage that was absorbed by a Monster.
     :vartype absorbed_damage: int
 
+    :var avoided_damage: Damage that was avoided by a Monster.
+    :vartype avoided_damage: int
+
     :var blocked_damage: Damage that was blocked by a Monster.
     :vartype blocked_damage: int
 
     :var damage: Damage done to a Monster.
     :vartype damage: int
 
-    :var total_blocked_damage: Total damage that was blocked by a Monster's defensive
+    :var total_defended_damage: Total damage that was defended by a Monster's defensive
     Effects.
-    :vartype total_blocked_damage: int
+    :vartype total_defended_damage: int
     """
 
     absorbed_damage: int
+    avoided_damage: int
     blocked_damage: int
     damage: int
-    total_blocked_damage: int
+    total_defended_damage: int
 
 
 def calculate_damage(
     effect: Effect,
     source: Entity,
     target: Entity,
-    consider_block: bool = False,
+    consider_defensive: bool = False,
 ) -> DamageData:
     """
     Calculate damage which will be done to a target.
@@ -53,18 +57,26 @@ def calculate_damage(
     :param target: An Entity object which the effect will be applied.
     :type target: Entity
 
-    :param consider_block: If Block or Absorb effects on the target will reduce the
-    damage. Absorb has priority over Block.
-    :type consider_block: bool
+    :param consider_defensive: If defensive type effects on the target will be taken
+    into account.
+    :type consider_defensive: bool
 
     :return: The damage caused on the target Entity.
     :rtype: int
     """
     damage = effect.value
     absorbed_damage = 0
+    avoided_damage = 0
     blocked_damage = 0
 
-    if consider_block:
+    if consider_defensive:
+        # Invisible
+        invisible = target.get_effect(Keyword.INVISIBLE)
+
+        if invisible:
+            avoided_damage = damage
+            damage = 0
+
         # Absorb
         absorbing = target.get_effect(Keyword.ABSORB)
 
@@ -95,11 +107,12 @@ def calculate_damage(
     if damage < 0:
         damage = 0
 
-    total_blocked_damage = absorbed_damage + blocked_damage
+    total_defended_damage = absorbed_damage + avoided_damage + blocked_damage
 
     return {
         "absorbed_damage": absorbed_damage,
+        "avoided_damage": avoided_damage,
         "blocked_damage": blocked_damage,
         "damage": damage,
-        "total_blocked_damage": total_blocked_damage,
+        "total_defended_damage": total_defended_damage,
     }

@@ -21,6 +21,7 @@ class Keyword(Enum):
     EXECUTE = "EXECUTE"
     FREEZE = "FREEZE"
     HEAL = "HEAL"
+    INVISIBLE = "INVISIBLE"
     MANA = "MANA"
     MANA_REGEN = "MANA_REGEN"
     NOTHING = "NOTHING"
@@ -54,7 +55,7 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = Color.HOT_PINK
     elif keyword in [Keyword.CURSE, Keyword.DOOM]:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.EXECUTE]:
+    elif keyword in [Keyword.EXECUTE, Keyword.INVISIBLE]:
         background_color = Color.GRAY
         foreground_color = Color.BLACK
         intensity = "BRIGHT"

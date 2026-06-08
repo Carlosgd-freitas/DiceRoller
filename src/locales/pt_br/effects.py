@@ -6,6 +6,7 @@ ACTIONS = {
     "block": "BLOQUEADO",
     "drain": "DRENOU",
     "execute": "EXECUTOU",
+    "invisible": "EVITADO",
     "pierce": "PERFUROU",
     "revive": "REVIVEU",
 }
@@ -39,16 +40,17 @@ DAMAGE = {
     # Part 2: Defensive messages
     "absorb": "{absorbed_damage} de dano foi {action}.",
     "block": "{blocked_damage} de dano foi {action}.",
+    "invisible": "{avoided_damage} de dano foi {action}.",
     # Part 3: Damage message
     "damage": "{damage} de dano foi infligido.",
 }
 
 DESCRIPTION = {
-    "absorb": "Reduz até {value} de dano recebido. Qualquer dano bloqueado restaura {hp}.",
+    "absorb": "Reduz até {value} de dano direto recebido. Qualquer dano bloqueado restaura {hp}.",
     "attack": "Inflige {value} de dano.",
     "bleed": "Inflige {value} de dano toda vez que o alvo rola um dado.",
     "blind": "Aumenta a chance de erro dos dados e habilidades do alvo em {value_perc}%.",
-    "block": "Reduz até {value} de dano recebido.",
+    "block": "Reduz até {value} de dano direto recebido.",
     "burn": "Inflige {value} de dano em todo início de turno. Remove {freeze}.",
     "confuse": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
     "curse": "Inflige {value} de dano a si mesmo. Ignora efeitos defensivos.",
@@ -57,6 +59,7 @@ DESCRIPTION = {
     "execute": "Mata o alvo se seu {hp} for menor ou igul a {value_perc}% de seu {hp} máximo.",
     "freeze": "Impede que o alvo aja. Remove {burn}.",
     "heal": "Restaura {value} {hp}.",
+    "invisible": "Evita todo o dano direto recebido por {duration} turnos.",
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
     "mana": "Aumenta {mana} em {value}.",
     "nothing": "Não faz nada.",
@@ -73,6 +76,8 @@ EXECUTION = {
     # Effect keywords
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} se {action}.",
+    "invisible": "{source} tornou {target} {keyword} por {duration} turnos.",
+    "invisible_self": "{source} se tornou {keyword} por {duration} turnos.",
     "revive": "{source} {action} {target}. {target} foi curado em {value_perc}% de seu {hp} máximo.",
     "revive_self": "{source} {action} a si mesmo e se curou em {value_perc}% de seu {hp} máximo.",
     # Effect types
@@ -94,6 +99,8 @@ EXECUTION_FAIL = {
     # Effect keywords
     "execute": "{source} tentou {keyword} {target}, mas",
     "execute_self": "{source} tentou se {keyword}, mas",
+    "invisible": "{source} tentou tornar {target} {keyword}, mas",
+    "invisible_self": "{source} tentou se tornar {keyword}, mas",
     "revive": "{source} tentou {keyword} {target}, mas",
     "revive_self": "{source} tentou se {keyword}, mas",
     # Effect types
@@ -138,6 +145,7 @@ KEYWORDS = {
     "execute": "EXECUTAR",
     "freeze": "CONGELAMENTO",
     "heal": "CURA",
+    "invisible": "INVISÍVEL",
     "mana_regen": "REGENERAÇÃO DE MANA",
     "mana": "MANA",
     "nothing": "NADA",

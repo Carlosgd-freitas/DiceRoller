@@ -6,6 +6,7 @@ ACTIONS = {
     "block": "BLOCKED",
     "drain": "DRAINED",
     "execute": "EXECUTED",
+    "invisible": "AVOIDED",
     "pierce": "PIERCED",
     "revive": "REVIVED",
 }
@@ -39,16 +40,17 @@ DAMAGE = {
     # Part 2: Defensive messages
     "absorb": "{absorbed_damage} damage was {action}.",
     "block": "{blocked_damage} damage was {action}.",
+    "invisible": "{avoided_damage} damage was {action}.",
     # Part 3: Damage message
     "damage": "{damage} damage was done.",
 }
 
 DESCRIPTION = {
-    "absorb": "Reduces up to {value} recieved damage. Any blocked damage restores {hp}.",
+    "absorb": "Reduces up to {value} recieved direct damage. Any blocked damage restores {hp}.",
     "attack": "Deals {value} damage.",
     "bleed": "Deals {value} damage every time the target rolls a dice.",
     "blind": "Increases the miss chance of target dice and skills by {value_perc}%.",
-    "block": "Reduces up to {value} recieved damage.",
+    "block": "Reduces up to {value} recieved direct damage.",
     "burn": "Deals {value} damage every turn start. Removes {freeze}.",
     "confuse": "Makes the target use their dice and skills randomly.",
     "curse": "Deals {value} damage to self. Ignores defensive effects.",
@@ -57,6 +59,7 @@ DESCRIPTION = {
     "execute": "Kills the target if its' {hp} is less than or equal to {value_perc}% of it's max {hp}.",
     "freeze": "Makes target unable to act. Removes {burn}.",
     "heal": "Restores {value} {hp}.",
+    "invisible": "Avoids all recieved direct damage for {duration} turns.",
     "mana_regen": "Increases {mana} by {value} every turn start.",
     "mana": "Increases {mana} by {value}.",
     "nothing": "Does nothing.",
@@ -73,6 +76,8 @@ EXECUTION = {
     # Effect keywords
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} {action} itself.",
+    "invisible": "{source} turned {target} {keyword} for {duration} turns.",
+    "invisible_self": "{source} turned itself {keyword} for {duration} turns.",
     "revive": "{source} {action} {target}. {target} was healed by {value_perc}% of its max {hp}.",
     "revive_self": "{source} {action} itself and was healed by {value_perc}% of its max {hp}.",
     # Effect types
@@ -94,6 +99,8 @@ EXECUTION_FAIL = {
     # Effect keywords
     "execute": "{source} tried to {keyword} {target}, but",
     "execute_self": "{source} tried to {keyword} itself, but",
+    "invisible": "{source} tried to turn {target} {keyword}, but",
+    "invisible_self": "{source} tried to turn itself {keyword}, but",
     "revive": "{source} tried to {keyword} {target}, but",
     "revive_self": "{source} tried to {keyword} itself, but",
     # Effect types
@@ -138,6 +145,7 @@ KEYWORDS = {
     "execute": "EXECUTE",
     "freeze": "FREEZE",
     "heal": "HEAL",
+    "invisible": "INVISIBLE",
     "mana_regen": "MANA REGEN",
     "mana": "MANA",
     "nothing": "NOTHING",

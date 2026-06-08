@@ -19,6 +19,7 @@ from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
+from src.effects.invisible import InvisibleEffect
 from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.nothing import NothingEffect
@@ -63,6 +64,7 @@ class EffectCompendium(Compendium):
             ExecuteEffect(),
             FreezeEffect(),
             HealEffect(),
+            InvisibleEffect(),
             ManaEffect(),
             ManaRegenEffect(),
             NothingEffect(),

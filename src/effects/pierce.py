@@ -61,7 +61,7 @@ class PierceEffect(Effect):
                 self,
                 source,
                 target,
-                consider_block=False,
+                consider_defensive=False,
             )
 
             target.hp -= damage_data["damage"]
