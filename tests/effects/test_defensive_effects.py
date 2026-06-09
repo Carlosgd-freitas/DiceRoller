@@ -9,6 +9,7 @@ from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.invisible import InvisibleEffect
+from src.effects.sacred_block import SacredBlockEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -179,6 +180,76 @@ def test_keyword_invisible(managers: Dict):
             monster_2.local_id == "MONSTER_2",
             monster_2.hp == 9,
             monster_2.get_effect(Keyword.INVISIBLE) is None,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_sacred_block(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["teams"][0].members[1]
+    monster_2: Monster = managers["teams"][0].members[2]
+
+    combat_manager.current_monster = monster_2
+
+    attack_effect_1 = AttackEffect(1)
+    attack_effect_99 = AttackEffect(99)
+    sacred_block_effect = SacredBlockEffect(2)
+
+    combat_manager.effect_manager.execute_effect(
+        sacred_block_effect,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    conditions = [
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 10,
+        monster_2.get_effect(Keyword.SACRED_BLOCK).keyword == Keyword.SACRED_BLOCK,
+        monster_2.get_effect(Keyword.SACRED_BLOCK).value == 2,
+        monster_1.get_effect(Keyword.SACRED_BLOCK) is None,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_99,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.local_id == "MONSTER_2",
+            monster_2.hp == 10,
+            monster_2.get_effect(Keyword.SACRED_BLOCK).value == 1,
+        ]
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_99,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.local_id == "MONSTER_2",
+            monster_2.hp == 10,
+            monster_2.get_effect(Keyword.SACRED_BLOCK) is None,
+        ]
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_1,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.local_id == "MONSTER_2",
+            monster_2.hp == 9,
+            monster_2.get_effect(Keyword.SACRED_BLOCK) is None,
         ]
     )
 

@@ -58,7 +58,15 @@ class DrainEffect(Effect):
                 removed_effects.append(sleep)
 
             damage_data = calculate_damage(
-                self, source, target, consider_defensive=True
+                self,
+                source,
+                target,
+                consider=[
+                    Keyword.ABSORB,
+                    Keyword.BLOCK,
+                    Keyword.INVISIBLE,
+                    Keyword.SACRED_BLOCK,
+                ],
             )
 
             target.hp -= damage_data["damage"]

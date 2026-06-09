@@ -9,6 +9,7 @@ ACTIONS = {
     "invisible": "AVOIDED",
     "pierce": "PIERCED",
     "revive": "REVIVED",
+    "sacred_block": "SACRED BLOCKED",
 }
 
 ACTIVATION = {
@@ -37,10 +38,8 @@ DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",
     "base_self": "{source} {action} itself.",
-    # Part 2: Defensive messages
-    "absorb": "{absorbed_damage} damage was {action}.",
-    "block": "{blocked_damage} damage was {action}.",
-    "invisible": "{avoided_damage} damage was {action}.",
+    # Part 2: Defensive message
+    "defended_damage": "{defended_damage} damage was {action}.",
     # Part 3: Damage message
     "damage": "{damage} damage was done.",
 }
@@ -63,10 +62,11 @@ DESCRIPTION = {
     "mana_regen": "Increases {mana} by {value} every turn start.",
     "mana": "Increases {mana} by {value}.",
     "nothing": "Does nothing.",
-    "pierce": "Deals {value} damage. Ignores defensive effects.",
+    "pierce": "Deals {value} damage. Ignores {absorb}, {block} and {sacred_block}.",
     "poison": "Deals {value} damage every turn start.",
     "regen": "Restores {value} {hp} every turn start.",
     "revive": "Revives a dead target and heals it by {value_perc}% of it's max {hp}.",
+    "sacred_block": "Reduces all recieved direct damage up to {value} times.",
     "sleep": "Makes target unable to act. Any direct damage will wake up the target.",
     "stun": "Makes target unable to act.",
     "thorns": "When attacked directly, deals {value} damage to the attacker.",
@@ -153,6 +153,7 @@ KEYWORDS = {
     "poison": "POISON",
     "regen": "REGEN",
     "revive": "REVIVE",
+    "sacred_block": "SACRED BLOCK",
     "sleep": "SLEEP",
     "stun": "STUN",
     "thorns": "THORNS",

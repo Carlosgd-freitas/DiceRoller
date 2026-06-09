@@ -38,9 +38,11 @@ class CombatLogger(Logger):
         )
         message = message + " #" + str(round)
 
+        self.log(message="")
         self.box_message(
             message=message,
             size=24,
+            isolate=False,
         )
 
     def log_turn_start(self, monster: Monster):

@@ -27,6 +27,7 @@ from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.revive import ReviveEffect
+from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
@@ -72,6 +73,7 @@ class EffectCompendium(Compendium):
             PoisonEffect(),
             RegenEffect(),
             ReviveEffect(),
+            SacredBlockEffect(),
             SleepEffect(),
             StunEffect(),
             ThornsEffect(),

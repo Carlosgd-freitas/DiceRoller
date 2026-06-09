@@ -62,7 +62,14 @@ class ThornsEffect(Effect):
 
         if target.is_alive():
             damage_data = calculate_damage(
-                self, source, target, consider_defensive=True
+                self,
+                source,
+                target,
+                consider=[
+                    Keyword.ABSORB,
+                    Keyword.BLOCK,
+                    Keyword.SACRED_BLOCK,
+                ],
             )
 
             target.hp -= damage_data["damage"]

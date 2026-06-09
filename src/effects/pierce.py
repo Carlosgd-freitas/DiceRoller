@@ -17,7 +17,7 @@ class PierceEffect(Effect):
     Pierce Effect.
 
     Will reduce the target's HP by the effect value and remove Sleep from it. Ignores
-    Block.
+    blocking-like effects.
     """
 
     def __init__(
@@ -61,7 +61,9 @@ class PierceEffect(Effect):
                 self,
                 source,
                 target,
-                consider_defensive=False,
+                consider=[
+                    Keyword.INVISIBLE,
+                ],
             )
 
             target.hp -= damage_data["damage"]

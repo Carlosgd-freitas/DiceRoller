@@ -26,6 +26,7 @@ from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.revive import ReviveEffect
+from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
@@ -54,6 +55,7 @@ all_effects = [
     AbsorbEffect(1),
     BlockEffect(1),
     InvisibleEffect(1),
+    SacredBlockEffect(1),
     # Deterioration
     CurseEffect(1),
     ExecuteEffect(0.5),
@@ -244,11 +246,17 @@ monster_a.effects = []
 
 print("\n===== Effect Activation: Being Attacked =====")
 
-for effect in [AbsorbEffect(1), BlockEffect(1), InvisibleEffect(), ThornsEffect(1)]:
+for effect in [
+    AbsorbEffect(1),
+    BlockEffect(1),
+    InvisibleEffect(),
+    SacredBlockEffect(1),
+    ThornsEffect(1),
+]:
     monster_b.effects = [effect]
 
     combat_manager.effect_manager.execute_effect(
-        AttackEffect(1),
+        AttackEffect(2),
         source=monster_a,
         target=monster_b,
     )

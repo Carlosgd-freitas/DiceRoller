@@ -29,6 +29,7 @@ class Keyword(Enum):
     POISON = "POISON"
     REGEN = "REGEN"
     REVIVE = "REVIVE"
+    SACRED_BLOCK = "SACRED_BLOCK"
     SLEEP = "SLEEP"
     STUN = "STUN"
     THORNS = "THORNS"
@@ -67,7 +68,7 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = Color.LILAC
     elif keyword in [Keyword.POISON]:
         foreground_color = Color.EMERALD_GREEN
-    elif keyword in [Keyword.REVIVE]:
+    elif keyword in [Keyword.REVIVE, Keyword.SACRED_BLOCK]:
         foreground_color = Color.LEMON
     elif keyword in [Keyword.SLEEP]:
         foreground_color = Color.METALLIC_BLUE

@@ -12,6 +12,7 @@ from src.logger.logger import Logger
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.monster import Monster
+    from src.processors.damage import DefendedDamage
 
 
 class EffectLogger(Logger):
@@ -130,13 +131,16 @@ class EffectLogger(Logger):
         )
 
         # Part 2: Defensive messages
-        for key, keyword in [
-            ("absorbed_damage", Keyword.ABSORB),
-            ("avoided_damage", Keyword.INVISIBLE),
-            ("blocked_damage", Keyword.BLOCK),
+        for keyword in [
+            Keyword.ABSORB,
+            Keyword.BLOCK,
+            Keyword.INVISIBLE,
+            Keyword.SACRED_BLOCK,
         ]:
-            if kwargs.get(key):
-                defensive_action = self.get_colored_message(
+            defended_damage: DefendedDamage = kwargs.get("defended_damage")
+            if (defended_damage) and (defended_damage.get(keyword.name.lower())):
+
+                action = self.get_colored_message(
                     namespace="effects",
                     message_group="ACTIONS",
                     keyword=keyword,
@@ -145,12 +149,10 @@ class EffectLogger(Logger):
                 self.log(
                     namespace="effects",
                     message_group="DAMAGE",
-                    key=keyword.name.lower(),
+                    key="defended_damage",
                     end=" ",
-                    action=defensive_action,
-                    absorbed_damage=kwargs.get("absorbed_damage"),
-                    avoided_damage=kwargs.get("avoided_damage"),
-                    blocked_damage=kwargs.get("blocked_damage"),
+                    action=action,
+                    defended_damage=defended_damage[keyword.name.lower()],
                 )
 
         # Part 3: Damage message

@@ -57,24 +57,36 @@ class Logger:
         self.enabled = enabled
         self.change_language(language)
 
-    def change_language(self, language: Language):
+    def _load_messages(self, language: Language) -> Dict:
         """
-        Changes the Logger's language. Loads all messages from a locale module.
+        Loads all messages from a locale module.
 
-        :var language: What language will be logged. Default value is Language.EN_US.
+        :var language: Language of the messages that will be loaded.
         :vartype language: Language
         """
         self.language = language
-        self._messages = {}
+        _messages = {}
 
         for namespace in get_args(Namespace):
             module = import_module(f"src.locales.{language.value}.{namespace}")
-            self._messages[namespace] = {}
+            _messages[namespace] = {}
 
             for message_group in get_args(MessageGroup):
                 namespace_message_group = getattr(module, message_group, None)
                 if namespace_message_group:
-                    self._messages[namespace][message_group] = namespace_message_group
+                    _messages[namespace][message_group] = namespace_message_group
+
+        return _messages
+
+    def change_language(self, language: Language):
+        """
+        Changes the Logger's language.
+
+        :var language: A Language.
+        :vartype language: Language
+        """
+        self.language = language
+        self._messages = self._load_messages(language)
 
     def get_message(
         self,

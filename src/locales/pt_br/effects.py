@@ -9,6 +9,7 @@ ACTIONS = {
     "invisible": "EVITADO",
     "pierce": "PERFUROU",
     "revive": "REVIVEU",
+    "sacred_block": "SAGRADAMENTE BLOQUEADO",
 }
 
 ACTIVATION = {
@@ -37,10 +38,8 @@ DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",
     "base_self": "{source} se {action}.",
-    # Part 2: Defensive messages
-    "absorb": "{absorbed_damage} de dano foi {action}.",
-    "block": "{blocked_damage} de dano foi {action}.",
-    "invisible": "{avoided_damage} de dano foi {action}.",
+    # Part 2: Defensive message
+    "defended_damage": "{defended_damage} de dano foi {action}.",
     # Part 3: Damage message
     "damage": "{damage} de dano foi infligido.",
 }
@@ -63,10 +62,11 @@ DESCRIPTION = {
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
     "mana": "Aumenta {mana} em {value}.",
     "nothing": "Não faz nada.",
-    "pierce": "Inflige {value} de dano. Ignora efeitos defensivos.",
+    "pierce": "Inflige {value} de dano. Ignora {absorb}, {block} e {sacred_block}.",
     "poison": "Inflige {value} de dano em todo início de turno.",
     "regen": "Restaura {value} {hp} em todo início de turno.",
     "revive": "Revive um alvo morto e o cura em {value_perc}% de seu {hp} máximo.",
+    "sacred_block": "Reduz todo o dano direto recebido até {value} vezes.",
     "sleep": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
     "stun": "Impede que o alvo aja.",
     "thorns": "Quando atacado diretamente, inflige {value} de dano ao atacante.",
@@ -153,6 +153,7 @@ KEYWORDS = {
     "poison": "ENVENENAMENTO",
     "regen": "REGENERAÇÃO",
     "revive": "REVIVER",
+    "sacred_block": "BLOQUEIO SAGRADO",
     "sleep": "SONO",
     "stun": "ATORDOAMENTO",
     "thorns": "ESPINHOS",

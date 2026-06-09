@@ -9,38 +9,27 @@ from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.drain import DrainEffect
+from src.effects.invisible import InvisibleEffect
 from src.effects.pierce import PierceEffect
+from src.effects.sacred_block import SacredBlockEffect
 from src.locales.languages import Language
 
 init()
 
 # ----------------------------
 
-attack_sides = []
-drain_sides = []
-pierce_sides = []
-
-absorb_sides = []
-block_sides = []
-
+sides = []
 for i in range(1, 7):
-    attack_sides.append(Side(effects=[AttackEffect(i)]))
-    drain_sides.append(Side(effects=[DrainEffect(i)]))
-    pierce_sides.append(Side(effects=[PierceEffect(i)]))
-
-    absorb_sides.append(Side(effects=[AbsorbEffect(i)]))
-    block_sides.append(Side(effects=[BlockEffect(i)]))
-
-# ----------------------------
+    sides.append(Side(effects=[AttackEffect(i)]))
+    sides.append(Side(effects=[DrainEffect(i)]))
+    sides.append(Side(effects=[PierceEffect(i)]))
 
 monster_a = Monster(
     name="Monster",
     hp=15,
-    max_hp=15,
+    max_hp=30,
     dice=[
-        Dice(sides=attack_sides),
-        Dice(sides=drain_sides),
-        Dice(sides=pierce_sides),
+        Dice(sides=sides),
     ],
 )
 
@@ -49,13 +38,22 @@ team_a = Team(
     members=[monster_a],
 )
 
+# ----------------------------
+
+sides = []
+for i in range(1, 4):
+    sides.append(Side(effects=[AbsorbEffect(i)]))
+    sides.append(Side(effects=[BlockEffect(i)]))
+
+sides.append(Side(effects=[InvisibleEffect()]))
+sides.append(Side(effects=[SacredBlockEffect(1)]))
+
 monster_b = Monster(
     name="Monster",
     hp=15,
-    max_hp=15,
+    max_hp=30,
     dice=[
-        Dice(sides=absorb_sides),
-        Dice(sides=block_sides),
+        Dice(sides=sides),
     ],
 )
 

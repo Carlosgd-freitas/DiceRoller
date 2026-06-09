@@ -78,6 +78,10 @@ class CombatManager:
     :vartype language: Language
     """
 
+    # =========================================================================
+    # Initialization
+    # =========================================================================
+
     def __init__(
         self,
         teams: List[Team] = None,
@@ -115,37 +119,23 @@ class CombatManager:
         # Target Selection Management
         self.selector_manager = SelectorManager()
 
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
     def change_language(self, language: Language):
         """
-        .
+        Changes the combat's language.
+
+        :var language: A Language.
+        :vartype language: Language
         """
         self.logger.change_language(language)
-        self.effect_manager.logger.change_language(language)
+        self.effect_manager.logger._messages = self.logger._messages
 
-    def get_turn_order(self) -> List[Monster]:
-        """
-        Returns the order in which monsters will take action.
-
-        :return: A list of monsters.
-        :rtype: List[Monster]
-        """
-        order: List[Monster] = [
-            monster
-            for team in self.teams
-            for monster in team.members
-            if monster.is_alive()
-        ]
-
-        if self.order_strategy == OrderStrategy.FASTER:
-            order.sort(key=lambda x: x.speed, reverse=True)
-
-        elif self.order_strategy == OrderStrategy.SLOWER:
-            order.sort(key=lambda x: x.speed)
-
-        elif self.order_strategy == OrderStrategy.SHUFFLE:
-            shuffle(order)
-
-        return order
+    # =========================================================================
+    # Team Management
+    # =========================================================================
 
     def get_team(
         self,
@@ -214,53 +204,6 @@ class CombatManager:
 
         return enemies
 
-    def get_combat_status(self) -> CombatStatus:
-        """
-        Returns the current status of the combat.
-
-        :return: The current combat status.
-        :rtype: CombatStatus
-        """
-        teams_status = {
-            "ALIVE": [],
-            "DEFEATED": [],
-        }
-
-        for team in self.teams:
-            team.status = team.get_status()
-            teams_status[team.status].append(team)
-
-        if len(teams_status["ALIVE"]) == 0:
-            teams_status["status"] = "DRAW"
-
-        elif len(teams_status["ALIVE"]) == 1:
-            teams_status["status"] = "WINNER"
-
-        else:
-            teams_status["status"] = "ONGOING"
-
-        return teams_status
-
-    def check_combat_status(self) -> None:
-        """
-        Checks and returns the current combat status. If the combat is over, an
-        appropiate message will be logged.
-        """
-        combat_status = self.get_combat_status()
-
-        if combat_status["status"] == "DRAW":
-            self.logger.log(namespace="combat", message_group="COMBAT", key="draw")
-
-        elif combat_status["status"] == "WINNER":
-            self.logger.log(
-                namespace="combat",
-                message_group="COMBAT",
-                key="winner",
-                team_name=combat_status["ALIVE"][0].name,
-            )
-
-        return combat_status
-
     def add_monster(
         self,
         monster: Monster,
@@ -306,33 +249,34 @@ class CombatManager:
 
         return
 
-    def check_deaths(self) -> None:
+    # =========================================================================
+    # Turn Management
+    # =========================================================================
+
+    def get_turn_order(self) -> List[Monster]:
         """
-        Checks deaths from monsters in combat and logs their deaths. Dead monsters will
-        be affected by Effects that triggers on death.
+        Returns the order in which monsters will take action.
+
+        :return: A list of monsters.
+        :rtype: List[Monster]
         """
-        for monster in self.order[:]:
-            if not monster.is_alive():
-                team = self.get_team(member=monster)
-                team.status = team.get_status()
+        order: List[Monster] = [
+            monster
+            for team in self.teams
+            for monster in team.members
+            if monster.is_alive()
+        ]
 
-                self.logger.log(
-                    namespace="combat",
-                    message_group="COMBAT",
-                    key="death",
-                    name=monster.name,
-                )
+        if self.order_strategy == OrderStrategy.FASTER:
+            order.sort(key=lambda x: x.speed, reverse=True)
 
-                # Cleaning monster effects
-                monster.effects = []
+        elif self.order_strategy == OrderStrategy.SLOWER:
+            order.sort(key=lambda x: x.speed)
 
-                # Procesing effects on death
-                self.effect_manager.process_trigger(
-                    Trigger.DEATH,
-                    target=monster,
-                )
+        elif self.order_strategy == OrderStrategy.SHUFFLE:
+            shuffle(order)
 
-        return
+        return order
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
@@ -500,6 +444,85 @@ class CombatManager:
     def end_combat(self) -> None:
         """End combat between teams of monsters."""
         return
+
+    # =========================================================================
+    # Combat Management
+    # =========================================================================
+
+    def check_deaths(self) -> None:
+        """
+        Checks deaths from monsters in combat and logs their deaths. Dead monsters will
+        be affected by Effects that triggers on death.
+        """
+        for monster in self.order[:]:
+            if not monster.is_alive():
+                team = self.get_team(member=monster)
+                team.status = team.get_status()
+
+                self.logger.log(
+                    namespace="combat",
+                    message_group="COMBAT",
+                    key="death",
+                    name=monster.name,
+                )
+
+                # Cleaning monster effects
+                monster.effects = []
+
+                # Procesing effects on death
+                self.effect_manager.process_trigger(
+                    Trigger.DEATH,
+                    target=monster,
+                )
+
+        return
+
+    def get_combat_status(self) -> CombatStatus:
+        """
+        Returns the current status of the combat.
+
+        :return: The current combat status.
+        :rtype: CombatStatus
+        """
+        teams_status = {
+            "ALIVE": [],
+            "DEFEATED": [],
+        }
+
+        for team in self.teams:
+            team.status = team.get_status()
+            teams_status[team.status].append(team)
+
+        if len(teams_status["ALIVE"]) == 0:
+            teams_status["status"] = "DRAW"
+
+        elif len(teams_status["ALIVE"]) == 1:
+            teams_status["status"] = "WINNER"
+
+        else:
+            teams_status["status"] = "ONGOING"
+
+        return teams_status
+
+    def check_combat_status(self) -> None:
+        """
+        Checks and returns the current combat status. If the combat is over, an
+        appropiate message will be logged.
+        """
+        combat_status = self.get_combat_status()
+
+        if combat_status["status"] == "DRAW":
+            self.logger.log(namespace="combat", message_group="COMBAT", key="draw")
+
+        elif combat_status["status"] == "WINNER":
+            self.logger.log(
+                namespace="combat",
+                message_group="COMBAT",
+                key="winner",
+                team_name=combat_status["ALIVE"][0].name,
+            )
+
+        return combat_status
 
     def run(self) -> Dict:
         """
