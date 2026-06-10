@@ -1,4 +1,4 @@
-"""Heal effect module."""
+"""Corrupt effect module."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class HealEffect(Effect):
+class CorruptEffect(Effect):
     """
-    Heal Effect.
+    Corrupt Effect.
 
-    If the target is alive, increases its HP by the effect value.
+    Removes buffs from the target, starting from the oldest.
     """
 
     def __init__(
@@ -26,12 +26,12 @@ class HealEffect(Effect):
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.HEAL,
+            Keyword.CORRUPT,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.RESTORATION,
+            EffectType.DETERIORATION,
         )
 
     def on_apply(
@@ -47,9 +47,17 @@ class HealEffect(Effect):
         source: Entity | None = None,
     ) -> EffectData:
         fail = None
+        removed_effects = []
 
         if target.is_alive():
-            target.hp += self.value
+
+            removed_effects = [
+                effect for effect in target.effects if effect.type == EffectType.BUFF
+            ][: self.value]
+
+            for buff in removed_effects:
+                target.effects.remove(buff)
+
             target.equalize_stats()
 
         else:
@@ -57,4 +65,5 @@ class HealEffect(Effect):
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }

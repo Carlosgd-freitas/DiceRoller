@@ -1,4 +1,4 @@
-"""Heal effect module."""
+"""Focus effect module."""
 
 from __future__ import annotations
 
@@ -11,27 +11,29 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class HealEffect(Effect):
+class FocusEffect(Effect):
     """
-    Heal Effect.
+    Focus Effect.
 
-    If the target is alive, increases its HP by the effect value.
+    Buff that increases the target's accuracies. Removes Blind when applied.
     """
 
     def __init__(
         self,
         value: float = 0,
-        duration: int = 0,
+        duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
     ):
         super().__init__(
-            Keyword.HEAL,
+            Keyword.FOCUS,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.RESTORATION,
+            EffectType.BUFF,
+            None,
+            True,
         )
 
     def on_apply(
@@ -39,7 +41,21 @@ class HealEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        removed_effects = []
+
+        if target.is_alive():
+            blind = target.remove_effect(Keyword.BLIND)
+            if blind:
+                removed_effects.append(blind)
+
+        else:
+            fail = "dead"
+
+        return {
+            "fail": fail,
+            "removed_effects": removed_effects,
+        }
 
     def activate(
         self,
@@ -47,12 +63,7 @@ class HealEffect(Effect):
         source: Entity | None = None,
     ) -> EffectData:
         fail = None
-
-        if target.is_alive():
-            target.hp += self.value
-            target.equalize_stats()
-
-        else:
+        if not target.is_alive():
             fail = "dead"
 
         return {

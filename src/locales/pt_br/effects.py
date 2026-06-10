@@ -18,8 +18,8 @@ ACTIVATION = {
     "doom": "{target} encontrou seu fim pela {keyword}.",
     "freeze": "{target} não pôde agir porque estava {status}.",
     "poison": "{target} recebeu {damage} de dano de {keyword}.",
-    "mana_regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
-    "regen": "{target} restaurou {value} de {attribute} de si mesmo através da {keyword}.",
+    "mana_regen": "{target} restaurou {value} de {mana} de si mesmo através da {keyword}.",
+    "regen": "{target} restaurou {value} de {hp} de si mesmo através da {keyword}.",
     "sleep": "{target} não pôde agir porque estava {status}.",
     "stun": "{target} não pôde agir porque estava {status}.",
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
@@ -48,14 +48,17 @@ DESCRIPTION = {
     "absorb": "Reduz até {value} de dano direto recebido. Qualquer dano bloqueado restaura {hp}.",
     "attack": "Inflige {value} de dano.",
     "bleed": "Inflige {value} de dano toda vez que o alvo rola um dado.",
-    "blind": "Aumenta a chance de erro dos dados e habilidades do alvo em {value_perc}%.",
+    "blind": "Diminui a acurácia dos dados e habilidades do alvo que não são usados em si mesmo em {value_perc}%.",
     "block": "Reduz até {value} de dano direto recebido.",
     "burn": "Inflige {value} de dano em todo início de turno. Remove {freeze}.",
+    "cleanse": "Remove até {value} enfraquecimentos do alvo, começando pelo mais antigo.",
     "confuse": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
+    "corrupt": "Remove até {value} fortalecimentos do alvo, começando pelo mais antigo.",
     "curse": "Inflige {value} de dano a si mesmo. Ignora efeitos defensivos.",
     "doom": "Mata o alvo após {duration} turnos.",
     "drain": "Inflige {value} de dano. Qualquer dano infligido restaura {hp}.",
     "execute": "Mata o alvo se seu {hp} for menor ou igul a {value_perc}% de seu {hp} máximo.",
+    "focus": "Aumenta a acurácia dos dados e habilidades do alvo em {value_perc}%.",
     "freeze": "Impede que o alvo aja. Remove {burn}.",
     "heal": "Restaura {value} {hp}.",
     "invisible": "Evita todo o dano direto recebido por {duration} turnos.",
@@ -74,10 +77,20 @@ DESCRIPTION = {
 
 EXECUTION = {
     # Effect keywords
+    "cleanse": "{source} removeu {count} enfraquecimentos de {target} através de {keyword}",
+    "cleanse_self": "{source} removeu {count} enfraquecimentos de si mesmo através de {keyword}",
+    "corrupt": "{source} removeu {count} fortalecimentos de {target} através de {keyword}",
+    "corrupt_self": "{source} removeu {count} fortalecimentos de si mesmo através de {keyword}",
+    "curse": "{source} infligiu {value} de dano em {target} através de {keyword}.",
+    "curse_self": "{source} se infligiu {value} de dano através de {keyword}.",
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} se {action}.",
+    "heal": "{source} restaurou {value} de {hp} de {target} através de {keyword}.",
+    "heal_self": "{source} restaurou {value} de {hp} de si mesmo através de {keyword}.",
     "invisible": "{source} tornou {target} {keyword} por {duration} turnos.",
     "invisible_self": "{source} se tornou {keyword} por {duration} turnos.",
+    "mana": "{source} restaurou {value} de {mana} de {target} através de {keyword}.",
+    "mana_self": "{source} restaurou {value} de {mana} de si mesmo através de {keyword}.",
     "revive": "{source} {action} {target}. {target} foi curado em {value_perc}% de seu {hp} máximo.",
     "revive_self": "{source} {action} a si mesmo e se curou em {value_perc}% de seu {hp} máximo.",
     # Effect types
@@ -87,12 +100,8 @@ EXECUTION = {
     "debuff_self": "{source} se enfraqueceu com {keyword} por {duration} turnos.",
     "defensive": "{source} protegeu {target}. {target} recebeu {value} de {keyword}.",
     "defensive_self": "{source} se protegeu e recebeu {value} de {keyword}.",
-    "deterioration": "{source} deteriorou {value} {attribute} de {target} através de {keyword}.",
-    "deterioration_self": "{source} deteriorou {value} {attribute} de si mesmo através de {keyword}.",
     "nothing": "Nada aconteceu.",
     "nothing_self": "Nada aconteceu.",
-    "restoration": "{source} restaurou {value} de {attribute} de {target} através de {keyword}.",
-    "restoration_self": "{source} restaurou {value} de {attribute} de si mesmo através de {keyword}.",
 }
 
 EXECUTION_FAIL = {
@@ -138,11 +147,14 @@ KEYWORDS = {
     "blind": "CEGUEIRA",
     "block": "BLOQUEIO",
     "burn": "QUEIMADURA",
+    "cleanse": "PURIFICAR",
     "confuse": "CONFUSÃO",
+    "corrupt": "CORROMPER",
     "curse": "MALDIÇÃO",
     "doom": "CONDENAÇÃO",
     "drain": "DRENAR",
     "execute": "EXECUTAR",
+    "focus": "FOCO",
     "freeze": "CONGELAMENTO",
     "heal": "CURA",
     "invisible": "INVISÍVEL",
@@ -160,7 +172,9 @@ KEYWORDS = {
 }
 
 REMOVAL = {
+    "blind": "{target} teve sua {removed_keyword} curada pelo efeito de {keyword}.",
     "burn": "{target} teve sua {removed_keyword} apagada pelo efeito de {keyword}.",
+    "focus": "{target} teve seu {removed_keyword} perturbado pelo efeito de {keyword}.",
     "freeze": "{target} teve seu {removed_keyword} derretido pelo efeito de {keyword}.",
     "sleep": "{target} acordou de seu {removed_keyword} pelo efeito de {keyword}.",
 }

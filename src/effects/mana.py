@@ -54,6 +54,5 @@ class ManaEffect(Effect):
             fail = "dead"
 
         return {
-            "attribute": "mana",
             "fail": fail,
         }

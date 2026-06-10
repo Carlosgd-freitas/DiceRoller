@@ -12,11 +12,14 @@ from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
 from src.effects.block import BlockEffect
 from src.effects.burn import BurnEffect
+from src.effects.cleanse import CleanseEffect
 from src.effects.confuse import ConfuseEffect
+from src.effects.corrupt import CorruptEffect
 from src.effects.curse import CurseEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
+from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
 from src.effects.invisible import InvisibleEffect
@@ -58,11 +61,14 @@ class EffectCompendium(Compendium):
             BlindEffect(),
             BlockEffect(),
             BurnEffect(),
+            CleanseEffect(),
             ConfuseEffect(),
+            CorruptEffect(),
             CurseEffect(),
             DoomEffect(),
             DrainEffect(),
             ExecuteEffect(),
+            FocusEffect(),
             FreezeEffect(),
             HealEffect(),
             InvisibleEffect(),
@@ -93,6 +99,7 @@ class EffectCompendium(Compendium):
             page_colalign=("right", "left", "left"),
         )
 
+        self.logger: EffectLogger
         self.options_messages.update(self.get_options_messages())
 
     def get_options_messages(self) -> CompendiumOptionsMessages:

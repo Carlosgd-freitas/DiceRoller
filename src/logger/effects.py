@@ -80,13 +80,16 @@ class EffectLogger(Logger):
                 keyword=removed_effect.keyword,
             )
 
-        # Specific attribute
-        if kwargs.get("attribute"):
-            kwargs["attribute"] = self.get_message(
-                namespace="base",
-                message_group="ATTRIBUTES",
-                key=kwargs["attribute"],
-            )
+        # Removed effects
+        if kwargs.get("removed_effects"):
+            kwargs["removed_effects"] = [
+                self.get_colored_message(
+                    namespace="effects",
+                    message_group="KEYWORDS",
+                    keyword=removed_effect.keyword,
+                )
+                for removed_effect in kwargs["removed_effects"]
+            ]
 
         kwargs.update(
             {
@@ -165,6 +168,69 @@ class EffectLogger(Logger):
 
         return
 
+    def _log_multiple_effect_removal(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        effect_limit: int = 3,
+        **kwargs,
+    ) -> None:
+        """
+        Logs multiple messages for effects that removes multiple effects at once
+        (e.g. CLEANSE an CORRUPT):
+        * Base message: Effect that was reponsible for removing the other effects
+        * Removed effects message
+        * Remaining effects message
+        """
+        # Part 1: Base message
+        key = effect.keyword.name.lower()
+        if source == target:
+            key += "_self"
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        count = len(kwargs["removed_effects"])
+        kwargs["count"] = color_string(
+            str(count),
+            intensity="BRIGHT",
+        )
+
+        self.log(
+            namespace="effects", message_group="EXECUTION", key=key, end="", **kwargs
+        )
+
+        # Part 1.5: No effects were removed
+        if count == 0:
+            self.log(message=".")
+            return
+
+        # Part 2: Removed Effects
+        removed_effects = kwargs["removed_effects"][:effect_limit]
+        message = ": " + ", ".join(removed_effects)
+        self.log(message=message, end="")
+
+        # Part 3: Remaining Effects
+        if count > effect_limit:
+            effects_remaining = count - effect_limit
+
+            message = self.get_message(
+                namespace="base",
+                message_group="WORDS",
+                key="effects",
+            ).capitalize()
+
+            message = ", " + color_string(
+                f"+{effects_remaining} {message}...",
+                intensity="BRIGHT",
+            )
+            self.log(message=message, end="")
+
+        else:
+            self.log(message=".")
+
+        return
+
     def log_effect_activation(
         self,
         effect: Effect,
@@ -184,6 +250,9 @@ class EffectLogger(Logger):
         :param target: The Monster targeted by the effect activation.
         :type target: Monster
         """
+        if not self.enabled:
+            return
+
         key = effect.keyword.value.lower()
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
@@ -216,8 +285,18 @@ class EffectLogger(Logger):
         :param target: The Monster targeted by the effect execution.
         :type target: Monster
         """
+        if not self.enabled:
+            return
+
         # Determining logging key
-        if effect.keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.REVIVE]:
+        if effect.keyword in [
+            Keyword.CURSE,
+            Keyword.EXECUTE,
+            Keyword.HEAL,
+            Keyword.INVISIBLE,
+            Keyword.MANA,
+            Keyword.REVIVE,
+        ]:
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()
@@ -234,6 +313,17 @@ class EffectLogger(Logger):
         # Logging offensive type effect execution
         if key == "offensive":
             self._log_damage_calculation(
+                effect,
+                source,
+                target,
+                **kwargs,
+            )
+
+            return
+
+        # Logging effect that removes multiple effects
+        if effect.keyword in [Keyword.CLEANSE, Keyword.CORRUPT]:
+            self._log_multiple_effect_removal(
                 effect,
                 source,
                 target,
@@ -276,6 +366,9 @@ class EffectLogger(Logger):
         :param target: The Monster targeted by the effect execution.
         :type target: Monster
         """
+        if not self.enabled:
+            return
+
         # Determining logging key
         if effect.keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.REVIVE]:
             key = effect.keyword.value.lower()
@@ -330,6 +423,9 @@ class EffectLogger(Logger):
         :param target: The Monster which had the effect removed.
         :type target: Monster
         """
+        if not self.enabled:
+            return
+
         removed_effect: Effect = kwargs["removed_effect"]
         key = removed_effect.keyword.value.lower()
 
@@ -360,6 +456,9 @@ class EffectLogger(Logger):
         If equal to "name", their names inside a <> will be used instead. Default value is "value".
         :type params: Literal["name", "value"]
         """
+        if not self.enabled:
+            return
+
         kwargs = self._update_log_parameters(effect, **kwargs)
 
         if params == "name":

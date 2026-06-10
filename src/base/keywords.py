@@ -14,11 +14,14 @@ class Keyword(Enum):
     BLIND = "BLIND"
     BLOCK = "BLOCK"
     BURN = "BURN"
+    CLEANSE = "CLEANSE"
     CONFUSE = "CONFUSE"
+    CORRUPT = "CORRUPT"
     CURSE = "CURSE"
     DOOM = "DOOM"
     DRAIN = "DRAIN"
     EXECUTE = "EXECUTE"
+    FOCUS = "FOCUS"
     FREEZE = "FREEZE"
     HEAL = "HEAL"
     INVISIBLE = "INVISIBLE"
@@ -49,27 +52,33 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
     elif keyword in [Keyword.BLIND, Keyword.STUN]:
         foreground_color = Color.GRAY
     elif keyword in [Keyword.BLOCK]:
-        foreground_color = Color.BLUE
+        foreground_color = Color.SKY_BLUE
     elif keyword in [Keyword.BURN]:
         foreground_color = Color.RED
+    elif keyword in [Keyword.CLEANSE]:
+        foreground_color = Color.AERO
     elif keyword in [Keyword.CONFUSE]:
         foreground_color = Color.HOT_PINK
+    elif keyword in [Keyword.CORRUPT]:
+        foreground_color = Color.LILAC
     elif keyword in [Keyword.CURSE, Keyword.DOOM]:
         foreground_color = Color.VIOLET
     elif keyword in [Keyword.EXECUTE, Keyword.INVISIBLE]:
         background_color = Color.GRAY
         foreground_color = Color.BLACK
         intensity = "BRIGHT"
+    elif keyword in [Keyword.FOCUS]:
+        foreground_color = Color.LEMON
     elif keyword in [Keyword.FREEZE]:
         foreground_color = Color.SKY_BLUE
     elif keyword in [Keyword.HEAL]:
         foreground_color = Color.GREEN
     elif keyword in [Keyword.MANA, Keyword.MANA_REGEN]:
-        foreground_color = Color.LILAC
+        foreground_color = Color.BLUE
     elif keyword in [Keyword.POISON]:
         foreground_color = Color.EMERALD_GREEN
     elif keyword in [Keyword.REVIVE, Keyword.SACRED_BLOCK]:
-        foreground_color = Color.LEMON
+        foreground_color = Color.GOLD
     elif keyword in [Keyword.SLEEP]:
         foreground_color = Color.METALLIC_BLUE
         intensity = "DIM"

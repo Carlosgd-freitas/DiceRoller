@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
 from src.effects.attack import AttackEffect
+from src.effects.blind import BlindEffect
+from src.effects.focus import FocusEffect
+from src.effects.heal import HealEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.regen import RegenEffect
 from src.effects.thorns import ThornsEffect
@@ -13,6 +16,85 @@ from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.combat.manager import CombatManager
+
+
+def test_keyword_focus(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    effect_blind = BlindEffect(1)
+    effect_focus = FocusEffect(1)
+    effect_heal = HealEffect(2, accuracy=0)
+    effect_attack = AttackEffect(2, accuracy=0)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_blind,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_focus,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    conditions = [
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.BLIND) is None,
+        combat_manager.order[0].get_effect(Keyword.FOCUS).keyword == Keyword.FOCUS,
+        combat_manager.order[0].get_effect(Keyword.FOCUS).value == 1,
+        combat_manager.order[0].get_effect(Keyword.FOCUS).duration == 1,
+        combat_manager.order[0].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.FOCUS) is None,
+        combat_manager.order[1].hp == 10,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 8,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.effect_manager.execute_effect(
+        effect_heal,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 0,
+            combat_manager.order[0].get_effect(Keyword.FOCUS) is None,
+            combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 8,
+        ]
+    )
+
+    assert_conditions(conditions)
 
 
 def test_keyword_mana_regen(managers: Dict):

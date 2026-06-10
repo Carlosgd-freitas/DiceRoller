@@ -13,6 +13,7 @@ from src.effects.blind import BlindEffect
 from src.effects.burn import BurnEffect
 from src.effects.confuse import ConfuseEffect
 from src.effects.doom import DoomEffect
+from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
 from src.effects.poison import PoisonEffect
@@ -94,8 +95,15 @@ def test_keyword_blind(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
     effect_blind = BlindEffect(1)
+    effect_focus = FocusEffect(1)
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_focus,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
 
     combat_manager.effect_manager.execute_effect(
         effect_blind,
@@ -106,6 +114,7 @@ def test_keyword_blind(managers: Dict):
     conditions = [
         combat_manager.order[0].local_id == "MONSTER_1",
         len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.FOCUS) is None,
         combat_manager.order[0].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
         combat_manager.order[0].get_effect(Keyword.BLIND).value == 1,
         combat_manager.order[0].get_effect(Keyword.BLIND).duration == 1,

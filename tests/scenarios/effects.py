@@ -11,11 +11,14 @@ from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
 from src.effects.block import BlockEffect
 from src.effects.burn import BurnEffect
+from src.effects.cleanse import CleanseEffect
 from src.effects.confuse import ConfuseEffect
+from src.effects.corrupt import CorruptEffect
 from src.effects.curse import CurseEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
+from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
 from src.effects.invisible import InvisibleEffect
@@ -38,6 +41,7 @@ init()
 
 all_effects = [
     # Buffs
+    FocusEffect(1),
     ManaRegenEffect(1),
     RegenEffect(1),
     ThornsEffect(1),
@@ -57,6 +61,7 @@ all_effects = [
     InvisibleEffect(1),
     SacredBlockEffect(1),
     # Deterioration
+    CorruptEffect(1),
     CurseEffect(1),
     ExecuteEffect(0.5),
     # Nothing
@@ -66,6 +71,7 @@ all_effects = [
     DrainEffect(1),
     PierceEffect(1),
     # Restoration
+    CleanseEffect(1),
     HealEffect(1),
     ManaEffect(1),
     ReviveEffect(0.25),
@@ -180,6 +186,60 @@ monster_a.effects = []
 
 # ----------------------------
 
+print("\n===== Effect Execution: CLEANSE =====")
+
+for effect in [
+    CleanseEffect(0),
+    CleanseEffect(1),
+    CleanseEffect(2),
+    CleanseEffect(5),
+]:
+    monster_a.effects = [
+        BlindEffect(1),
+        BurnEffect(1),
+        PoisonEffect(1),
+        BlindEffect(1),
+        BurnEffect(1),
+        PoisonEffect(1),
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        effect=effect,
+        source=monster_a,
+        target=monster_a,
+    )
+
+monster_a.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: CORRUPT =====")
+
+for effect in [
+    CorruptEffect(0),
+    CorruptEffect(1),
+    CorruptEffect(2),
+    CorruptEffect(5),
+]:
+    monster_a.effects = [
+        ManaRegenEffect(1),
+        RegenEffect(1),
+        ThornsEffect(1),
+        ManaRegenEffect(1),
+        RegenEffect(1),
+        ThornsEffect(1),
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        effect=effect,
+        source=monster_a,
+        target=monster_a,
+    )
+
+monster_a.effects = []
+
+# ----------------------------
+
 print("\n===== Effect Execution: EXECUTE =====")
 
 monster_b.hp = 100
@@ -198,8 +258,16 @@ print("\n===== Effect Removal =====")
 
 removal_sets = [
     (
+        BlindEffect(1),
+        [FocusEffect(1)],
+    ),
+    (
         BurnEffect(1),
         [FreezeEffect(1)],
+    ),
+    (
+        FocusEffect(1),
+        [BlindEffect(1)],
     ),
     (
         FreezeEffect(1),

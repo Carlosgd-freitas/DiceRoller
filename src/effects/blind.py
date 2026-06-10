@@ -15,7 +15,7 @@ class BlindEffect(Effect):
     """
     Blind Effect.
 
-    This is a debuff which will reduce the target dice's accuracies.
+    Debuff that reduces the target's accuracies. Removes Focus when applied.
     """
 
     def __init__(
@@ -42,11 +42,19 @@ class BlindEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            focus = target.remove_effect(Keyword.FOCUS)
+            if focus:
+                removed_effects.append(focus)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(

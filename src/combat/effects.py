@@ -124,6 +124,13 @@ class EffectManager:
             if blinded and source != target:
                 accuracy -= blinded.value
 
+            # Focus check
+            focusing = source.get_effect(Keyword.FOCUS)
+
+            if focusing:
+                accuracy += focusing.value
+
+            # Effect miss
             if random() >= accuracy:
                 self.logger.log_effect_execution_fail(
                     effect=effect,
@@ -156,13 +163,14 @@ class EffectManager:
         )
 
         # Log effect removals
-        for removed_effect in effect_data.get("removed_effects", []):
-            self.logger.log_effect_removal(
-                effect=effect,
-                source=source,
-                target=target,
-                removed_effect=removed_effect,
-            )
+        if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:
+            for removed_effect in effect_data.get("removed_effects", []):
+                self.logger.log_effect_removal(
+                    effect=effect,
+                    source=source,
+                    target=target,
+                    removed_effect=removed_effect,
+                )
 
         # Procesing effects on being attacked
         if effect.type == EffectType.OFFENSIVE:

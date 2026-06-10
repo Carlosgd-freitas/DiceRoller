@@ -18,8 +18,8 @@ ACTIVATION = {
     "doom": "{target} met its {keyword}.",
     "freeze": "{target} could not act because it was {status}.",
     "poison": "{target} took {damage} damage from {keyword}.",
-    "mana_regen": "{target} restored {value} {attribute} of itself through {keyword}.",
-    "regen": "{target} restored {value} {attribute} of itself through {keyword}.",
+    "mana_regen": "{target} restored {value} {mana} of itself through {keyword}.",
+    "regen": "{target} restored {value} {hp} of itself through {keyword}.",
     "sleep": "{target} could not act because it was {status}.",
     "stun": "{target} could not act because it was {status}.",
     "thorns": "{target} took {damage} damage from {keyword}.",
@@ -48,14 +48,17 @@ DESCRIPTION = {
     "absorb": "Reduces up to {value} recieved direct damage. Any blocked damage restores {hp}.",
     "attack": "Deals {value} damage.",
     "bleed": "Deals {value} damage every time the target rolls a dice.",
-    "blind": "Increases the miss chance of target dice and skills by {value_perc}%.",
+    "blind": "Reduces the accuracy of target dice and skills that are not used in itself by {value_perc}%.",
     "block": "Reduces up to {value} recieved direct damage.",
     "burn": "Deals {value} damage every turn start. Removes {freeze}.",
+    "cleanse": "Removes up to {value} debuffs from the target, starting from the oldest.",
     "confuse": "Makes the target use their dice and skills randomly.",
+    "corrupt": "Removes up to {value} buffs from the target, starting from the oldest.",
     "curse": "Deals {value} damage to self. Ignores defensive effects.",
     "doom": "Kills the target after {duration} turns.",
     "drain": "Deals {value} damage. Any dealt damage restores {hp}.",
     "execute": "Kills the target if its' {hp} is less than or equal to {value_perc}% of it's max {hp}.",
+    "focus": "Increases the accuracy of target dice and skills by {value_perc}%.",
     "freeze": "Makes target unable to act. Removes {burn}.",
     "heal": "Restores {value} {hp}.",
     "invisible": "Avoids all recieved direct damage for {duration} turns.",
@@ -74,10 +77,20 @@ DESCRIPTION = {
 
 EXECUTION = {
     # Effect keywords
+    "cleanse": "{source} removed {count} debuffs from {target} through {keyword}",
+    "cleanse_self": "{source} removed {count} debuffs from itself through {keyword}",
+    "corrupt": "{source} removed {count} buffs from {target} through {keyword}",
+    "corrupt_self": "{source} removed {count} buffs from itself through {keyword}",
+    "curse": "{source} inflicted {value} damage to {target} through {keyword}.",
+    "curse_self": "{source} inflicted {value} damage to itself through {keyword}.",
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} {action} itself.",
+    "heal": "{source} restored {value} {hp} of {target} through {keyword}.",
+    "heal_self": "{source} restored {value} {hp} of itself through {keyword}.",
     "invisible": "{source} turned {target} {keyword} for {duration} turns.",
     "invisible_self": "{source} turned itself {keyword} for {duration} turns.",
+    "mana": "{source} restored {value} {mana} of {target} through {keyword}.",
+    "mana_self": "{source} restored {value} {mana} of itself through {keyword}.",
     "revive": "{source} {action} {target}. {target} was healed by {value_perc}% of its max {hp}.",
     "revive_self": "{source} {action} itself and was healed by {value_perc}% of its max {hp}.",
     # Effect types
@@ -87,12 +100,8 @@ EXECUTION = {
     "debuff_self": "{source} debuffed itself with {keyword} for {duration} turns.",
     "defensive": "{source} protected {target}. {target} recieved {value} {keyword}.",
     "defensive_self": "{source} protected itself and recieved {value} {keyword}.",
-    "deterioration": "{source} deteriored {value} {attribute} of {target} through {keyword}.",
-    "deterioration_self": "{source} deteriored {value} {attribute} of itself through {keyword}.",
     "nothing": "Nothing happened.",
     "nothing_self": "Nothing happened.",
-    "restoration": "{source} restored {value} {attribute} of {target} through {keyword}.",
-    "restoration_self": "{source} restored {value} {attribute} of itself through {keyword}.",
 }
 
 EXECUTION_FAIL = {
@@ -138,11 +147,14 @@ KEYWORDS = {
     "blind": "BLIND",
     "block": "BLOCK",
     "burn": "BURN",
+    "cleanse": "CLEANSE",
     "confuse": "CONFUSE",
+    "corrupt": "CORRUPT",
     "curse": "CURSE",
     "doom": "DOOM",
     "drain": "DRAIN",
     "execute": "EXECUTE",
+    "focus": "FOCUS",
     "freeze": "FREEZE",
     "heal": "HEAL",
     "invisible": "INVISIBLE",
@@ -160,7 +172,9 @@ KEYWORDS = {
 }
 
 REMOVAL = {
+    "blind": "{target} is not {removed_keyword} anymore by the effect of {keyword}.",
     "burn": "{target} had its {removed_keyword} put out by the effect of {keyword}.",
+    "focus": "{target} had its {removed_keyword} disturbed by the effect of {keyword}.",
     "freeze": "{target} thawed from its {removed_keyword} by the effect of {keyword}.",
     "sleep": "{target} woke up from its {removed_keyword} by the effect of {keyword}.",
 }
