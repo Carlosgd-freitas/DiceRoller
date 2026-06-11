@@ -27,6 +27,7 @@ class BleedEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.BLEED,
@@ -37,6 +38,7 @@ class BleedEffect(Effect):
             EffectType.DEBUFF,
             Trigger.ROLL,
             True,
+            removable,
         )
 
     def on_apply(

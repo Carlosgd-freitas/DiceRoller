@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-def test_filter_first(managers: Dict):
+def test_filter_method_first(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     filtered = filter_entities(
@@ -32,7 +32,7 @@ def test_filter_first(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_last(managers: Dict):
+def test_filter_method_last(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     filtered = filter_entities(
@@ -52,7 +52,7 @@ def test_filter_last(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_alive(managers: Dict):
+def test_filter_life_state_alive(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     filtered = filter_entities(
@@ -73,7 +73,7 @@ def test_filter_alive(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_dead(managers: Dict):
+def test_filter_life_state_dead(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     filtered = filter_entities(
@@ -114,7 +114,7 @@ def test_filter_hurt(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_lowest_hp(managers: Dict):
+def test_filter_sort_functions_single(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     filtered = filter_entities(
@@ -134,27 +134,31 @@ def test_filter_lowest_hp(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_highest_hp(managers: Dict):
+def test_filter_sort_functions_multiple(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
+
+    for monster in monsters:
+        monster.mana = 5
 
     filtered = filter_entities(
         monsters,
         k=1,
-        method="LAST",
-        sort_functions=[lambda x: x.hp],
-        life_state="ALIVE",
+        method="FIRST",
+        sort_functions=[lambda x: x.mana, lambda x: -x.hp],
+        life_state="ANY",
     )
 
     conditions = [
         len(filtered) == 1,
         filtered[0].local_id == "MONSTER_4",
         filtered[0].hp == 200,
+        filtered[0].mana == 5,
     ]
 
     assert_conditions(conditions)
 
 
-def test_filter_with_effect(managers: Dict):
+def test_filter_keyword_whitelist(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     effect_burn = BurnEffect()
@@ -179,7 +183,7 @@ def test_filter_with_effect(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_without_effect(managers: Dict):
+def test_filter_keyword_blacklist(managers: Dict):
     monsters: List[Monster] = managers["monsters"]
 
     effect_burn = BurnEffect()

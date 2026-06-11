@@ -1,10 +1,11 @@
-"""Offensive Selector module."""
+"""Corrupt Selector module."""
 
 from __future__ import annotations
 
 from random import random
 from typing import TYPE_CHECKING, List
 
+from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.targeting.selectors.selector import Selector
 
@@ -12,9 +13,9 @@ if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-class OffensiveSelector(Selector):
+class CorruptSelector(Selector):
     """
-    Selects monster targets for offensive type effects.
+    Selects monster targets for the corrupt effect.
     """
 
     def get_targets_easy(
@@ -27,9 +28,8 @@ class OffensiveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        offensive type effects:
-        * 50% -> random alive enemies
-        * 50% -> alive enemies with most hp
+        the corrupt effect:
+        * 100% -> k alive enemies that have the least buffs
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -49,17 +49,11 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        if random() < 0.5:
-            return self._get_targets_random(
-                enemies,
-                k=k,
-            )
-
-        else:
-            return self._get_targets_highest_hp(
-                enemies,
-                k=k,
-            )
+        return self._get_targets_least_effects(
+            enemies,
+            k=k,
+            effect_type=EffectType.BUFF,
+        )
 
     def get_targets_normal(
         self,
@@ -71,9 +65,9 @@ class OffensiveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        offensive type effects:
-        * 30% -> random alive enemies
-        * 70% -> alive enemies with least effective hp and hp
+        the corrupt effect:
+        * 30% -> k random alive enemies
+        * 70% -> k alive enemies that have the most buffs
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -94,16 +88,20 @@ class OffensiveSelector(Selector):
         :rtype: List[Monster]
         """
         if random() < 0.3:
-            return self._get_targets_random(
+            targets = self._get_targets_random(
                 enemies,
                 k=k,
+                effect_type=EffectType.BUFF,
             )
 
         else:
-            return self._get_targets_lowest_hp(
+            targets = self._get_targets_most_effects(
                 enemies,
                 k=k,
+                effect_type=EffectType.BUFF,
             )
+
+        return targets
 
     def get_targets_hard(
         self,
@@ -115,10 +113,8 @@ class OffensiveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        offensive type effects:
-        * 10% -> random alive enemies
-        * 90% -> alive enemies without Invisible or Sacred Block effects, and least
-        effective hp and hp
+        the corrupt effect:
+        * 100% -> k alive enemies that have the most buffs
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -138,28 +134,8 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets: List[Monster] = []
-
-        if random() < 0.1:
-            targets = self._get_targets_random(
-                enemies,
-                k=k,
-            )
-
-        else:
-            targets = self._get_targets_lowest_hp(
-                enemies,
-                k=k,
-                keyword_blacklist=[Keyword.INVISIBLE, Keyword.SACRED_BLOCK],
-            )
-
-            if len(targets) < k:
-                targets.extend(
-                    self._get_targets_lowest_hp(
-                        enemies,
-                        k=k - len(targets),
-                        exclude=[target.local_id for target in targets],
-                    )
-                )
-
-        return targets
+        return self._get_targets_most_effects(
+            enemies,
+            k=k,
+            effect_type=EffectType.BUFF,
+        )

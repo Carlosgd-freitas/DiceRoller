@@ -24,6 +24,7 @@ class NothingEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.NOTHING,
@@ -32,6 +33,9 @@ class NothingEffect(Effect):
             decay,
             accuracy,
             EffectType.NOTHING,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(

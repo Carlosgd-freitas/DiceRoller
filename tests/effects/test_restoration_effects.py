@@ -29,7 +29,7 @@ def test_keyword_cleanse(managers: Dict):
     monster.effects = [
         BleedEffect(1),
         RegenEffect(1),
-        BurnEffect(1),
+        BurnEffect(1, removable=False),
         PoisonEffect(1),
     ]
 
@@ -47,7 +47,7 @@ def test_keyword_cleanse(managers: Dict):
     conditions.extend(
         [
             len(monster.effects) == 2,
-            monster.get_effect(Keyword.POISON).keyword == Keyword.POISON,
+            monster.get_effect(Keyword.BURN).keyword == Keyword.BURN,
             monster.get_effect(Keyword.REGEN).keyword == Keyword.REGEN,
         ]
     )
@@ -75,6 +75,7 @@ def test_keyword_heal(managers: Dict):
     conditions.extend(
         [
             monster.hp == 7,
+            len(monster.effects) == 0,
         ]
     )
 
@@ -101,6 +102,7 @@ def test_keyword_mana(managers: Dict):
     conditions.extend(
         [
             monster.mana == 2,
+            len(monster.effects) == 0,
         ]
     )
 
@@ -130,6 +132,7 @@ def test_keyword_revive(managers: Dict):
         [
             monster_0.hp == 25,
             monster_0.is_alive(),
+            len(monster_0.effects) == 0,
         ]
     )
 

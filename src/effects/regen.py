@@ -26,6 +26,7 @@ class RegenEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.REGEN,
@@ -36,6 +37,7 @@ class RegenEffect(Effect):
             EffectType.BUFF,
             Trigger.TURN_START,
             True,
+            removable,
         )
 
     def on_apply(

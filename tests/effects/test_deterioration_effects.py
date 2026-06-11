@@ -29,7 +29,7 @@ def test_keyword_corrupt(managers: Dict):
     monster.effects = [
         ManaRegenEffect(1),
         BleedEffect(1),
-        RegenEffect(1),
+        RegenEffect(1, removable=False),
         ThornsEffect(1),
     ]
 
@@ -48,7 +48,7 @@ def test_keyword_corrupt(managers: Dict):
         [
             len(monster.effects) == 2,
             monster.get_effect(Keyword.BLEED).keyword == Keyword.BLEED,
-            monster.get_effect(Keyword.THORNS).keyword == Keyword.THORNS,
+            monster.get_effect(Keyword.REGEN).keyword == Keyword.REGEN,
         ]
     )
 
@@ -77,6 +77,7 @@ def test_keyword_curse(managers: Dict):
     conditions = [
         monster.local_id == "MONSTER_1",
         monster.hp == 0,
+        len(monster.effects) == 1,
     ]
 
     assert_conditions(conditions)
@@ -98,6 +99,7 @@ def test_keyword_execute(managers: Dict):
     conditions = [
         monster_4.local_id == "MONSTER_4",
         monster_4.hp == 200,
+        len(monster_4.effects) == 0,
     ]
 
     monster_4.hp = 100
@@ -111,6 +113,7 @@ def test_keyword_execute(managers: Dict):
     conditions.extend(
         [
             monster_4.hp == 0,
+            len(monster_4.effects) == 0,
         ]
     )
 

@@ -27,6 +27,7 @@ class ThornsEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.THORNS,
@@ -37,6 +38,7 @@ class ThornsEffect(Effect):
             EffectType.BUFF,
             Trigger.BEING_ATTACKED,
             True,
+            removable,
         )
 
     def on_apply(

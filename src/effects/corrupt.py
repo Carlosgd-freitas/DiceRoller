@@ -24,6 +24,7 @@ class CorruptEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.CORRUPT,
@@ -32,6 +33,9 @@ class CorruptEffect(Effect):
             decay,
             accuracy,
             EffectType.DETERIORATION,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(
@@ -52,7 +56,9 @@ class CorruptEffect(Effect):
         if target.is_alive():
 
             removed_effects = [
-                effect for effect in target.effects if effect.type == EffectType.BUFF
+                effect
+                for effect in target.effects
+                if (effect.type == EffectType.BUFF) and (effect.removable)
             ][: self.value]
 
             for buff in removed_effects:

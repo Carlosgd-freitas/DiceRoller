@@ -32,6 +32,7 @@ def test_keyword_attack(managers: Dict):
     conditions = [
         monster_2.local_id == "MONSTER_2",
         monster_2.hp == 4,
+        len(monster_2.effects) == 0,
     ]
 
     assert_conditions(conditions)
@@ -60,9 +61,10 @@ def test_keyword_drain(managers: Dict):
     conditions = [
         monster_2.local_id == "MONSTER_2",
         monster_2.hp == 8,
-        monster_2.get_effect(Keyword.BLOCK) is None,
+        len(monster_2.effects) == 0,
         monster_1.local_id == "MONSTER_1",
         monster_1.hp == 3,
+        len(monster_1.effects) == 0,
     ]
 
     assert_conditions(conditions)
@@ -91,8 +93,10 @@ def test_keyword_pierce(managers: Dict):
     conditions = [
         monster_2.local_id == "MONSTER_2",
         monster_2.hp == 8,
+        len(monster_2.effects) == 1,
         monster_2.get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
         monster_2.get_effect(Keyword.BLOCK).value == 6,
+        len(monster_1.effects) == 0,
     ]
 
     assert_conditions(conditions)

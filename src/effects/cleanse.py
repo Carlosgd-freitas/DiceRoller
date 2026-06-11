@@ -24,6 +24,7 @@ class CleanseEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.CLEANSE,
@@ -32,6 +33,9 @@ class CleanseEffect(Effect):
             decay,
             accuracy,
             EffectType.RESTORATION,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(
@@ -52,7 +56,9 @@ class CleanseEffect(Effect):
         if target.is_alive():
 
             removed_effects = [
-                effect for effect in target.effects if effect.type == EffectType.DEBUFF
+                effect
+                for effect in target.effects
+                if (effect.type == EffectType.DEBUFF) and (effect.removable)
             ][: self.value]
 
             for debuff in removed_effects:

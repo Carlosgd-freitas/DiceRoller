@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List
 
+from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.effects.stun import StunEffect
 from src.targeting.selectors.random_selector import RandomSelector
@@ -149,6 +150,52 @@ def test_get_targets_without_effects(managers: Dict):
     conditions = [
         len(targets) == 3,
         targets_ids == {"MONSTER_2", "MONSTER_3", "MONSTER_4"},
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_get_targets_most_effects(managers: Dict):
+    monsters: List[Monster] = managers["monsters"]
+    selector = RandomSelector()
+
+    for i in range(5):
+        monsters[i].effects = [StunEffect() for _ in range(i)]
+
+    targets = selector._get_targets_most_effects(
+        monsters,
+        effect_type=EffectType.DEBUFF,
+        k=2,
+        life_state="ANY",
+    )
+
+    conditions = [
+        len(targets) == 2,
+        targets[0].local_id == "MONSTER_4",
+        targets[1].local_id == "MONSTER_3",
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_get_targets_least_effects(managers: Dict):
+    monsters: List[Monster] = managers["monsters"]
+    selector = RandomSelector()
+
+    for i in range(5):
+        monsters[i].effects = [StunEffect() for _ in range(i)]
+
+    targets = selector._get_targets_least_effects(
+        monsters,
+        effect_type=EffectType.DEBUFF,
+        k=2,
+        life_state="ANY",
+    )
+
+    conditions = [
+        len(targets) == 2,
+        targets[0].local_id == "MONSTER_0",
+        targets[1].local_id == "MONSTER_1",
     ]
 
     assert_conditions(conditions)

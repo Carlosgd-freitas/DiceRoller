@@ -25,6 +25,7 @@ class AbsorbEffect(Effect):
         duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.ABSORB,
@@ -35,6 +36,7 @@ class AbsorbEffect(Effect):
             EffectType.DEFENSIVE,
             None,
             True,
+            removable,
         )
 
     def on_apply(

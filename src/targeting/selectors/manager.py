@@ -9,6 +9,8 @@ from src.base.difficulties import Difficulty
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.targeting.selectors.buff_selector import BuffSelector
+from src.targeting.selectors.cleanse_selector import CleanseSelector
+from src.targeting.selectors.corrupt_selector import CorruptSelector
 from src.targeting.selectors.debuff_selector import DebuffSelector
 from src.targeting.selectors.defensive_selector import DefensiveSelector
 from src.targeting.selectors.offensive_selector import OffensiveSelector
@@ -77,7 +79,15 @@ class SelectorManager:
 
         # Specific Keywords
         for effect in side.effects:
-            if effect.keyword == Keyword.CURSE:
+            if effect.keyword == Keyword.CLEANSE:
+                selector = CleanseSelector()
+                break
+
+            elif effect.keyword == Keyword.CORRUPT:
+                selector = CorruptSelector()
+                break
+
+            elif effect.keyword == Keyword.CURSE:
                 selector = DefensiveSelector()
                 break
 

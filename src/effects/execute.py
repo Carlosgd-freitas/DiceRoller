@@ -24,6 +24,7 @@ class ExecuteEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.EXECUTE,
@@ -32,6 +33,9 @@ class ExecuteEffect(Effect):
             decay,
             accuracy,
             EffectType.DETERIORATION,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(

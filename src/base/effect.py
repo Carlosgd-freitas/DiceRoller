@@ -87,6 +87,9 @@ class Effect(ABC):
 
     :var persistent: If the Effect is persistent or instant. Default value is False.
     :vartype persistent: bool
+
+    :var removable: If the Effect is removable by other Effects. Default value is True.
+    :vartype removable: bool
     """
 
     def __init__(
@@ -99,6 +102,7 @@ class Effect(ABC):
         type: EffectType = None,
         trigger: Trigger = None,
         persistent: bool = False,
+        removable: bool = True,
     ):
         self.keyword = keyword
         self.value = value
@@ -108,6 +112,7 @@ class Effect(ABC):
         self.type = type
         self.trigger = trigger
         self.persistent = persistent
+        self.removable = removable
 
     def __str__(self) -> str:
         color_params = get_keyword_color(self.keyword)

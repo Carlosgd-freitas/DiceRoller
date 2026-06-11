@@ -25,6 +25,7 @@ class DoomEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.DOOM,
@@ -35,6 +36,7 @@ class DoomEffect(Effect):
             EffectType.DEBUFF,
             Trigger.TURN_END,
             True,
+            removable,
         )
 
     def on_apply(

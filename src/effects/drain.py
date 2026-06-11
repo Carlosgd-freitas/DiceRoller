@@ -26,6 +26,7 @@ class DrainEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.DRAIN,
@@ -34,6 +35,9 @@ class DrainEffect(Effect):
             decay,
             accuracy,
             EffectType.OFFENSIVE,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(

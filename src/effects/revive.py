@@ -26,6 +26,7 @@ class ReviveEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.REVIVE,
@@ -34,6 +35,9 @@ class ReviveEffect(Effect):
             decay,
             accuracy,
             EffectType.RESTORATION,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(

@@ -24,6 +24,7 @@ class ManaEffect(Effect):
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.MANA,
@@ -32,6 +33,9 @@ class ManaEffect(Effect):
             decay,
             accuracy,
             EffectType.RESTORATION,
+            None,
+            False,
+            removable,
         )
 
     def on_apply(

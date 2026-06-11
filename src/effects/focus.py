@@ -24,6 +24,7 @@ class FocusEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.FOCUS,
@@ -34,6 +35,7 @@ class FocusEffect(Effect):
             EffectType.BUFF,
             None,
             True,
+            removable,
         )
 
     def on_apply(

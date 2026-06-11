@@ -25,6 +25,7 @@ class ConfuseEffect(Effect):
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
+        removable: bool = True,
     ):
         super().__init__(
             Keyword.CONFUSE,
@@ -35,6 +36,7 @@ class ConfuseEffect(Effect):
             EffectType.DEBUFF,
             None,
             True,
+            removable,
         )
 
     def on_apply(
