@@ -11,6 +11,7 @@ Namespace = Literal[
     "base",
     "combat",
     "effects",
+    "menus",
 ]
 
 
@@ -32,7 +33,11 @@ MessageGroup = Literal[
     "REMOVAL",
     "STATUS",
     "TYPES",
+    # Menus
+    "MAIN",
+    "CONFIGURATIONS",
     # On Multiple Namespaces
+    "BASE",
     "COMPENDIUM",
 ]
 
