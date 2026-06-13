@@ -11,17 +11,6 @@ ATTRIBUTES = {
     ),
 }
 
-COMPENDIUM = {
-    "exit": "Sair",
-    "next_page": "Próxima Página",
-    "page": "Página",
-    "previous_page": "Página Anterior",
-    "return_to_pages": "Retornar",
-    "search": "Procurar",
-    "select_option_prompt": "Selecione uma opção",
-    "show_details": "Mostrar detalhes",
-}
-
 WORDS = {
     "accuracy": "precisão",
     "area": "área",

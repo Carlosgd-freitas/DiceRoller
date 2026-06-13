@@ -25,15 +25,6 @@ ACTIVATION = {
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
 }
 
-COMPENDIUM = {
-    "item_not_found": "Efeito não foi encontrado.",
-    "next_item": "Próximo Efeito",
-    "previous_item": "Efeito Anterior",
-    "search_prompt": "Digite o nome de um efeito",
-    "select_item_prompt": "Selecione um efeito (ou [0] para cancelar)",
-    "title": "Compêndio de Efeitos",
-}
-
 DAMAGE = {
     # Part 1: Base message
     "base": "{source} {action} {target}.",

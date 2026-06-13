@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING, List
 
-from src.base.text import normalize
-from src.compendium.compendium import Compendium, CompendiumOptionsMessages
+from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
@@ -36,9 +36,46 @@ from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
 from src.locales.languages import Language
 from src.logger.effects import EffectLogger
+from src.menus.option import Option
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
+
+
+ALL_EFFECTS = [
+    AbsorbEffect(),
+    AttackEffect(),
+    BleedEffect(),
+    BlindEffect(),
+    BlockEffect(),
+    BurnEffect(),
+    CleanseEffect(),
+    ConfuseEffect(),
+    CorruptEffect(),
+    CurseEffect(),
+    DoomEffect(),
+    DrainEffect(),
+    ExecuteEffect(),
+    FocusEffect(),
+    FreezeEffect(),
+    HealEffect(),
+    InvisibleEffect(),
+    ManaEffect(),
+    ManaRegenEffect(),
+    NothingEffect(),
+    PierceEffect(),
+    PoisonEffect(),
+    RegenEffect(),
+    ReviveEffect(),
+    SacredBlockEffect(),
+    SleepEffect(),
+    StunEffect(),
+    ThornsEffect(),
+]
+
+
+def get_all_effects() -> List[Effect]:
+    return deepcopy(ALL_EFFECTS)
 
 
 class EffectCompendium(Compendium):
@@ -54,41 +91,12 @@ class EffectCompendium(Compendium):
         self,
         language: Language = Language.EN_US,
     ):
-        items = [
-            AbsorbEffect(),
-            AttackEffect(),
-            BleedEffect(),
-            BlindEffect(),
-            BlockEffect(),
-            BurnEffect(),
-            CleanseEffect(),
-            ConfuseEffect(),
-            CorruptEffect(),
-            CurseEffect(),
-            DoomEffect(),
-            DrainEffect(),
-            ExecuteEffect(),
-            FocusEffect(),
-            FreezeEffect(),
-            HealEffect(),
-            InvisibleEffect(),
-            ManaEffect(),
-            ManaRegenEffect(),
-            NothingEffect(),
-            PierceEffect(),
-            PoisonEffect(),
-            RegenEffect(),
-            ReviveEffect(),
-            SacredBlockEffect(),
-            SleepEffect(),
-            StunEffect(),
-            ThornsEffect(),
-        ]
+        items = get_all_effects()
 
         logger = EffectLogger(language=language)
 
         title = logger.get_message(
-            namespace="effects", message_group="COMPENDIUM", key="title"
+            namespace="compendium", message_group="EFFECTS", key="title"
         )
 
         super().__init__(
@@ -100,46 +108,89 @@ class EffectCompendium(Compendium):
         )
 
         self.logger: EffectLogger
-        self.options_messages.update(self.get_options_messages())
 
-    def get_options_messages(self) -> CompendiumOptionsMessages:
+    def get_item_options(self) -> List[Option]:
         """
-        Return the messages that will be used on the Compendium's options and prompts.
+        Returns the options that will be used in the Compendium at ITEM level.
         """
-        options_messages = {}
+        options = [
+            Option(
+                id="PREVIOUS_ITEM",
+                key="1",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="EFFECTS",
+                    key="previous_item_message",
+                ),
+            ),
+            Option(
+                id="NEXT_ITEM",
+                key="2",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="EFFECTS",
+                    key="next_item_message",
+                ),
+            ),
+            Option(
+                id="SEARCH",
+                key="3",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="search_message",
+                ),
+            ),
+            Option(
+                id="RETURN",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="return_message",
+                ),
+                isolate=True,
+            ),
+        ]
 
-        for option in [
-            "item_not_found",
-            "next_item",
-            "previous_item",
+        return options
+
+    def get_messages(self) -> CompendiumMessages:
+        """
+        Returns messages that will be used by the Compendium.
+        """
+        messages = {}
+
+        for key in [
+            "item_not_found_message",
             "search_prompt",
             "select_item_prompt",
         ]:
-            options_messages[option] = self.logger.get_message(
-                namespace="effects",
-                message_group="COMPENDIUM",
-                key=option,
+            messages[key] = self.logger.get_message(
+                namespace="compendium",
+                message_group="EFFECTS",
+                key=key,
             )
 
-        return options_messages
+        return messages
 
     # =========================================================================
     # Data access
     # =========================================================================
 
-    def get_page_data(self, page_items: List) -> List[List]:
+    def get_pages_data(self, items: List[Effect]) -> List[List]:
         """
-        Returns tabulated data that will be used with `tabulate` package.
+        Returns all the tabulated data that will be used on the Compendium.
 
-        :var page_items: A Compendium page's items.
-        :vartype page_items: List
+        :var items: Compendium items.
+        :vartype items: List
 
-        :return: A Compendium page's items structured as tabulated data.
+        :return: Compendium items structured as tabulated data.
         :rtype: List[List]
         """
-        page_data = []
+        pages_data = []
 
-        for idx, item in enumerate(page_items):
+        for idx, item in enumerate(items):
             effect_keyword = self.logger.get_colored_message(
                 namespace="effects",
                 message_group="KEYWORDS",
@@ -150,7 +201,7 @@ class EffectCompendium(Compendium):
                 namespace="effects", message_group="TYPES", key=item.type.value.lower()
             )
 
-            page_data.append(
+            pages_data.append(
                 [
                     f"[{idx+1}]",
                     effect_keyword,
@@ -158,35 +209,23 @@ class EffectCompendium(Compendium):
                 ]
             )
 
-        return page_data
+        return pages_data
 
-    # =========================================================================
-    # Options
-    # =========================================================================
-
-    def _search(self, name: str) -> int | None:
+    def get_item_name(self, item: Effect) -> str:
         """
-        Searches an item by its name and returns its number if found.
+        Returns the name of an item.
 
-        :var name: The Effect's keyword.
-        :vartype name: str
+        :var item: A Compendium's item.
+        :vartype item: Any
 
-        :return: The found item's number.
-        :rtype: int
+        :return: The Compendium's item name.
+        :rtype: str
         """
-        normalized_name = normalize(name)
-
-        for index, item in enumerate(self.items):
-            translated_item_name = self.logger.get_message(
-                namespace="effects",
-                message_group="KEYWORDS",
-                key=item.keyword.value.lower(),
-            )
-
-            if normalized_name == normalize(translated_item_name):
-                return index + 1
-
-        return
+        return self.logger.get_message(
+            namespace="effects",
+            message_group="KEYWORDS",
+            key=item.keyword.value.lower(),
+        )
 
     # =========================================================================
     # Rendering

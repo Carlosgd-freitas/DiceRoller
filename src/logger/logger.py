@@ -10,6 +10,7 @@ from src.locales.languages import Language
 Namespace = Literal[
     "base",
     "combat",
+    "compendium",
     "effects",
     "menus",
 ]
@@ -21,6 +22,8 @@ MessageGroup = Literal[
     "WORDS",
     # Combat
     "COMBAT",
+    # Compendium
+    "EFFECTS",
     # Effects
     "ACTIONS",
     "ACTIVATION",
@@ -38,7 +41,6 @@ MessageGroup = Literal[
     "CONFIGURATIONS",
     # On Multiple Namespaces
     "BASE",
-    "COMPENDIUM",
 ]
 
 

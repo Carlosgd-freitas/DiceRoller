@@ -61,8 +61,8 @@ class MainMenu(Menu):
                 id="EFFECT_COMPENDIUM",
                 key="3",
                 message=self.logger.get_message(
-                    namespace="effects",
-                    message_group="COMPENDIUM",
+                    namespace="compendium",
+                    message_group="EFFECTS",
                     key="title",
                 ),
             ),

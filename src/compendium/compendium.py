@@ -2,74 +2,49 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from enum import Enum
 from math import ceil
-from typing import TYPE_CHECKING, List, Literal, Tuple, TypedDict
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, TypedDict
 
 from tabulate import tabulate
 
 from src.base.color import Color, color_string
+from src.base.text import normalize
+from src.menus.menu import Menu
+from src.menus.option import Option
 
 if TYPE_CHECKING:
     from src.logger.logger import Logger
 
 
-class CompendiumOptionsMessages(TypedDict):
+class CompendiumLevel(Enum):
+    """Compendium Level."""
+
+    ITEM = "ITEM"
+    PAGE = "PAGE"
+
+
+class CompendiumMessages(TypedDict):
     """
-    Compendium Option Messages.
+    Compendium Messages.
 
-    :var exit: Message for the 'Exit' option.
-    :vartype exit: str
-
-    :var item_not_found: 'Item not found' message.
-    :vartype item_not_found: str
-
-    :var next_item: Message for the 'Next Item' option.
-    :vartype next_item: str
-
-    :var next_page: Message for the 'Next Page' option.
-    :vartype next_page: str
-
-    :var previous_item: Message for the 'Previous Item' option.
-    :vartype previous_item: str
-
-    :var previous_page: Message for the 'Previous Page' option.
-    :vartype previous_page: str
-
-    :var return_to_pages: Message for the 'Return' option.
-    :vartype return_to_pages: str
-
-    :var search: Message for the 'Search' option.
-    :vartype search: str
+    :var item_not_found_message: 'Item not found' message.
+    :vartype item_not_found_message: str
 
     :var search_prompt: Message for the 'Search' input prompt.
     :vartype search_prompt: str
 
     :var select_item_prompt: Message for the 'Select Item' input prompt.
     :vartype select_item_prompt: str
-
-    :var select_option_prompt: Message for the 'Select Option' input prompt.
-    :vartype select_option_prompt: str
-
-    :var show_details: Message for the 'Show Details' option.
-    :vartype show_details: str
     """
 
-    exit: str
-    item_not_found: str
-    next_item: str
-    next_page: str
-    previous_item: str
-    previous_page: str
-    return_to_pages: str
-    search: str
+    item_not_found_message: str
     search_prompt: str
     select_item_prompt: str
-    select_option_prompt: str
-    show_details: str
 
 
-class Compendium(ABC):
+class Compendium(Menu):
     """
     Compendium class.
 
@@ -111,51 +86,129 @@ class Compendium(ABC):
         page_size: int = 15,
     ):
         # Compendium Attributes
-        self.logger = logger
+        super().__init__(
+            logger,
+        )
         self.title = title
         self.items = items
 
+        # Page Attributes
         self.page_number = page_number
         self.page_size = page_size
         self.num_pages = ceil(len(self.items) / self.page_size)
+        self.pages_data = self.get_pages_data(self.items)
 
-        self.item_number = 1
-
-        # Page Attributes
         self.page_headers = page_headers
         self.page_colalign = page_colalign
 
+        self.item_number = 1
+
         # Setup
-        self.level: Literal["ITEM", "PAGE"] = "PAGE"
-        self.options_messages = self.get_base_options_messages()
+        self.level: CompendiumLevel = CompendiumLevel.PAGE
+        self.options = self.get_options()
+        self.messages = self.get_messages()
 
-    def get_base_options_messages(self) -> CompendiumOptionsMessages:
+    def get_options(self) -> Dict:
         """
-        Return base messages that will be used on the Compendium's options and prompts.
+        Returns the options that will be used by the Compendium.
         """
-        options_messages = {}
+        options = {
+            "ITEM": self.get_item_options(),
+            "PAGE": self.get_page_options(),
+        }
 
-        for option in [
-            "exit",
-            "next_page",
-            "previous_page",
-            "return_to_pages",
-            "search",
-            "select_option_prompt",
-            "show_details",
-        ]:
-            options_messages[option] = self.logger.get_message(
-                namespace="base",
-                message_group="COMPENDIUM",
-                key=option,
-            )
+        return options
 
-        return options_messages
+    def get_page_options(self) -> List[Option]:
+        """
+        Returns the options that will be used in the Compendium at PAGE level.
+        """
+        options = [
+            Option(
+                id="PREVIOUS_PAGE",
+                key="1",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="previous_page_message",
+                ),
+            ),
+            Option(
+                id="NEXT_PAGE",
+                key="2",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="next_page_message",
+                ),
+            ),
+            Option(
+                id="SEARCH",
+                key="3",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="search_message",
+                ),
+            ),
+            Option(
+                id="SHOW_DETAILS",
+                key="4",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="show_details_message",
+                ),
+            ),
+            Option(
+                id="EXIT",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="exit_message",
+                ),
+                isolate=True,
+            ),
+        ]
+
+        return options
 
     @abstractmethod
-    def get_options_messages(self) -> CompendiumOptionsMessages:
+    def get_item_options(self) -> List[Option]:
         """
-        Returns the messages that will be used on the Compendium's options.
+        Returns the options that will be used in the Compendium at ITEM level.
+        """
+        raise NotImplementedError
+
+    def select_option(self) -> Option:
+        """
+        Prompts the user to select one of the Compendium's options:
+        * if a valid option is selected, it will be returned.
+        * if an invalid option is selected, the prompt will repeat.
+
+        :return: The option selected by the user.
+        :rtype: Option
+        """
+        while True:
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+
+            selected = self.logger.input(message=message)
+
+            for option in self.options[self.level.value]:
+                option: Option
+
+                if selected == option.key:
+                    return option
+
+    @abstractmethod
+    def get_messages(self) -> CompendiumMessages:
+        """
+        Returns messages that will be used by the Compendium.
         """
         raise NotImplementedError
 
@@ -164,89 +217,121 @@ class Compendium(ABC):
     # =========================================================================
 
     @abstractmethod
-    def get_page_data(self, page_items: List) -> List[List]:
+    def get_pages_data(self, items: List) -> List[List]:
         """
-        Returns tabulated data that will be used with `tabulate` package.
+        Returns all the tabulated data that will be used on the Compendium.
 
-        :var page_items: A Compendium page's items.
-        :vartype page_items: List
+        :var items: Compendium items.
+        :vartype items: List
 
-        :return: A Compendium page's items structured as tabulated data.
+        :return: Compendium items structured as tabulated data.
         :rtype: List[List]
         """
         raise NotImplementedError
 
-    def get_page_items(self):
+    def get_page_data(self, page_number: int) -> List[List]:
         """
-        Returns the items for the current page.
+        Returns the tabulated data from a Compendium's page.
+
+        :var page_number: Compendium's page number.
+        :vartype page_number: int
+
+        :return: Compendium items structured as tabulated data for one page.
+        :rtype: List[List]
         """
-        return self.items[
-            ((self.page_number - 1) * self.page_size) : (
-                self.page_number * self.page_size
-            )
+        return self.pages_data[
+            ((page_number - 1) * self.page_size) : (page_number * self.page_size)
         ]
 
-    def next_item(self):
+    def get_page_items(self, page_number: int) -> List:
         """
-        Setup for the next item.
-        """
-        if self.item_number < len(self.items):
-            self.item_number += 1
+        Returns the items from a Compendium's page.
 
-    def next_page(self):
-        """
-        Setup for the next page.
-        """
-        if self.page_number < self.num_pages:
-            self.page_number += 1
+        :var page_number: Compendium's page number.
+        :vartype page_number: int
 
-    def previous_item(self):
+        :return: Compendium items structured as tabulated data for one page.
+        :rtype: List[List]
         """
-        Setup for the previous item.
-        """
-        if self.item_number > 1:
-            self.item_number -= 1
+        return self.items[
+            ((page_number - 1) * self.page_size) : (page_number * self.page_size)
+        ]
 
-    def previous_page(self):
+    def get_page_items_indexes(self, page_number: int) -> List[int]:
         """
-        Setup for the previous page.
+        Returns the items indexes from a Compendium's page.
+
+        :var page_number: Compendium's page number.
+        :vartype page_number: int
+
+        :return: Compendium items structured as tabulated data for one page.
+        :rtype: List[int]
         """
-        if self.page_number > 1:
-            self.page_number -= 1
+        page_items = self.get_page_items(page_number)
+        initial_index = ((page_number - 1) * self.page_size) + 1
+
+        return range(initial_index, initial_index + len(page_items))
+
+    def is_option_valid(self, option: Option) -> bool:
+        """
+        Returns if the option can be selected or not.
+        """
+        if option.id == "PREVIOUS_PAGE":
+            return self.page_number > 1
+
+        elif option.id == "NEXT_PAGE":
+            return self.page_number < self.num_pages
+
+        elif option.id == "PREVIOUS_ITEM":
+            return self.item_number > 1
+
+        elif option.id == "NEXT_ITEM":
+            return self.item_number < len(self.items)
+
+        return True
+
+    @abstractmethod
+    def get_item_name(self, item: Any) -> str:
+        """
+        Returns the name of an item.
+
+        :var item: A Compendium's item.
+        :vartype item: Any
+
+        :return: The Compendium's item name.
+        :rtype: str
+        """
+        raise NotImplementedError
 
     # =========================================================================
     # Options
     # =========================================================================
 
-    @abstractmethod
-    def _search(self, name: str) -> int | None:
-        """
-        Searches an item by its name and returns its number if found.
-
-        :var name: The item's name.
-        :vartype name: str
-
-        :return: The found item's number.
-        :rtype: int
-        """
-        raise NotImplementedError
-
     def search_item(self):
         """
         Prompts the user to type an item's name, and if the item is:
         * found, switches the Compedium's level to "ITEM" and updates the current item
-        number
-        * not found, logs a message
+        number.
+        * not found, logs a message.
         """
-        name = self.logger.input(message=self.options_messages["search_prompt"])
-        item_number = self._search(name)
+        name = self.logger.input(message=self.messages["search_prompt"])
+        normalized_name = normalize(name)
+
+        item_number = None
+
+        for index, item in enumerate(self.items):
+            item_name = normalize(self.get_item_name(item))
+
+            if normalized_name == item_name:
+                item_number = index + 1
+                break
 
         if item_number:
-            self.level = "ITEM"
+            self.level = CompendiumLevel.ITEM
             self.item_number = item_number
 
         else:
-            self.logger.log(message=self.options_messages["item_not_found"], end="")
+            self.logger.log(message=self.messages["item_not_found_message"], end="")
             self.logger.input(message="")
 
         return
@@ -263,22 +348,23 @@ class Compendium(ABC):
         :return: The index of the selected item.
         :rtype: int
         """
-        page_items = self.get_page_items()
+        page_items_idx = self.get_page_items_indexes(self.page_number)
 
         while True:
-            page_item_number = self.logger.input(
-                message=self.options_messages["select_item_prompt"]
+            selected_item_number = self.logger.input(
+                message=self.messages["select_item_prompt"]
             )
 
             try:
-                page_item_number = int(page_item_number)
-                if page_item_number in range(0, len(page_items) + 1):
+                selected_item_number = int(selected_item_number)
+
+                if selected_item_number == 0 or selected_item_number in page_items_idx:
                     break
 
             except Exception:
                 continue
 
-        return page_item_number
+        return selected_item_number
 
     # =========================================================================
     # Rendering
@@ -291,55 +377,75 @@ class Compendium(ABC):
         """
         raise NotImplementedError
 
-    def show_options(self, level: Literal["ITEM", "PAGE"]):
+    def show_options(self, level: CompendiumLevel):
         """
-        Shows the options based on what is being displayed.
+        Shows the options based on the Compendium level.
 
-        :var level: What is being displayed.
-        :vartype level: Literal["ITEM", "PAGE"]
+        :var level: Compendium level.
+        :vartype level: CompendiumLevel
         """
-        if level == "ITEM":
-            # Previous Item
-            message = f"[1] {self.options_messages['previous_item']}"
-            if self.item_number == 1:
+        for option in self.options[level.value]:
+            option: Option
+            message = ""
+
+            if option.isolate:
+                message += "\n"
+
+            message = f"[{option.key}] {option.message}"
+
+            if option.isolate:
+                message += "\n"
+
+            if not self.is_option_valid(option):
                 message = color_string(message, foreground_color=Color.RED)
+
             self.logger.log(message=message)
 
-            # Next Item
-            message = f"[2] {self.options_messages['next_item']}"
-            if self.item_number == len(self.items):
-                message = color_string(message, foreground_color=Color.RED)
-            self.logger.log(message=message)
+        if not self.options[level.value][-1].isolate:
+            self.logger.log(message="")
 
-            # Search
-            self.logger.log(message=f"[3] {self.options_messages['search']}")
+        return
 
-            # Return to Pages
-            self.logger.log(
-                message=f"\n[0] {self.options_messages['return_to_pages']}\n"
-            )
+    def process_option(self, option: Option):
+        """
+        Processes an option.
+        """
+        if option.id == "PREVIOUS_PAGE":
+            if self.page_number > 1:
+                self.page_number -= 1
 
-        elif level == "PAGE":
-            # Previous Page
-            message = f"[1] {self.options_messages['previous_page']}"
-            if self.page_number == 1:
-                message = color_string(message, foreground_color=Color.RED)
-            self.logger.log(message=message)
+        elif option.id == "NEXT_PAGE":
+            if self.page_number < self.num_pages:
+                self.page_number += 1
 
-            # Next Page
-            message = f"[2] {self.options_messages['next_page']}"
-            if self.page_number == self.num_pages:
-                message = color_string(message, foreground_color=Color.RED)
-            self.logger.log(message=message)
+        elif option.id == "PREVIOUS_ITEM":
+            if self.item_number > 1:
+                self.item_number -= 1
+            self.page_number = ceil(self.item_number / self.page_size)
 
-            # Search
-            self.logger.log(message=f"[3] {self.options_messages['search']}")
+        elif option.id == "NEXT_ITEM":
+            if self.item_number < len(self.items):
+                self.item_number += 1
+            self.page_number = ceil(self.item_number / self.page_size)
 
-            # Show Item Details
-            self.logger.log(message=f"[4] {self.options_messages['show_details']}")
+        elif option.id == "SEARCH":
+            self.search_item()
+            self.page_number = ceil(self.item_number / self.page_size)
 
-            # Exit
-            self.logger.log(message=f"\n[0] {self.options_messages['exit']}\n")
+        elif option.id == "SHOW_DETAILS":
+            selected_item_number = self.select_item()
+
+            if selected_item_number:
+                self.item_number = selected_item_number
+                self.level = CompendiumLevel.ITEM
+            else:
+                self.level = CompendiumLevel.PAGE
+
+        elif option.id == "RETURN":
+            self.level = CompendiumLevel.PAGE
+
+        elif option.id == "EXIT":
+            pass
 
         return
 
@@ -348,7 +454,7 @@ class Compendium(ABC):
         Shows the current page.
         """
         message = self.logger.get_message(
-            namespace="base", message_group="COMPENDIUM", key="page"
+            namespace="compendium", message_group="BASE", key="page"
         )
         message = self.title + ": " + message + " " + str(self.page_number)
 
@@ -357,8 +463,7 @@ class Compendium(ABC):
             size=50,
         )
 
-        page_items = self.get_page_items()
-        page_data = self.get_page_data(page_items)
+        page_data = self.get_page_data(self.page_number)
 
         table = tabulate(
             page_data,
@@ -373,56 +478,28 @@ class Compendium(ABC):
         """
         Opens the Compendium on current page.
         """
+        # Current page showing
+        self.show_page()
+
         while True:
-            # Showing content
-            if self.level == "PAGE":
+            # Options
+            self.show_options(self.level)
+            selected = self.select_option()
+
+            # Option processing
+            if selected.id == "EXIT":
+                break
+
+            elif self.is_option_valid(selected):
+                self.process_option(selected)
+
+            else:
+                self.logger.log(message="")
+
+            # Showing Content
+            if self.level == CompendiumLevel.PAGE:
                 self.show_page()
-            elif self.level == "ITEM":
+            elif self.level == CompendiumLevel.ITEM:
                 self.show_item()
-                self.page_number = ceil(self.item_number / self.page_size)
-
-            self.show_options(level=self.level)
-
-            # Player option input
-            option = self.logger.input(
-                message=self.options_messages["select_option_prompt"]
-            )
-
-            # Option validation
-            if self.level == "PAGE":
-                if option == "0":
-                    break
-
-                elif option == "1":
-                    self.previous_page()
-
-                elif option == "2":
-                    self.next_page()
-
-                elif option == "3":
-                    self.search_item()
-
-                elif option == "4":
-                    self.level = "ITEM"
-                    page_item_number = self.select_item()
-                    self.item_number = (
-                        (self.page_number - 1) * self.page_size
-                    ) + page_item_number
-
-                    if self.item_number == 0:
-                        self.level = "PAGE"
-
-            elif self.level == "ITEM":
-                if option == "0":
-                    self.level = "PAGE"
-
-                elif option == "1":
-                    self.previous_item()
-
-                elif option == "2":
-                    self.next_item()
-
-                elif option == "3":
-                    self.search_item()
 
         return
