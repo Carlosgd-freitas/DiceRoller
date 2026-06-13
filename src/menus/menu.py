@@ -56,20 +56,6 @@ class Menu(ABC):
     # Options
     # =========================================================================
 
-    @abstractmethod
-    def is_option_valid(self, option: Option) -> bool:
-        """
-        Returns if the option can be selected or not.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def process_option(self, option: Option):
-        """
-        Processes an option.
-        """
-        raise NotImplementedError
-
     def select_option(self) -> Option:
         """
         Prompts the user to select one of the Menu's options:
@@ -92,6 +78,20 @@ class Menu(ABC):
                 if selected == option.key:
                     return option
 
+    @abstractmethod
+    def is_option_valid(self, option: Option) -> bool:
+        """
+        Returns if the option can be selected or not.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def process_option(self, option: Option):
+        """
+        Processes an option.
+        """
+        raise NotImplementedError
+
     # =========================================================================
     # Rendering
     # =========================================================================
@@ -106,7 +106,7 @@ class Menu(ABC):
             if option.isolate:
                 message += "\n"
 
-            message = f"[{option.key}] {option.message}"
+            message += f"[{option.key}] {option.message}"
 
             if option.isolate:
                 message += "\n"

@@ -181,30 +181,6 @@ class Compendium(Menu):
         """
         raise NotImplementedError
 
-    def select_option(self) -> Option:
-        """
-        Prompts the user to select one of the Compendium's options:
-        * if a valid option is selected, it will be returned.
-        * if an invalid option is selected, the prompt will repeat.
-
-        :return: The option selected by the user.
-        :rtype: Option
-        """
-        while True:
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="BASE",
-                key="select_option_prompt",
-            )
-
-            selected = self.logger.input(message=message)
-
-            for option in self.options[self.level.value]:
-                option: Option
-
-                if selected == option.key:
-                    return option
-
     @abstractmethod
     def get_messages(self) -> CompendiumMessages:
         """
@@ -272,24 +248,6 @@ class Compendium(Menu):
 
         return range(initial_index, initial_index + len(page_items))
 
-    def is_option_valid(self, option: Option) -> bool:
-        """
-        Returns if the option can be selected or not.
-        """
-        if option.id == "PREVIOUS_PAGE":
-            return self.page_number > 1
-
-        elif option.id == "NEXT_PAGE":
-            return self.page_number < self.num_pages
-
-        elif option.id == "PREVIOUS_ITEM":
-            return self.item_number > 1
-
-        elif option.id == "NEXT_ITEM":
-            return self.item_number < len(self.items)
-
-        return True
-
     @abstractmethod
     def get_item_name(self, item: Any) -> str:
         """
@@ -307,104 +265,47 @@ class Compendium(Menu):
     # Options
     # =========================================================================
 
-    def search_item(self):
+    def select_option(self) -> Option:
         """
-        Prompts the user to type an item's name, and if the item is:
-        * found, switches the Compedium's level to "ITEM" and updates the current item
-        number.
-        * not found, logs a message.
+        Prompts the user to select one of the Compendium's options:
+        * if a valid option is selected, it will be returned.
+        * if an invalid option is selected, the prompt will repeat.
+
+        :return: The option selected by the user.
+        :rtype: Option
         """
-        name = self.logger.input(message=self.messages["search_prompt"])
-        normalized_name = normalize(name)
-
-        item_number = None
-
-        for index, item in enumerate(self.items):
-            item_name = normalize(self.get_item_name(item))
-
-            if normalized_name == item_name:
-                item_number = index + 1
-                break
-
-        if item_number:
-            self.level = CompendiumLevel.ITEM
-            self.item_number = item_number
-
-        else:
-            self.logger.log(message=self.messages["item_not_found_message"], end="")
-            self.logger.input(message="")
-
-        return
-
-    def select_item(self) -> int:
-        """
-        Prompts the user to select one of the Compendium page's items:
-        * if a valid index is selected, it will be returned.
-        * if an invalid index is selected, the prompt will repeat.
-
-        A valid index is either 0 (which will cancel the operation) or an item index
-        that shows in the page.
-
-        :return: The index of the selected item.
-        :rtype: int
-        """
-        page_items_idx = self.get_page_items_indexes(self.page_number)
-
         while True:
-            selected_item_number = self.logger.input(
-                message=self.messages["select_item_prompt"]
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
             )
 
-            try:
-                selected_item_number = int(selected_item_number)
+            selected = self.logger.input(message=message)
 
-                if selected_item_number == 0 or selected_item_number in page_items_idx:
-                    break
+            for option in self.options[self.level.value]:
+                option: Option
 
-            except Exception:
-                continue
+                if selected == option.key:
+                    return option
 
-        return selected_item_number
-
-    # =========================================================================
-    # Rendering
-    # =========================================================================
-
-    @abstractmethod
-    def show_item(self):
+    def is_option_valid(self, option: Option) -> bool:
         """
-        Shows the current item.
+        Returns if the option can be selected or not.
         """
-        raise NotImplementedError
+        if option.id == "PREVIOUS_PAGE":
+            return self.page_number > 1
 
-    def show_options(self, level: CompendiumLevel):
-        """
-        Shows the options based on the Compendium level.
+        elif option.id == "NEXT_PAGE":
+            return self.page_number < self.num_pages
 
-        :var level: Compendium level.
-        :vartype level: CompendiumLevel
-        """
-        for option in self.options[level.value]:
-            option: Option
-            message = ""
+        elif option.id == "PREVIOUS_ITEM":
+            return self.item_number > 1
 
-            if option.isolate:
-                message += "\n"
+        elif option.id == "NEXT_ITEM":
+            return self.item_number < len(self.items)
 
-            message = f"[{option.key}] {option.message}"
-
-            if option.isolate:
-                message += "\n"
-
-            if not self.is_option_valid(option):
-                message = color_string(message, foreground_color=Color.RED)
-
-            self.logger.log(message=message)
-
-        if not self.options[level.value][-1].isolate:
-            self.logger.log(message="")
-
-        return
+        return True
 
     def process_option(self, option: Option):
         """
@@ -430,22 +331,111 @@ class Compendium(Menu):
 
         elif option.id == "SEARCH":
             self.search_item()
-            self.page_number = ceil(self.item_number / self.page_size)
 
         elif option.id == "SHOW_DETAILS":
-            selected_item_number = self.select_item()
-
-            if selected_item_number:
-                self.item_number = selected_item_number
-                self.level = CompendiumLevel.ITEM
-            else:
-                self.level = CompendiumLevel.PAGE
+            self.select_item()
 
         elif option.id == "RETURN":
             self.level = CompendiumLevel.PAGE
 
         elif option.id == "EXIT":
             pass
+
+        return
+
+    def search_item(self):
+        """
+        Prompts the user to type an item's name, and if the item is:
+        * found, switches the Compedium's level to ITEM and updates the current item
+        number.
+        * not found, logs a message.
+        """
+        name = self.logger.input(message=self.messages["search_prompt"])
+        normalized_name = normalize(name)
+
+        item_number = None
+
+        for index, item in enumerate(self.items):
+            item_name = normalize(self.get_item_name(item))
+
+            if normalized_name == item_name:
+                item_number = index + 1
+                break
+
+        if item_number:
+            self.level = CompendiumLevel.ITEM
+            self.item_number = item_number
+            self.page_number = ceil(self.item_number / self.page_size)
+
+        else:
+            self.logger.log(message=self.messages["item_not_found_message"], end="")
+            self.logger.input(message="")
+
+        return
+
+    def select_item(self):
+        """
+        Prompts the user to select one of the Compendium page's items, and if:
+        * the cancel index is selected, the operation is canceled.
+        * a valid index is selected, switches the Compedium's level to ITEM and
+        updates the current item number.
+        * an invalid index is selected, the prompt will repeat.
+        """
+        page_items_idx = self.get_page_items_indexes(self.page_number)
+
+        while True:
+            selected_item_number = self.logger.input(
+                message=self.messages["select_item_prompt"]
+            )
+
+            try:
+                selected_item_number = int(selected_item_number)
+
+                if selected_item_number == 0 or selected_item_number in page_items_idx:
+                    break
+
+            except Exception:
+                continue
+
+        if selected_item_number:
+            self.level = CompendiumLevel.ITEM
+            self.item_number = selected_item_number
+
+        else:
+            self.level = CompendiumLevel.PAGE
+
+        return
+
+    # =========================================================================
+    # Rendering
+    # =========================================================================
+
+    def show_options(self, level: CompendiumLevel):
+        """
+        Shows the options based on the Compendium level.
+
+        :var level: Compendium level.
+        :vartype level: CompendiumLevel
+        """
+        for option in self.options[level.value]:
+            option: Option
+            message = ""
+
+            if option.isolate:
+                message += "\n"
+
+            message += f"[{option.key}] {option.message}"
+
+            if option.isolate:
+                message += "\n"
+
+            if not self.is_option_valid(option):
+                message = color_string(message, foreground_color=Color.RED)
+
+            self.logger.log(message=message)
+
+        if not self.options[level.value][-1].isolate:
+            self.logger.log(message="")
 
         return
 
@@ -473,6 +463,13 @@ class Compendium(Menu):
         )
 
         self.logger.log(message=table + "\n")
+
+    @abstractmethod
+    def show_item(self):
+        """
+        Shows the current item.
+        """
+        raise NotImplementedError
 
     def open(self):
         """
