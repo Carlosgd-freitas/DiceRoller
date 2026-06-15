@@ -24,6 +24,7 @@ class Keyword(Enum):
     FOCUS = "FOCUS"
     FREEZE = "FREEZE"
     HEAL = "HEAL"
+    IMMUNITY = "IMMUNITY"
     INVISIBLE = "INVISIBLE"
     MANA = "MANA"
     MANA_REGEN = "MANA_REGEN"
@@ -73,6 +74,8 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = Color.SKY_BLUE
     elif keyword in [Keyword.HEAL]:
         foreground_color = Color.GREEN
+    elif keyword in [Keyword.IMMUNITY, Keyword.NOTHING]:
+        foreground_color = Color.WHITE
     elif keyword in [Keyword.MANA, Keyword.MANA_REGEN]:
         foreground_color = Color.BLUE
     elif keyword in [Keyword.POISON]:

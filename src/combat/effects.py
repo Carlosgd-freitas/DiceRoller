@@ -13,6 +13,7 @@ from src.logger.effects import EffectLogger
 if TYPE_CHECKING:
     from src.base.entity import Entity
     from src.base.side import Side
+    from src.effects.immunity import ImmunityEffect
     from src.logger.effects import EffectLogger
 
 
@@ -84,6 +85,7 @@ class EffectManager:
         source: Entity,
         target: Entity,
         check_can_act: bool = True,
+        check_immunity: bool = True,
         check_accuracy: bool = True,
     ) -> bool:
         """
@@ -103,6 +105,10 @@ class EffectManager:
         before trying do activate the Effect. Default value is True.
         :type check_can_act: bool
 
+        :param check_immunity: If True, an immunity check will be done before
+        trying do activate the Effect. Default value is True.
+        :type check_immunity: bool
+
         :param check_accuracy: If True, an accuracy check will be done before
         trying do activate the Effect. Default value is True.
         :type check_accuracy: bool
@@ -113,6 +119,19 @@ class EffectManager:
         # Check can act
         if (check_can_act) and (not source.can_act()):
             return False
+
+        # Check immunity
+        if check_immunity:
+            immunity: ImmunityEffect = target.get_effect(Keyword.IMMUNITY)
+
+            if immunity and effect.keyword in immunity.effects:
+                self.logger.log_effect_execution_fail(
+                    effect=effect,
+                    source=source,
+                    target=target,
+                    fail="immunity",
+                )
+                return False
 
         # Check accuracy
         if check_accuracy:

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.entity import Entity
     from src.base.side import Side
+    from src.effects.immunity import ImmunityEffect
 
 type stack_method = Literal["add", "overwrite"]
 
@@ -221,6 +222,15 @@ class Entity:
                         parameter,
                         current_value + new_value,
                     )
+
+            # Stacking Immunity effect
+            if current_effect.keyword == Keyword.IMMUNITY:
+                new_effect: ImmunityEffect
+                current_effect: ImmunityEffect
+
+                for effect_immunity in new_effect.effects:
+                    if effect_immunity not in current_effect.effects:
+                        current_effect.effects.append(effect_immunity)
 
             effect_data = current_effect.on_apply(
                 source,

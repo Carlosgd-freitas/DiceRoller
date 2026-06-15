@@ -16,12 +16,12 @@ ACTIVATION = {
     "bleed": "{target} recebeu {damage} de dano de {keyword}.",
     "burn": "{target} recebeu {damage} de dano de {keyword}.",
     "doom": "{target} encontrou seu fim pela {keyword}.",
-    "freeze": "{target} não pôde agir porque estava {status}.",
+    "freeze": "{source} não pôde agir porque estava {status}.",
     "poison": "{target} recebeu {damage} de dano de {keyword}.",
     "mana_regen": "{target} restaurou {value} de {mana} de si mesmo através da {keyword}.",
     "regen": "{target} restaurou {value} de {hp} de si mesmo através da {keyword}.",
-    "sleep": "{target} não pôde agir porque estava {status}.",
-    "stun": "{target} não pôde agir porque estava {status}.",
+    "sleep": "{source} não pôde agir porque estava {status}.",
+    "stun": "{source} não pôde agir porque estava {status}.",
     "thorns": "{target} recebeu {damage} de dano de {keyword}.",
 }
 
@@ -52,6 +52,7 @@ DESCRIPTION = {
     "focus": "Aumenta a acurácia dos dados e habilidades do alvo em {value_perc}%.",
     "freeze": "Impede que o alvo aja. Remove {burn}.",
     "heal": "Restaura {value} {hp}.",
+    "immunity": "Faz com que o alvo seja imune a outros efeitos. Quaisquer efeitos que o alvo esteja sobre continuarão a ser aplicados.",
     "invisible": "Evita todo o dano direto recebido por {duration} turnos.",
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
     "mana": "Aumenta {mana} em {value}.",
@@ -127,8 +128,16 @@ FAILS = {
     "dead_self": "estava morto.",
     "default": "falhou.",
     "default_self": "falhou.",
+    "freeze": "{target} estava {status}.",
+    "freeze_self": "estava {status}.",
+    "immunity": "{target} era {status}.",
+    "immunity_self": "era {status}",
     "miss": "errou o alvo.",
     "miss_self": "se errou.",
+    "sleep": "{target} estava {status}.",
+    "sleep_self": "estava {status}.",
+    "stun": "{target} estava {status}.",
+    "stun_self": "estava {status}.",
 }
 
 KEYWORDS = {
@@ -148,6 +157,7 @@ KEYWORDS = {
     "focus": "FOCO",
     "freeze": "CONGELAMENTO",
     "heal": "CURA",
+    "immunity": "IMUNIDADE",
     "invisible": "INVISÍVEL",
     "mana_regen": "REGENERAÇÃO DE MANA",
     "mana": "MANA",
@@ -174,6 +184,7 @@ STATUS = {
     "blind": "CEGO",
     "confuse": "CONFUSO",
     "freeze": "CONGELADO",
+    "immunity": "IMUNE",
     "sleep": "DORMINDO",
     "stun": "ATORDOADO",
 }

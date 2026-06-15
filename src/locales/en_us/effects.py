@@ -16,12 +16,12 @@ ACTIVATION = {
     "bleed": "{target} took {damage} damage from {keyword}.",
     "burn": "{target} took {damage} damage from {keyword}.",
     "doom": "{target} met its {keyword}.",
-    "freeze": "{target} could not act because it was {status}.",
+    "freeze": "{source} could not act because it was {status}.",
     "poison": "{target} took {damage} damage from {keyword}.",
     "mana_regen": "{target} restored {value} {mana} of itself through {keyword}.",
     "regen": "{target} restored {value} {hp} of itself through {keyword}.",
-    "sleep": "{target} could not act because it was {status}.",
-    "stun": "{target} could not act because it was {status}.",
+    "sleep": "{source} could not act because it was {status}.",
+    "stun": "{source} could not act because it was {status}.",
     "thorns": "{target} took {damage} damage from {keyword}.",
 }
 
@@ -52,6 +52,7 @@ DESCRIPTION = {
     "focus": "Increases the accuracy of target dice and skills by {value_perc}%.",
     "freeze": "Makes target unable to act. Removes {burn}.",
     "heal": "Restores {value} {hp}.",
+    "immunity": "Makes target immune to other effects. Any effects the target is under will still continue to be applied.",
     "invisible": "Avoids all recieved direct damage for {duration} turns.",
     "mana_regen": "Increases {mana} by {value} every turn start.",
     "mana": "Increases {mana} by {value}.",
@@ -127,8 +128,16 @@ FAILS = {
     "dead_self": "it was dead.",
     "default": "failed.",
     "default_self": "failed.",
+    "freeze": "{target} was {status}.",
+    "freeze_self": "it was {status}.",
+    "immunity": "{target} was {status}.",
+    "immunity_self": "it was {status}.",
     "miss": "missed the target.",
     "miss_self": "missed itself.",
+    "sleep": "{target} was {status}.",
+    "sleep_self": "it was {status}.",
+    "stun": "{target} was {status}.",
+    "stun_self": "it was {status}.",
 }
 
 KEYWORDS = {
@@ -148,6 +157,7 @@ KEYWORDS = {
     "focus": "FOCUS",
     "freeze": "FREEZE",
     "heal": "HEAL",
+    "immunity": "IMMUNITY",
     "invisible": "INVISIBLE",
     "mana_regen": "MANA REGEN",
     "mana": "MANA",
@@ -174,6 +184,7 @@ STATUS = {
     "blind": "BLIND",
     "confuse": "CONFUSED",
     "freeze": "FROZEN",
+    "immunity": "IMMUNE",
     "sleep": "ASLEEP",
     "stun": "STUNNED",
 }

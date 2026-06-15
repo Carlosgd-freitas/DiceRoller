@@ -9,6 +9,7 @@ from src.effects.attack import AttackEffect
 from src.effects.blind import BlindEffect
 from src.effects.focus import FocusEffect
 from src.effects.heal import HealEffect
+from src.effects.immunity import ImmunityEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.regen import RegenEffect
 from src.effects.thorns import ThornsEffect
@@ -90,6 +91,80 @@ def test_keyword_focus(managers: Dict):
             len(combat_manager.order[0].effects) == 0,
             combat_manager.order[0].get_effect(Keyword.FOCUS) is None,
             combat_manager.order[0].hp == 3,
+            combat_manager.order[1].hp == 8,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_immunity(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    effect_blind = BlindEffect(1)
+    effect_immunity = ImmunityEffect(effects=[Keyword.BLIND])
+    effect_attack = AttackEffect(2)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_immunity,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_blind,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    conditions = [
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 1,
+        combat_manager.order[0].get_effect(Keyword.BLIND) is None,
+        combat_manager.order[0].get_effect(Keyword.IMMUNITY).keyword
+        == Keyword.IMMUNITY,
+        combat_manager.order[0].get_effect(Keyword.IMMUNITY).duration == 1,
+        combat_manager.order[0].hp == 1,
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 0,
+        combat_manager.order[1].get_effect(Keyword.IMMUNITY) is None,
+        combat_manager.order[1].hp == 10,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            combat_manager.order[0].hp == 1,
+            combat_manager.order[1].hp == 8,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.effect_manager.execute_effect(
+        effect_blind,
+        source=combat_manager.order[0],
+        target=combat_manager.order[0],
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_attack,
+        source=combat_manager.order[0],
+        target=combat_manager.order[1],
+    )
+
+    conditions.extend(
+        [
+            len(combat_manager.order[0].effects) == 1,
+            combat_manager.order[0].get_effect(Keyword.IMMUNITY) is None,
+            combat_manager.order[0].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
+            combat_manager.order[0].get_effect(Keyword.BLIND).duration == 1,
+            combat_manager.order[0].hp == 1,
             combat_manager.order[1].hp == 8,
         ]
     )

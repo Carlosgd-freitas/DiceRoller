@@ -22,6 +22,7 @@ from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.heal import HealEffect
+from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
 from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
@@ -59,6 +60,7 @@ ALL_EFFECTS = [
     FocusEffect(),
     FreezeEffect(),
     HealEffect(),
+    ImmunityEffect(),
     InvisibleEffect(),
     ManaEffect(),
     ManaRegenEffect(),

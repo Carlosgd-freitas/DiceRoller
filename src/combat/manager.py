@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from math import inf
 from random import shuffle
 from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict
 
@@ -357,8 +358,9 @@ class CombatManager:
             if effect:
                 self.effect_manager.logger.log_effect_activation(
                     effect=effect,
-                    source=None,
-                    target=self.current_monster,
+                    source=self.current_monster,
+                    target=None,
+                    fail=keyword.name.lower(),
                 )
                 return False
 
@@ -393,7 +395,8 @@ class CombatManager:
         idx_removed_effects = []
 
         for idx, effect in enumerate(self.current_monster.effects):
-            effect.duration -= 1
+            if effect.duration != inf:
+                effect.duration -= 1
             effect.value -= effect.decay
 
             if effect.duration <= 0:

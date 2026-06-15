@@ -96,7 +96,7 @@ class Effect(ABC):
         self,
         keyword: Keyword,
         value: float = 0,
-        duration: int = 0,
+        duration: float = 0,
         decay: float = 0,
         accuracy: float = 1,
         type: EffectType = None,

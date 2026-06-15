@@ -1,10 +1,12 @@
 from colorama import init
 
 from src.base.dice import Dice
+from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
 from src.combat.manager import CombatManager
 from src.combat.team import Team
+from src.compendium.effects import get_all_effects
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
@@ -12,23 +14,18 @@ from src.effects.blind import BlindEffect
 from src.effects.block import BlockEffect
 from src.effects.burn import BurnEffect
 from src.effects.cleanse import CleanseEffect
-from src.effects.confuse import ConfuseEffect
 from src.effects.corrupt import CorruptEffect
-from src.effects.curse import CurseEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
-from src.effects.heal import HealEffect
+from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
-from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
-from src.effects.nothing import NothingEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
-from src.effects.revive import ReviveEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
@@ -39,43 +36,7 @@ init()
 
 # ----------------------------
 
-all_effects = [
-    # Buffs
-    FocusEffect(1),
-    ManaRegenEffect(1),
-    RegenEffect(1),
-    ThornsEffect(1),
-    # Debuff
-    BleedEffect(1),
-    BlindEffect(1),
-    BurnEffect(1),
-    ConfuseEffect(1),
-    DoomEffect(1),
-    FreezeEffect(1),
-    PoisonEffect(1),
-    SleepEffect(1),
-    StunEffect(1),
-    # Defensive
-    AbsorbEffect(1),
-    BlockEffect(1),
-    InvisibleEffect(1),
-    SacredBlockEffect(1),
-    # Deterioration
-    CorruptEffect(1),
-    CurseEffect(1),
-    ExecuteEffect(0.5),
-    # Nothing
-    NothingEffect(),
-    # Offensive
-    AttackEffect(1),
-    DrainEffect(1),
-    PierceEffect(1),
-    # Restoration
-    CleanseEffect(1),
-    HealEffect(1),
-    ManaEffect(1),
-    ReviveEffect(0.25),
-]
+all_effects = get_all_effects()
 
 # ----------------------------
 
@@ -240,6 +201,18 @@ monster_a.effects = []
 
 # ----------------------------
 
+print("\n===== Effect Execution: DOOM =====")
+
+turns = 3
+combat_manager.current_monster.apply_effect(DoomEffect(duration=turns))
+
+for _ in range(turns):
+    combat_manager.end_turn()
+
+combat_manager.current_monster.hp = 150
+
+# ----------------------------
+
 print("\n===== Effect Execution: EXECUTE =====")
 
 monster_b.hp = 100
@@ -251,6 +224,26 @@ combat_manager.effect_manager.execute_effect(
 )
 
 monster_b.hp = 150
+
+# ----------------------------
+
+print("\n===== Effect Execution: IMMUNITY =====")
+
+immunity_effect = ImmunityEffect(effects=[Keyword.BURN, Keyword.STUN])
+
+combat_manager.effect_manager.execute_effect(
+    effect=immunity_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=StunEffect(),
+    source=monster_a,
+    target=monster_b,
+)
+
+monster_b.effects = []
 
 # ----------------------------
 
@@ -365,20 +358,6 @@ for effect in [
     combat_manager.current_monster.apply_effect(effect)
 
 combat_manager.start_turn()
-
-# ----------------------------
-
-print("\n===== Effect Activation: Turn End =====")
-
-combat_manager.current_monster.effects = []
-
-for effect in [
-    DoomEffect(),
-]:
-    combat_manager.current_monster.apply_effect(effect)
-    combat_manager.end_turn()
-
-    combat_manager.current_monster.hp = 150
 
 # ----------------------------
 

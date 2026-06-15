@@ -50,16 +50,9 @@ class EffectLogger(Logger):
             if target.suffix:
                 kwargs["target"] += " " + target.suffix
 
-        # Keywords
-        for keyword in Keyword:
-            kwargs[keyword.name.lower()] = self.get_colored_message(
-                namespace="effects",
-                message_group="KEYWORDS",
-                keyword=keyword,
-            )
-
-        # Effect keyword variations
+        # Keyword and variations
         for parameter, category in [
+            (effect.keyword.name.lower(), "KEYWORDS"),
             ("action", "ACTIONS"),
             ("status", "STATUS"),
             ("keyword", "KEYWORDS"),
@@ -224,7 +217,7 @@ class EffectLogger(Logger):
                 f"+{effects_remaining} {message}...",
                 intensity="BRIGHT",
             )
-            self.log(message=message, end="")
+            self.log(message=message)
 
         else:
             self.log(message=".")
@@ -392,6 +385,16 @@ class EffectLogger(Logger):
 
         # Logging fail cause
         key = kwargs["fail"]
+
+        for keyword in Keyword:
+            if key == keyword.name.lower():
+                kwargs["status"] = self.get_colored_message(
+                    namespace="effects",
+                    message_group="STATUS",
+                    keyword=keyword,
+                )
+                break
+
         if (source) and (target) and (source == target):
             key += "_self"
 

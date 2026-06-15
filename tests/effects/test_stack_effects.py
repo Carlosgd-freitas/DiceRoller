@@ -7,6 +7,7 @@ from src.base.keywords import Keyword
 from src.combat.manager import CombatManager
 from src.effects.burn import BurnEffect
 from src.effects.freeze import FreezeEffect
+from src.effects.immunity import ImmunityEffect
 from src.effects.nothing import NothingEffect
 from src.effects.stun import StunEffect
 from tests.utils import assert_conditions
@@ -164,6 +165,29 @@ def test_stack_effect_remove(managers: Dict):
         monster.get_effect(Keyword.BURN).decay == 6,
         isclose(monster.get_effect(Keyword.BURN).accuracy, 0.2),
         monster.get_effect(Keyword.FREEZE) is None,
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_stack_immunity_effect(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster = combat_manager.order[1]
+
+    effect_0 = ImmunityEffect(effects=[Keyword.BURN, Keyword.BLIND])
+    effect_1 = ImmunityEffect(effects=[Keyword.BURN, Keyword.POISON])
+
+    monster.apply_effect(effect_0)
+    monster.apply_effect(effect_1)
+
+    stacked_effect = monster.get_effect(Keyword.IMMUNITY)
+
+    conditions = [
+        stacked_effect is not None,
+        len(monster.effects) == 1,
+        stacked_effect.keyword == Keyword.IMMUNITY,
+        len(stacked_effect.effects) == 3,
+        set(stacked_effect.effects) == {Keyword.BURN, Keyword.BLIND, Keyword.POISON},
     ]
 
     assert_conditions(conditions)
