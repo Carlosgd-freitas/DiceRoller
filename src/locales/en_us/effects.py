@@ -7,10 +7,10 @@ ACTIONS = {
     "doom": "DOOMED",
     "drain": "DRAINED",
     "execute": "EXECUTED",
-    "invisible": "AVOIDED",
     "pierce": "PIERCED",
     "revive": "REVIVED",
     "sacred_block": "SACRED BLOCKED",
+    "taunt": "TAUNTED",
 }
 
 ACTIVATION = {
@@ -19,6 +19,7 @@ ACTIVATION = {
     "doom": "{target} met its {keyword}.",
     "doom_countdown": "{duration} turns remain for {target} to meet its {keyword}.",
     "freeze": "{source} could not act because it was {status}.",
+    "frostburn": "{target} took {damage} damage from {keyword}.",
     "poison": "{target} took {damage} damage from {keyword}.",
     "mana_regen": "{target} restored {value} {mana} of itself through {keyword}.",
     "regen": "{target} restored {value} {hp} of itself through {keyword}.",
@@ -32,7 +33,10 @@ DAMAGE = {
     "base": "{source} {action} {target}.",
     "base_self": "{source} {action} itself.",
     # Part 2: Defensive message
-    "defended_damage": "{defended_damage} damage was {action}.",
+    "absorb": "{defended_damage} damage was {action}.",
+    "block": "{defended_damage} damage was {action}.",
+    "invulnerable": "{defended_damage} damage was negated because {target} was {status}.",
+    "sacred_block": "{defended_damage} damage was {action}.",
     # Part 3: Damage message
     "damage": "{damage} damage was done.",
 }
@@ -53,9 +57,11 @@ DESCRIPTION = {
     "execute": "Kills the target if its' {hp} is less than or equal to {value_perc}% of it's max {hp}.",
     "focus": "Increases the accuracy of target dice and skills by {value_perc}%.",
     "freeze": "Makes target unable to act. Removes {burn}.",
+    "frostburn": "Deals {value} damage every turn start.",
     "heal": "Restores {value} {hp}.",
     "immunity": "Makes target immune to other effects. Any effects the target is under will still continue to be applied.",
-    "invisible": "Avoids all recieved direct damage for {duration} turns.",
+    "invisible": "Makes the target untargetable by enemies.",
+    "invulnerable": "Negates any damage that would be done to the target's {hp}.",
     "mana_regen": "Increases {mana} by {value} every turn start.",
     "mana": "Increases {mana} by {value}.",
     "nothing": "Does nothing.",
@@ -66,6 +72,7 @@ DESCRIPTION = {
     "sacred_block": "Reduces all recieved direct damage up to {value} times.",
     "sleep": "Makes target unable to act. Any direct damage will wake up the target.",
     "stun": "Makes target unable to act.",
+    "taunt": "Makes the target a priority for enemies dices and skills.",
     "thorns": "When attacked directly, deals {value} damage to the attacker.",
 }
 
@@ -87,10 +94,14 @@ EXECUTION = {
     "immunity_self": "{source} granted {keyword} of {count} effects to itself",
     "invisible": "{source} turned {target} {keyword} for {duration} turns.",
     "invisible_self": "{source} turned itself {keyword} for {duration} turns.",
+    "invulnerable": "{source} turned {target} {keyword} for {duration} turns.",
+    "invulnerable_self": "{source} turned itself {keyword} for {duration} turns.",
     "mana": "{source} restored {value} {mana} of {target} through {keyword}.",
     "mana_self": "{source} restored {value} {mana} of itself through {keyword}.",
     "revive": "{source} {action} {target}. {target} was healed by {value_perc}% of its max {hp}.",
     "revive_self": "{source} {action} itself and was healed by {value_perc}% of its max {hp}.",
+    "taunt": "{source} made {target} {keyword} the enemies for {duration} turns.",
+    "taunt_self": "{source} {action} the enemies for {duration} turns.",
     # Effect types
     "buff": "{source} buffed {target} with {keyword} for {duration} turns.",
     "buff_self": "{source} buffed itself with {keyword} for {duration} turns.",
@@ -108,10 +119,16 @@ EXECUTION_FAIL = {
     "doom_self": "{source} tried to {keyword} itself, but",
     "execute": "{source} tried to {keyword} {target}, but",
     "execute_self": "{source} tried to {keyword} itself, but",
+    "immunity": "{source} tried to turn {target} {status}, but",
+    "immunity_self": "{source} tried to turn itself {status}, but",
     "invisible": "{source} tried to turn {target} {keyword}, but",
     "invisible_self": "{source} tried to turn itself {keyword}, but",
+    "invulnerable": "{source} tried to turn {target} {keyword}, but",
+    "invulnerable_self": "{source} tried to turn itself {keyword}, but",
     "revive": "{source} tried to {keyword} {target}, but",
     "revive_self": "{source} tried to {keyword} itself, but",
+    "taunt": "{source} tried to make {target} {keyword} the enemies, but",
+    "taunt_self": "{source} tried to {keyword} the enemies, but",
     # Effect types
     "buff": "{source} tried to buff {target} with {keyword}, but",
     "buff_self": "{source} tried to buff itself with {keyword}, but",
@@ -164,9 +181,11 @@ KEYWORDS = {
     "execute": "EXECUTE",
     "focus": "FOCUS",
     "freeze": "FREEZE",
+    "frostburn": "FROSTBURN",
     "heal": "HEAL",
     "immunity": "IMMUNITY",
     "invisible": "INVISIBLE",
+    "invulnerable": "INVULNERABLE",
     "mana_regen": "MANA REGEN",
     "mana": "MANA",
     "nothing": "NOTHING",
@@ -177,6 +196,7 @@ KEYWORDS = {
     "sacred_block": "SACRED BLOCK",
     "sleep": "SLEEP",
     "stun": "STUN",
+    "taunt": "TAUNT",
     "thorns": "THORNS",
 }
 
@@ -189,13 +209,17 @@ REMOVAL = {
 }
 
 STATUS = {
+    "burn": "BURNED",
     "blind": "BLIND",
     "confuse": "CONFUSED",
     "doom": "DOOMED",
     "freeze": "FROZEN",
+    "frostburn": "FROSTBURNED",
     "immunity": "IMMUNE",
+    "invulnerable": "INVULNERABLE",
     "sleep": "ASLEEP",
     "stun": "STUNNED",
+    "taunt": "TAUNTING",
 }
 
 TYPES = {

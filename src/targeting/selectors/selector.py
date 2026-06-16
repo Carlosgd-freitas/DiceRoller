@@ -6,10 +6,10 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Literal
 
 from src.base.effect import EffectType
+from src.base.keywords import Keyword
 from src.targeting.filters import filter_entities
 
 if TYPE_CHECKING:
-    from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
@@ -122,6 +122,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k random monsters.
@@ -138,6 +139,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_highest_hp(
@@ -148,6 +150,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with most effective hp and hp.
@@ -168,6 +171,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_lowest_hp(
@@ -178,6 +182,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with least effective hp and hp.
@@ -198,6 +203,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_highest_max_hp(
@@ -208,6 +214,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with most max hp.
@@ -227,6 +234,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_lowest_max_hp(
@@ -237,6 +245,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with least max hp.
@@ -256,6 +265,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_with_effects(
@@ -265,6 +275,7 @@ class Selector(ABC):
         effects: List[Keyword],
         life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k random monsters with effects.
@@ -277,6 +288,7 @@ class Selector(ABC):
             life_state=life_state,
             keyword_whitelist=effects,
             exclude=exclude,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_without_effects(
@@ -286,6 +298,7 @@ class Selector(ABC):
         effects: List[Keyword],
         life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
         exclude: List[str] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k random monsters without effects.
@@ -298,6 +311,7 @@ class Selector(ABC):
             life_state=life_state,
             keyword_blacklist=effects,
             exclude=exclude,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_most_effects(
@@ -309,6 +323,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with most effects of a type.
@@ -332,6 +347,7 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
 
     def _get_targets_least_effects(
@@ -343,6 +359,7 @@ class Selector(ABC):
         exclude: List[str] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        check_taunt: bool = True,
     ):
         """
         Returns k monsters with least effects of a type.
@@ -366,4 +383,18 @@ class Selector(ABC):
             exclude=exclude,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            check_taunt=check_taunt,
         )
+
+    def _preprocess_enemies(
+        self,
+        monsters: List[Monster],
+    ) -> List[Monster]:
+        """
+        Preprocesses a list of enemy monsters for future targeting.
+        """
+        monsters = [
+            monster for monster in monsters if not monster.get_effect(Keyword.INVISIBLE)
+        ]
+
+        return monsters

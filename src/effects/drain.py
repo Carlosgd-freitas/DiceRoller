@@ -68,7 +68,7 @@ class DrainEffect(Effect):
                 consider=[
                     Keyword.ABSORB,
                     Keyword.BLOCK,
-                    Keyword.INVISIBLE,
+                    Keyword.INVULNERABLE,
                     Keyword.SACRED_BLOCK,
                 ],
             )

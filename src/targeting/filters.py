@@ -5,9 +5,10 @@ from __future__ import annotations
 from random import sample
 from typing import TYPE_CHECKING, Callable, List, Literal
 
+from src.base.keywords import Keyword
+
 if TYPE_CHECKING:
     from src.base.entity import Entity
-    from src.base.keywords import Keyword
 
 
 def filter_entities(
@@ -20,6 +21,7 @@ def filter_entities(
     exclude: List[str] = None,
     keyword_whitelist: List[Keyword] = None,
     keyword_blacklist: List[Keyword] = None,
+    check_taunt: bool = True,
 ) -> List[Entity]:
     """
     Copies and filters a list of entities which meet the criteria.
@@ -57,6 +59,10 @@ def filter_entities(
     returned.
     :type keyword_blacklist: List[Keyword]
 
+    :param check_taunt: Whether to prioritize entities with Taunt effect. Default value
+    is True.
+    :type check_taunt: bool
+
     :return: A list of entities which meets the criteria.
     :rtype: List[Entity]
     """
@@ -70,6 +76,10 @@ def filter_entities(
     # Sorting
     for sort_function in reversed(sort_functions):
         filtered.sort(key=sort_function)
+
+    # Taunt
+    if check_taunt:
+        filtered.sort(key=lambda entity: not entity.get_effect(Keyword.TAUNT))
 
     # Entity attribute conditions
     if life_state == "ALIVE":

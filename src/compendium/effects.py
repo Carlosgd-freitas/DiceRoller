@@ -21,9 +21,11 @@ from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
+from src.effects.frostburn import FrostburnEffect
 from src.effects.heal import HealEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
+from src.effects.invulnerable import InvulnerableEffect
 from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.nothing import NothingEffect
@@ -34,6 +36,7 @@ from src.effects.revive import ReviveEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
+from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
 from src.locales.languages import Language
 from src.logger.effects import EffectLogger
@@ -59,9 +62,11 @@ ALL_EFFECTS = [
     ExecuteEffect(),
     FocusEffect(),
     FreezeEffect(),
+    FrostburnEffect(),
     HealEffect(),
     ImmunityEffect(),
     InvisibleEffect(),
+    InvulnerableEffect(),
     ManaEffect(),
     ManaRegenEffect(),
     NothingEffect(),
@@ -72,6 +77,7 @@ ALL_EFFECTS = [
     SacredBlockEffect(),
     SleepEffect(),
     StunEffect(),
+    TauntEffect(),
     ThornsEffect(),
 ]
 

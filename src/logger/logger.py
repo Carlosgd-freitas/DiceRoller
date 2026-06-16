@@ -186,14 +186,17 @@ class Logger:
         """
         color_data = get_keyword_color(keyword)
 
-        message = color_string(
-            self.get_message(
-                namespace=namespace,
-                message_group=message_group,
-                key=keyword.value.lower(),
-            ),
-            **color_data,
+        message = self.get_message(
+            namespace=namespace,
+            message_group=message_group,
+            key=keyword.value.lower(),
         )
+
+        if message:
+            message = color_string(
+                message,
+                **color_data,
+            )
 
         return message
 

@@ -15,6 +15,7 @@ from src.effects.confuse import ConfuseEffect
 from src.effects.doom import DoomEffect
 from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
+from src.effects.frostburn import FrostburnEffect
 from src.effects.heal import HealEffect
 from src.effects.poison import PoisonEffect
 from src.effects.sleep import SleepEffect
@@ -32,7 +33,7 @@ def test_keyword_bleed(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_bleed = BleedEffect(1)
+    effect_bleed = BleedEffect(1, duration=1)
     effect_attack_1 = AttackEffect(1)
     effect_attack_2 = AttackEffect(2)
     effect_attack_3 = AttackEffect(3)
@@ -94,8 +95,8 @@ def test_keyword_bleed(managers: Dict):
 def test_keyword_blind(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_blind = BlindEffect(1)
-    effect_focus = FocusEffect(1)
+    effect_blind = BlindEffect(1, duration=1)
+    effect_focus = FocusEffect(1, duration=1)
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
 
@@ -176,7 +177,7 @@ def test_keyword_burn(managers: Dict):
     combat_manager.current_monster = combat_manager.order[1]
 
     effect_burn = BurnEffect(2)
-    effect_freeze = FreezeEffect()
+    effect_freeze = FreezeEffect(duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect_burn,
@@ -223,7 +224,7 @@ def test_keyword_confuse(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector_manager: SelectorManager = managers["selector_manager"]
 
-    effect_confuse = ConfuseEffect(1)
+    effect_confuse = ConfuseEffect(duration=1)
     effect_attack = AttackEffect(1)
     side = Side(effects=[effect_attack])
 
@@ -237,7 +238,6 @@ def test_keyword_confuse(managers: Dict):
         combat_manager.order[0].local_id == "MONSTER_1",
         len(combat_manager.order[0].effects) == 1,
         combat_manager.order[0].get_effect(Keyword.CONFUSE).keyword == Keyword.CONFUSE,
-        combat_manager.order[0].get_effect(Keyword.CONFUSE).value == 1,
         combat_manager.order[0].get_effect(Keyword.CONFUSE).duration == 1,
         combat_manager.order[0].hp == 1,
     ]
@@ -331,10 +331,10 @@ def test_keyword_doom(managers: Dict):
 def test_keyword_freeze(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_freeze = FreezeEffect()
+    effect_freeze = FreezeEffect(duration=1)
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
-    effect_burn = BurnEffect(2)
+    effect_burn = BurnEffect(2, duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect_freeze,
@@ -404,12 +404,55 @@ def test_keyword_freeze(managers: Dict):
     assert_conditions(conditions)
 
 
+def test_keyword_frostburn(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+
+    combat_manager.current_monster = combat_manager.order[1]
+
+    effect_frostburn = FrostburnEffect(2, duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_frostburn,
+        source=combat_manager.order[1],
+        target=combat_manager.order[1],
+    )
+
+    conditions = [
+        combat_manager.order[1].local_id == "MONSTER_2",
+        len(combat_manager.order[1].effects) == 1,
+        combat_manager.order[1].get_effect(Keyword.FROSTBURN).keyword
+        == Keyword.FROSTBURN,
+        combat_manager.order[1].get_effect(Keyword.FROSTBURN).value == 2,
+        combat_manager.order[1].get_effect(Keyword.FROSTBURN).duration == 1,
+        combat_manager.order[1].hp == 10,
+        combat_manager.order[0].local_id == "MONSTER_1",
+        len(combat_manager.order[0].effects) == 0,
+        combat_manager.order[0].get_effect(Keyword.FROSTBURN) is None,
+        combat_manager.order[0].hp == 1,
+    ]
+
+    combat_manager.start_turn()
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            len(combat_manager.order[1].effects) == 0,
+            combat_manager.order[1].get_effect(Keyword.FROSTBURN) is None,
+            combat_manager.order[1].hp == 8,
+            combat_manager.order[0].hp == 1,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
 def test_keyword_poison(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_poison = PoisonEffect(3)
+    effect_poison = PoisonEffect(3, duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect_poison,
@@ -451,7 +494,7 @@ def test_keyword_sleep(managers: Dict):
 
     combat_manager.current_monster = combat_manager.order[1]
 
-    effect_sleep = SleepEffect()
+    effect_sleep = SleepEffect(duration=1)
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 
@@ -533,7 +576,7 @@ def test_keyword_sleep(managers: Dict):
 def test_keyword_stun(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
 
-    effect_stun = StunEffect()
+    effect_stun = StunEffect(duration=1)
     effect_attack = AttackEffect(2)
     effect_heal = HealEffect(2)
 

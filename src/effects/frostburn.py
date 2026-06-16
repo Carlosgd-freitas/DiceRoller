@@ -1,4 +1,4 @@
-"""Attack effect module."""
+"""Frostburn effect module."""
 
 from __future__ import annotations
 
@@ -6,37 +6,38 @@ from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.triggers import Trigger
 from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class AttackEffect(Effect):
+class FrostburnEffect(Effect):
     """
-    Attack Effect.
+    Frostburn Effect.
 
-    Will reduce the target's HP by the effect value and remove Sleep from it. The damage
-    done will be affected by the target's Block.
+    This is a debuff which will reduce the target's HP by the effect value at the start
+    of each of the target's turn.
     """
 
     def __init__(
         self,
         value: float = 0,
-        duration: int = 0,
+        duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
     ):
         super().__init__(
-            Keyword.ATTACK,
+            Keyword.FROSTBURN,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.OFFENSIVE,
-            None,
-            False,
+            EffectType.DEBUFF,
+            Trigger.TURN_START,
+            True,
             removable,
         )
 
@@ -45,7 +46,13 @@ class AttackEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,
@@ -54,23 +61,12 @@ class AttackEffect(Effect):
     ) -> EffectData:
         damage_data = {}
         fail = None
-        removed_effects = []
 
         if target.is_alive():
-            sleep = target.remove_effect(Keyword.SLEEP)
-            if sleep:
-                removed_effects.append(sleep)
-
             damage_data = calculate_damage(
                 self,
                 source,
                 target,
-                consider=[
-                    Keyword.ABSORB,
-                    Keyword.BLOCK,
-                    Keyword.INVULNERABLE,
-                    Keyword.SACRED_BLOCK,
-                ],
             )
 
             target.hp -= damage_data["damage"]
@@ -82,5 +78,4 @@ class AttackEffect(Effect):
         return {
             **damage_data,
             "fail": fail,
-            "removed_effects": removed_effects,
         }

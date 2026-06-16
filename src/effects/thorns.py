@@ -24,7 +24,7 @@ class ThornsEffect(Effect):
     def __init__(
         self,
         value: float = 0,
-        duration: int = 1,
+        duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
@@ -70,6 +70,7 @@ class ThornsEffect(Effect):
                 consider=[
                     Keyword.ABSORB,
                     Keyword.BLOCK,
+                    Keyword.INVULNERABLE,
                     Keyword.SACRED_BLOCK,
                 ],
             )

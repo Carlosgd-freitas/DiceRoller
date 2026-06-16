@@ -49,6 +49,8 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         return self._get_targets_least_effects(
             enemies,
             k=k,
@@ -87,6 +89,8 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         if random() < 0.3:
             targets = self._get_targets_random(
                 enemies,
@@ -134,6 +138,8 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         return self._get_targets_most_effects(
             enemies,
             k=k,

@@ -49,6 +49,8 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         if random() < 0.5:
             return self._get_targets_random(
                 enemies,
@@ -93,6 +95,8 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         if random() < 0.3:
             return self._get_targets_random(
                 enemies,
@@ -138,6 +142,7 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
         targets: List[Monster] = []
 
         if random() < 0.1:

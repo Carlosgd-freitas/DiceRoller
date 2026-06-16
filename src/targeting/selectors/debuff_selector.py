@@ -48,6 +48,8 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         return self._get_targets_random(
             enemies,
             k=k,
@@ -85,6 +87,8 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         if random() < 0.5:
             targets = self._get_targets_without_effects(
                 enemies,
@@ -142,6 +146,8 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
+        enemies = self._preprocess_enemies(enemies)
+
         if random() < 0.5:
             targets = self._get_targets_without_effects(
                 enemies,

@@ -53,6 +53,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
+            enemies = self._preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(
@@ -97,6 +98,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
+            enemies = self._preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(
@@ -141,6 +143,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
+            enemies = self._preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(

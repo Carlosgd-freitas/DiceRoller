@@ -9,7 +9,7 @@ from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.drain import DrainEffect
-from src.effects.invisible import InvisibleEffect
+from src.effects.invulnerable import InvulnerableEffect
 from src.effects.pierce import PierceEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.locales.languages import Language
@@ -45,7 +45,7 @@ for i in range(1, 4):
     sides.append(Side(effects=[AbsorbEffect(i)]))
     sides.append(Side(effects=[BlockEffect(i)]))
 
-sides.append(Side(effects=[InvisibleEffect()]))
+sides.append(Side(effects=[InvulnerableEffect()]))
 sides.append(Side(effects=[SacredBlockEffect(1)]))
 
 monster_b = Monster(

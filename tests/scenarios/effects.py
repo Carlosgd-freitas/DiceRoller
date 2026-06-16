@@ -20,8 +20,10 @@ from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
 from src.effects.freeze import FreezeEffect
+from src.effects.frostburn import FrostburnEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
+from src.effects.invulnerable import InvulnerableEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
@@ -324,7 +326,7 @@ print("\n===== Effect Activation: Being Attacked =====")
 for effect in [
     AbsorbEffect(1),
     BlockEffect(1),
-    InvisibleEffect(),
+    InvulnerableEffect(),
     SacredBlockEffect(1),
     ThornsEffect(1),
 ]:
@@ -365,6 +367,7 @@ combat_manager.current_monster.effects = []
 
 for effect in [
     BurnEffect(1),
+    FrostburnEffect(1),
     ManaRegenEffect(1),
     PoisonEffect(1),
     RegenEffect(1),

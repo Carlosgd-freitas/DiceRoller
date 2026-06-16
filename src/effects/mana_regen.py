@@ -23,7 +23,7 @@ class ManaRegenEffect(Effect):
     def __init__(
         self,
         value: float = 0,
-        duration: int = 1,
+        duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,

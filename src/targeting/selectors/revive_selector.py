@@ -54,6 +54,7 @@ class ReviveSelector(Selector):
             allies,
             k=k,
             life_state="DEAD",
+            check_taunt=False,
         )
 
         return targets
@@ -95,6 +96,7 @@ class ReviveSelector(Selector):
             allies,
             k=k,
             life_state="DEAD",
+            check_taunt=False,
         )
 
         return targets
@@ -138,6 +140,7 @@ class ReviveSelector(Selector):
                 allies,
                 k=k,
                 life_state="DEAD",
+                check_taunt=False,
             )
 
         else:
@@ -145,6 +148,7 @@ class ReviveSelector(Selector):
                 allies,
                 k=k,
                 life_state="DEAD",
+                check_taunt=False,
             )
 
         return targets

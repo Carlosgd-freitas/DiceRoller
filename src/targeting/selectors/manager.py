@@ -11,6 +11,7 @@ from src.base.keywords import Keyword
 from src.targeting.selectors.buff_selector import BuffSelector
 from src.targeting.selectors.cleanse_selector import CleanseSelector
 from src.targeting.selectors.corrupt_selector import CorruptSelector
+from src.targeting.selectors.curse_selector import CurseSelector
 from src.targeting.selectors.debuff_selector import DebuffSelector
 from src.targeting.selectors.defensive_selector import DefensiveSelector
 from src.targeting.selectors.offensive_selector import OffensiveSelector
@@ -88,7 +89,7 @@ class SelectorManager:
                 break
 
             elif effect.keyword == Keyword.CURSE:
-                selector = DefensiveSelector()
+                selector = CurseSelector()
                 break
 
             elif effect.keyword == Keyword.REVIVE:

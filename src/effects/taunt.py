@@ -1,4 +1,4 @@
-"""Focus effect module."""
+"""Taunt effect module."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class FocusEffect(Effect):
+class TauntEffect(Effect):
     """
-    Focus Effect.
+    Taunt Effect.
 
-    Buff that increases the target's accuracies. Removes Blind when applied.
+    Makes the target a priority for enemies.
     """
 
     def __init__(
@@ -27,7 +27,7 @@ class FocusEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            Keyword.FOCUS,
+            Keyword.TAUNT,
             value,
             duration,
             decay,
@@ -44,19 +44,11 @@ class FocusEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        removed_effects = []
-
-        if target.is_alive():
-            blind = target.remove_effect(Keyword.BLIND)
-            if blind:
-                removed_effects.append(blind)
-
-        else:
+        if not target.is_alive():
             fail = "dead"
 
         return {
             "fail": fail,
-            "removed_effects": removed_effects,
         }
 
     def activate(
@@ -64,10 +56,4 @@ class FocusEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

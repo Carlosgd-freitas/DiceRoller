@@ -8,7 +8,7 @@ from src.base.keywords import Keyword
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
-from src.effects.invisible import InvisibleEffect
+from src.effects.invulnerable import InvulnerableEffect
 from src.effects.sacred_block import SacredBlockEffect
 from tests.utils import assert_conditions
 
@@ -128,7 +128,7 @@ def test_keyword_block(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_invisible(managers: Dict):
+def test_keyword_invulnerable(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     monster_1: Monster = managers["teams"][0].members[1]
     monster_2: Monster = managers["teams"][0].members[2]
@@ -137,10 +137,10 @@ def test_keyword_invisible(managers: Dict):
 
     attack_effect_1 = AttackEffect(1)
     attack_effect_99 = AttackEffect(99)
-    invisible_effect = InvisibleEffect(duration=1)
+    invulnerable_effect = InvulnerableEffect(duration=1)
 
     combat_manager.effect_manager.execute_effect(
-        invisible_effect,
+        invulnerable_effect,
         source=monster_2,
         target=monster_2,
     )
@@ -148,9 +148,9 @@ def test_keyword_invisible(managers: Dict):
     conditions = [
         monster_2.local_id == "MONSTER_2",
         monster_2.hp == 10,
-        monster_2.get_effect(Keyword.INVISIBLE).keyword == Keyword.INVISIBLE,
-        monster_2.get_effect(Keyword.INVISIBLE).duration == 1,
-        monster_1.get_effect(Keyword.INVISIBLE) is None,
+        monster_2.get_effect(Keyword.INVULNERABLE).keyword == Keyword.INVULNERABLE,
+        monster_2.get_effect(Keyword.INVULNERABLE).duration == 1,
+        monster_1.get_effect(Keyword.INVULNERABLE) is None,
     ]
 
     combat_manager.effect_manager.execute_effect(
@@ -163,7 +163,7 @@ def test_keyword_invisible(managers: Dict):
         [
             monster_2.local_id == "MONSTER_2",
             monster_2.hp == 10,
-            monster_2.get_effect(Keyword.INVISIBLE).keyword == Keyword.INVISIBLE,
+            monster_2.get_effect(Keyword.INVULNERABLE).keyword == Keyword.INVULNERABLE,
         ]
     )
 
@@ -179,7 +179,7 @@ def test_keyword_invisible(managers: Dict):
         [
             monster_2.local_id == "MONSTER_2",
             monster_2.hp == 9,
-            monster_2.get_effect(Keyword.INVISIBLE) is None,
+            monster_2.get_effect(Keyword.INVULNERABLE) is None,
         ]
     )
 

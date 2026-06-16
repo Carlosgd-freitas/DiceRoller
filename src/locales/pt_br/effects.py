@@ -7,10 +7,10 @@ ACTIONS = {
     "doom": "CONDENOU",
     "drain": "DRENOU",
     "execute": "EXECUTOU",
-    "invisible": "EVITADO",
     "pierce": "PERFUROU",
     "revive": "REVIVEU",
     "sacred_block": "SAGRADAMENTE BLOQUEADO",
+    "taunt": "PROVOCOU",
 }
 
 ACTIVATION = {
@@ -19,6 +19,7 @@ ACTIVATION = {
     "doom": "{target} foi morto pela {keyword}.",
     "doom_countdown": "Restam {duration} turnos para que {target} morra pela {keyword}.",
     "freeze": "{source} não pôde agir porque estava {status}.",
+    "frostburn": "{target} recebeu {damage} de dano de {keyword}.",
     "poison": "{target} recebeu {damage} de dano de {keyword}.",
     "mana_regen": "{target} restaurou {value} de {mana} de si mesmo através da {keyword}.",
     "regen": "{target} restaurou {value} de {hp} de si mesmo através da {keyword}.",
@@ -32,7 +33,10 @@ DAMAGE = {
     "base": "{source} {action} {target}.",
     "base_self": "{source} se {action}.",
     # Part 2: Defensive message
-    "defended_damage": "{defended_damage} de dano foi {action}.",
+    "absorb": "{defended_damage} de dano foi {action}.",
+    "block": "{defended_damage} de dano foi {action}.",
+    "invulnerable": "{defended_damage} de dano foi negado porque {target} estava {status}.",
+    "sacred_block": "{defended_damage} de dano foi {action}.",
     # Part 3: Damage message
     "damage": "{damage} de dano foi infligido.",
 }
@@ -53,9 +57,11 @@ DESCRIPTION = {
     "execute": "Mata o alvo se seu {hp} for menor ou igul a {value_perc}% de seu {hp} máximo.",
     "focus": "Aumenta a acurácia dos dados e habilidades do alvo em {value_perc}%.",
     "freeze": "Impede que o alvo aja. Remove {burn}.",
+    "frostburn": "Inflige {value} de dano em todo início de turno.",
     "heal": "Restaura {value} {hp}.",
     "immunity": "Faz com que o alvo seja imune a outros efeitos. Quaisquer efeitos que o alvo esteja sobre continuarão a ser aplicados.",
-    "invisible": "Evita todo o dano direto recebido por {duration} turnos.",
+    "invisible": "Faz o alvo inalvejável pelos inimigos.",
+    "invulnerable": "Nega qualquer dano que seria infligido ao {hp} do alvo.",
     "mana_regen": "Aumenta {mana} em {value} em todo início de turno.",
     "mana": "Aumenta {mana} em {value}.",
     "nothing": "Não faz nada.",
@@ -66,6 +72,7 @@ DESCRIPTION = {
     "sacred_block": "Reduz todo o dano direto recebido até {value} vezes.",
     "sleep": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
     "stun": "Impede que o alvo aja.",
+    "taunt": "Faz com que o alvo se torne prioridade de dados e habilidades de inimigos.",
     "thorns": "Quando atacado diretamente, inflige {value} de dano ao atacante.",
 }
 
@@ -87,10 +94,14 @@ EXECUTION = {
     "immunity_self": "{source} concedeu {keyword} de {count} efeitos a si mesmo",
     "invisible": "{source} tornou {target} {keyword} por {duration} turnos.",
     "invisible_self": "{source} se tornou {keyword} por {duration} turnos.",
+    "invulnerable": "{source} tornou {target} {keyword} por {duration} turnos.",
+    "invulnerable_self": "{source} se tornou {keyword} por {duration} turnos.",
     "mana": "{source} restaurou {value} de {mana} de {target} através de {keyword}.",
     "mana_self": "{source} restaurou {value} de {mana} de si mesmo através de {keyword}.",
     "revive": "{source} {action} {target}. {target} foi curado em {value_perc}% de seu {hp} máximo.",
     "revive_self": "{source} {action} a si mesmo e se curou em {value_perc}% de seu {hp} máximo.",
+    "taunt": "{source} fez {target} {keyword} os inimigos por {duration} turnos.",
+    "taunt_self": "{source} {action} os inimigos por {duration} turnos.",
     # Effect types
     "buff": "{source} fortaleceu {target} com {keyword} por {duration} turnos.",
     "buff_self": "{source} se fortaleceu com {keyword} por {duration} turnos.",
@@ -106,10 +117,16 @@ EXECUTION_FAIL = {
     # Effect keywords
     "execute": "{source} tentou {keyword} {target}, mas",
     "execute_self": "{source} tentou se {keyword}, mas",
+    "immunity": "{source} tentou tornar {target} {status}, mas",
+    "immunity_self": "{source} tentou se tornar {status}, mas",
     "invisible": "{source} tentou tornar {target} {keyword}, mas",
     "invisible_self": "{source} tentou se tornar {keyword}, mas",
+    "invulnerable": "{source} tentou tornar {target} {keyword}, mas",
+    "invulnerable_self": "{source} tentou se tornar {keyword}, mas",
     "revive": "{source} tentou {keyword} {target}, mas",
     "revive_self": "{source} tentou se {keyword}, mas",
+    "taunt": "{source} tentou fazer {target} {keyword} os inimigos, mas",
+    "taunt_self": "{source} tentou {keyword} os inimigos, mas",
     # Effect types
     "buff": "{source} tentou fortalecer {target} com {keyword}, mas",
     "buff_self": "{source} tentou se fortalecer com {keyword}, mas",
@@ -162,9 +179,11 @@ KEYWORDS = {
     "execute": "EXECUTAR",
     "focus": "FOCO",
     "freeze": "CONGELAMENTO",
+    "frostburn": "QUEIMADURA DE FRIO",
     "heal": "CURA",
     "immunity": "IMUNIDADE",
     "invisible": "INVISÍVEL",
+    "invulnerable": "INVULNERÁVEL",
     "mana_regen": "REGENERAÇÃO DE MANA",
     "mana": "MANA",
     "nothing": "NADA",
@@ -175,6 +194,7 @@ KEYWORDS = {
     "sacred_block": "BLOQUEIO SAGRADO",
     "sleep": "SONO",
     "stun": "ATORDOAMENTO",
+    "taunt": "PROVOCAR",
     "thorns": "ESPINHOS",
 }
 
@@ -187,13 +207,17 @@ REMOVAL = {
 }
 
 STATUS = {
+    "burn": "QUEIMANDO",
     "blind": "CEGO",
     "confuse": "CONFUSO",
     "doom": "CONDENADO",
     "freeze": "CONGELADO",
+    "frostburn": "QUEIMANDO DE FRIO",
     "immunity": "IMUNE",
+    "invulnerable": "INVULNERÁVEL",
     "sleep": "DORMINDO",
     "stun": "ATORDOADO",
+    "taunt": "PROVOCANDO",
 }
 
 TYPES = {

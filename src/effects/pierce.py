@@ -65,9 +65,6 @@ class PierceEffect(Effect):
                 self,
                 source,
                 target,
-                consider=[
-                    Keyword.INVISIBLE,
-                ],
             )
 
             target.hp -= damage_data["damage"]

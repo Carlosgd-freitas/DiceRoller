@@ -6,7 +6,7 @@ from math import ceil
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, color_string
-from src.base.keywords import Keyword
+from src.base.keywords import Keyword, get_keyword
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
@@ -109,7 +109,15 @@ class EffectLogger(Logger):
             if target.suffix:
                 kwargs["target"] += " " + target.suffix
 
-        # Keyword and variations
+        # All keywords
+        for keyword in Keyword:
+            kwargs[keyword.name.lower()] = self.get_colored_message(
+                namespace="effects",
+                message_group="KEYWORDS",
+                keyword=keyword,
+            )
+
+        # Effect keyword and variations
         for parameter, category in [
             (effect.keyword.name.lower(), "KEYWORDS"),
             ("action", "ACTIONS"),
@@ -176,37 +184,46 @@ class EffectLogger(Logger):
         )
 
         # Part 2: Defensive messages
-        for keyword in [
-            Keyword.ABSORB,
-            Keyword.BLOCK,
-            Keyword.INVISIBLE,
-            Keyword.SACRED_BLOCK,
-        ]:
-            defended_damage: DefendedDamage = kwargs.get("defended_damage")
-            if (defended_damage) and (defended_damage.get(keyword.name.lower())):
+        defended_damage: DefendedDamage = kwargs.get("defended_damage", {})
 
-                action = self.get_colored_message(
+        for key, value in defended_damage.items():
+            if key == "total":
+                continue
+
+            defensive_keyword = get_keyword(key)
+
+            # Defensive keyword parameters
+            for parameter, category in [
+                ("action", "ACTIONS"),
+                ("status", "STATUS"),
+            ]:
+                kwargs[parameter] = self.get_colored_message(
                     namespace="effects",
-                    message_group="ACTIONS",
-                    keyword=keyword,
+                    message_group=category,
+                    keyword=defensive_keyword,
                 )
 
-                self.log(
-                    namespace="effects",
-                    message_group="DAMAGE",
-                    key="defended_damage",
-                    end=" ",
-                    action=action,
-                    defended_damage=defended_damage[keyword.name.lower()],
-                )
+            kwargs["defended_damage"] = value
+
+            self.log(
+                namespace="effects",
+                message_group="DAMAGE",
+                key=key,
+                end=" ",
+                **kwargs,
+            )
 
         # Part 3: Damage message
-        self.log(
-            namespace="effects",
-            message_group="DAMAGE",
-            key="damage",
-            **kwargs,
-        )
+        if kwargs.get("damage") and kwargs["damage"] > 0:
+            self.log(
+                namespace="effects",
+                message_group="DAMAGE",
+                key="damage",
+                end=" ",
+                **kwargs,
+            )
+
+        self.log(message="")
 
         return
 

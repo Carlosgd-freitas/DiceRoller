@@ -21,8 +21,8 @@ class DefendedDamage(TypedDict):
     :var block: Damage that was defended by a Monster's Block effect.
     :vartype block: int
 
-    :var invisible: Damage that was defended by a Monster's Invisible effect.
-    :vartype invisible: int
+    :var invulnerable: Damage that was defended by a Monster's Invulnerable effect.
+    :vartype invulnerable: int
 
     :var sacred_block: Damage that was defended by a Monster's Sacred Block effect.
     :vartype sacred_block: int
@@ -33,7 +33,7 @@ class DefendedDamage(TypedDict):
 
     absorb: int
     block: int
-    invisible: int
+    invulnerable: int
     sacred_block: int
     total: int
 
@@ -72,11 +72,11 @@ def calculate_damage(
     :type target: Entity
 
     :param consider: A list of defensive effect keywords to be considered on damage
-    calculation. By default, none are considered.
+    calculation. By default, only the Invulnerable effect is considered.
     :type consider_defensive: List[Effect]
 
     The priority of defensive effect activation is:
-    * Invisible
+    * Invulnerable
     * Sacred Block
     * Absorb
     * Block
@@ -84,16 +84,16 @@ def calculate_damage(
     :return: The damage caused on the target Entity.
     :rtype: int
     """
-    consider = [] if consider is None else consider
+    consider = [Keyword.INVULNERABLE] if consider is None else consider
     damage = effect.value
     defended_damage: DefendedDamage = {}
 
-    # Invisible
-    if Keyword.INVISIBLE in consider:
-        invisible = target.get_effect(Keyword.INVISIBLE)
+    # Invulnerable
+    if Keyword.INVULNERABLE in consider:
+        invulnerable = target.get_effect(Keyword.INVULNERABLE)
 
-        if invisible:
-            defended_damage["invisible"] = damage
+        if invulnerable:
+            defended_damage["invulnerable"] = damage
             damage = 0
 
     # Sacred Block

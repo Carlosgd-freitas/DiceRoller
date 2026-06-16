@@ -1,21 +1,20 @@
-"""Cleanse Selector module."""
+"""Curse Selector module."""
 
 from __future__ import annotations
 
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.base.effect import EffectType
-from src.base.keywords import Keyword
 from src.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
+    from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
-class CleanseSelector(Selector):
+class CurseSelector(Selector):
     """
-    Selects monster targets for the cleanse effect.
+    Selects monster targets for curse type effects.
     """
 
     def get_targets_easy(
@@ -28,8 +27,8 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        the cleanse effect:
-        * 100% -> k monsters between self and alive allies that have the least debuffs
+        curse type effects:
+        * 100% -> self + (k-1) random, alive allies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -49,18 +48,20 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        return self._get_targets_least_effects(
-            monsters,
-            k=k,
-            effect_type=EffectType.DEBUFF,
-            check_taunt=False,
-        )
+        if len(targets) < k:
+            targets.append(source)
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    allies,
+                    k=k,
+                )
+            )
+
+        return targets
 
     def get_targets_normal(
         self,
@@ -72,9 +73,9 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        the cleanse effect:
-        * 30% -> k random monsters between self and alive allies
-        * 70% -> k monsters between self and alive allies that have the most debuffs
+        curse type effects:
+        * 30% -> self + (k-1) random, alive allies
+        * 70% -> self + (k-1) alive allies with least hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -94,27 +95,27 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        if random() < 0.3:
-            targets = self._get_targets_random(
-                monsters,
-                k=k,
-                effect_type=EffectType.DEBUFF,
-                check_taunt=False,
-            )
+        if len(targets) < k:
+            targets.append(source)
 
-        else:
-            targets = self._get_targets_most_effects(
-                monsters,
-                k=k,
-                effect_type=EffectType.DEBUFF,
-                check_taunt=False,
-            )
+        if len(targets) < k:
+            if random() < 0.3:
+                targets.extend(
+                    self._get_targets_random(
+                        allies,
+                        k=k - len(targets),
+                    )
+                )
+
+            else:
+                targets.extend(
+                    self._get_targets_lowest_hp(
+                        allies,
+                        k=k - len(targets),
+                    )
+                )
 
         return targets
 
@@ -128,8 +129,8 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        the cleanse effect:
-        * 100% -> k monsters between self and alive allies that have the most debuffs
+        curse type effects:
+        * 100% -> self + (k-1) alive allies with least hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -149,15 +150,17 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        return self._get_targets_most_effects(
-            monsters,
-            k=k,
-            effect_type=EffectType.DEBUFF,
-            check_taunt=False,
-        )
+        if len(targets) < k:
+            targets.append(source)
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_lowest_hp(
+                    allies,
+                    k=k - len(targets),
+                )
+            )
+
+        return targets

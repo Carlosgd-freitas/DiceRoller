@@ -139,8 +139,10 @@ class CombatLogger(Logger):
                         Keyword.DOOM,
                         Keyword.FREEZE,
                         Keyword.INVISIBLE,
+                        Keyword.INVULNERABLE,
                         Keyword.SLEEP,
                         Keyword.STUN,
+                        Keyword.TAUNT,
                     ]
                     and effect.duration
                 ):

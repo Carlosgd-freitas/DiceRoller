@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Dict, List
 from src.base.keywords import Keyword
 from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
+from src.effects.taunt import TauntEffect
 from src.targeting.filters import filter_entities
 from tests.utils import assert_conditions
 
@@ -206,6 +207,30 @@ def test_filter_keyword_blacklist(managers: Dict):
         filtered[1].local_id == "MONSTER_2",
         filtered[2].local_id == "MONSTER_3",
         filtered[3].local_id == "MONSTER_4",
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_filter_check_taunt(managers: Dict):
+    monsters: List[Monster] = managers["monsters"]
+
+    monsters[3].apply_effect(TauntEffect())
+    monsters[4].apply_effect(TauntEffect())
+
+    filtered = filter_entities(
+        monsters,
+        k=3,
+        method="FIRST",
+        life_state="ANY",
+        check_taunt=True,
+    )
+
+    conditions = [
+        len(filtered) == 3,
+        filtered[0].local_id == "MONSTER_3",
+        filtered[1].local_id == "MONSTER_4",
+        filtered[2].local_id == "MONSTER_0",
     ]
 
     assert_conditions(conditions)

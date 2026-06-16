@@ -15,7 +15,7 @@ class InvisibleEffect(Effect):
     """
     Invisible Effect.
 
-    This will avoid any direct damage that would be done to the target's HP.
+    This will make the target untargetable by enemies.
     """
 
     def __init__(
@@ -32,7 +32,7 @@ class InvisibleEffect(Effect):
             duration,
             decay,
             accuracy,
-            EffectType.DEFENSIVE,
+            EffectType.BUFF,
             None,
             True,
             removable,
