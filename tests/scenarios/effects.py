@@ -204,9 +204,14 @@ monster_a.effects = []
 print("\n===== Effect Execution: DOOM =====")
 
 turns = 3
-combat_manager.current_monster.apply_effect(DoomEffect(duration=turns))
 
-for _ in range(turns):
+combat_manager.effect_manager.execute_effect(
+    effect=DoomEffect(duration=turns),
+    source=monster_b,
+    target=monster_a,
+)
+
+for _ in range(turns + 2):
     combat_manager.end_turn()
 
 combat_manager.current_monster.hp = 150
@@ -229,16 +234,23 @@ monster_b.hp = 150
 
 print("\n===== Effect Execution: IMMUNITY =====")
 
-immunity_effect = ImmunityEffect(effects=[Keyword.BURN, Keyword.STUN])
+effects = [
+    Keyword.BLEED,
+    Keyword.BURN,
+    Keyword.POISON,
+]
+
+for i in range(0, 4):
+    immunity_effect = ImmunityEffect(effects=effects[:i])
+
+    combat_manager.effect_manager.execute_effect(
+        effect=immunity_effect,
+        source=monster_b,
+        target=monster_b,
+    )
 
 combat_manager.effect_manager.execute_effect(
-    effect=immunity_effect,
-    source=monster_b,
-    target=monster_b,
-)
-
-combat_manager.effect_manager.execute_effect(
-    effect=StunEffect(),
+    effect=BurnEffect(),
     source=monster_a,
     target=monster_b,
 )

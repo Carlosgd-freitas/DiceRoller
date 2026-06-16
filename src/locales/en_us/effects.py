@@ -4,6 +4,7 @@ ACTIONS = {
     "absorb": "ABSORBED",
     "attack": "ATTACKED",
     "block": "BLOCKED",
+    "doom": "DOOMED",
     "drain": "DRAINED",
     "execute": "EXECUTED",
     "invisible": "AVOIDED",
@@ -16,6 +17,7 @@ ACTIVATION = {
     "bleed": "{target} took {damage} damage from {keyword}.",
     "burn": "{target} took {damage} damage from {keyword}.",
     "doom": "{target} met its {keyword}.",
+    "doom_countdown": "{duration} turns remain for {target} to meet its {keyword}.",
     "freeze": "{source} could not act because it was {status}.",
     "poison": "{target} took {damage} damage from {keyword}.",
     "mana_regen": "{target} restored {value} {mana} of itself through {keyword}.",
@@ -75,10 +77,14 @@ EXECUTION = {
     "corrupt_self": "{source} removed {count} buffs from itself through {keyword}",
     "curse": "{source} inflicted {value} damage to {target} through {keyword}.",
     "curse_self": "{source} inflicted {value} damage to itself through {keyword}.",
+    "doom": "{source} {action} {target}. {target} will die in {duration} turns.",
+    "doom_self": "{source} {action} itself. {source} will die in {duration} turns.",
     "execute": "{source} {action} {target}.",
     "execute_self": "{source} {action} itself.",
     "heal": "{source} restored {value} {hp} of {target} through {keyword}.",
     "heal_self": "{source} restored {value} {hp} of itself through {keyword}.",
+    "immunity": "{source} granted {keyword} of {count} effects to {target}",
+    "immunity_self": "{source} granted {keyword} of {count} effects to itself",
     "invisible": "{source} turned {target} {keyword} for {duration} turns.",
     "invisible_self": "{source} turned itself {keyword} for {duration} turns.",
     "mana": "{source} restored {value} {mana} of {target} through {keyword}.",
@@ -98,6 +104,8 @@ EXECUTION = {
 
 EXECUTION_FAIL = {
     # Effect keywords
+    "doom": "{source} tried to {keyword} {target}, but",
+    "doom_self": "{source} tried to {keyword} itself, but",
     "execute": "{source} tried to {keyword} {target}, but",
     "execute_self": "{source} tried to {keyword} itself, but",
     "invisible": "{source} tried to turn {target} {keyword}, but",
@@ -183,6 +191,7 @@ REMOVAL = {
 STATUS = {
     "blind": "BLIND",
     "confuse": "CONFUSED",
+    "doom": "DOOMED",
     "freeze": "FROZEN",
     "immunity": "IMMUNE",
     "sleep": "ASLEEP",

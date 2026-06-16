@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Dict, Literal
+from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, color_string
 from src.base.keywords import Keyword
@@ -12,6 +12,7 @@ from src.logger.logger import Logger
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.base.monster import Monster
+    from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
 
 
@@ -25,6 +26,64 @@ class EffectLogger(Logger):
         **kwargs,
     ):
         super().__init__(**kwargs)
+
+    def get_multiple_effects_message(
+        self,
+        keywords: List[Keyword] = None,
+        effects: List[Effect] = None,
+        limit: int = 3,
+    ) -> str:
+        """
+        Gets a message composed by multiple effects. If the number of composing effects
+        is:
+        * 1, the message will be its colored keyword.
+        * 2 or more, the message will be their colored keywords separated by ",".
+
+        :param keywords: The effects keywords.
+        :type keywords: List[Keyword]
+
+        :param effects: The effects.
+        :type effects: List[Effect]
+
+        :param limit: The limit of effects that will compose the message. If the amount of effects exceeds
+        the limit, "+X Effects..." will be appended at the end of the message. Default value is 3.
+        :type limit: int
+
+        :return: Composed message containg multiple effects.
+        :rtype: str
+        """
+        if effects:
+            keywords = [effect.keyword for effect in effects]
+        elif keywords is None:
+            keywords = []
+
+        effects_remaining = len(keywords) - limit
+
+        # Multiple effects message
+        keywords = keywords[:limit]
+        keywords = [
+            self.get_colored_message(
+                namespace="effects", message_group="KEYWORDS", keyword=keyword
+            )
+            for keyword in keywords
+        ]
+
+        message = ", ".join(keywords)
+
+        # Remaining effects message
+        if effects_remaining > 0:
+            effect_word = self.get_message(
+                namespace="base",
+                message_group="WORDS",
+                key="effects",
+            ).capitalize()
+
+            message += ", " + color_string(
+                f"+{effects_remaining} {effect_word}...",
+                intensity="BRIGHT",
+            )
+
+        return message
 
     def _update_log_parameters(
         self,
@@ -73,17 +132,7 @@ class EffectLogger(Logger):
                 keyword=removed_effect.keyword,
             )
 
-        # Removed effects
-        if kwargs.get("removed_effects"):
-            kwargs["removed_effects"] = [
-                self.get_colored_message(
-                    namespace="effects",
-                    message_group="KEYWORDS",
-                    keyword=removed_effect.keyword,
-                )
-                for removed_effect in kwargs["removed_effects"]
-            ]
-
+        # Other parameters
         kwargs.update(
             {
                 # Effect parameters
@@ -161,29 +210,48 @@ class EffectLogger(Logger):
 
         return
 
-    def _log_multiple_effect_removal(
+    def _log_countdown_effect(
         self,
         effect: Effect,
         source: Monster,
         target: Monster,
-        effect_limit: int = 3,
         **kwargs,
     ) -> None:
         """
-        Logs multiple messages for effects that removes multiple effects at once
-        (e.g. CLEANSE an CORRUPT):
-        * Base message: Effect that was reponsible for removing the other effects
-        * Removed effects message
-        * Remaining effects message
+        Logs a message for a countdown effect activation (e.g. Doom).
         """
-        # Part 1: Base message
+        key = effect.keyword.name.lower()
+
+        if effect.duration > 1:
+            key += "_countdown"
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        kwargs["duration"] -= 1
+
+        self.log(namespace="effects", message_group="ACTIVATION", key=key, **kwargs)
+
+        return
+
+    def _log_immunity_effect(
+        self,
+        effect: ImmunityEffect,
+        source: Monster,
+        target: Monster,
+        limit: int = 3,
+        **kwargs,
+    ) -> None:
+        """
+        Logs a message for the Immunity effect execution.
+        """
+        # Base message
         key = effect.keyword.name.lower()
         if source == target:
             key += "_self"
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        count = len(kwargs["removed_effects"])
+        immune_to: List[Keyword] = effect.effects
+        count = len(immune_to)
         kwargs["count"] = color_string(
             str(count),
             intensity="BRIGHT",
@@ -193,31 +261,68 @@ class EffectLogger(Logger):
             namespace="effects", message_group="EXECUTION", key=key, end="", **kwargs
         )
 
-        # Part 1.5: No effects were removed
+        # Immune to no effects
         if count == 0:
             self.log(message=".")
             return
 
-        # Part 2: Removed Effects
-        removed_effects = kwargs["removed_effects"][:effect_limit]
-        message = ": " + ", ".join(removed_effects)
-        self.log(message=message, end="")
+        # Immune to multiple effects
+        message = self.get_multiple_effects_message(keywords=immune_to, limit=limit)
+        self.log(message=": " + message, end="")
 
-        # Part 3: Remaining Effects
-        if count > effect_limit:
-            effects_remaining = count - effect_limit
+        # Message ending
+        if count > limit:
+            self.log(message="")
 
-            message = self.get_message(
-                namespace="base",
-                message_group="WORDS",
-                key="effects",
-            ).capitalize()
+        else:
+            self.log(message=".")
 
-            message = ", " + color_string(
-                f"+{effects_remaining} {message}...",
-                intensity="BRIGHT",
-            )
-            self.log(message=message)
+        return
+
+    def _log_multiple_effect_removal(
+        self,
+        effect: Effect,
+        source: Monster,
+        target: Monster,
+        limit: int = 3,
+        **kwargs,
+    ) -> None:
+        """
+        Logs a message for effects that removes multiple effects at once (e.g.
+        Cleanse an Corrupt).
+        """
+        # Base message
+        key = effect.keyword.name.lower()
+        if source == target:
+            key += "_self"
+
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        removed_effects: List[Effect] = kwargs["removed_effects"]
+        count = len(removed_effects)
+        kwargs["count"] = color_string(
+            str(count),
+            intensity="BRIGHT",
+        )
+
+        self.log(
+            namespace="effects", message_group="EXECUTION", key=key, end="", **kwargs
+        )
+
+        # No effects were removed
+        if count == 0:
+            self.log(message=".")
+            return
+
+        # Removed Effects
+        message = self.get_multiple_effects_message(
+            effects=removed_effects, limit=limit
+        )
+        self.log(message=": " + message, end="")
+
+        # Message ending
+        if count > limit:
+            self.log(message="")
 
         else:
             self.log(message=".")
@@ -248,16 +353,22 @@ class EffectLogger(Logger):
 
         key = effect.keyword.value.lower()
 
+        if effect.keyword == Keyword.DOOM:
+            return self._log_countdown_effect(
+                effect,
+                source,
+                target,
+                **kwargs,
+            )
+
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(
+        return self.log(
             namespace="effects",
             message_group="ACTIVATION",
             key=key,
             **kwargs,
         )
-
-        return
 
     def log_effect_execution(
         self,
@@ -284,6 +395,7 @@ class EffectLogger(Logger):
         # Determining logging key
         if effect.keyword in [
             Keyword.CURSE,
+            Keyword.DOOM,
             Keyword.EXECUTE,
             Keyword.HEAL,
             Keyword.INVISIBLE,
@@ -305,25 +417,29 @@ class EffectLogger(Logger):
 
         # Logging offensive type effect execution
         if key == "offensive":
-            self._log_damage_calculation(
+            return self._log_damage_calculation(
                 effect,
                 source,
                 target,
                 **kwargs,
             )
 
-            return
-
-        # Logging effect that removes multiple effects
+        # Specific effect logging
         if effect.keyword in [Keyword.CLEANSE, Keyword.CORRUPT]:
-            self._log_multiple_effect_removal(
+            return self._log_multiple_effect_removal(
                 effect,
                 source,
                 target,
                 **kwargs,
             )
 
-            return
+        elif effect.keyword == Keyword.IMMUNITY:
+            return self._log_immunity_effect(
+                effect,
+                source,
+                target,
+                **kwargs,
+            )
 
         # Logging other effect executions
         if (source) and (target) and (source == target):
@@ -331,14 +447,12 @@ class EffectLogger(Logger):
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(
+        return self.log(
             namespace="effects",
             message_group="EXECUTION",
             key=key,
             **kwargs,
         )
-
-        return
 
     def log_effect_execution_fail(
         self,
@@ -398,14 +512,12 @@ class EffectLogger(Logger):
         if (source) and (target) and (source == target):
             key += "_self"
 
-        self.log(
+        return self.log(
             namespace="effects",
             message_group="FAILS",
             key=key,
             **kwargs,
         )
-
-        return
 
     def log_effect_removal(
         self,
@@ -434,14 +546,12 @@ class EffectLogger(Logger):
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(
+        return self.log(
             namespace="effects",
             message_group="REMOVAL",
             key=key,
             **kwargs,
         )
-
-        return
 
     def log_effect_description(
         self,
@@ -484,11 +594,9 @@ class EffectLogger(Logger):
 
         key = effect.keyword.value.lower()
 
-        self.log(
+        return self.log(
             namespace="effects",
             message_group="DESCRIPTION",
             key=key,
             **kwargs,
         )
-
-        return
