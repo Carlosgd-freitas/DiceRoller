@@ -236,11 +236,13 @@ print("\n===== Effect Execution: IMMUNITY =====")
 
 effects = [
     Keyword.BLEED,
+    Keyword.BLIND,
     Keyword.BURN,
+    Keyword.FREEZE,
     Keyword.POISON,
 ]
 
-for i in range(0, 4):
+for i in [0, 1, 2, 5]:
     immunity_effect = ImmunityEffect(effects=effects[:i])
 
     combat_manager.effect_manager.execute_effect(

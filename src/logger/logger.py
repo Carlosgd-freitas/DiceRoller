@@ -95,6 +95,37 @@ class Logger:
         self.language = language
         self._messages = self._load_messages(language)
 
+    def get_message_group(
+        self,
+        namespace: Namespace,
+        message_group: MessageGroup,
+        **kwargs,
+    ) -> Dict | None:
+        """
+        Gets a message group from a locale's namespace.
+
+        :param namespace: The namespace.
+        :type namespace: Namespace
+
+        :param message_group: The message group.
+        :type message_group: MessageGroup
+
+        :param key: The message key.
+        :type key: str
+
+        :return: A message.
+        :rtype: str
+        """
+        namespace: Dict = self._messages.get(namespace)
+
+        if namespace:
+            message_group: Dict = namespace.get(message_group)
+
+            if message_group:
+                return message_group
+
+        return
+
     def get_message(
         self,
         namespace: Namespace,
@@ -103,7 +134,7 @@ class Logger:
         **kwargs,
     ) -> str | None:
         """
-        Gets a message from a locale's namespace.
+        Gets a message from a locale's namespace and message group.
 
         :param namespace: The namespace.
         :type namespace: Namespace

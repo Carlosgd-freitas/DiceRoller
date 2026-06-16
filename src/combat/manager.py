@@ -281,12 +281,25 @@ class CombatManager:
 
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
+        # Procesing effects on combat start
+        self.effect_manager.process_trigger(
+            Trigger.COMBAT_START,
+            target=self.current_monster,
+        )
+
         self.order = self.get_turn_order()
         self.current_monster = self.order[0]
+
         return
 
     def start_round(self) -> None:
         """Start the current round."""
+        # Procesing effects on round start
+        self.effect_manager.process_trigger(
+            Trigger.ROUND_START,
+            target=self.current_monster,
+        )
+
         return
 
     def start_turn(self) -> None:
@@ -392,26 +405,34 @@ class CombatManager:
         )
 
         # Decaying and removing effects
-        idx_removed_effects = []
+        to_remove = []
+        removed_effects = []
 
-        for idx, effect in enumerate(self.current_monster.effects):
+        for effect in self.current_monster.effects:
             if effect.duration != inf:
                 effect.duration -= 1
-            effect.value -= effect.decay
+
+                # Procesing effects on duration decay
+                self.effect_manager.process_trigger(
+                    Trigger.DURATION_DECAY,
+                    target=self.current_monster,
+                )
+
+            if effect.decay:
+                effect.value -= effect.decay
 
             if effect.duration <= 0:
-                idx_removed_effects.append(idx)
+                to_remove.append(effect.keyword)
 
-        removed_effects = [
-            effect
-            for idx, effect in enumerate(self.current_monster.effects)
-            if idx in idx_removed_effects
-        ]
-        self.current_monster.effects = [
-            effect
-            for idx, effect in enumerate(self.current_monster.effects)
-            if idx not in idx_removed_effects
-        ]
+        for keyword in to_remove:
+            # Procesing effects on removal
+            self.effect_manager.process_trigger(
+                Trigger.REMOVE,
+                target=self.current_monster,
+            )
+
+            removed_effect = self.current_monster.remove_effect(keyword)
+            removed_effects.append(removed_effect)
 
         self.turn += 1
 
@@ -441,11 +462,24 @@ class CombatManager:
 
     def end_round(self) -> None:
         """End the current round."""
+        # Procesing effects on round end
+        self.effect_manager.process_trigger(
+            Trigger.ROUND_END,
+            target=self.current_monster,
+        )
+
         self.round += 1
+
         return
 
     def end_combat(self) -> None:
         """End combat between teams of monsters."""
+        # Procesing effects on combat end
+        self.effect_manager.process_trigger(
+            Trigger.COMBAT_END,
+            target=self.current_monster,
+        )
+
         return
 
     # =========================================================================

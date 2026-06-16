@@ -41,7 +41,12 @@ class EffectManager:
         Activates all effects of a target entity that have the specified trigger type.
         The following triggers will invert the target and source entities on
         activation:
+        * BEING_BUFFED
+        * BEING_DEBUFFED
+        * BEING_DEFENDED
+        * BEING_DETERIORATED
         * BEING_ATTACKED
+        * BEING_RESTORED
 
         :param trigger: A trigger.
         :type trigger: Trigger
@@ -58,7 +63,14 @@ class EffectManager:
         for effect in target.effects[:]:
 
             # Invert target and source monsters
-            if trigger == Trigger.BEING_ATTACKED:
+            if trigger in [
+                Trigger.BEING_BUFFED,
+                Trigger.BEING_DEBUFFED,
+                Trigger.BEING_DEFENDED,
+                Trigger.BEING_DETERIORATED,
+                Trigger.BEING_ATTACKED,
+                Trigger.BEING_RESTORED,
+            ]:
                 aux = target
                 target = source
                 source = aux
@@ -159,6 +171,23 @@ class EffectManager:
                 )
                 return False
 
+        # Procesing effects before effect execution
+        for effect_type, trigger in [
+            (EffectType.BUFF, Trigger.BUFF),
+            (EffectType.DEBUFF, Trigger.DEBUFF),
+            (EffectType.DEFENSIVE, Trigger.DEFEND),
+            (EffectType.DETERIORATION, Trigger.DETERIORATE),
+            (EffectType.OFFENSIVE, Trigger.ATTACK),
+            (EffectType.RESTORATION, Trigger.RESTORE),
+        ]:
+            if effect.type == effect_type:
+                self.process_trigger(
+                    trigger,
+                    source=source,
+                    target=target,
+                )
+                break
+
         # Persistent effects
         if effect.persistent:
             effect_data = target.apply_effect(
@@ -191,13 +220,22 @@ class EffectManager:
                     removed_effect=removed_effect,
                 )
 
-        # Procesing effects on being attacked
-        if effect.type == EffectType.OFFENSIVE:
-            self.process_trigger(
-                Trigger.BEING_ATTACKED,
-                source=source,
-                target=target,
-            )
+        # Procesing effects after effect execution
+        for effect_type, trigger in [
+            (EffectType.BUFF, Trigger.BEING_BUFFED),
+            (EffectType.DEBUFF, Trigger.BEING_DEBUFFED),
+            (EffectType.DEFENSIVE, Trigger.BEING_DEFENDED),
+            (EffectType.DETERIORATION, Trigger.BEING_DETERIORATED),
+            (EffectType.OFFENSIVE, Trigger.BEING_ATTACKED),
+            (EffectType.RESTORATION, Trigger.BEING_RESTORED),
+        ]:
+            if effect.type == effect_type:
+                self.process_trigger(
+                    trigger,
+                    source=source,
+                    target=target,
+                )
+                break
 
         return True
 

@@ -222,11 +222,10 @@ class EffectLogger(Logger):
         """
         key = effect.keyword.name.lower()
 
-        if effect.duration > 1:
+        if effect.duration > 0:
             key += "_countdown"
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-        kwargs["duration"] -= 1
 
         self.log(namespace="effects", message_group="ACTIVATION", key=key, **kwargs)
 
@@ -393,15 +392,11 @@ class EffectLogger(Logger):
             return
 
         # Determining logging key
-        if effect.keyword in [
-            Keyword.CURSE,
-            Keyword.DOOM,
-            Keyword.EXECUTE,
-            Keyword.HEAL,
-            Keyword.INVISIBLE,
-            Keyword.MANA,
-            Keyword.REVIVE,
-        ]:
+        message_group = self.get_message_group(
+            namespace="effects", message_group="EXECUTION"
+        )
+
+        if effect.keyword.name.lower() in message_group.keys():
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()
@@ -477,7 +472,11 @@ class EffectLogger(Logger):
             return
 
         # Determining logging key
-        if effect.keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.REVIVE]:
+        message_group = self.get_message_group(
+            namespace="effects", message_group="EXECUTION_FAIL"
+        )
+
+        if effect.keyword.name.lower() in message_group.keys():
             key = effect.keyword.value.lower()
         else:
             key = effect.type.value.lower()

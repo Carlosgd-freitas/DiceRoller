@@ -34,7 +34,7 @@ class DoomEffect(Effect):
             decay,
             accuracy,
             EffectType.DEBUFF,
-            Trigger.TURN_END,
+            Trigger.DURATION_DECAY,
             True,
             removable,
         )
@@ -59,7 +59,7 @@ class DoomEffect(Effect):
     ) -> EffectData:
         fail = None
 
-        if (target.is_alive()) and (self.duration == 1):
+        if (target.is_alive()) and (self.duration == 0):
             target.hp = 0
         else:
             fail = "dead"
