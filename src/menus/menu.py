@@ -11,6 +11,7 @@ from src.locales.languages import Language
 if TYPE_CHECKING:
     from src.logger.logger import Logger
     from src.menus.option import Option
+    from src.systems.settings import Settings
 
 
 class Menu(ABC):
@@ -19,6 +20,12 @@ class Menu(ABC):
 
     :var logger: Logger used to print the Menu.
     :vartype logger: Logger
+
+    :var settings: Game settings.
+    :vartype settings: Settings
+
+    :var title: Menu's title.
+    :vartype title: str
     """
 
     # =========================================================================
@@ -28,9 +35,19 @@ class Menu(ABC):
     def __init__(
         self,
         logger: Logger,
+        settings: Settings,
     ):
         self.logger = logger
+        self.settings = settings
+        self.title = self.get_title()
         self.options = self.get_options()
+
+    @abstractmethod
+    def get_title(self) -> str:
+        """
+        Returns the Menu's title.
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def get_options(self) -> List[Option]:
@@ -51,6 +68,9 @@ class Menu(ABC):
         :vartype language: Language
         """
         self.logger.change_language(language)
+
+        self.title = self.get_title()
+        self.options = self.get_options()
 
     # =========================================================================
     # Options
@@ -96,6 +116,13 @@ class Menu(ABC):
     # Rendering
     # =========================================================================
 
+    @abstractmethod
+    def show_title(self):
+        """
+        Shows the Menu's title.
+        """
+        raise NotImplementedError
+
     def show_options(self):
         """
         Shows the Menu's options.
@@ -126,14 +153,15 @@ class Menu(ABC):
         Opens the Menu.
         """
         while True:
+            self.show_title()
             self.show_options()
             selected = self.select_option()
 
+            if self.is_option_valid(selected):
+                self.process_option(selected)
+
             if selected.id in ["EXIT", "RETURN"]:
                 break
-
-            elif self.is_option_valid(selected):
-                self.process_option(selected)
 
             else:
                 self.logger.log(message="")

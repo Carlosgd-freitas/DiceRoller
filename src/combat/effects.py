@@ -14,22 +14,33 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
     from src.base.side import Side
     from src.effects.immunity import ImmunityEffect
-    from src.logger.effects import EffectLogger
+    from src.systems.settings import Settings
 
 
 class EffectManager:
     """
     Effect Manager class.
 
-    :var logger: A combat logger to log messages for effect management.
-    :vartype logger: EffectLogger
+    :var settings: Game settings.
+    :vartype settings: Settings
+
+    :var logging: If the combat will be logged. Default value is True.
+    :vartype logging: bool
     """
 
     def __init__(
         self,
-        logger: EffectLogger,
+        settings: Settings,
+        logging: bool = True,
     ):
-        self.logger = logger
+        # Settings
+        self.settings = settings
+
+        # Logger
+        self.logger = EffectLogger(
+            enabled=logging,
+            language=settings.language,
+        )
 
     def process_trigger(
         self,

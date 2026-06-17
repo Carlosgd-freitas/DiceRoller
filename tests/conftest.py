@@ -7,6 +7,7 @@ from pytest import fixture
 from src.base.monster import Monster
 from src.combat.manager import CombatManager, OrderStrategy
 from src.combat.team import Team
+from src.systems.settings import Settings
 
 
 @fixture()
@@ -65,6 +66,7 @@ def managers() -> Dict:
     monsters = [monster for team in teams for monster in team.members]
 
     combat_manager = CombatManager(
+        settings=Settings(),
         teams=teams,
         order_strategy=OrderStrategy.SET,
         logging=False,

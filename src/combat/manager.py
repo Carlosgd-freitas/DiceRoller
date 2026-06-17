@@ -14,11 +14,11 @@ from src.combat.effects import EffectManager
 from src.combat.suffixes import SuffixManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
-from src.logger.effects import EffectLogger
 from src.targeting.selectors.manager import SelectorManager
 
 if TYPE_CHECKING:
     from src.combat.team import Team
+    from src.systems.settings import Settings
 
 
 class OrderStrategy(Enum):
@@ -65,6 +65,9 @@ class CombatManager:
     """
     Combat Manager class.
 
+    :var settings: Game settings.
+    :vartype settings: Settings
+
     :var teams: Teams of characters or monsters that will fight each other.
     :vartype teams: List[Team]
 
@@ -74,9 +77,6 @@ class CombatManager:
 
     :var logging: If the combat will be logged. Default value is True.
     :vartype logging: bool
-
-    :var language: What language will be logged. Default value is Language.EN_US.
-    :vartype language: Language
     """
 
     # =========================================================================
@@ -85,23 +85,25 @@ class CombatManager:
 
     def __init__(
         self,
+        settings: Settings,
         teams: List[Team] = None,
         order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
-        language: Language = Language.EN_US,
     ):
+        # Settings
+        self.settings = settings
+
         # Logger
         self.logger = CombatLogger(
             enabled=logging,
-            language=language,
+            language=settings.language,
         )
 
         # Effect Management
-        effect_logger = EffectLogger(
-            enabled=logging,
-            language=language,
+        self.effect_manager = EffectManager(
+            settings,
+            logging,
         )
-        self.effect_manager = EffectManager(logger=effect_logger)
 
         # Team Management
         self.teams = [] if teams is None else teams
@@ -132,7 +134,7 @@ class CombatManager:
         :vartype language: Language
         """
         self.logger.change_language(language)
-        self.effect_manager.logger._messages = self.logger._messages
+        self.effect_manager.logger.change_language(language)
 
     # =========================================================================
     # Team Management
@@ -380,6 +382,9 @@ class CombatManager:
         if self.current_monster.control_type == ControlType.AI:
             self.take_action(self.current_monster)
 
+            if self.settings.end_turn_ai_monsters == "MANUAL":
+                self.logger.input("")
+
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError
 
@@ -572,7 +577,15 @@ class CombatManager:
 
         while combat_status["status"] == "ONGOING":
             # Round Start
-            self.logger.log_round(self.round)
+            if self.round == 1 or self.settings.end_turn_ai_monsters == "AUTO":
+                start_line_break = True
+            else:
+                start_line_break = False
+
+            self.logger.log_round(
+                self.round,
+                start_line_break,
+            )
 
             self.start_round()
             self.check_deaths()
@@ -582,12 +595,20 @@ class CombatManager:
                 break
 
             self.order = self.get_turn_order()
-            for monster in self.order:
+            for idx, monster in enumerate(self.order):
                 # Setup
                 self.current_monster = monster
 
                 # Turn Start
-                self.logger.log_turn_start(self.current_monster)
+                if idx > 0 and self.settings.end_turn_ai_monsters == "MANUAL":
+                    start_line_break = False
+                else:
+                    start_line_break = True
+
+                self.logger.log_turn_start(
+                    self.current_monster,
+                    start_line_break,
+                )
                 self.logger.log_teams(self.teams)
 
                 self.start_turn()

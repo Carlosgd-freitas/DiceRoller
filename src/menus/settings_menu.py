@@ -1,23 +1,23 @@
-"""Main Menu module."""
+"""Settings Menu module."""
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import TYPE_CHECKING, List
 
-from src.compendium.effects import EffectCompendium
+from src.base.color import color_string
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
 from src.menus.option import Option
-from src.menus.settings_menu import SettingsMenu
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
 
 
-class MainMenu(Menu):
+class SettingsMenu(Menu):
     """
-    Main Menu class.
+    Settings Menu class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -38,15 +38,12 @@ class MainMenu(Menu):
             settings,
         )
 
-        self.effect_compendium = EffectCompendium(self.settings)
-        self.settings_menu = SettingsMenu(self.settings)
-
     def get_title(self) -> str:
         """
         Returns the Menu's title.
         """
         return self.logger.get_message(
-            namespace="menus", message_group="MAIN", key="title"
+            namespace="settings", message_group="MENU", key="title"
         )
 
     def get_options(self) -> List[Option]:
@@ -55,39 +52,21 @@ class MainMenu(Menu):
         """
         options = [
             Option(
-                id="NEW_GAME",
+                id="LANGUAGE",
                 key="1",
                 message=self.logger.get_message(
-                    namespace="menus",
-                    message_group="MAIN",
-                    key="new_game",
+                    namespace="settings",
+                    message_group="SETTINGS",
+                    key="language",
                 ),
             ),
             Option(
-                id="SANDBOX_MODE",
+                id="END_TURN_AI_MONSTERS",
                 key="2",
                 message=self.logger.get_message(
-                    namespace="menus",
-                    message_group="MAIN",
-                    key="sandbox_mode",
-                ),
-            ),
-            Option(
-                id="EFFECT_COMPENDIUM",
-                key="3",
-                message=self.logger.get_message(
-                    namespace="compendium",
-                    message_group="EFFECTS",
-                    key="title",
-                ),
-            ),
-            Option(
-                id="SETTINGS",
-                key="4",
-                message=self.logger.get_message(
                     namespace="settings",
-                    message_group="MENU",
-                    key="title",
+                    message_group="SETTINGS",
+                    key="end_turn_ai_monsters",
                 ),
             ),
             Option(
@@ -105,26 +84,6 @@ class MainMenu(Menu):
         return options
 
     # =========================================================================
-    # Utility
-    # =========================================================================
-
-    def change_language(self, language: Language):
-        """
-        Changes the Menu's language.
-
-        :var language: A Language.
-        :vartype language: Language
-        """
-        # Changing self language
-        self.logger.change_language(language)
-        self.title = self.get_title()
-        self.options = self.get_options()
-
-        # Changing other menus languages
-        self.effect_compendium.change_language(language)
-        self.settings_menu.change_language(language)
-
-    # =========================================================================
     # Options
     # =========================================================================
 
@@ -132,31 +91,27 @@ class MainMenu(Menu):
         """
         Returns if the option can be selected or not.
         """
-        if option.id in ["NEW_GAME", "SANDBOX_MODE"]:
-            return False
-
         return True
 
     def process_option(self, option: Option):
         """
         Processes an option.
         """
-        if option.id == "NEW_GAME":
-            pass
-
-        elif option.id == "SANDBOX_MODE":
-            pass
-
-        elif option.id == "EFFECT_COMPENDIUM":
-            self.effect_compendium.open()
-
-        elif option.id == "SETTINGS":
-            self.settings_menu.open()
-            self.settings.load()
+        if option.id == "LANGUAGE":
+            self.settings.switch_setting(
+                "language",
+                [Language.EN_US, Language.PT_BR],
+            )
             self.change_language(self.settings.language)
 
+        elif option.id == "END_TURN_AI_MONSTERS":
+            self.settings.switch_setting(
+                "end_turn_ai_monsters",
+                ["AUTO", "MANUAL"],
+            )
+
         elif option.id == "EXIT":
-            pass
+            self.settings.save()
 
         return
 
@@ -169,6 +124,44 @@ class MainMenu(Menu):
         Shows the Menu's title.
         """
         self.logger.box_message(
-            message="DiceRoller v0.1.X",
+            message=self.title,
             size=50,
         )
+
+    def show_options(self):
+        """
+        Shows the Menu's options.
+        """
+        for option in self.options:
+            message = ""
+
+            if option.isolate:
+                message += "\n"
+
+            message += f"[{option.key}] {option.message}"
+
+            if option.id != "EXIT":
+                message += ": "
+
+                setting_value = getattr(self.settings, option.id.lower())
+
+                if isinstance(setting_value, str):
+                    setting_value = setting_value.lower()
+                elif isinstance(setting_value, Enum):
+                    setting_value = setting_value.value.lower()
+
+                message += color_string(
+                    self.logger.get_message(
+                        namespace="settings",
+                        message_group="VALUES",
+                        key=setting_value,
+                    ),
+                    intensity="BRIGHT",
+                )
+
+            if option.isolate:
+                message += "\n"
+
+            self.logger.log(message=message)
+
+        return

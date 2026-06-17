@@ -9,8 +9,5 @@ BASE = {
 MAIN = {
     "new_game": "Novo Jogo",
     "sandbox_mode": "Modo Sandbox",
-}
-
-CONFIGURATIONS = {
-    "title": "Configurações",
+    "title": "Menu Principal",
 }

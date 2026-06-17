@@ -32,7 +32,7 @@ from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.thorns import ThornsEffect
-from src.locales.languages import Language
+from src.systems.settings import Settings
 
 init()
 
@@ -67,12 +67,14 @@ team_b = Team(
 # ----------------------------
 
 combat_manager = CombatManager(
+    settings=Settings(
+        end_turn_ai_monsters="AUTO",
+    ),
     teams=[
         team_a,
         team_b,
     ],
     order_strategy="SET",
-    language=Language.EN_US,
 )
 
 combat_manager.start_combat()

@@ -24,12 +24,16 @@ class CombatLogger(Logger):
     ):
         super().__init__(**kwargs)
 
-    def log_round(self, round: int):
+    def log_round(self, round: int, start_line_break: bool = True):
         """
         Logs the round start.
 
         :param round: The round number.
         :type round: int
+
+        :param start_line_break: If a line break will be present at the start of the
+        logs. Default value is True.
+        :type start_line_break: bool
         """
         message = self.get_message(
             namespace="combat",
@@ -38,19 +42,25 @@ class CombatLogger(Logger):
         )
         message = message + " #" + str(round)
 
-        self.log(message="")
+        if start_line_break:
+            self.log(message="")
+
         self.box_message(
             message=message,
             size=24,
             isolate=False,
         )
 
-    def log_turn_start(self, monster: Monster):
+    def log_turn_start(self, monster: Monster, start_line_break: bool = True):
         """
         Logs a Monster's turn start in combat.
 
         :param monster: A monster.
         :type monster: Monster
+
+        :param start_line_break: If a line break will be present at the start of the
+        logs. Default value is True.
+        :type start_line_break: bool
         """
         turn = self.get_message(
             namespace="combat",
@@ -58,7 +68,10 @@ class CombatLogger(Logger):
             key="turn",
         )
 
-        message = color_string(f"\n> {turn}: ", intensity="BRIGHT")
+        if start_line_break:
+            self.log(message="")
+
+        message = color_string(f"> {turn}: ", intensity="BRIGHT")
         message += color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
         if monster.suffix:
             message += color_string(

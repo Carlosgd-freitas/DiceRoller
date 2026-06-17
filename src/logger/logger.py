@@ -1,7 +1,7 @@
 """Logger module."""
 
 from importlib import import_module
-from typing import Dict, Literal, get_args
+from typing import Dict, List, Literal, get_args
 
 from src.base.color import color_string
 from src.base.keywords import Keyword, get_keyword_color
@@ -13,6 +13,7 @@ Namespace = Literal[
     "compendium",
     "effects",
     "menus",
+    "settings",
 ]
 
 
@@ -38,9 +39,12 @@ MessageGroup = Literal[
     "TYPES",
     # Menus
     "MAIN",
-    "CONFIGURATIONS",
+    # Settings
+    "SETTINGS",
     # On Multiple Namespaces
     "BASE",
+    "MENU",
+    "VALUES",
 ]
 
 
@@ -53,16 +57,22 @@ class Logger:
 
     :var language: What language will be logged. Default value is Language.EN_US.
     :vartype language: Language
+
+    :var max_length: Max length of a logged message. If the length of a message exceed
+    this limit, it will be broken into multiple lines. Default value is 200.
+    :vartype max_length: int
     """
 
     def __init__(
         self,
         enabled: bool = True,
         language: Language = Language.EN_US,
+        max_length: int = 200,
     ):
         self._messages = {}
         self.enabled = enabled
         self.change_language(language)
+        self.max_length = max_length
 
     def _load_messages(self, language: Language) -> Dict:
         """
@@ -199,6 +209,64 @@ class Logger:
             )
 
         return message
+
+    def break_message(
+        message: str,
+        max_length: int,
+        break_long_words: bool = False,
+    ) -> List[str]:
+        """
+        Break a message into lines whose length is at most max_length. Existing line
+        breaks are preserved.
+
+        :var message: The message that will be broken into smaller parts.
+        :vartype message: str
+
+        :var max_length: Maximum length of each part of the message.
+        :vartype max_length: int
+
+        :var break_long_words: If words longer than max_length will be kept intact or
+        also broken into smaller parts. Default value is False.
+        :vartype break_long_words: bool
+
+        :return: Message parts.
+        :rtype: List[str]
+        """
+        if max_length <= 0:
+            raise ValueError("max_length must be positive")
+
+        result = []
+
+        for paragraph in message.splitlines():
+            if not paragraph:
+                result.append("")
+                continue
+
+            current = ""
+
+            for word in paragraph.split():
+                if break_long_words and len(word) > max_length:
+                    if current:
+                        result.append(current)
+                        current = ""
+
+                    for i in range(0, len(word), max_length):
+                        result.append(word[i : i + max_length])
+
+                    continue
+
+                if not current:
+                    current = word
+                elif len(current) + len(word) + 1 <= max_length:
+                    current += f" {word}"
+                else:
+                    result.append(current)
+                    current = word
+
+            if current:
+                result.append(current)
+
+        return result
 
     def log(
         self,

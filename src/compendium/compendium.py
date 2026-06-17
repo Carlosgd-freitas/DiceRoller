@@ -11,11 +11,13 @@ from tabulate import tabulate
 
 from src.base.color import Color, color_string
 from src.base.text import normalize
+from src.locales.languages import Language
 from src.menus.menu import Menu
 from src.menus.option import Option
 
 if TYPE_CHECKING:
     from src.logger.logger import Logger
+    from src.systems.settings import Settings
 
 
 class CompendiumLevel(Enum):
@@ -51,6 +53,9 @@ class Compendium(Menu):
     :var logger: Logger used to print the Compendium.
     :vartype logger: Logger
 
+    :var settings: Game settings.
+    :vartype settings: Settings
+
     :var title: Compendium's title.
     :vartype title: str
 
@@ -78,7 +83,7 @@ class Compendium(Menu):
     def __init__(
         self,
         logger: Logger,
-        title: str,
+        settings: Settings,
         items: List,
         page_headers: List[str],
         page_colalign: Tuple[str] = None,
@@ -88,8 +93,8 @@ class Compendium(Menu):
         # Compendium Attributes
         super().__init__(
             logger,
+            settings,
         )
-        self.title = title
         self.items = items
 
         # Page Attributes
@@ -187,6 +192,24 @@ class Compendium(Menu):
         Returns messages that will be used by the Compendium.
         """
         raise NotImplementedError
+
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language):
+        """
+        Changes the Compendium's language.
+
+        :var language: A Language.
+        :vartype language: Language
+        """
+        self.logger.change_language(language)
+
+        self.title = self.get_title()
+        self.options = self.get_options()
+        self.messages = self.get_messages()
+        self.pages_data = self.get_pages_data(self.items)
 
     # =========================================================================
     # Data access
@@ -409,6 +432,12 @@ class Compendium(Menu):
     # =========================================================================
     # Rendering
     # =========================================================================
+
+    def show_title(self):
+        """
+        Shows the Compendium's title.
+        """
+        pass
 
     def show_options(self, level: CompendiumLevel):
         """

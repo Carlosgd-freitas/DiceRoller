@@ -38,13 +38,12 @@ from src.effects.sleep import SleepEffect
 from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
-from src.locales.languages import Language
 from src.logger.effects import EffectLogger
 from src.menus.option import Option
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
-
+    from src.systems.settings import Settings
 
 ALL_EFFECTS = [
     AbsorbEffect(),
@@ -89,6 +88,9 @@ def get_all_effects() -> List[Effect]:
 class EffectCompendium(Compendium):
     """
     Effect Compendium class.
+
+    :var settings: Game settings.
+    :vartype settings: Settings
     """
 
     # =========================================================================
@@ -97,25 +99,29 @@ class EffectCompendium(Compendium):
 
     def __init__(
         self,
-        language: Language = Language.EN_US,
+        settings: Settings,
     ):
         items = get_all_effects()
 
-        logger = EffectLogger(language=language)
-
-        title = logger.get_message(
-            namespace="compendium", message_group="EFFECTS", key="title"
-        )
+        logger = EffectLogger(language=settings.language)
 
         super().__init__(
             logger=logger,
-            title=title,
+            settings=settings,
             items=items,
             page_headers=["#", "Name", "Type"],
             page_colalign=("right", "left", "left"),
         )
 
         self.logger: EffectLogger
+
+    def get_title(self) -> str:
+        """
+        Returns the Compendium's title.
+        """
+        return self.logger.get_message(
+            namespace="compendium", message_group="EFFECTS", key="title"
+        )
 
     def get_item_options(self) -> List[Option]:
         """
