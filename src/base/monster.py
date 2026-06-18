@@ -26,12 +26,19 @@ class Monster(Entity):
     :var skills: Monster's skills.
     :vartype skills: List[Skill]
 
-    :var control_type: If the Monster is controller by AI or the player. Default is AI.
+    :var control_type: If the Monster is controller by AI or the player. Default value
+    is ControlType.AI.
     :vartype control_type: ControlType
 
     :var difficulty: Monster's difficulty level, which dictates how the AI will choose
     it's actions. Default is NORMAL.
     :vartype difficulty: Difficulty
+
+    :var in_combat: If the monster is in combat. Default value is True.
+    :vartype in_combat: bool
+
+    :var turn_taken: If the monster has taken its turn. Default value is False.
+    :vartype turn_taken: bool
 
     :var suffix: Monster's name suffix (e.g. Slime 'A').
     :vartype suffix: str
@@ -42,6 +49,8 @@ class Monster(Entity):
         skills: List[Skill] = None,
         control_type: ControlType = ControlType.AI,
         difficulty: Difficulty = Difficulty.NORMAL,
+        in_combat: bool = True,
+        turn_taken: bool = False,
         suffix: str = None,
         **kwargs,
     ):
@@ -49,4 +58,6 @@ class Monster(Entity):
         self.skills = [] if skills is None else skills
         self.control_type = control_type
         self.difficulty = difficulty
+        self.in_combat = in_combat
+        self.turn_taken = turn_taken
         self.suffix = suffix

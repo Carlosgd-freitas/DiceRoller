@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from colorama import init
 
 from src.base.dice import Dice
@@ -33,11 +35,6 @@ monster_a = Monster(
     ],
 )
 
-team_a = Team(
-    name="Red Team",
-    members=[monster_a],
-)
-
 # ----------------------------
 
 sides = []
@@ -57,9 +54,22 @@ monster_b = Monster(
     ],
 )
 
+# ----------------------------
+
+team_a = Team(
+    name="Red Team",
+    members=[
+        deepcopy(monster_a),
+        deepcopy(monster_b),
+    ],
+)
+
 team_b = Team(
     name="Blue Team",
-    members=[monster_b],
+    members=[
+        deepcopy(monster_a),
+        deepcopy(monster_b),
+    ],
 )
 
 # ----------------------------

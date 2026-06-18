@@ -104,7 +104,6 @@ class CleanseSelector(Selector):
             targets = self._get_targets_random(
                 monsters,
                 k=k,
-                effect_type=EffectType.DEBUFF,
                 check_taunt=False,
             )
 

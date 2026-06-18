@@ -3,7 +3,7 @@
 from src.base.color import color_string
 
 COMBAT = {
-    "death": "{name} died!",
+    "died": "died",
     "draw": "It's a draw!",
     "round": "Round",
     "team": color_string("Team #{index}: {team_name}", intensity="BRIGHT"),

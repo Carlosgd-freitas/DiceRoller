@@ -187,6 +187,33 @@ class CombatLogger(Logger):
 
         self.log("")
 
+    def log_monster_death(
+        self,
+        monster: Monster,
+    ):
+        """
+        Logs a Monster death.
+
+        :param monster: A monster.
+        :type monster: Monster
+        """
+        message = monster.name
+
+        if monster.suffix:
+            message += f" {monster.suffix}"
+
+        message += (
+            " "
+            + self.get_message(
+                namespace="combat",
+                message_group="COMBAT",
+                key="died",
+            )
+            + "!"
+        )
+
+        self.log(message=message)
+
     def log_teams(self, teams: List[Team]):
         """
         Logs teams of monsters in combat. Only alive monsters will be logged.

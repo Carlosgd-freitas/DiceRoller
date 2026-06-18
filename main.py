@@ -8,12 +8,17 @@ from src.systems.settings import Settings
 # Colorama
 init()
 
-# Settings
-settings = Settings()
+try:
+    # Settings
+    settings = Settings()
 
-if settings.exists():
-    settings.load()
+    if settings.exists():
+        settings.load()
 
-# Main Menu
-menu = MainMenu(settings=settings)
-menu.open()
+    # Main Menu
+    menu = MainMenu(settings=settings)
+    menu.open()
+
+except Exception as e:
+    input(e)
+    raise e

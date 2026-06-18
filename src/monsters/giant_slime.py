@@ -1,4 +1,4 @@
-"""Slime module."""
+"""Giant Slime module."""
 
 from src.base.dice import Dice
 from src.base.monster import Monster
@@ -7,9 +7,9 @@ from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 
 
-class Slime(Monster):
+class GiantSlime(Monster):
     """
-    Slime class.
+    Giant Slime class.
     """
 
     def __init__(self, **kwargs):
@@ -19,6 +19,8 @@ class Slime(Monster):
                 Side([AttackEffect(2)]),
                 Side([AttackEffect(3)]),
                 Side([AttackEffect(4)]),
+                Side([AttackEffect(5)]),
+                Side([AttackEffect(6)]),
             ]
         )
 
@@ -28,18 +30,20 @@ class Slime(Monster):
                 Side([BlockEffect(2)]),
                 Side([BlockEffect(3)]),
                 Side([BlockEffect(4)]),
+                Side([BlockEffect(5)]),
+                Side([BlockEffect(6)]),
             ]
         )
 
         super().__init__(
-            global_id="SLIME",
+            global_id="GIANT_SLIME",
             dice=[
                 dice_0,
                 dice_1,
             ],
-            hp=6,
-            max_hp=6,
-            speed=1,
+            hp=12,
+            max_hp=12,
+            speed=2,
             mana=0,
             **kwargs
         )

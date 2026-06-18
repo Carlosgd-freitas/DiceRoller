@@ -13,38 +13,8 @@ Namespace = Literal[
     "compendium",
     "effects",
     "menus",
+    "monsters",
     "settings",
-]
-
-
-MessageGroup = Literal[
-    # Base
-    "ATTRIBUTES",
-    "WORDS",
-    # Combat
-    "COMBAT",
-    # Compendium
-    "EFFECTS",
-    # Effects
-    "ACTIONS",
-    "ACTIVATION",
-    "DAMAGE",
-    "DESCRIPTION",
-    "EXECUTION",
-    "EXECUTION_FAIL",
-    "FAILS",
-    "KEYWORDS",
-    "REMOVAL",
-    "STATUS",
-    "TYPES",
-    # Menus
-    "MAIN",
-    # Settings
-    "SETTINGS",
-    # On Multiple Namespaces
-    "BASE",
-    "MENU",
-    "VALUES",
 ]
 
 
@@ -88,10 +58,9 @@ class Logger:
             module = import_module(f"src.locales.{language.value}.{namespace}")
             _messages[namespace] = {}
 
-            for message_group in get_args(MessageGroup):
-                namespace_message_group = getattr(module, message_group, None)
-                if namespace_message_group:
-                    _messages[namespace][message_group] = namespace_message_group
+            for name, value in vars(module).items():
+                if isinstance(value, dict):
+                    _messages[namespace][name] = value
 
         return _messages
 
@@ -108,7 +77,7 @@ class Logger:
     def get_message_group(
         self,
         namespace: Namespace,
-        message_group: MessageGroup,
+        message_group: str,
         **kwargs,
     ) -> Dict | None:
         """
@@ -118,7 +87,7 @@ class Logger:
         :type namespace: Namespace
 
         :param message_group: The message group.
-        :type message_group: MessageGroup
+        :type message_group: str
 
         :param key: The message key.
         :type key: str
@@ -139,7 +108,7 @@ class Logger:
     def get_message(
         self,
         namespace: Namespace,
-        message_group: MessageGroup,
+        message_group: str,
         key: str,
         **kwargs,
     ) -> str | None:
@@ -150,7 +119,7 @@ class Logger:
         :type namespace: Namespace
 
         :param message_group: The message group.
-        :type message_group: MessageGroup
+        :type message_group: str
 
         :param key: The message key.
         :type key: str
@@ -175,7 +144,7 @@ class Logger:
     def get_colored_message(
         self,
         namespace: Namespace,
-        message_group: MessageGroup,
+        message_group: str,
         keyword: Keyword,
     ) -> str | None:
         """
@@ -185,7 +154,7 @@ class Logger:
         :type namespace: Namespace
 
         :param message_group: The message group.
-        :type message_group: MessageGroup
+        :type message_group: str
 
         :param keyword: A keyword that serves as the message key. The returned message
         will have the same colors as this keyword.
@@ -272,7 +241,7 @@ class Logger:
         self,
         message: str = None,
         namespace: Namespace = None,
-        message_group: MessageGroup = None,
+        message_group: str = None,
         key: str = None,
         end: str = "\n",
         **kwargs,
@@ -288,7 +257,7 @@ class Logger:
         :type namespace: Namespace
 
         :param message_group: The message group.
-        :type message_group: MessageGroup
+        :type message_group: str
 
         :param key: The message key.
         :type key: str
@@ -316,7 +285,7 @@ class Logger:
         self,
         message: str = None,
         namespace: Namespace = None,
-        message_group: MessageGroup = None,
+        message_group: str = None,
         key: str = None,
         **kwargs,
     ) -> str:
@@ -331,7 +300,7 @@ class Logger:
         :type namespace: Namespace
 
         :param message_group: The message group.
-        :type message_group: MessageGroup
+        :type message_group: str
 
         :param key: The message key.
         :type key: str

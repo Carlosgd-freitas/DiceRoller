@@ -86,6 +86,23 @@ class Entity:
         self.dice = [] if dice is None else dice
         self.effects = [] if effects is None else effects
 
+    def update_locale_params(self, name: str = None, description: str = None):
+        """
+        Update parameters that depends on a locale.
+
+        :param name: The entity's name.
+        :type name: str
+
+        :param description: The entity's description.
+        :type description: str
+        .
+        """
+        if name:
+            self.name = name
+        if description:
+            self.description = description
+        return
+
     def is_alive(self) -> bool:
         """
         Returns if the monster is alive or not.

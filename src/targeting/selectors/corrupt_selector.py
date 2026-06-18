@@ -95,7 +95,6 @@ class CorruptSelector(Selector):
             targets = self._get_targets_random(
                 enemies,
                 k=k,
-                effect_type=EffectType.BUFF,
             )
 
         else:

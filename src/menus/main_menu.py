@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.compendium.effects import EffectCompendium
+from src.gamemodes import sandbox
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
@@ -132,7 +133,7 @@ class MainMenu(Menu):
         """
         Returns if the option can be selected or not.
         """
-        if option.id in ["NEW_GAME", "SANDBOX_MODE"]:
+        if option.id in ["NEW_GAME"]:
             return False
 
         return True
@@ -145,7 +146,7 @@ class MainMenu(Menu):
             pass
 
         elif option.id == "SANDBOX_MODE":
-            pass
+            sandbox.run(self.settings, teams_size=3)
 
         elif option.id == "EFFECT_COMPENDIUM":
             self.effect_compendium.open()

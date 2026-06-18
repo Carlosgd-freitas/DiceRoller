@@ -107,6 +107,7 @@ class CombatManager:
 
         # Team Management
         self.teams = [] if teams is None else teams
+        self.update_teams()
 
         # Turn Management
         self.round: int = 1
@@ -135,6 +136,29 @@ class CombatManager:
         """
         self.logger.change_language(language)
         self.effect_manager.logger.change_language(language)
+
+        self.update_teams()
+
+    def update_teams(self):
+        """
+        Updates teams with:
+        * monster's parameters that depends on a locale.
+        """
+        for team in self.teams:
+            for monster in team.members:
+                name = self.logger.get_message(
+                    namespace="monsters",
+                    message_group=monster.global_id,
+                    key="name",
+                )
+
+                description = self.logger.get_message(
+                    namespace="monsters",
+                    message_group=monster.global_id,
+                    key="description",
+                )
+
+                monster.update_locale_params(name, description)
 
     # =========================================================================
     # Team Management
@@ -232,6 +256,7 @@ class CombatManager:
             elif (team) and (self_team == team):
                 self_team.members.append(monster)
 
+        self.update_teams()
         self.suffix_manager.add_suffixes(self.teams)
 
         return
@@ -382,9 +407,6 @@ class CombatManager:
         if self.current_monster.control_type == ControlType.AI:
             self.take_action(self.current_monster)
 
-            if self.settings.end_turn_ai_monsters == "MANUAL":
-                self.logger.input("")
-
         elif self.current_monster.control_type == ControlType.PLAYER:
             raise NotImplementedError
 
@@ -497,19 +519,15 @@ class CombatManager:
         be affected by Effects that triggers on death.
         """
         for monster in self.order[:]:
-            if not monster.is_alive():
+            if monster.in_combat and not monster.is_alive():
                 team = self.get_team(member=monster)
                 team.status = team.get_status()
 
-                self.logger.log(
-                    namespace="combat",
-                    message_group="COMBAT",
-                    key="death",
-                    name=monster.name,
-                )
+                self.logger.log_monster_death(monster)
 
-                # Cleaning monster effects
+                # Updating monster on death
                 monster.effects = []
+                monster.in_combat = False
 
                 # Procesing effects on death
                 self.effect_manager.process_trigger(
@@ -596,6 +614,9 @@ class CombatManager:
 
             self.order = self.get_turn_order()
             for idx, monster in enumerate(self.order):
+                if not monster.is_alive():
+                    continue
+
                 # Setup
                 self.current_monster = monster
 
@@ -635,6 +656,9 @@ class CombatManager:
                     combat_status = self.check_combat_status()
                     if combat_status["status"] != "ONGOING":
                         break
+
+                if self.settings.end_turn_ai_monsters == "MANUAL":
+                    self.logger.input("")
 
             # Round End
             if combat_status["status"] == "ONGOING":

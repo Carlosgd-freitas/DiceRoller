@@ -55,6 +55,8 @@ class ReviveEffect(Effect):
         fail = None
 
         if not target.is_alive():
+            if target.in_combat:
+                target.in_combat = True
             target.hp += ceil(target.max_hp * self.value)
             target.equalize_stats()
         else:
