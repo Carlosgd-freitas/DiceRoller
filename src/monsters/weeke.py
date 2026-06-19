@@ -6,8 +6,10 @@ from src.base.side import Side
 from src.effects.block import BlockEffect
 from src.effects.confuse import ConfuseEffect
 from src.effects.corrupt import CorruptEffect
+from src.effects.fragile import FragileEffect
 from src.effects.heal import HealEffect
 from src.effects.mana import ManaEffect
+from src.effects.weak import WeakEffect
 
 
 class Weeke(Monster):
@@ -27,7 +29,9 @@ class Weeke(Monster):
 
         dice_1 = Dice(
             sides=[
-                Side([ConfuseEffect(1)]),
+                Side([WeakEffect(1, duration=1)]),
+                Side([FragileEffect(1, duration=1)]),
+                Side([ConfuseEffect(duration=1)]),
                 Side([CorruptEffect(1)]),
             ]
         )

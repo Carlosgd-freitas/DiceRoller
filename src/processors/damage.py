@@ -85,7 +85,7 @@ def calculate_damage(
     :rtype: int
     """
     consider = [Keyword.INVULNERABLE] if consider is None else consider
-    damage = effect.value
+    damage = effect.get_effective_value(source, target)
     defended_damage: DefendedDamage = {}
 
     # Invulnerable

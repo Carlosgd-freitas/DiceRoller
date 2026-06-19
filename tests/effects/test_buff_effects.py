@@ -8,12 +8,15 @@ from src.base.keywords import Keyword
 from src.base.side import Side
 from src.effects.attack import AttackEffect
 from src.effects.blind import BlindEffect
+from src.effects.block import BlockEffect
 from src.effects.focus import FocusEffect
+from src.effects.fortify import FortifyEffect
 from src.effects.heal import HealEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.regen import RegenEffect
+from src.effects.strength import StrengthEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
 from src.targeting.selectors.offensive_selector import OffensiveSelector
@@ -27,6 +30,8 @@ if TYPE_CHECKING:
 
 def test_keyword_focus(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["monsters"][1]
+    monster_2: Monster = managers["monsters"][2]
 
     effect_blind = BlindEffect(1, duration=1)
     effect_focus = FocusEffect(1, duration=1)
@@ -35,46 +40,46 @@ def test_keyword_focus(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         effect_blind,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     combat_manager.effect_manager.execute_effect(
         effect_focus,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     conditions = [
-        combat_manager.order[0].local_id == "MONSTER_1",
-        len(combat_manager.order[0].effects) == 1,
-        combat_manager.order[0].get_effect(Keyword.BLIND) is None,
-        combat_manager.order[0].get_effect(Keyword.FOCUS).keyword == Keyword.FOCUS,
-        combat_manager.order[0].get_effect(Keyword.FOCUS).value == 1,
-        combat_manager.order[0].get_effect(Keyword.FOCUS).duration == 1,
-        combat_manager.order[0].hp == 1,
-        combat_manager.order[1].local_id == "MONSTER_2",
-        len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.FOCUS) is None,
-        combat_manager.order[1].hp == 10,
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 1,
+        monster_1.get_effect(Keyword.BLIND) is None,
+        monster_1.get_effect(Keyword.FOCUS).keyword == Keyword.FOCUS,
+        monster_1.get_effect(Keyword.FOCUS).value == 1,
+        monster_1.get_effect(Keyword.FOCUS).duration == 1,
+        monster_1.hp == 1,
+        monster_2.local_id == "MONSTER_2",
+        len(monster_2.effects) == 0,
+        monster_2.get_effect(Keyword.FOCUS) is None,
+        monster_2.hp == 10,
     ]
 
     combat_manager.effect_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     combat_manager.effect_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions.extend(
         [
-            combat_manager.order[0].hp == 3,
-            combat_manager.order[1].hp == 8,
+            monster_1.hp == 3,
+            monster_2.hp == 8,
         ]
     )
 
@@ -82,22 +87,81 @@ def test_keyword_focus(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         effect_heal,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     combat_manager.effect_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions.extend(
         [
-            len(combat_manager.order[0].effects) == 0,
-            combat_manager.order[0].get_effect(Keyword.FOCUS) is None,
-            combat_manager.order[0].hp == 3,
-            combat_manager.order[1].hp == 8,
+            len(monster_1.effects) == 0,
+            monster_1.get_effect(Keyword.FOCUS) is None,
+            monster_1.hp == 3,
+            monster_2.hp == 8,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_fortify(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["monsters"][1]
+
+    combat_manager.current_monster = monster_1
+
+    block_effect = BlockEffect(3, duration=1)
+    fortify_effect = FortifyEffect(2, duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        fortify_effect,
+        source=monster_1,
+        target=monster_1,
+    )
+
+    conditions = [
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 1,
+        monster_1.get_effect(Keyword.FORTIFY).keyword == Keyword.FORTIFY,
+        monster_1.get_effect(Keyword.FORTIFY).value == 2,
+        monster_1.get_effect(Keyword.FORTIFY).duration == 1,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        block_effect,
+        source=monster_1,
+        target=monster_1,
+    )
+
+    conditions.extend(
+        [
+            len(monster_1.effects) == 2,
+            monster_1.get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+            monster_1.get_effect(Keyword.BLOCK).value == 5,
+            monster_1.get_effect(Keyword.BLOCK).duration == 1,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.effect_manager.execute_effect(
+        block_effect,
+        source=monster_1,
+        target=monster_1,
+    )
+
+    conditions.extend(
+        [
+            len(monster_1.effects) == 1,
+            monster_1.get_effect(Keyword.FORTIFY) is None,
+            monster_1.get_effect(Keyword.BLOCK).keyword == Keyword.BLOCK,
+            monster_1.get_effect(Keyword.BLOCK).value == 3,
+            monster_1.get_effect(Keyword.BLOCK).duration == 1,
         ]
     )
 
@@ -106,6 +170,8 @@ def test_keyword_focus(managers: Dict):
 
 def test_keyword_immunity(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["monsters"][1]
+    monster_2: Monster = managers["monsters"][2]
 
     effect_blind = BlindEffect(1, duration=1)
     effect_immunity = ImmunityEffect(effects=[Keyword.BLIND], duration=1)
@@ -113,40 +179,39 @@ def test_keyword_immunity(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         effect_immunity,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     combat_manager.effect_manager.execute_effect(
         effect_blind,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     conditions = [
-        combat_manager.order[0].local_id == "MONSTER_1",
-        len(combat_manager.order[0].effects) == 1,
-        combat_manager.order[0].get_effect(Keyword.BLIND) is None,
-        combat_manager.order[0].get_effect(Keyword.IMMUNITY).keyword
-        == Keyword.IMMUNITY,
-        combat_manager.order[0].get_effect(Keyword.IMMUNITY).duration == 1,
-        combat_manager.order[0].hp == 1,
-        combat_manager.order[1].local_id == "MONSTER_2",
-        len(combat_manager.order[1].effects) == 0,
-        combat_manager.order[1].get_effect(Keyword.IMMUNITY) is None,
-        combat_manager.order[1].hp == 10,
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 1,
+        monster_1.get_effect(Keyword.BLIND) is None,
+        monster_1.get_effect(Keyword.IMMUNITY).keyword == Keyword.IMMUNITY,
+        monster_1.get_effect(Keyword.IMMUNITY).duration == 1,
+        monster_1.hp == 1,
+        monster_2.local_id == "MONSTER_2",
+        len(monster_2.effects) == 0,
+        monster_2.get_effect(Keyword.IMMUNITY) is None,
+        monster_2.hp == 10,
     ]
 
     combat_manager.effect_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions.extend(
         [
-            combat_manager.order[0].hp == 1,
-            combat_manager.order[1].hp == 8,
+            monster_1.hp == 1,
+            monster_2.hp == 8,
         ]
     )
 
@@ -154,24 +219,24 @@ def test_keyword_immunity(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         effect_blind,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     combat_manager.effect_manager.execute_effect(
         effect_attack,
-        source=combat_manager.order[0],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions.extend(
         [
-            len(combat_manager.order[0].effects) == 1,
-            combat_manager.order[0].get_effect(Keyword.IMMUNITY) is None,
-            combat_manager.order[0].get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
-            combat_manager.order[0].get_effect(Keyword.BLIND).duration == 1,
-            combat_manager.order[0].hp == 1,
-            combat_manager.order[1].hp == 8,
+            len(monster_1.effects) == 1,
+            monster_1.get_effect(Keyword.IMMUNITY) is None,
+            monster_1.get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
+            monster_1.get_effect(Keyword.BLIND).duration == 1,
+            monster_1.hp == 1,
+            monster_2.hp == 8,
         ]
     )
 
@@ -181,6 +246,10 @@ def test_keyword_immunity(managers: Dict):
 def test_keyword_invisible(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector_manager: SelectorManager = managers["selector_manager"]
+    monster_1: Monster = managers["monsters"][1]
+    monster_2: Monster = managers["monsters"][2]
+    monster_3: Monster = managers["monsters"][3]
+    monster_4: Monster = managers["monsters"][4]
 
     effect_invisible = InvisibleEffect(duration=1)
     effect_attack = AttackEffect(1)
@@ -191,24 +260,23 @@ def test_keyword_invisible(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         effect_invisible,
-        source=combat_manager.order[0],
-        target=combat_manager.order[0],
+        source=monster_1,
+        target=monster_1,
     )
 
     conditions = [
-        combat_manager.order[0].local_id == "MONSTER_1",
-        len(combat_manager.order[0].effects) == 1,
-        combat_manager.order[0].get_effect(Keyword.INVISIBLE).keyword
-        == Keyword.INVISIBLE,
-        combat_manager.order[0].get_effect(Keyword.INVISIBLE).duration == 1,
-        combat_manager.order[0].hp == 1,
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 1,
+        monster_1.get_effect(Keyword.INVISIBLE).keyword == Keyword.INVISIBLE,
+        monster_1.get_effect(Keyword.INVISIBLE).duration == 1,
+        monster_1.hp == 1,
     ]
 
     targets: List[Monster] = selector_manager.get_targets(
         side=side_attack,
-        source=combat_manager.order[2],
-        allies=[combat_manager.order[3]],
-        enemies=[combat_manager.order[0], combat_manager.order[1]],
+        source=monster_3,
+        allies=[monster_4],
+        enemies=[monster_1, monster_2],
         k=2,
     )
 
@@ -221,9 +289,9 @@ def test_keyword_invisible(managers: Dict):
 
     targets: List[Monster] = selector_manager.get_targets(
         side=side_heal,
-        source=combat_manager.order[1],
-        allies=[combat_manager.order[0]],
-        enemies=[combat_manager.order[2], combat_manager.order[3]],
+        source=monster_2,
+        allies=[monster_1],
+        enemies=[monster_3, monster_4],
         k=2,
     )
 
@@ -240,9 +308,9 @@ def test_keyword_invisible(managers: Dict):
 
     targets: List[Monster] = selector_manager.get_targets(
         side=side_attack,
-        source=combat_manager.order[2],
-        allies=[combat_manager.order[3]],
-        enemies=[combat_manager.order[0], combat_manager.order[1]],
+        source=monster_3,
+        allies=[monster_4],
+        enemies=[monster_1, monster_2],
         k=2,
     )
 
@@ -260,25 +328,25 @@ def test_keyword_invisible(managers: Dict):
 
 def test_keyword_mana_regen(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    monster: Monster = managers["monsters"][2]
 
-    combat_manager.current_monster = combat_manager.order[1]
+    combat_manager.current_monster = monster
 
     effect = ManaRegenEffect(1, duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=monster,
+        target=monster,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).keyword
-        == Keyword.MANA_REGEN,
-        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).value == 1,
-        combat_manager.order[1].get_effect(Keyword.MANA_REGEN).duration == 1,
-        combat_manager.order[1].mana == 0,
+        monster.local_id == "MONSTER_2",
+        len(monster.effects) == 1,
+        monster.get_effect(Keyword.MANA_REGEN).keyword == Keyword.MANA_REGEN,
+        monster.get_effect(Keyword.MANA_REGEN).value == 1,
+        monster.get_effect(Keyword.MANA_REGEN).duration == 1,
+        monster.mana == 0,
     ]
 
     combat_manager.start_turn()
@@ -287,9 +355,9 @@ def test_keyword_mana_regen(managers: Dict):
 
     conditions.extend(
         [
-            len(combat_manager.order[1].effects) == 0,
-            combat_manager.order[1].get_effect(Keyword.MANA_REGEN) is None,
-            combat_manager.order[1].mana == 1,
+            len(monster.effects) == 0,
+            monster.get_effect(Keyword.MANA_REGEN) is None,
+            monster.mana == 1,
         ]
     )
 
@@ -298,24 +366,25 @@ def test_keyword_mana_regen(managers: Dict):
 
 def test_keyword_regen(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    monster: Monster = managers["monsters"][2]
 
-    combat_manager.current_monster = combat_manager.order[1]
+    combat_manager.current_monster = monster
 
     effect = RegenEffect(1, duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=monster,
+        target=monster,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.REGEN).keyword == Keyword.REGEN,
-        combat_manager.order[1].get_effect(Keyword.REGEN).value == 1,
-        combat_manager.order[1].get_effect(Keyword.REGEN).duration == 1,
-        combat_manager.order[1].hp == 10,
+        monster.local_id == "MONSTER_2",
+        len(monster.effects) == 1,
+        monster.get_effect(Keyword.REGEN).keyword == Keyword.REGEN,
+        monster.get_effect(Keyword.REGEN).value == 1,
+        monster.get_effect(Keyword.REGEN).duration == 1,
+        monster.hp == 10,
     ]
 
     combat_manager.start_turn()
@@ -324,9 +393,9 @@ def test_keyword_regen(managers: Dict):
 
     conditions.extend(
         [
-            len(combat_manager.order[1].effects) == 0,
-            combat_manager.order[1].get_effect(Keyword.REGEN) is None,
-            combat_manager.order[1].hp == 11,
+            len(monster.effects) == 0,
+            monster.get_effect(Keyword.REGEN) is None,
+            monster.hp == 11,
         ]
     )
 
@@ -336,30 +405,33 @@ def test_keyword_regen(managers: Dict):
 def test_keyword_taunt(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     selector = OffensiveSelector()
+    monster_1: Monster = managers["monsters"][1]
+    monster_2: Monster = managers["monsters"][2]
+    monster_3: Monster = managers["monsters"][3]
 
-    combat_manager.current_monster = combat_manager.order[1]
+    combat_manager.current_monster = monster_2
 
     effect_taunt = TauntEffect(duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect_taunt,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        source=monster_2,
+        target=monster_2,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        len(combat_manager.order[1].effects) == 1,
-        combat_manager.order[1].get_effect(Keyword.TAUNT).keyword == Keyword.TAUNT,
-        combat_manager.order[1].get_effect(Keyword.TAUNT).duration == 1,
-        combat_manager.order[1].hp == 10,
+        monster_2.local_id == "MONSTER_2",
+        len(monster_2.effects) == 1,
+        monster_2.get_effect(Keyword.TAUNT).keyword == Keyword.TAUNT,
+        monster_2.get_effect(Keyword.TAUNT).duration == 1,
+        monster_2.hp == 10,
     ]
 
     targets: List[Monster] = selector._get_targets_lowest_hp(
         monsters=[
-            combat_manager.order[0],
-            combat_manager.order[1],
-            combat_manager.order[2],
+            monster_1,
+            monster_2,
+            monster_3,
         ],
         k=1,
     )
@@ -375,16 +447,16 @@ def test_keyword_taunt(managers: Dict):
 
     conditions.extend(
         [
-            len(combat_manager.order[1].effects) == 0,
-            combat_manager.order[1].get_effect(Keyword.TAUNT) is None,
+            len(monster_2.effects) == 0,
+            monster_2.get_effect(Keyword.TAUNT) is None,
         ]
     )
 
     targets: List[Monster] = selector._get_targets_lowest_hp(
         monsters=[
-            combat_manager.order[0],
-            combat_manager.order[1],
-            combat_manager.order[2],
+            monster_1,
+            monster_2,
+            monster_3,
         ],
         k=1,
     )
@@ -399,42 +471,46 @@ def test_keyword_taunt(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_thorns(managers: Dict):
+def test_keyword_strength(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
+    monster_1: Monster = managers["monsters"][1]
+    monster_3: Monster = managers["monsters"][3]
 
-    combat_manager.current_monster = combat_manager.order[1]
+    combat_manager.current_monster = monster_1
 
-    attack_effect = AttackEffect(4)
-    thorns_effect = ThornsEffect(4, duration=1)
+    attack_effect = AttackEffect(2)
+    strength_effect = StrengthEffect(2, duration=1)
 
     combat_manager.effect_manager.execute_effect(
-        thorns_effect,
-        source=combat_manager.order[1],
-        target=combat_manager.order[1],
+        strength_effect,
+        source=monster_1,
+        target=monster_1,
     )
 
     conditions = [
-        combat_manager.order[1].local_id == "MONSTER_2",
-        combat_manager.order[1].hp == 10,
-        combat_manager.order[1].get_effect(Keyword.THORNS).keyword == Keyword.THORNS,
-        combat_manager.order[1].get_effect(Keyword.THORNS).value == 4,
-        combat_manager.order[2].local_id == "MONSTER_3",
-        combat_manager.order[2].get_effect(Keyword.THORNS) is None,
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 1,
+        monster_1.get_effect(Keyword.STRENGTH).keyword == Keyword.STRENGTH,
+        monster_1.get_effect(Keyword.STRENGTH).value == 2,
+        monster_1.get_effect(Keyword.STRENGTH).duration == 1,
+        monster_3.local_id == "MONSTER_3",
+        monster_3.get_effect(Keyword.STRENGTH) is None,
     ]
 
     combat_manager.effect_manager.execute_effect(
         attack_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_3,
     )
 
     conditions.extend(
         [
-            combat_manager.order[1].hp == 6,
-            combat_manager.order[1].get_effect(Keyword.THORNS).keyword
-            == Keyword.THORNS,
-            combat_manager.order[1].get_effect(Keyword.THORNS).value == 4,
-            combat_manager.order[2].hp == 96,
+            monster_1.hp == 1,
+            len(monster_1.effects) == 1,
+            monster_1.get_effect(Keyword.STRENGTH).keyword == Keyword.STRENGTH,
+            monster_1.get_effect(Keyword.STRENGTH).value == 2,
+            monster_1.get_effect(Keyword.STRENGTH).duration == 1,
+            monster_3.hp == 96,
         ]
     )
 
@@ -442,15 +518,75 @@ def test_keyword_thorns(managers: Dict):
 
     combat_manager.effect_manager.execute_effect(
         attack_effect,
-        source=combat_manager.order[2],
-        target=combat_manager.order[1],
+        source=monster_1,
+        target=monster_3,
     )
 
     conditions.extend(
         [
-            combat_manager.order[1].hp == 2,
-            combat_manager.order[1].get_effect(Keyword.THORNS) is None,
-            combat_manager.order[2].hp == 96,
+            monster_1.hp == 1,
+            len(monster_1.effects) == 0,
+            monster_1.get_effect(Keyword.STRENGTH) is None,
+            monster_3.hp == 94,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_thorns(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_2: Monster = managers["monsters"][2]
+    monster_3: Monster = managers["monsters"][3]
+
+    combat_manager.current_monster = monster_2
+
+    attack_effect = AttackEffect(4)
+    thorns_effect = ThornsEffect(4, duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        thorns_effect,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    conditions = [
+        monster_2.local_id == "MONSTER_2",
+        monster_2.hp == 10,
+        monster_2.get_effect(Keyword.THORNS).keyword == Keyword.THORNS,
+        monster_2.get_effect(Keyword.THORNS).value == 4,
+        monster_3.local_id == "MONSTER_3",
+        monster_3.get_effect(Keyword.THORNS) is None,
+    ]
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect,
+        source=monster_3,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.hp == 6,
+            monster_2.get_effect(Keyword.THORNS).keyword == Keyword.THORNS,
+            monster_2.get_effect(Keyword.THORNS).value == 4,
+            monster_3.hp == 96,
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect,
+        source=monster_3,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            monster_2.hp == 2,
+            monster_2.get_effect(Keyword.THORNS) is None,
+            monster_3.hp == 96,
         ]
     )
 

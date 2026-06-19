@@ -22,8 +22,11 @@ class Keyword(Enum):
     DRAIN = "DRAIN"
     EXECUTE = "EXECUTE"
     FOCUS = "FOCUS"
+    FORTIFY = "FORTIFY"
+    FRAGILE = "FRAGILE"
     FREEZE = "FREEZE"
     FROSTBURN = "FROSTBURN"
+    HASTE = "HASTE"
     HEAL = "HEAL"
     IMMUNITY = "IMMUNITY"
     INVISIBLE = "INVISIBLE"
@@ -31,15 +34,19 @@ class Keyword(Enum):
     MANA = "MANA"
     MANA_REGEN = "MANA_REGEN"
     NOTHING = "NOTHING"
+    OIL = "OIL"
     PIERCE = "PIERCE"
     POISON = "POISON"
     REGEN = "REGEN"
     REVIVE = "REVIVE"
     SACRED_BLOCK = "SACRED_BLOCK"
     SLEEP = "SLEEP"
+    SLOW = "SLOW"
+    STRENGTH = "STRENGTH"
     STUN = "STUN"
     TAUNT = "TAUNT"
     THORNS = "THORNS"
+    WEAK = "WEAK"
 
 
 def get_keyword(name: str) -> Keyword:
@@ -68,7 +75,7 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
     elif keyword in [Keyword.ATTACK, Keyword.PIERCE]:
         foreground_color = Color.ORANGE
     elif keyword in [Keyword.BLEED]:
-        foreground_color = Color.BURGUNDY
+        foreground_color = Color.RED
         intensity = "DIM"
     elif keyword in [Keyword.BLIND, Keyword.STUN]:
         foreground_color = Color.GRAY
@@ -84,12 +91,16 @@ def get_keyword_color(keyword: Keyword) -> ColorParams:
         foreground_color = Color.LILAC
     elif keyword in [Keyword.CURSE, Keyword.DOOM]:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.EXECUTE, Keyword.INVISIBLE]:
+    elif keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.OIL]:
         background_color = Color.GRAY
         foreground_color = Color.BLACK
         intensity = "BRIGHT"
     elif keyword in [Keyword.FOCUS]:
         foreground_color = Color.LEMON
+    elif keyword in [Keyword.FORTIFY, Keyword.HASTE, Keyword.STRENGTH]:
+        foreground_color = Color.SPRING_GREEN
+    elif keyword in [Keyword.FRAGILE, Keyword.SLOW, Keyword.WEAK]:
+        foreground_color = Color.TOMATO
     elif keyword in [Keyword.FREEZE, Keyword.FROSTBURN]:
         foreground_color = Color.SKY_BLUE
     elif keyword in [Keyword.HEAL]:

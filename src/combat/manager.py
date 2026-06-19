@@ -296,10 +296,10 @@ class CombatManager:
         ]
 
         if self.order_strategy == OrderStrategy.FASTER:
-            order.sort(key=lambda x: x.speed, reverse=True)
+            order.sort(key=lambda x: x.get_effective_speed(), reverse=True)
 
         elif self.order_strategy == OrderStrategy.SLOWER:
-            order.sort(key=lambda x: x.speed)
+            order.sort(key=lambda x: x.get_effective_speed())
 
         elif self.order_strategy == OrderStrategy.SHUFFLE:
             shuffle(order)

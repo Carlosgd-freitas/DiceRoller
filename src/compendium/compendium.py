@@ -369,7 +369,7 @@ class Compendium(Menu):
     def search_item(self):
         """
         Prompts the user to type an item's name, and if the item is:
-        * found, switches the Compedium's level to ITEM and updates the current item
+        * found, switches the Compendium's level to ITEM and updates the current item
         number.
         * not found, logs a message.
         """
@@ -400,7 +400,7 @@ class Compendium(Menu):
         """
         Prompts the user to select one of the Compendium page's items, and if:
         * the cancel index is selected, the operation is canceled.
-        * a valid index is selected, switches the Compedium's level to ITEM and
+        * a valid index is selected, switches the Compendium's level to ITEM and
         updates the current item number.
         * an invalid index is selected, the prompt will repeat.
         """

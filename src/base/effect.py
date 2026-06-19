@@ -128,6 +128,20 @@ class Effect(ABC):
 
         return _str
 
+    def get_effective_value(
+        self,
+        source: Entity = None,
+        target: Entity = None,
+    ) -> float:
+        """
+        Returns the effects' effective value, taking effects on source and target
+        entities into account.
+
+        :return: The effective value.
+        :rtype: float
+        """
+        return self.value
+
     @abstractmethod
     def on_apply(
         self,

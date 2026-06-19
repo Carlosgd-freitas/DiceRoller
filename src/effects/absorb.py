@@ -39,6 +39,34 @@ class AbsorbEffect(Effect):
             removable,
         )
 
+    def get_effective_value(
+        self,
+        source: Entity,
+        target: Entity,
+    ) -> float:
+        """
+        Returns the effects' effective value, taking effects on source and target
+        entities into account.
+
+        :return: The effective value.
+        :rtype: float
+        """
+        effective_value = self.value
+
+        if source:
+            fortify = source.get_effect(Keyword.FORTIFY)
+            if fortify:
+                effective_value += fortify.value
+
+            fragile = source.get_effect(Keyword.FRAGILE)
+            if fragile:
+                effective_value -= fragile.value
+
+        if effective_value < 0:
+            effective_value = 0
+
+        return effective_value
+
     def on_apply(
         self,
         source: Entity,

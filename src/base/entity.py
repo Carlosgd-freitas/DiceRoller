@@ -166,9 +166,9 @@ class Entity:
         self,
         effect: Effect,
         source: Entity = None,
-        stack_value: stack_method = "overwrite",
+        stack_value: stack_method = "add",
         stack_duration: stack_method = "overwrite",
-        stack_decay: stack_method = "overwrite",
+        stack_decay: stack_method = "add",
         stack_accuracy: stack_method = "overwrite",
     ) -> Dict:
         """
@@ -210,6 +210,7 @@ class Entity:
         :rtype: Dict
         """
         new_effect = deepcopy(effect)
+        new_effect.value = new_effect.get_effective_value(source, source)
         current_effect = self.get_effect(effect.keyword)
 
         # Stack existing effect
@@ -302,7 +303,7 @@ class Entity:
 
     def get_effective_hp(self) -> int:
         """
-        Returns the entity' effective hp, taking any blocking effects into account.
+        Returns the entity' effective hp, taking some effects into account.
 
         :return: The effective hp.
         :rtype: int
@@ -315,3 +316,29 @@ class Entity:
                 effective_hp += effect.value
 
         return effective_hp
+
+    def get_effective_speed(self) -> int:
+        """
+        Returns the entity' effective speed, taking some effects into account.
+
+        :return: The effective speed.
+        :rtype: int
+        """
+        effective_speed = self.speed
+
+        haste = self.get_effect(Keyword.HASTE)
+        if haste:
+            effective_speed += haste.value
+
+        oil = self.get_effect(Keyword.OIL)
+        if oil:
+            effective_speed -= oil.value
+
+        slow = self.get_effect(Keyword.SLOW)
+        if slow:
+            effective_speed -= slow.value
+
+        if effective_speed < 0:
+            effective_speed = 0
+
+        return effective_speed

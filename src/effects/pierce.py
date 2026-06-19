@@ -40,6 +40,34 @@ class PierceEffect(Effect):
             removable,
         )
 
+    def get_effective_value(
+        self,
+        source: Entity,
+        target: Entity,
+    ) -> float:
+        """
+        Returns the effects' effective value, taking effects on source and target
+        entities into account.
+
+        :return: The effective value.
+        :rtype: float
+        """
+        effective_value = self.value
+
+        if source:
+            strength = source.get_effect(Keyword.STRENGTH)
+            if strength:
+                effective_value += strength.value
+
+            weak = source.get_effect(Keyword.WEAK)
+            if weak:
+                effective_value -= weak.value
+
+        if effective_value < 0:
+            effective_value = 0
+
+        return effective_value
+
     def on_apply(
         self,
         source: Entity,

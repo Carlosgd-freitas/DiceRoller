@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 def test_keyword_corrupt(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["teams"][0].members[1]
+    monster: Monster = managers["monsters"][1]
 
     corrupt_effect = CorruptEffect(2)
 
@@ -57,7 +57,7 @@ def test_keyword_corrupt(managers: Dict):
 
 def test_keyword_curse(managers: Dict):
     effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["teams"][0].members[1]
+    monster: Monster = managers["monsters"][1]
 
     curse_effect = CurseEffect(6)
     block_effect = BlockEffect(6)

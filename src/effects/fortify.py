@@ -1,4 +1,4 @@
-"""Block effect module."""
+"""Fortify effect module."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class BlockEffect(Effect):
+class FortifyEffect(Effect):
     """
-    Block Effect.
+    Fortify Effect.
 
-    This will reduce direct damage done to the target's HP.
+    Increases block recieved by defensive effects.
     """
 
     def __init__(
@@ -27,44 +27,16 @@ class BlockEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            Keyword.BLOCK,
+            Keyword.FORTIFY,
             value,
             duration,
             decay,
             accuracy,
-            EffectType.DEFENSIVE,
+            EffectType.BUFF,
             None,
             True,
             removable,
         )
-
-    def get_effective_value(
-        self,
-        source: Entity,
-        target: Entity,
-    ) -> float:
-        """
-        Returns the effects' effective value, taking effects on source and target
-        entities into account.
-
-        :return: The effective value.
-        :rtype: float
-        """
-        effective_value = self.value
-
-        if source:
-            fortify = source.get_effect(Keyword.FORTIFY)
-            if fortify:
-                effective_value += fortify.value
-
-            fragile = source.get_effect(Keyword.FRAGILE)
-            if fragile:
-                effective_value -= fragile.value
-
-        if effective_value < 0:
-            effective_value = 0
-
-        return effective_value
 
     def on_apply(
         self,

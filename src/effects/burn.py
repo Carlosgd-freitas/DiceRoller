@@ -41,6 +41,27 @@ class BurnEffect(Effect):
             removable,
         )
 
+    def get_effective_value(
+        self,
+        source: Entity,
+        target: Entity,
+    ) -> float:
+        """
+        Returns the effects' effective value, taking effects on source and target
+        entities into account.
+
+        :return: The effective value.
+        :rtype: float
+        """
+        effective_value = self.value
+
+        if target:
+            oil = target.get_effect(Keyword.OIL)
+            if oil:
+                effective_value += oil.value
+
+        return effective_value
+
     def on_apply(
         self,
         source: Entity,

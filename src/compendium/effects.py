@@ -20,8 +20,11 @@ from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
+from src.effects.fortify import FortifyEffect
+from src.effects.fragile import FragileEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.frostburn import FrostburnEffect
+from src.effects.haste import HasteEffect
 from src.effects.heal import HealEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
@@ -29,15 +32,19 @@ from src.effects.invulnerable import InvulnerableEffect
 from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.nothing import NothingEffect
+from src.effects.oil import OilEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.revive import ReviveEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
+from src.effects.slow import SlowEffect
+from src.effects.strength import StrengthEffect
 from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
+from src.effects.weak import WeakEffect
 from src.logger.effects import EffectLogger
 from src.menus.option import Option
 
@@ -60,8 +67,11 @@ ALL_EFFECTS = [
     DrainEffect(),
     ExecuteEffect(),
     FocusEffect(),
+    FortifyEffect(),
+    FragileEffect(),
     FreezeEffect(),
     FrostburnEffect(),
+    HasteEffect(),
     HealEffect(),
     ImmunityEffect(),
     InvisibleEffect(),
@@ -69,15 +79,19 @@ ALL_EFFECTS = [
     ManaEffect(),
     ManaRegenEffect(),
     NothingEffect(),
+    OilEffect(),
     PierceEffect(),
     PoisonEffect(),
     RegenEffect(),
     ReviveEffect(),
     SacredBlockEffect(),
     SleepEffect(),
+    SlowEffect(),
+    StrengthEffect(),
     StunEffect(),
     TauntEffect(),
     ThornsEffect(),
+    WeakEffect(),
 ]
 
 

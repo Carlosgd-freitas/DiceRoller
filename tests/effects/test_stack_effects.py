@@ -1,10 +1,11 @@
 """Tests for stacking effects."""
 
+from __future__ import annotations
+
 from math import isclose
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
-from src.combat.manager import CombatManager
 from src.effects.burn import BurnEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.immunity import ImmunityEffect
@@ -12,10 +13,12 @@ from src.effects.nothing import NothingEffect
 from src.effects.stun import StunEffect
 from tests.utils import assert_conditions
 
+if TYPE_CHECKING:
+    from src.base.monster import Monster
+
 
 def test_stack_effect_new(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster = combat_manager.order[1]
+    monster: Monster = managers["monsters"][2]
 
     effect = NothingEffect(
         value=1,
@@ -42,8 +45,7 @@ def test_stack_effect_new(managers: Dict):
 
 
 def test_stack_effect_add(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster = combat_manager.order[1]
+    monster: Monster = managers["monsters"][2]
 
     effect_0 = NothingEffect(
         value=1,
@@ -84,8 +86,7 @@ def test_stack_effect_add(managers: Dict):
 
 
 def test_stack_effect_overwrite(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster = combat_manager.order[1]
+    monster: Monster = managers["monsters"][2]
 
     effect_0 = NothingEffect(
         value=1,
@@ -126,8 +127,7 @@ def test_stack_effect_overwrite(managers: Dict):
 
 
 def test_stack_effect_remove(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster = combat_manager.order[1]
+    monster: Monster = managers["monsters"][2]
 
     effect_freeze = FreezeEffect(
         value=1,
@@ -171,8 +171,7 @@ def test_stack_effect_remove(managers: Dict):
 
 
 def test_stack_immunity_effect(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster = combat_manager.order[1]
+    monster: Monster = managers["monsters"][2]
 
     effect_0 = ImmunityEffect(effects=[Keyword.BURN, Keyword.BLIND])
     effect_1 = ImmunityEffect(effects=[Keyword.BURN, Keyword.POISON])
