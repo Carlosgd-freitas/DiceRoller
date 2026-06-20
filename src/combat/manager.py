@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import Enum
 from math import inf
 from random import shuffle
-from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict
+from typing import TYPE_CHECKING, Callable, Dict, List, Literal, TypedDict
 
 from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
@@ -306,26 +306,65 @@ class CombatManager:
 
         return order
 
+    def set_order(self, order_strategy: OrderStrategy):
+        """
+        Sets the order in which monsters will take action.
+
+        :param order_strategy: Strategy when definining monsters turn order in combat.
+        :type order_strategy: OrderStrategy
+        """
+        self.order_strategy = order_strategy
+        self.order = self.get_turn_order()
+
+    def is_round_start(self) -> bool:
+        """
+        Returns if the combat is currently on round start.
+
+        :return: If the combat is in round start or not.
+        :rtype: bool
+        """
+        return all([not monster.turn_taken for monster in self.order])
+
+    def is_round_end(self) -> bool:
+        """
+        Returns if the combat is currently on round end.
+
+        :return: If the combat is in round end or not.
+        :rtype: bool
+        """
+        return all([monster.turn_taken for monster in self.order])
+
     def start_combat(self) -> None:
         """Start combat between teams of monsters."""
-        # Procesing effects on combat start
-        self.effect_manager.process_trigger(
-            Trigger.COMBAT_START,
-            target=self.current_monster,
-        )
+        self.set_order(self.order_strategy)
 
-        self.order = self.get_turn_order()
+        for monster in self.order:
+            monster.turn_taken = False
+
+            # Procesing effects on combat start
+            if monster.in_combat and monster.is_alive():
+                self.effect_manager.process_trigger(
+                    Trigger.COMBAT_START,
+                    target=monster,
+                )
+
         self.current_monster = self.order[0]
 
         return
 
     def start_round(self) -> None:
         """Start the current round."""
-        # Procesing effects on round start
-        self.effect_manager.process_trigger(
-            Trigger.ROUND_START,
-            target=self.current_monster,
-        )
+        self.set_order(self.order_strategy)
+
+        for monster in self.order:
+            # Procesing effects on round start
+            if monster.in_combat and monster.is_alive():
+                self.effect_manager.process_trigger(
+                    Trigger.ROUND_START,
+                    target=monster,
+                )
+
+        self.current_monster = self.order[0]
 
         return
 
@@ -388,6 +427,8 @@ class CombatManager:
         :return: If the turn was taken.
         :rtype: bool
         """
+        self.current_monster.turn_taken = True
+
         for keyword in [
             Keyword.FREEZE,
             Keyword.SLEEP,
@@ -467,33 +508,29 @@ class CombatManager:
             "removed_effects": removed_effects,
         }
 
-    def next_turn(self) -> None:
+    def next_turn(self):
         """Sets up the next turn in the turn order."""
+        self.set_order(self.order_strategy)
 
-        # Getting the current monster
-        idx_monster: int = None
-        for idx, monster in enumerate(self.order):
-            if monster == self.current_monster:
-                idx_monster = idx
+        for monster in self.order:
+            if (monster != self.current_monster) and (not monster.turn_taken):
+                self.current_monster = monster
                 break
-
-        # Getting the next monster
-        if idx_monster + 1 < len(self.order):
-            self.current_monster = self.order[idx_monster + 1]
-
-        else:  # Round end -> Remaking the turn order
-            self.order = self.get_turn_order()
-            self.current_monster = self.order[0]
 
         return
 
     def end_round(self) -> None:
         """End the current round."""
-        # Procesing effects on round end
-        self.effect_manager.process_trigger(
-            Trigger.ROUND_END,
-            target=self.current_monster,
-        )
+        for monster in self.order:
+            # Clearing turn taken flags
+            monster.turn_taken = False
+
+            # Procesing effects on round end
+            if monster.in_combat and monster.is_alive():
+                self.effect_manager.process_trigger(
+                    Trigger.ROUND_END,
+                    target=monster,
+                )
 
         self.round += 1
 
@@ -502,10 +539,12 @@ class CombatManager:
     def end_combat(self) -> None:
         """End combat between teams of monsters."""
         # Procesing effects on combat end
-        self.effect_manager.process_trigger(
-            Trigger.COMBAT_END,
-            target=self.current_monster,
-        )
+        for monster in self.order:
+            if monster.in_combat and monster.is_alive():
+                self.effect_manager.process_trigger(
+                    Trigger.COMBAT_END,
+                    target=monster,
+                )
 
         return
 
@@ -584,91 +623,79 @@ class CombatManager:
 
         return combat_status
 
+    def _run_step(self, step: Callable, **kwargs):
+        """Runs a step of combat, check deaths and return the combat status."""
+        step(**kwargs)
+        self.check_deaths()
+        return self.check_combat_status()
+
     def run(self) -> Dict:
         """
         Runs combat until only one team remains alive.
         """
         # Combat Start
-        self.start_combat()
-        self.check_deaths()
-        combat_status = self.check_combat_status()
+        combat_status = self._run_step(self.start_combat)
 
         while combat_status["status"] == "ONGOING":
             # Round Start
-            if self.round == 1 or self.settings.end_turn_ai_monsters == "AUTO":
-                start_line_break = True
-            else:
-                start_line_break = False
+            if self.is_round_start():
+                if self.round == 1 or self.settings.end_turn_ai_monsters == "AUTO":
+                    start_line_break = True
+                else:
+                    start_line_break = False
 
-            self.logger.log_round(
-                self.round,
+                self.logger.log_round(
+                    self.round,
+                    start_line_break,
+                )
+
+                combat_status = self._run_step(self.start_round)
+                if combat_status["status"] != "ONGOING":
+                    break
+
+            # Turn Start
+            if (self.settings.end_turn_ai_monsters == "MANUAL") and (
+                not self.is_round_start()
+            ):
+                start_line_break = False
+            else:
+                start_line_break = True
+
+            self.logger.log_turn_start(
+                self.current_monster,
                 start_line_break,
             )
+            self.logger.log_teams(self.teams)
 
-            self.start_round()
-            self.check_deaths()
-
-            combat_status = self.check_combat_status()
+            combat_status = self._run_step(self.start_turn)
             if combat_status["status"] != "ONGOING":
                 break
 
-            self.order = self.get_turn_order()
-            for idx, monster in enumerate(self.order):
-                if not monster.is_alive():
-                    continue
+            # Take Turn Action
+            if self.current_monster.is_alive():
+                combat_status = self._run_step(self.take_turn)
 
-                # Setup
-                self.current_monster = monster
-
-                # Turn Start
-                if idx > 0 and self.settings.end_turn_ai_monsters == "MANUAL":
-                    start_line_break = False
-                else:
-                    start_line_break = True
-
-                self.logger.log_turn_start(
-                    self.current_monster,
-                    start_line_break,
-                )
-                self.logger.log_teams(self.teams)
-
-                self.start_turn()
-                self.check_deaths()
-
-                combat_status = self.check_combat_status()
                 if combat_status["status"] != "ONGOING":
                     break
 
-                # Turn Action
-                if monster.is_alive():
-                    self.take_turn()
-                    self.check_deaths()
+            # Turn End
+            combat_status = self._run_step(self.end_turn)
+            if combat_status["status"] != "ONGOING":
+                break
 
-                    combat_status = self.check_combat_status()
-                    if combat_status["status"] != "ONGOING":
-                        break
+            if self.settings.end_turn_ai_monsters == "MANUAL":
+                self.logger.input("")
 
-                # Turn End
-                if combat_status["status"] == "ONGOING":
-                    self.end_turn()
-                    self.check_deaths()
-
-                    combat_status = self.check_combat_status()
-                    if combat_status["status"] != "ONGOING":
-                        break
-
-                if self.settings.end_turn_ai_monsters == "MANUAL":
-                    self.logger.input("")
+            # Next Turn
+            self.next_turn()
 
             # Round End
-            if combat_status["status"] == "ONGOING":
-                self.end_round()
-                self.check_deaths()
-
-                combat_status = self.check_combat_status()
+            if self.is_round_end():
+                combat_status = self._run_step(self.end_round)
                 if combat_status["status"] != "ONGOING":
                     break
 
+        # Combat end
         self.end_combat()
 
         return combat_status

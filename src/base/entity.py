@@ -338,7 +338,4 @@ class Entity:
         if slow:
             effective_speed -= slow.value
 
-        if effective_speed < 0:
-            effective_speed = 0
-
         return effective_speed

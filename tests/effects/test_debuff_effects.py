@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Dict, List
 from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.side import Side
+from src.combat.manager import CombatManager, OrderStrategy
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
@@ -19,15 +20,16 @@ from src.effects.fragile import FragileEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.frostburn import FrostburnEffect
 from src.effects.heal import HealEffect
+from src.effects.oil import OilEffect
 from src.effects.poison import PoisonEffect
 from src.effects.sleep import SleepEffect
+from src.effects.slow import SlowEffect
 from src.effects.stun import StunEffect
 from src.effects.weak import WeakEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    from src.combat.manager import CombatManager
     from src.targeting.selectors.manager import SelectorManager
 
 
@@ -345,8 +347,6 @@ def test_keyword_fragile(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     monster_1: Monster = managers["monsters"][1]
 
-    combat_manager.current_monster = monster_1
-
     block_effect = BlockEffect(3, duration=1)
     fragile_effect = FragileEffect(2, duration=1)
 
@@ -523,6 +523,87 @@ def test_keyword_frostburn(managers: Dict):
     assert_conditions(conditions)
 
 
+def test_keyword_oil(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_2: Monster = managers["monsters"][2]
+
+    combat_manager.order_strategy = OrderStrategy.FASTER
+    combat_manager.start_combat()
+
+    turn_local_ids = []
+
+    combat_manager.start_round()
+    for turn in range(4):
+        combat_manager.start_turn()
+        turn_local_ids.append(combat_manager.current_monster.local_id)
+
+        if turn == 0:
+            oil_effect = OilEffect(5, duration=1)
+
+            combat_manager.effect_manager.execute_effect(
+                oil_effect,
+                source=combat_manager.current_monster,
+                target=monster_2,
+            )
+
+            burn_effect = BurnEffect(1, duration=1)
+
+            combat_manager.effect_manager.execute_effect(
+                burn_effect,
+                source=combat_manager.current_monster,
+                target=monster_2,
+            )
+
+            conditions = [
+                monster_2.local_id == "MONSTER_2",
+                len(monster_2.effects) == 2,
+                monster_2.hp == 10,
+                monster_2.get_effect(Keyword.OIL).keyword == Keyword.OIL,
+                monster_2.get_effect(Keyword.OIL).value == 5,
+                monster_2.get_effect(Keyword.OIL).duration == 1,
+                monster_2.get_effective_speed() == -4,
+            ]
+
+        combat_manager.current_monster.turn_taken = True
+        combat_manager.end_turn()
+        combat_manager.next_turn()
+    combat_manager.end_round()
+
+    conditions.extend(
+        [
+            turn_local_ids[0] == "MONSTER_3",
+            turn_local_ids[1] == "MONSTER_1",
+            turn_local_ids[2] == "MONSTER_4",
+            turn_local_ids[3] == "MONSTER_2",
+            len(monster_2.effects) == 0,
+            monster_2.hp == 4,
+            monster_2.get_effect(Keyword.OIL) is None,
+            monster_2.get_effective_speed() == 1,
+        ]
+    )
+
+    turn_local_ids = []
+
+    combat_manager.start_round()
+    for _ in range(4):
+        turn_local_ids.append(combat_manager.current_monster.local_id)
+        combat_manager.current_monster.turn_taken = True
+        combat_manager.end_turn()
+        combat_manager.next_turn()
+    combat_manager.end_round()
+
+    conditions.extend(
+        [
+            turn_local_ids[0] == "MONSTER_3",
+            turn_local_ids[1] == "MONSTER_1",
+            turn_local_ids[2] == "MONSTER_2",
+            turn_local_ids[3] == "MONSTER_4",
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
 def test_keyword_poison(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     monster_1: Monster = managers["monsters"][1]
@@ -653,6 +734,76 @@ def test_keyword_sleep(managers: Dict):
     assert_conditions(conditions)
 
 
+def test_keyword_slow(managers: Dict):
+    combat_manager: CombatManager = managers["combat_manager"]
+    monster_2: Monster = managers["monsters"][2]
+
+    combat_manager.order_strategy = OrderStrategy.FASTER
+    combat_manager.start_combat()
+
+    turn_local_ids = []
+
+    combat_manager.start_round()
+    for turn in range(4):
+        turn_local_ids.append(combat_manager.current_monster.local_id)
+
+        if turn == 0:
+            slow_effect = SlowEffect(100, duration=1)
+
+            combat_manager.effect_manager.execute_effect(
+                slow_effect,
+                source=combat_manager.current_monster,
+                target=monster_2,
+            )
+
+            conditions = [
+                monster_2.local_id == "MONSTER_2",
+                len(monster_2.effects) == 1,
+                monster_2.get_effect(Keyword.SLOW).keyword == Keyword.SLOW,
+                monster_2.get_effect(Keyword.SLOW).value == 100,
+                monster_2.get_effect(Keyword.SLOW).duration == 1,
+                monster_2.get_effective_speed() == -99,
+            ]
+
+        combat_manager.current_monster.turn_taken = True
+        combat_manager.end_turn()
+        combat_manager.next_turn()
+    combat_manager.end_round()
+
+    conditions.extend(
+        [
+            turn_local_ids[0] == "MONSTER_3",
+            turn_local_ids[1] == "MONSTER_1",
+            turn_local_ids[2] == "MONSTER_4",
+            turn_local_ids[3] == "MONSTER_2",
+            len(monster_2.effects) == 0,
+            monster_2.get_effect(Keyword.SLOW) is None,
+            monster_2.get_effective_speed() == 1,
+        ]
+    )
+
+    turn_local_ids = []
+
+    combat_manager.start_round()
+    for _ in range(4):
+        turn_local_ids.append(combat_manager.current_monster.local_id)
+        combat_manager.current_monster.turn_taken = True
+        combat_manager.end_turn()
+        combat_manager.next_turn()
+    combat_manager.end_round()
+
+    conditions.extend(
+        [
+            turn_local_ids[0] == "MONSTER_3",
+            turn_local_ids[1] == "MONSTER_1",
+            turn_local_ids[2] == "MONSTER_2",
+            turn_local_ids[3] == "MONSTER_4",
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
 def test_keyword_stun(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     monster_1: Monster = managers["monsters"][1]
@@ -729,8 +880,6 @@ def test_keyword_weak(managers: Dict):
     combat_manager: CombatManager = managers["combat_manager"]
     monster_1: Monster = managers["monsters"][1]
     monster_3: Monster = managers["monsters"][3]
-
-    combat_manager.current_monster = monster_1
 
     attack_effect = AttackEffect(2)
     weak_effect = WeakEffect(2, duration=1)
