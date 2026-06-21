@@ -1,12 +1,12 @@
 """Settings module."""
 
-import pickle
-from pathlib import Path
 from typing import List, Literal
 
 from src.locales.languages import Language
 
-FILENAME = "settings.dat"
+BASENAME = "settings"
+EXTENSION = ".dat"
+FILENAME = BASENAME + EXTENSION
 
 
 class Settings:
@@ -29,35 +29,6 @@ class Settings:
     ):
         self.language = language
         self.end_turn_ai_monsters = end_turn_ai_monsters
-
-    def exists(self) -> bool:
-        """
-        Checks if the settings file exists.
-
-        :return: If the settings file exists or not.
-        :rtype: bool
-        """
-        file_path = Path(FILENAME)
-
-        return file_path.is_file()
-
-    def save(self):
-        """
-        Saves the settings on a file.
-        """
-        with open(FILENAME, "wb") as f:
-            pickle.dump(self, f)
-
-        return
-
-    def load(self):
-        """
-        Loads the settings from a file.
-        """
-        with open(FILENAME, "rb") as f:
-            new_settings = pickle.load(f)
-
-        self.__dict__.update(new_settings.__dict__)
 
     def switch_setting(self, setting_name: str, values: List):
         """

@@ -33,10 +33,10 @@ if TYPE_CHECKING:
     from src.targeting.selectors.manager import SelectorManager
 
 
-def test_keyword_bleed(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_bleed(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     combat_manager.current_monster = monster_2
 
@@ -99,10 +99,10 @@ def test_keyword_bleed(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_blind(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_blind(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect_blind = BlindEffect(1, duration=1)
     effect_focus = FocusEffect(1, duration=1)
@@ -180,10 +180,10 @@ def test_keyword_blind(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_burn(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_burn(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster_2
 
@@ -230,12 +230,12 @@ def test_keyword_burn(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_confuse(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    selector_manager: SelectorManager = managers["selector_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_confuse(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    selector_manager: SelectorManager = combat["selector_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     effect_confuse = ConfuseEffect(duration=1)
     effect_attack = AttackEffect(1)
@@ -288,10 +288,10 @@ def test_keyword_confuse(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_doom(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_doom(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect_doom = DoomEffect(duration=3)
 
@@ -343,9 +343,9 @@ def test_keyword_doom(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_fragile(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
+def test_keyword_fragile(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
 
     block_effect = BlockEffect(3, duration=1)
     fragile_effect = FragileEffect(2, duration=1)
@@ -400,11 +400,11 @@ def test_keyword_fragile(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_freeze(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_freeze(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     effect_freeze = FreezeEffect(duration=1)
     effect_attack = AttackEffect(2)
@@ -479,10 +479,10 @@ def test_keyword_freeze(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_frostburn(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_frostburn(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster_2
 
@@ -523,9 +523,9 @@ def test_keyword_frostburn(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_oil(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_oil(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.order_strategy = OrderStrategy.FASTER
     combat_manager.start_combat()
@@ -604,10 +604,10 @@ def test_keyword_oil(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_poison(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_poison(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster_2
 
@@ -648,10 +648,10 @@ def test_keyword_poison(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_sleep(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_sleep(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     combat_manager.current_monster = monster_2
 
@@ -734,9 +734,9 @@ def test_keyword_sleep(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_slow(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_slow(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.order_strategy = OrderStrategy.FASTER
     combat_manager.start_combat()
@@ -804,10 +804,10 @@ def test_keyword_slow(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_stun(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_stun(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect_stun = StunEffect(duration=1)
     effect_attack = AttackEffect(2)
@@ -876,10 +876,10 @@ def test_keyword_stun(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_weak(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_weak(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_3: Monster = combat["monsters"][3]
 
     attack_effect = AttackEffect(2)
     weak_effect = WeakEffect(2, duration=1)

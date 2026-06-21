@@ -18,10 +18,10 @@ if TYPE_CHECKING:
     from src.combat.manager import CombatManager
 
 
-def test_keyword_absorb(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_absorb(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     attack_effect_1 = AttackEffect(3)
     attack_effect_2 = AttackEffect(4)
@@ -73,10 +73,10 @@ def test_keyword_absorb(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_block(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_block(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     attack_effect_1 = AttackEffect(3)
     attack_effect_2 = AttackEffect(4)
@@ -128,10 +128,10 @@ def test_keyword_block(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_invulnerable(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_invulnerable(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster_2
 
@@ -186,10 +186,10 @@ def test_keyword_invulnerable(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_sacred_block(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_sacred_block(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster_2
 

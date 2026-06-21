@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-def test_get_targets_random(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_random(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     targets = selector._get_targets_random(
@@ -33,8 +33,8 @@ def test_get_targets_random(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_lowest_hp(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_lowest_hp(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     targets = selector._get_targets_lowest_hp(
@@ -51,8 +51,8 @@ def test_get_targets_lowest_hp(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_highest_hp(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_highest_hp(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     targets = selector._get_targets_highest_hp(
@@ -69,8 +69,8 @@ def test_get_targets_highest_hp(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_lowest_max_hp(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_lowest_max_hp(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     targets = selector._get_targets_lowest_max_hp(
@@ -87,8 +87,8 @@ def test_get_targets_lowest_max_hp(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_highest_max_hp(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_highest_max_hp(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     targets = selector._get_targets_highest_max_hp(
@@ -105,8 +105,8 @@ def test_get_targets_highest_max_hp(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_with_effects(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_with_effects(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
     effect = StunEffect()
 
@@ -130,8 +130,8 @@ def test_get_targets_with_effects(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_without_effects(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_without_effects(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
     effect = StunEffect()
 
@@ -155,8 +155,8 @@ def test_get_targets_without_effects(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_most_effects(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_most_effects(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     for i in range(5):
@@ -178,8 +178,8 @@ def test_get_targets_most_effects(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_targets_least_effects(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_get_targets_least_effects(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
     selector = RandomSelector()
 
     for i in range(5):

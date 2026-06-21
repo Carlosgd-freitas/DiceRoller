@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from src.base.color import Color, ColorParams
+from src.base.color import Color, ColorData
 
 
 class Keyword(Enum):
@@ -66,7 +66,7 @@ def get_keyword(name: str) -> Keyword:
     return
 
 
-def get_keyword_color(keyword: Keyword) -> ColorParams:
+def get_keyword_color(keyword: Keyword) -> ColorData:
     background_color = None
     intensity = "BRIGHT"
 

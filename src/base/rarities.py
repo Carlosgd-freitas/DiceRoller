@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from src.base.color import Color, ColorParams
+from src.base.color import Color, ColorData
 
 
 class Rarity(Enum):
@@ -16,7 +16,7 @@ class Rarity(Enum):
     LEGENDARY = 5
 
 
-def get_rarity_color(rarity: Rarity) -> ColorParams:
+def get_rarity_color(rarity: Rarity) -> ColorData:
     background_color = None
     intensity = "BRIGHT"
 

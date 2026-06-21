@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from src.combat.manager import CombatManager
 
 
-def test_end_turn_decay_effects(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_end_turn_decay_effects(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     combat_manager.start_combat()
 
     combat_manager.order[0].effects = [
@@ -52,8 +52,8 @@ def test_end_turn_decay_effects(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_end_turn_remove_effects(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_end_turn_remove_effects(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     combat_manager.start_combat()
 
     combat_manager.order[0].effects = [

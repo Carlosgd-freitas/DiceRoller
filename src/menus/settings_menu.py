@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, List
+from typing import List
 
 from src.base.color import color_string
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
 from src.menus.option import Option
-
-if TYPE_CHECKING:
-    from src.systems.settings import Settings
+from src.systems.file import FileManager
+from src.systems.settings import FILENAME, Settings
 
 
 class SettingsMenu(Menu):
@@ -37,6 +36,8 @@ class SettingsMenu(Menu):
             logger,
             settings,
         )
+
+        self.file_manager = FileManager()
 
     def get_title(self) -> str:
         """
@@ -111,22 +112,13 @@ class SettingsMenu(Menu):
             )
 
         elif option.id == "EXIT":
-            self.settings.save()
+            self.file_manager.save(self.settings, FILENAME)
 
         return
 
     # =========================================================================
     # Rendering
     # =========================================================================
-
-    def show_title(self):
-        """
-        Shows the Menu's title.
-        """
-        self.logger.box_message(
-            message=self.title,
-            size=50,
-        )
 
     def show_options(self):
         """

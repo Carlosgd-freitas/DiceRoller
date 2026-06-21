@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from src.combat.manager import CombatManager
 
 
-def test_get_team(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_team(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     monster = combat_manager.teams[0].members[0]
 
     team = combat_manager.get_team(member=monster)
@@ -26,8 +26,8 @@ def test_get_team(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_allies(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_allies(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     monster = combat_manager.teams[0].members[0]
 
     allies = combat_manager.get_allies(monster)
@@ -41,8 +41,8 @@ def test_get_allies(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_enemies(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_enemies(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     monster = combat_manager.teams[0].members[0]
 
     enemies = combat_manager.get_enemies(monster)
@@ -56,8 +56,8 @@ def test_get_enemies(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_team_status(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_team_status(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     teams_status = []
 
     for idx, team in enumerate(combat_manager.teams):
@@ -75,8 +75,8 @@ def test_get_team_status(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_combat_status_winner(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_combat_status_winner(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     for idx, team in enumerate(combat_manager.teams):
         for monster in team.members:
@@ -96,8 +96,8 @@ def test_get_combat_status_winner(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_combat_status_draw(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_combat_status_draw(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     for team in combat_manager.teams:
         for monster in team.members:
@@ -116,8 +116,8 @@ def test_get_combat_status_draw(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_combat_status_ongoing(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_get_combat_status_ongoing(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_status = combat_manager.get_combat_status()
 

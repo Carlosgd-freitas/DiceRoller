@@ -20,9 +20,9 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_cleanse(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["monsters"][1]
+def test_keyword_cleanse(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster: Monster = combat["monsters"][1]
 
     cleanse_effect = CleanseEffect(2)
 
@@ -55,9 +55,9 @@ def test_keyword_cleanse(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_heal(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["monsters"][1]
+def test_keyword_heal(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster: Monster = combat["monsters"][1]
 
     effect = HealEffect(6)
 
@@ -82,9 +82,9 @@ def test_keyword_heal(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_mana(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["monsters"][1]
+def test_keyword_mana(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster: Monster = combat["monsters"][1]
 
     effect = ManaEffect(2)
 
@@ -109,10 +109,10 @@ def test_keyword_mana(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_revive(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_0: Monster = managers["monsters"][0]
-    monster_1: Monster = managers["monsters"][1]
+def test_keyword_revive(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_0: Monster = combat["monsters"][0]
+    monster_1: Monster = combat["monsters"][1]
 
     effect = ReviveEffect(0.25)
 

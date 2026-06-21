@@ -2,5 +2,5 @@ __pycache__
 .pytest_cache
 .vscode/*
 playground.py
-settings.dat
+*.dat
 todo.txt

@@ -17,8 +17,8 @@ if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-def test_stack_effect_new(managers: Dict):
-    monster: Monster = managers["monsters"][2]
+def test_stack_effect_new(combat: Dict):
+    monster: Monster = combat["monsters"][2]
 
     effect = NothingEffect(
         value=1,
@@ -44,8 +44,8 @@ def test_stack_effect_new(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_stack_effect_add(managers: Dict):
-    monster: Monster = managers["monsters"][2]
+def test_stack_effect_add(combat: Dict):
+    monster: Monster = combat["monsters"][2]
 
     effect_0 = NothingEffect(
         value=1,
@@ -85,8 +85,8 @@ def test_stack_effect_add(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_stack_effect_overwrite(managers: Dict):
-    monster: Monster = managers["monsters"][2]
+def test_stack_effect_overwrite(combat: Dict):
+    monster: Monster = combat["monsters"][2]
 
     effect_0 = NothingEffect(
         value=1,
@@ -126,8 +126,8 @@ def test_stack_effect_overwrite(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_stack_effect_remove(managers: Dict):
-    monster: Monster = managers["monsters"][2]
+def test_stack_effect_remove(combat: Dict):
+    monster: Monster = combat["monsters"][2]
 
     effect_freeze = FreezeEffect(
         value=1,
@@ -170,8 +170,8 @@ def test_stack_effect_remove(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_stack_immunity_effect(managers: Dict):
-    monster: Monster = managers["monsters"][2]
+def test_stack_immunity_effect(combat: Dict):
+    monster: Monster = combat["monsters"][2]
 
     effect_0 = ImmunityEffect(effects=[Keyword.BURN, Keyword.BLIND])
     effect_1 = ImmunityEffect(effects=[Keyword.BURN, Keyword.POISON])

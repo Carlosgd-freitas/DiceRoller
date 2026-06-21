@@ -16,10 +16,10 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_attack(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_attack(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect = AttackEffect(6)
 
@@ -38,10 +38,10 @@ def test_keyword_attack(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_drain(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_drain(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     drain_effect = DrainEffect(3)
     block_effect = BlockEffect(1)
@@ -70,10 +70,10 @@ def test_keyword_drain(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_pierce(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_pierce(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     pierce_effect = PierceEffect(2)
     block_effect = BlockEffect(6)

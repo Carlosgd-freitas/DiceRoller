@@ -37,6 +37,25 @@ class OrderStrategy(Enum):
     SLOWER = "SLOWER"
 
 
+class CombatData(TypedDict):
+    """
+    Combat Data.
+
+    :var round: combat round number.
+    :vartype round: int
+
+    :var teams: teams of monsters in combat.
+    :vartype teams: List[Team]
+
+    :var turn: combat turn number.
+    :vartype turn: int
+    """
+
+    round: int
+    teams: List[Team]
+    turn: int
+
+
 class CombatStatus(TypedDict):
     """
     The combat's status.
@@ -107,7 +126,6 @@ class CombatManager:
 
         # Team Management
         self.teams = [] if teams is None else teams
-        self.update_teams()
 
         # Turn Management
         self.round: int = 1
@@ -118,10 +136,11 @@ class CombatManager:
 
         # Suffix Management
         self.suffix_manager = SuffixManager()
-        self.suffix_manager.add_suffixes(self.teams)
 
         # Target Selection Management
         self.selector_manager = SelectorManager()
+
+        self.update_teams()
 
     # =========================================================================
     # Utility
@@ -141,9 +160,12 @@ class CombatManager:
 
     def update_teams(self):
         """
-        Updates teams with:
-        * monster's parameters that depends on a locale.
+        Updates teams's members with:
+        * parameters that depends on a locale (name, description, etc.)
+        * suffixes
         """
+        self.suffix_manager.suffixes = {}
+
         for team in self.teams:
             for monster in team.members:
                 name = self.logger.get_message(
@@ -159,6 +181,31 @@ class CombatManager:
                 )
 
                 monster.update_locale_params(name, description)
+
+        self.suffix_manager.add_suffixes(self.teams)
+
+    def get_combat_data(self) -> CombatData:
+        """
+        Gets the current combat data.
+
+        :return: Combat data.
+        :rtype: CombatData
+        """
+        return {
+            "round": self.round,
+            "teams": self.teams,
+            "turn": self.turn,
+        }
+
+    def set_combat_data(self, combat_data: CombatData):
+        """
+        Sets combat data.
+
+        :var combat_data: Combat data.
+        :vartype combat_data: CombatData
+        """
+        self.__dict__.update(combat_data)
+        self.update_teams()
 
     # =========================================================================
     # Team Management
@@ -257,7 +304,6 @@ class CombatManager:
                 self_team.members.append(monster)
 
         self.update_teams()
-        self.suffix_manager.add_suffixes(self.teams)
 
         return
 

@@ -116,12 +116,14 @@ class Menu(ABC):
     # Rendering
     # =========================================================================
 
-    @abstractmethod
     def show_title(self):
         """
         Shows the Menu's title.
         """
-        raise NotImplementedError
+        self.logger.box_message(
+            message=self.title,
+            size=50,
+        )
 
     def show_options(self):
         """

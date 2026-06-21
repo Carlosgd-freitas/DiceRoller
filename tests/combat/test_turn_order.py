@@ -6,8 +6,8 @@ from src.combat.manager import CombatManager, OrderStrategy
 from tests.utils import assert_conditions
 
 
-def test_turn_order_faster(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_turn_order_faster(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.order_strategy = OrderStrategy.FASTER
     combat_manager.start_combat()
@@ -22,8 +22,8 @@ def test_turn_order_faster(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_turn_order_set(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_turn_order_set(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.order_strategy = OrderStrategy.SET
     combat_manager.start_combat()
@@ -38,8 +38,8 @@ def test_turn_order_set(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_turn_order_shuffle(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_turn_order_shuffle(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.order_strategy = OrderStrategy.SHUFFLE
     combat_manager.start_combat()
@@ -53,8 +53,8 @@ def test_turn_order_shuffle(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_turn_order_slower(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_turn_order_slower(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.order_strategy = OrderStrategy.SLOWER
     combat_manager.start_combat()

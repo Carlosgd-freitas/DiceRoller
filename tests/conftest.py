@@ -7,11 +7,30 @@ from pytest import fixture
 from src.base.monster import Monster
 from src.combat.manager import CombatManager, OrderStrategy
 from src.combat.team import Team
+from src.logger.combat import CombatLogger
+from src.logger.effects import EffectLogger
+from src.logger.file import FileLogger
+from src.logger.logger import Logger
 from src.systems.settings import Settings
 
 
 @fixture()
-def managers() -> Dict:
+def loggers() -> Dict:
+    logger = Logger(enabled=False)
+    combat_logger = CombatLogger(enabled=False)
+    effect_logger = EffectLogger(enabled=False)
+    file_logger = FileLogger(enabled=False)
+
+    return {
+        "logger": logger,
+        "combat_logger": combat_logger,
+        "effect_logger": effect_logger,
+        "file_logger": file_logger,
+    }
+
+
+@fixture()
+def combat() -> Dict:
     monster_0 = Monster(
         local_id="MONSTER_0",
         name="Red",

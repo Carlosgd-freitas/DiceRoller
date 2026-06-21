@@ -221,14 +221,16 @@ class CombatLogger(Logger):
         :param teams: Teams of monsters.
         :type teams: List[Team]
         """
-        for team_index, team in enumerate(teams):
-            self.log(
-                namespace="combat",
-                message_group="COMBAT",
-                key="team",
-                index=team_index + 1,
-                team_name=team.name,
+        for index, team in enumerate(teams):
+            message = self.get_message(
+                namespace="combat", message_group="COMBAT", key="team"
             )
+
+            message = color_string(f"{message} #{index+1}", intensity="BRIGHT")
+            if team.name:
+                message += color_string(f": {team.name}", intensity="BRIGHT")
+
+            self.log(message=message)
 
             for monster in team.members:
                 if monster.is_alive():

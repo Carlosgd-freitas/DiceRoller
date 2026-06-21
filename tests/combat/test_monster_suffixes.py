@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from src.combat.manager import CombatManager, SuffixManager
 
 
-def test_increase_suffix(managers: Dict):
-    suffix_manager: SuffixManager = managers["suffix_manager"]
+def test_increase_suffix(combat: Dict):
+    suffix_manager: SuffixManager = combat["suffix_manager"]
 
     conditions = [
         suffix_manager.increase_suffix("A") == "B",
@@ -33,8 +33,8 @@ def test_increase_suffix(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_monster_suffixes_none(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_monster_suffixes_none(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     conditions = [
         combat_manager.teams[0].members[0].suffix is None,
@@ -47,9 +47,9 @@ def test_monster_suffixes_none(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_monster_suffixes_simple(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    suffix_manager: SuffixManager = managers["suffix_manager"]
+def test_monster_suffixes_simple(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    suffix_manager: SuffixManager = combat["suffix_manager"]
 
     team_0 = Team(
         members=[
@@ -81,8 +81,8 @@ def test_monster_suffixes_simple(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_monster_suffixes_add_monster(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_monster_suffixes_add_monster(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     monster = Monster(
         local_id="MONSTER_5",
@@ -113,8 +113,8 @@ def test_monster_suffixes_add_monster(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_monster_suffixes_remove_monster(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_monster_suffixes_remove_monster(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.remove_monster(
         monster=combat_manager.teams[0].members[0],

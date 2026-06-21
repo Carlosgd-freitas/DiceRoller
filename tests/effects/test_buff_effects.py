@@ -29,10 +29,10 @@ if TYPE_CHECKING:
     from src.targeting.selectors.manager import SelectorManager
 
 
-def test_keyword_focus(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_focus(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect_blind = BlindEffect(1, duration=1)
     effect_focus = FocusEffect(1, duration=1)
@@ -110,9 +110,9 @@ def test_keyword_focus(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_fortify(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
+def test_keyword_fortify(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
 
     block_effect = BlockEffect(3, duration=1)
     fortify_effect = FortifyEffect(2, duration=1)
@@ -167,9 +167,9 @@ def test_keyword_fortify(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_haste(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_haste(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
 
     combat_manager.order_strategy = OrderStrategy.FASTER
     combat_manager.start_combat()
@@ -237,10 +237,10 @@ def test_keyword_haste(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_immunity(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
+def test_keyword_immunity(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
 
     effect_blind = BlindEffect(1, duration=1)
     effect_immunity = ImmunityEffect(effects=[Keyword.BLIND], duration=1)
@@ -312,13 +312,13 @@ def test_keyword_immunity(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_invisible(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    selector_manager: SelectorManager = managers["selector_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
-    monster_4: Monster = managers["monsters"][4]
+def test_keyword_invisible(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    selector_manager: SelectorManager = combat["selector_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
+    monster_4: Monster = combat["monsters"][4]
 
     effect_invisible = InvisibleEffect(duration=1)
     effect_attack = AttackEffect(1)
@@ -395,9 +395,9 @@ def test_keyword_invisible(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_mana_regen(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster: Monster = managers["monsters"][2]
+def test_keyword_mana_regen(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster
 
@@ -433,9 +433,9 @@ def test_keyword_mana_regen(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_regen(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster: Monster = managers["monsters"][2]
+def test_keyword_regen(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster: Monster = combat["monsters"][2]
 
     combat_manager.current_monster = monster
 
@@ -471,12 +471,12 @@ def test_keyword_regen(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_taunt(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_keyword_taunt(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
     selector = OffensiveSelector()
-    monster_1: Monster = managers["monsters"][1]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     combat_manager.current_monster = monster_2
 
@@ -540,10 +540,10 @@ def test_keyword_taunt(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_strength(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_1: Monster = managers["monsters"][1]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_strength(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_3: Monster = combat["monsters"][3]
 
     attack_effect = AttackEffect(2)
     strength_effect = StrengthEffect(2, duration=1)
@@ -601,10 +601,10 @@ def test_keyword_strength(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_thorns(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
-    monster_2: Monster = managers["monsters"][2]
-    monster_3: Monster = managers["monsters"][3]
+def test_keyword_thorns(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
 
     combat_manager.current_monster = monster_2
 

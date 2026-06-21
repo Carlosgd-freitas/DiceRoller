@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-def test_filter_method_first(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_method_first(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -33,8 +33,8 @@ def test_filter_method_first(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_method_last(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_method_last(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -53,8 +53,8 @@ def test_filter_method_last(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_life_state_alive(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_life_state_alive(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -74,8 +74,8 @@ def test_filter_life_state_alive(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_life_state_dead(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_life_state_dead(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -93,8 +93,8 @@ def test_filter_life_state_dead(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_hurt(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_hurt(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -115,8 +115,8 @@ def test_filter_hurt(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_sort_functions_single(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_sort_functions_single(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_entities(
         monsters,
@@ -135,8 +135,8 @@ def test_filter_sort_functions_single(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_sort_functions_multiple(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_sort_functions_multiple(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     for monster in monsters:
         monster.mana = 5
@@ -159,8 +159,8 @@ def test_filter_sort_functions_multiple(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_keyword_whitelist(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_keyword_whitelist(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
@@ -184,8 +184,8 @@ def test_filter_keyword_whitelist(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_keyword_blacklist(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_keyword_blacklist(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     effect_burn = BurnEffect()
     effect_stun = StunEffect()
@@ -212,8 +212,8 @@ def test_filter_keyword_blacklist(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_check_taunt(managers: Dict):
-    monsters: List[Monster] = managers["monsters"]
+def test_filter_check_taunt(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
 
     monsters[3].apply_effect(TauntEffect())
     monsters[4].apply_effect(TauntEffect())

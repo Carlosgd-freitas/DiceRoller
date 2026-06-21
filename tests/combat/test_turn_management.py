@@ -6,8 +6,8 @@ from src.combat.manager import CombatManager
 from tests.utils import assert_conditions
 
 
-def test_next_turn_simple(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_next_turn_simple(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     turn_local_ids = []
 
@@ -23,8 +23,8 @@ def test_next_turn_simple(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_next_turn_skip(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_next_turn_skip(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.order[1].turn_taken = True
     combat_manager.order[2].turn_taken = True
@@ -43,8 +43,8 @@ def test_next_turn_skip(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_next_turn_wrap(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_next_turn_wrap(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.current_monster = combat_manager.order[3]
 
@@ -66,8 +66,8 @@ def test_next_turn_wrap(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_next_turn_unfound(managers: Dict):
-    combat_manager: CombatManager = managers["combat_manager"]
+def test_next_turn_unfound(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
 
     combat_manager.current_monster = combat_manager.order[1]
 

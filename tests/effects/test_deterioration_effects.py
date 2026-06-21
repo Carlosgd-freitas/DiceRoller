@@ -20,9 +20,9 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_corrupt(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["monsters"][1]
+def test_keyword_corrupt(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster: Monster = combat["monsters"][1]
 
     corrupt_effect = CorruptEffect(2)
 
@@ -55,9 +55,9 @@ def test_keyword_corrupt(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_curse(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster: Monster = managers["monsters"][1]
+def test_keyword_curse(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster: Monster = combat["monsters"][1]
 
     curse_effect = CurseEffect(6)
     block_effect = BlockEffect(6)
@@ -83,10 +83,10 @@ def test_keyword_curse(managers: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_execute(managers: Dict):
-    effect_manager: EffectManager = managers["effect_manager"]
-    monster_0: Monster = managers["monsters"][0]
-    monster_4: Monster = managers["monsters"][4]
+def test_keyword_execute(combat: Dict):
+    effect_manager: EffectManager = combat["effect_manager"]
+    monster_0: Monster = combat["monsters"][0]
+    monster_4: Monster = combat["monsters"][4]
 
     execute_effect = ExecuteEffect(0.5)
 

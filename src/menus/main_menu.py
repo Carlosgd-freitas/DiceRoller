@@ -5,12 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.compendium.effects import EffectCompendium
-from src.gamemodes import sandbox
+from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.menus.settings_menu import SettingsMenu
+from src.systems.file import FileManager
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
@@ -39,6 +40,10 @@ class MainMenu(Menu):
             settings,
         )
 
+        self.file_manager = FileManager()
+
+        # Menus
+        self.sandbox_menu = SandboxMenu(self.settings)
         self.effect_compendium = EffectCompendium(self.settings)
         self.settings_menu = SettingsMenu(self.settings)
 
@@ -122,6 +127,7 @@ class MainMenu(Menu):
         self.options = self.get_options()
 
         # Changing other menus languages
+        self.sandbox_menu.change_language(language)
         self.effect_compendium.change_language(language)
         self.settings_menu.change_language(language)
 
@@ -146,14 +152,13 @@ class MainMenu(Menu):
             pass
 
         elif option.id == "SANDBOX_MODE":
-            sandbox.run(self.settings, teams_size=3)
+            self.sandbox_menu.open()
 
         elif option.id == "EFFECT_COMPENDIUM":
             self.effect_compendium.open()
 
         elif option.id == "SETTINGS":
             self.settings_menu.open()
-            self.settings.load()
             self.change_language(self.settings.language)
 
         elif option.id == "EXIT":

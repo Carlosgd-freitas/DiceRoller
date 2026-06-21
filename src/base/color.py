@@ -86,9 +86,9 @@ class Color(Enum):
     PINK = (255, 153, 204)
 
 
-class ColorParams(TypedDict):
+class ColorData(TypedDict):
     """
-    Parameters for coloring a string.
+    Data for coloring a string.
 
     :var foreground_color: color that will be used on the string itself. Default value
     is the terminal's foreground color.

@@ -9,6 +9,7 @@ ATTRIBUTES = {
         "MANA",
         **get_keyword_color(Keyword.MANA),
     ),
+    "speed": color_string("SPEED", foreground_color=Color.WHITE, intensity="BRIGHT"),
 }
 
 WORDS = {
