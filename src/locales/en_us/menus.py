@@ -2,7 +2,11 @@
 
 BASE = {
     "exit_message": "Exit",
-    "file_not_found_message": "File not found.",
+    "file": "File",
+    "file_found_message": "was found!",
+    "file_load_message": "was loaded sucessfully!",
+    "file_not_found_message": "was not found!",
+    "file_save_message": "was saved sucessfully!",
     "filename_prompt": "Type a filename",
     "return_message": "Return",
     "select_option_prompt": "Select an option",

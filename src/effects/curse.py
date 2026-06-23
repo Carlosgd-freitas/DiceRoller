@@ -16,7 +16,7 @@ class CurseEffect(Effect):
     """
     Curse Effect.
 
-    Will reduce the target's HP by the effect value.
+    Will reduce self's HP by the effect value.
     """
 
     def __init__(
@@ -33,7 +33,7 @@ class CurseEffect(Effect):
             duration,
             decay,
             accuracy,
-            EffectType.DETERIORATION,
+            EffectType.CURSE,
             None,
             False,
             removable,

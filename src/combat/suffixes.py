@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class SuffixManager:
     """
-    Suffix Manager class.
+    SuffixManager class.
     """
 
     def __init__(self):

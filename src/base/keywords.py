@@ -48,6 +48,10 @@ class Keyword(Enum):
     THORNS = "THORNS"
     WEAK = "WEAK"
 
+    def __str__(self) -> str:
+        """String representation of Keyword."""
+        return self.value
+
 
 def get_keyword(name: str) -> Keyword:
     """

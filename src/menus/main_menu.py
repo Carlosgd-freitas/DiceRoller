@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from src.compendium.effects import EffectCompendium
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
@@ -23,6 +23,9 @@ class MainMenu(Menu):
 
     :var settings: Game settings.
     :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
     """
 
     # =========================================================================
@@ -32,20 +35,18 @@ class MainMenu(Menu):
     def __init__(
         self,
         settings: Settings,
+        logging: bool = True,
     ):
-        logger = Logger(language=settings.language)
+        # Initialization
+        logger = Logger(enabled=logging, language=settings.language)
 
         super().__init__(
             logger,
             settings,
         )
 
-        self.file_manager = FileManager()
-
-        # Menus
-        self.sandbox_menu = SandboxMenu(self.settings)
-        self.effect_compendium = EffectCompendium(self.settings)
-        self.settings_menu = SettingsMenu(self.settings)
+        # Managers
+        self.file_manager = FileManager(settings, logging)
 
     def get_title(self) -> str:
         """
@@ -114,22 +115,33 @@ class MainMenu(Menu):
     # Utility
     # =========================================================================
 
-    def change_language(self, language: Language):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
         Changes the Menu's language.
 
         :var language: A Language.
         :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        # Changing self language
-        self.logger.change_language(language)
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
         self.title = self.get_title()
         self.options = self.get_options()
 
-        # Changing other menus languages
-        self.sandbox_menu.change_language(language)
-        self.effect_compendium.change_language(language)
-        self.settings_menu.change_language(language)
+        self.file_manager.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Menu logging.
+
+        :var enabled: If the Menu logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+        self.file_manager.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -152,13 +164,16 @@ class MainMenu(Menu):
             pass
 
         elif option.id == "SANDBOX_MODE":
-            self.sandbox_menu.open()
+            sandbox_menu = SandboxMenu(self.settings, self.logger.enabled)
+            sandbox_menu.open()
 
         elif option.id == "EFFECT_COMPENDIUM":
-            self.effect_compendium.open()
+            effect_compendium = EffectCompendium(self.settings, self.logger.enabled)
+            effect_compendium.open()
 
         elif option.id == "SETTINGS":
-            self.settings_menu.open()
+            settings_menu = SettingsMenu(self.settings, self.logger.enabled)
+            settings_menu.open()
             self.change_language(self.settings.language)
 
         elif option.id == "EXIT":

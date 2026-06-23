@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List
+from typing import Dict, List
 
 from src.base.color import color_string
 from src.locales.languages import Language
@@ -20,6 +20,9 @@ class SettingsMenu(Menu):
 
     :var settings: Game settings.
     :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
     """
 
     # =========================================================================
@@ -29,15 +32,18 @@ class SettingsMenu(Menu):
     def __init__(
         self,
         settings: Settings,
+        logging: bool = True,
     ):
-        logger = Logger(language=settings.language)
+        # Initialization
+        logger = Logger(enabled=logging, language=settings.language)
 
         super().__init__(
             logger,
             settings,
         )
 
-        self.file_manager = FileManager()
+        # Managers
+        self.file_manager = FileManager(settings, logging)
 
     def get_title(self) -> str:
         """
@@ -83,6 +89,38 @@ class SettingsMenu(Menu):
         ]
 
         return options
+
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
+        """
+        Changes the Manager language.
+
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
+        """
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
+        self.title = self.get_title()
+        self.options = self.get_options()
+
+        self.file_manager.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+        self.file_manager.toggle_logging(enabled)
 
     # =========================================================================
     # Options

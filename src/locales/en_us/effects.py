@@ -4,6 +4,7 @@ ACTIONS = {
     "absorb": "ABSORBED",
     "attack": "ATTACKED",
     "block": "BLOCKED",
+    "curse": "CURSE",
     "doom": "DOOMED",
     "drain": "DRAINED",
     "execute": "EXECUTED",
@@ -122,6 +123,8 @@ EXECUTION = {
 
 EXECUTION_FAIL = {
     # Effect keywords
+    "curse": "{source} tried to {keyword} {target}, but",
+    "curse_self": "{source} tried to {keyword} itself, but",
     "doom": "{source} tried to {keyword} {target}, but",
     "doom_self": "{source} tried to {keyword} itself, but",
     "execute": "{source} tried to {keyword} {target}, but",
@@ -238,6 +241,7 @@ STATUS = {
 
 TYPES = {
     "buff": "BUFF",
+    "curse": "CURSE",
     "debuff": "DEBUFF",
     "defensive": "DEFENSIVE",
     "deterioration": "DETERIORATION",

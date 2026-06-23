@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from copy import deepcopy
 from random import choice
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
 from src.combat.manager import CombatData, CombatManager
 from src.combat.team import Team
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
+from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
@@ -26,6 +27,9 @@ class SandboxMenu(Menu):
 
     :var settings: Game settings.
     :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
     """
 
     # =========================================================================
@@ -35,8 +39,10 @@ class SandboxMenu(Menu):
     def __init__(
         self,
         settings: Settings,
+        logging: bool = True,
     ):
-        logger = CombatLogger(language=settings.language)
+        # Initialization
+        logger = CombatLogger(enabled=logging, language=settings.language)
 
         super().__init__(
             logger,
@@ -45,10 +51,12 @@ class SandboxMenu(Menu):
 
         self.logger: CombatLogger
 
+        # Attributes
         self.all_effects = get_all_effects()
         self.all_monsters = get_all_monsters()
 
-        self.file_manager = FileManager()
+        # Managers
+        self.file_manager = FileManager(settings)
         self.combat_manager = CombatManager(settings)
 
         combat_data = self.get_random_combat()
@@ -130,20 +138,35 @@ class SandboxMenu(Menu):
     # Utility
     # =========================================================================
 
-    def _filename_prompt(self):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
-        Prompts the user to type a filename and returns it.
+        Changes the Manager language.
+
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        message = self.logger.get_message(
-            namespace="menus",
-            message_group="BASE",
-            key="filename_prompt",
-        )
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
 
-        filename = self.logger.input(message=message)
-        filename = self.file_manager.normalize_filename(filename, ".dat")
+        self.title = self.get_title()
+        self.options = self.get_options()
 
-        return filename
+        self.file_manager.change_language(language, _messages)
+        self.combat_manager.logger.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+        self.file_manager.toggle_logging(enabled)
+        self.combat_manager.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -201,20 +224,15 @@ class SandboxMenu(Menu):
         """
         Imports combat from a file.
         """
-        filename = self._filename_prompt()
+        filename = self.file_manager.logger.input_filename()
 
         if self.file_manager.exists(filename):
             combat_data: CombatData = self.file_manager.load(filename)
             self.combat_manager.set_combat_data(combat_data)
 
         else:
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="BASE",
-                key="file_not_found_message",
-            )
-
-            self.logger.log(message="\n" + message)
+            self.file_manager.logger.log_file_not_found(filename)
+            self.logger.log("")
 
         return
 
@@ -222,7 +240,7 @@ class SandboxMenu(Menu):
         """
         Exports the current combat to a file.
         """
-        filename = self._filename_prompt()
+        filename = self.file_manager.logger.input_filename()
         combat_data = self.combat_manager.get_combat_data()
         self.file_manager.save(combat_data, filename)
 

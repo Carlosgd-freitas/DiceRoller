@@ -2,7 +2,11 @@
 
 BASE = {
     "exit_message": "Sair",
-    "file_not_found_message": "Arquivo não encontrado.",
+    "file": "Arquivo",
+    "file_found_message": "foi encontrado!",
+    "file_load_message": "foi carregado com sucesso!",
+    "file_not_found_message": "não foi encontrado!",
+    "file_save_message": "foi salvo com sucesso!",
     "filename_prompt": "Digite o nome do arquivo",
     "return_message": "Retornar",
     "select_option_prompt": "Selecione uma opção",

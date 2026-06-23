@@ -61,3 +61,16 @@ class Monster(Entity):
         self.in_combat = in_combat
         self.turn_taken = turn_taken
         self.suffix = suffix
+
+    def __str__(self) -> str:
+        """String representation of Monster."""
+        _str = f"{self.name}"
+        _str += f" | HP: {self.hp}/{self.max_hp}"
+        _str += f" | Speed: {self.speed}"
+        _str += f" | Mana: {self.mana}"
+
+        _str += f"\n>>> Dice ({len(self.dice)}):"
+        for one_dice in self.dice:
+            _str += f"\n>> {one_dice}\n"
+
+        return _str

@@ -12,11 +12,11 @@ from src.systems.settings import Settings
 # Colorama
 init()
 
-file_manager = FileManager()
+settings = Settings()
 
 try:
-    # Settings
-    settings = Settings()
+    # Loading player settings
+    file_manager = FileManager(settings, logging=False)
 
     if file_manager.exists(SETTINGS_FILENAME):
         settings_data = file_manager.load(SETTINGS_FILENAME)

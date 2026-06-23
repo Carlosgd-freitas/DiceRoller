@@ -26,13 +26,13 @@ class Side:
         self.weight = weight
 
     def __str__(self) -> str:
-        _str = ""
+        """String representation of Side."""
+        _str = f"Effects ({len(self.effects)}):"
 
-        for idx, effect in enumerate(self.effects):
-            if idx > 0:
-                _str += " + "
+        for effect in self.effects:
+            _str += f"\n* {effect}"
 
-            _str += str(effect)
+        _str += f"\n* Weight: {self.weight}"
 
         return _str
 

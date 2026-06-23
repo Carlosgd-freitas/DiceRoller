@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
+from src.base.manager import Manager
 from src.base.triggers import Trigger
 from src.logger.effects import EffectLogger
 
@@ -17,14 +18,14 @@ if TYPE_CHECKING:
     from src.systems.settings import Settings
 
 
-class EffectManager:
+class EffectManager(Manager):
     """
-    Effect Manager class.
+    EffectManager class.
 
     :var settings: Game settings.
     :vartype settings: Settings
 
-    :var logging: If the combat will be logged. Default value is True.
+    :var logging: If logging is enabled. Default value is True.
     :vartype logging: bool
     """
 
@@ -33,14 +34,15 @@ class EffectManager:
         settings: Settings,
         logging: bool = True,
     ):
-        # Settings
-        self.settings = settings
+        # Initialization
+        logger = EffectLogger(enabled=logging)
 
-        # Logger
-        self.logger = EffectLogger(
-            enabled=logging,
-            language=settings.language,
+        super().__init__(
+            logger,
+            settings,
         )
+
+        self.logger: EffectLogger
 
     def process_trigger(
         self,

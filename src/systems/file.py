@@ -4,32 +4,40 @@ from __future__ import annotations
 
 import pickle
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from src.base.text import normalize
+from src.base.manager import Manager
+from src.logger.file import FileLogger
+
+if TYPE_CHECKING:
+    from src.systems.settings import Settings
 
 
-class FileManager:
+class FileManager(Manager):
     """
-    File Manager class.
+    FileManager class.
+
+    :var settings: Game settings.
+    :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
     """
 
-    def normalize_filename(self, filename: str, extension: str) -> str:
-        """
-        Normalizes a filename.
+    def __init__(
+        self,
+        settings: Settings,
+        logging: bool = True,
+    ):
+        # Initialization
+        logger = FileLogger(enabled=logging)
 
-        :param filename: Filename.
-        :type filename: str
+        super().__init__(
+            logger,
+            settings,
+        )
 
-        :param extension: Filename extension, including the '.' (e.g. '.dat').
-        :type extension: str
-        """
-        normalized = normalize(filename)
-
-        if not normalized.endswith(extension):
-            normalized += extension
-
-        return normalized
+        self.logger: FileLogger
 
     def exists(self, filename: str) -> bool:
         """
@@ -66,6 +74,9 @@ class FileManager:
 
         :param filename: Filename.
         :type filename: str
+
+        :return: Data from a file.
+        :rtype: Any
         """
         data = None
 

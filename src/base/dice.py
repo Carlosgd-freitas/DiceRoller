@@ -20,6 +20,15 @@ class Dice:
     def __init__(self, sides: List[Side] = None):
         self.sides = [] if sides is None else sides
 
+    def __str__(self) -> str:
+        """String representation of Dice."""
+        _str = f"Sides ({len(self.sides)}):"
+
+        for side in self.sides:
+            _str += f"\n> {side}"
+
+        return _str
+
     def roll(self) -> Side:
         """
         Randomly returns one of the Dice's sides, based on each side's weight.

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, List
+from abc import abstractmethod
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
+from src.base.manager import Manager
 from src.locales.languages import Language
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from src.systems.settings import Settings
 
 
-class Menu(ABC):
+class Menu(Manager):
     """
     Menu class.
 
@@ -37,8 +38,11 @@ class Menu(ABC):
         logger: Logger,
         settings: Settings,
     ):
-        self.logger = logger
-        self.settings = settings
+        super().__init__(
+            logger,
+            settings,
+        )
+
         self.title = self.get_title()
         self.options = self.get_options()
 
@@ -60,14 +64,18 @@ class Menu(ABC):
     # Utility
     # =========================================================================
 
-    def change_language(self, language: Language):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
-        Changes the Menu's language.
+        Changes the Manager language.
 
         :var language: A Language.
         :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        self.logger.change_language(language)
+        if self.logger:
+            self.logger.change_language(language, _messages)
 
         self.title = self.get_title()
         self.options = self.get_options()

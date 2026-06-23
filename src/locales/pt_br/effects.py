@@ -4,6 +4,7 @@ ACTIONS = {
     "absorb": "ABSORVIDO",
     "attack": "ATACOU",
     "block": "BLOQUEADO",
+    "curse": "AMALDIÇOAR",
     "doom": "CONDENOU",
     "drain": "DRENOU",
     "execute": "EXECUTOU",
@@ -122,6 +123,8 @@ EXECUTION = {
 
 EXECUTION_FAIL = {
     # Effect keywords
+    "curse": "{source} tentou {action} {target}, mas",
+    "curse_self": "{source} tentou se {action}, mas",
     "execute": "{source} tentou {keyword} {target}, mas",
     "execute_self": "{source} tentou se {keyword}, mas",
     "immunity": "{source} tentou tornar {target} {status}, mas",
@@ -236,6 +239,7 @@ STATUS = {
 
 TYPES = {
     "buff": "FORTALECIMENTO",
+    "curse": "MALDIÇÃO",
     "debuff": "ENFRAQUECIMENTO",
     "defensive": "DEFENSIVO",
     "deterioration": "DETERIORAÇÃO",

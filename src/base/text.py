@@ -27,3 +27,25 @@ def normalize(text: str) -> str:
     :rtype: str
     """
     return unaccent(text).lower()
+
+
+def normalize_filename(filename: str, extension: str) -> str:
+    """
+    Normalizes a filename, unaccenting it and including a file extension, if does
+    not have one.
+
+    :param filename: Filename.
+    :type filename: str
+
+    :param extension: Filename extension, including the '.' (e.g. '.dat').
+    :type extension: str
+
+    :return: Normalized filename.
+    :rtype: str
+    """
+    normalized = normalize(filename)
+
+    if not normalized.endswith(extension):
+        normalized += extension
+
+    return normalized

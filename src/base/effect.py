@@ -6,8 +6,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING, List, TypedDict
 
-from src.base.color import color_string
-from src.base.keywords import Keyword, get_keyword_color
+from src.base.keywords import Keyword
 from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
@@ -49,6 +48,7 @@ class EffectType(Enum):
     """Type of Effect."""
 
     BUFF = "BUFF"
+    CURSE = "CURSE"
     DEBUFF = "DEBUFF"
     DEFENSIVE = "DEFENSIVE"
     DETERIORATION = "DETERIORATION"
@@ -115,16 +115,19 @@ class Effect(ABC):
         self.removable = removable
 
     def __str__(self) -> str:
-        color_params = get_keyword_color(self.keyword)
+        """String representation of Effect."""
+        type = self.type.value if self.type else None
+        trigger = self.trigger.value if self.trigger else None
 
-        _str = color_string(
-            string=self.keyword.value,
-            foreground_color=color_params["foreground_color"],
-            intensity=color_params["intensity"],
-        )
-
-        if self.value:
-            _str += f" {self.value}"
+        _str = f"{self.keyword}"
+        _str += f" | Value: {self.value}"
+        _str += f" | Duration: {self.duration}"
+        _str += f" | Decay: {self.decay}"
+        _str += f" | Acc: {self.accuracy}"
+        _str += f" | Type: {type}"
+        _str += f" | Trigger: {trigger}"
+        _str += f" | Persistent: {self.persistent}"
+        _str += f" | Removable: {self.removable}"
 
         return _str
 

@@ -8,6 +8,7 @@ from random import shuffle
 from typing import TYPE_CHECKING, Callable, Dict, List, Literal, TypedDict
 
 from src.base.keywords import Keyword
+from src.base.manager import Manager
 from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
@@ -80,9 +81,9 @@ class CombatStatus(TypedDict):
     status: Literal["DRAW", "ONGOING", "WINNER"]
 
 
-class CombatManager:
+class CombatManager(Manager):
     """
-    Combat Manager class.
+    CombatManager class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -94,7 +95,7 @@ class CombatManager:
     Default value is OrderStrategy.FASTER.
     :vartype order_strategy: OrderStrategy
 
-    :var logging: If the combat will be logged. Default value is True.
+    :var logging: If logging is enabled. Default value is True.
     :vartype logging: bool
     """
 
@@ -109,20 +110,27 @@ class CombatManager:
         order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
     ):
-        # Settings
-        self.settings = settings
+        # Initialization
+        logger = CombatLogger(enabled=logging)
 
-        # Logger
-        self.logger = CombatLogger(
-            enabled=logging,
-            language=settings.language,
+        super().__init__(
+            logger,
+            settings,
         )
+
+        self.logger: CombatLogger
 
         # Effect Management
         self.effect_manager = EffectManager(
             settings,
             logging,
         )
+
+        # Suffix Management
+        self.suffix_manager = SuffixManager()
+
+        # Target Selection Management
+        self.selector_manager = SelectorManager()
 
         # Team Management
         self.teams = [] if teams is None else teams
@@ -134,29 +142,36 @@ class CombatManager:
         self.order: List[Monster] = []
         self.current_monster: Monster = None
 
-        # Suffix Management
-        self.suffix_manager = SuffixManager()
-
-        # Target Selection Management
-        self.selector_manager = SelectorManager()
-
-        self.update_teams()
-
     # =========================================================================
     # Utility
     # =========================================================================
 
-    def change_language(self, language: Language):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
-        Changes the combat's language.
+        Changes the Manager language.
 
         :var language: A Language.
         :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        self.logger.change_language(language)
-        self.effect_manager.logger.change_language(language)
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
+        self.effect_manager.change_language(language, _messages)
 
         self.update_teams()
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+        self.effect_manager.toggle_logging(enabled)
 
     def update_teams(self):
         """

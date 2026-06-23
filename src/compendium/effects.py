@@ -105,6 +105,9 @@ class EffectCompendium(Compendium):
 
     :var settings: Game settings.
     :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
     """
 
     # =========================================================================
@@ -114,10 +117,11 @@ class EffectCompendium(Compendium):
     def __init__(
         self,
         settings: Settings,
+        logging: bool = True,
     ):
         items = get_all_effects()
 
-        logger = EffectLogger(language=settings.language)
+        logger = EffectLogger(enabled=logging, language=settings.language)
 
         super().__init__(
             logger=logger,

@@ -64,7 +64,7 @@ class Logger:
 
         return _messages
 
-    def change_language(self, language: Language):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
         Changes the Logger's language.
 
@@ -72,7 +72,11 @@ class Logger:
         :vartype language: Language
         """
         self.language = language
-        self._messages = self._load_messages(language)
+
+        if not _messages:
+            _messages = self._load_messages(language)
+
+        self._messages = _messages
 
     def get_message_group(
         self,

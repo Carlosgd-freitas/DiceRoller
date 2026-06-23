@@ -31,6 +31,16 @@ class Team:
         self.members = [] if members is None else members
         self.status = self.get_status()
 
+    def __str__(self) -> str:
+        """String representation of Team."""
+        _str = f"{self.name}"
+
+        _str += f"\n>>>>> Members ({len(self.members)}):"
+        for member in self.members:
+            _str += f"\n>>>> {member}\n"
+
+        return _str
+
     def get_status(self) -> Literal["ALIVE", "DEFEATED"]:
         """
         Returns the liveness status of the team:

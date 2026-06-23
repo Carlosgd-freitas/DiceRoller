@@ -197,14 +197,14 @@ class Compendium(Menu):
     # Utility
     # =========================================================================
 
-    def change_language(self, language: Language):
+    def change_language(self, language: Language, _messages: Dict = None):
         """
         Changes the Compendium's language.
 
         :var language: A Language.
         :vartype language: Language
         """
-        self.logger.change_language(language)
+        self.logger.change_language(language, _messages)
 
         self.title = self.get_title()
         self.options = self.get_options()

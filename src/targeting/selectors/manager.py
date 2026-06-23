@@ -25,6 +25,10 @@ if TYPE_CHECKING:
 
 
 class SelectorManager:
+    """
+    SelectorManager class.
+    """
+
     def get_targets(
         self,
         side: Side,
@@ -88,10 +92,6 @@ class SelectorManager:
                 selector = CorruptSelector()
                 break
 
-            elif effect.keyword == Keyword.CURSE:
-                selector = CurseSelector()
-                break
-
             elif effect.keyword == Keyword.REVIVE:
                 selector = ReviveSelector()
                 break
@@ -113,6 +113,9 @@ class SelectorManager:
 
             elif main_effect_type == EffectType.BUFF.value:
                 selector = BuffSelector()
+
+            elif main_effect_type == EffectType.CURSE.value:
+                selector = CurseSelector()
 
             elif main_effect_type == EffectType.DEBUFF.value:
                 selector = DebuffSelector()

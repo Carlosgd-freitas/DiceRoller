@@ -14,6 +14,7 @@ An **Effect** is the smallest component of `Sides` and `Skills`, and are applied
 
 ## Effect types
 * **BUFF**: a persistent effect that benefits the target.
+* **CURSE**: an instant or persistent effect that harms self.
 * **DEBUFF**: a persistent effect that harms the target.
 * **DEFENSIVE**: a persistent effect that reduces direct damage that the target would recieve.
 * **DETERIORATION**: an instant effect that harms the target.

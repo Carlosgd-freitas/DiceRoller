@@ -40,6 +40,25 @@ class ImmunityEffect(Effect):
         )
         self.effects = [] if effects is None else effects
 
+    def __str__(self) -> str:
+        """String representation of ImmunityEffect."""
+        type = self.type.value if self.type else None
+        trigger = self.trigger.value if self.trigger else None
+        effects = ", ".join([str(effect) for effect in self.effects])
+
+        _str = f"{self.keyword}"
+        _str += f" | Value: {self.value}"
+        _str += f" | Duration: {self.duration}"
+        _str += f" | Decay: {self.decay}"
+        _str += f" | Acc: {self.accuracy}"
+        _str += f" | Type: {type}"
+        _str += f" | Trigger: {trigger}"
+        _str += f" | Persistent: {self.persistent}"
+        _str += f" | Removable: {self.removable}"
+        _str += f" | Effects: {effects}"
+
+        return _str
+
     def on_apply(
         self,
         source: Entity,
