@@ -21,12 +21,12 @@ from src.effects.regen import RegenEffect
 from src.effects.strength import StrengthEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
-from src.targeting.selectors.offensive_selector import OffensiveSelector
+from src.systems.targeting.selectors.offensive_selector import OffensiveSelector
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    from src.targeting.selectors.manager import SelectorManager
+    from src.systems.targeting.selectors.manager import SelectorManager
 
 
 def test_keyword_focus(combat: Dict):

@@ -30,7 +30,7 @@ from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
-    from src.targeting.selectors.manager import SelectorManager
+    from src.systems.targeting.selectors.manager import SelectorManager
 
 
 def test_keyword_bleed(combat: Dict):

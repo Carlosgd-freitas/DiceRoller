@@ -1,20 +1,19 @@
-"""Revive Selector module."""
+"""Random Selector module."""
 
 from __future__ import annotations
 
-from random import random
 from typing import TYPE_CHECKING, List
 
-from src.targeting.selectors.selector import Selector
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
-class ReviveSelector(Selector):
+class RandomSelector(Selector):
     """
-    Selects monster targets for the revive effect.
+    Selects monster targets randomly.
     """
 
     def get_targets_easy(
@@ -27,8 +26,8 @@ class ReviveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        the revive effect:
-        * 100% -> k dead allies with least max hp
+        Offensive type effects:
+        * 100% -> random alive monters, among source, allies and enemies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -48,16 +47,19 @@ class ReviveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets: List[Monster] = []
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            enemies = self._preprocess_enemies(enemies)
+            monsters.extend(enemies)
 
-        targets = self._get_targets_lowest_max_hp(
-            allies,
+        return self._get_targets_random(
+            monsters=monsters,
             k=k,
-            life_state="DEAD",
-            check_taunt=False,
         )
-
-        return targets
 
     def get_targets_normal(
         self,
@@ -69,8 +71,8 @@ class ReviveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        the revive effect:
-        * 100% -> k random, dead allies
+        Offensive type effects:
+        * 100% -> random alive monters, among source, allies and enemies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -90,16 +92,19 @@ class ReviveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets: List[Monster] = []
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            enemies = self._preprocess_enemies(enemies)
+            monsters.extend(enemies)
 
-        targets = self._get_targets_random(
-            allies,
+        return self._get_targets_random(
+            monsters=monsters,
             k=k,
-            life_state="DEAD",
-            check_taunt=False,
         )
-
-        return targets
 
     def get_targets_hard(
         self,
@@ -111,9 +116,8 @@ class ReviveSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        the revive effect:
-        * 10% -> k random, dead allies
-        * 90% -> k dead allies with most max hp
+        Offensive type effects:
+        * 100% -> random alive monters, among source, allies and enemies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -133,22 +137,16 @@ class ReviveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        targets: List[Monster] = []
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            enemies = self._preprocess_enemies(enemies)
+            monsters.extend(enemies)
 
-        if random() < 0.1:
-            targets = self._get_targets_random(
-                allies,
-                k=k,
-                life_state="DEAD",
-                check_taunt=False,
-            )
-
-        else:
-            targets = self._get_targets_highest_max_hp(
-                allies,
-                k=k,
-                life_state="DEAD",
-                check_taunt=False,
-            )
-
-        return targets
+        return self._get_targets_random(
+            monsters=monsters,
+            k=k,
+        )

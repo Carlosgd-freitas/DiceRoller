@@ -3,19 +3,16 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Dict, List, Literal
+from typing import TYPE_CHECKING, List
 from uuid import uuid4
 
 from src.base.keywords import Keyword
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
-    from src.base.effect import Effect
+    from src.base.effect import Effect, EffectData
     from src.base.entity import Entity
     from src.base.side import Side
-    from src.effects.immunity import ImmunityEffect
-
-type stack_method = Literal["add", "overwrite"]
 
 
 class Entity:
@@ -166,15 +163,10 @@ class Entity:
         self,
         effect: Effect,
         source: Entity = None,
-        stack_value: stack_method = "add",
-        stack_duration: stack_method = "overwrite",
-        stack_decay: stack_method = "add",
-        stack_accuracy: stack_method = "overwrite",
-    ) -> Dict:
+    ) -> EffectData:
         """
-        Add an effect to the Entity, also stacking it by the stacking parameters if the
-        Entity already has an effect with that same keyword. Effects with incompatible
-        keywords will also be removed from the Entity.
+        Add an effect to the Entity, also stacking if the Entity already has an effect
+        with that same keyword.
 
         :param effect: The effect that will be added to the Entity.
         :type effect: Effect
@@ -182,32 +174,8 @@ class Entity:
         :param source: The Entity object where the effect is from.
         :type source: Entity
 
-        :param stack_value: How the Effect's value is stacked. By default, this value is
-        "overwrite".
-        :type stack_value: stack_method
-
-        :param stack_duration: How the Effect's duration is stacked. By default, this
-        value is "overwrite".
-        :type stack_duration: stack_method
-
-        :param stack_decay: How the Effect's decay is stacked. By default, this value is
-        "overwrite".
-        :type stack_decay: stack_method
-
-        :param stack_accuracy: How the Effect's accuracy is stacked. By default, this
-        value is "overwrite".
-        :type stack_accuracy: stack_method
-
-        **Stack Methods**
-        * ``add``: if the monster has an existing effect with the same Keyword, the values
-        of the existing effect and the new effect for that parameter will be added.
-
-        * ``overwrite``: if the monster has an existing effect with the same Keyword, the
-        value of the existing effect will be overwritten by the new effect for that
-        parameter.
-
-        :return: A dictionary containing .on_apply() data for logging.
-        :rtype: Dict
+        :return: Data when applying or activating an Effect.
+        :rtype: EffectData
         """
         new_effect = deepcopy(effect)
         new_effect.value = new_effect.get_effective_value(source, source)
@@ -215,40 +183,7 @@ class Entity:
 
         # Stack existing effect
         if current_effect:
-            for parameter, method in [
-                ("value", stack_value),
-                ("duration", stack_duration),
-                ("decay", stack_decay),
-                ("accuracy", stack_accuracy),
-            ]:
-                current_value = getattr(current_effect, parameter)
-                new_value = getattr(new_effect, parameter)
-
-                if method == "overwrite":
-                    setattr(
-                        current_effect,
-                        parameter,
-                        new_value,
-                    )
-
-                elif method == "add":
-                    current_value = current_value if current_value else 0
-                    new_value = new_value if new_value else 0
-
-                    setattr(
-                        current_effect,
-                        parameter,
-                        current_value + new_value,
-                    )
-
-            # Stacking Immunity effect
-            if current_effect.keyword == Keyword.IMMUNITY:
-                new_effect: ImmunityEffect
-                current_effect: ImmunityEffect
-
-                for effect_immunity in new_effect.effects:
-                    if effect_immunity not in current_effect.effects:
-                        current_effect.effects.append(effect_immunity)
+            current_effect.stack(new_effect)
 
             effect_data = current_effect.on_apply(
                 source,

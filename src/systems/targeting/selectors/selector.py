@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, List, Literal
 
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
-from src.targeting.filters import filter_entities
+from src.systems.targeting.filters import filter_entities
 
 if TYPE_CHECKING:
     from src.base.monster import Monster

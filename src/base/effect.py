@@ -140,10 +140,50 @@ class Effect(ABC):
         Returns the effects' effective value, taking effects on source and target
         entities into account.
 
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
+
         :return: The effective value.
         :rtype: float
         """
         return self.value
+
+    def stack(
+        self,
+        new_effect: Effect,
+    ):
+        """
+        Modifies the Effect parameters based on a new effect, if both are of the same
+        class:
+        * value of both effects are summed.
+        * the highest duration between the two effects is maintained.
+        * decay of both effects are summed.
+        * the highest accuracy between the two effects is maintained.
+        * if the new effect is not removable, then the stacked effect will be also.
+
+        :param new_effect: A new effect that is being applied to an Entity.
+        :type new_effect: Effect
+        """
+        if type(self) is not type(new_effect):
+            return
+
+        self.value += new_effect.value
+
+        if new_effect.duration > self.duration:
+            self.duration = new_effect.duration
+
+        self.decay += new_effect.decay
+
+        if new_effect.accuracy > self.accuracy:
+            self.accuracy = new_effect.accuracy
+
+        if not new_effect.removable:
+            self.removable = False
+
+        return
 
     @abstractmethod
     def on_apply(

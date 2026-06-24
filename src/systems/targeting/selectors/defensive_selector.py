@@ -1,20 +1,20 @@
-"""Curse Selector module."""
+"""Defensive Selector module."""
 
 from __future__ import annotations
 
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.targeting.selectors.selector import Selector
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
-class CurseSelector(Selector):
+class DefensiveSelector(Selector):
     """
-    Selects monster targets for curse type effects.
+    Selects monster targets for defensive type effects.
     """
 
     def get_targets_easy(
@@ -27,7 +27,7 @@ class CurseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        curse type effects:
+        defensive type effects:
         * 100% -> self + (k-1) random, alive allies
 
         :param source: The source monster which is targeting others.
@@ -58,6 +58,7 @@ class CurseSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k,
+                    check_taunt=False,
                 )
             )
 
@@ -73,7 +74,7 @@ class CurseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        curse type effects:
+        defensive type effects:
         * 30% -> self + (k-1) random, alive allies
         * 70% -> self + (k-1) alive allies with least hp
 
@@ -106,6 +107,7 @@ class CurseSelector(Selector):
                     self._get_targets_random(
                         allies,
                         k=k - len(targets),
+                        check_taunt=False,
                     )
                 )
 
@@ -114,6 +116,7 @@ class CurseSelector(Selector):
                     self._get_targets_lowest_hp(
                         allies,
                         k=k - len(targets),
+                        check_taunt=False,
                     )
                 )
 
@@ -129,7 +132,7 @@ class CurseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        curse type effects:
+        defensive type effects:
         * 100% -> self + (k-1) alive allies with least hp
 
         :param source: The source monster which is targeting others.
@@ -160,6 +163,7 @@ class CurseSelector(Selector):
                 self._get_targets_lowest_hp(
                     allies,
                     k=k - len(targets),
+                    check_taunt=False,
                 )
             )
 

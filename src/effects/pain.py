@@ -1,4 +1,4 @@
-"""Curse effect module."""
+"""Pain effect module."""
 
 from __future__ import annotations
 
@@ -12,9 +12,9 @@ if TYPE_CHECKING:
     from src.base.entity import Entity
 
 
-class CurseEffect(Effect):
+class PainEffect(Effect):
     """
-    Curse Effect.
+    Pain Effect.
 
     Will reduce self's HP by the effect value.
     """
@@ -28,7 +28,7 @@ class CurseEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            Keyword.CURSE,
+            Keyword.PAIN,
             value,
             duration,
             decay,

@@ -8,7 +8,7 @@ from src.base.keywords import Keyword
 from src.effects.burn import BurnEffect
 from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
-from src.targeting.filters import filter_entities
+from src.systems.targeting.filters import filter_entities
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:

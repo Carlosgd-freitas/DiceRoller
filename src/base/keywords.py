@@ -17,7 +17,6 @@ class Keyword(Enum):
     CLEANSE = "CLEANSE"
     CONFUSE = "CONFUSE"
     CORRUPT = "CORRUPT"
-    CURSE = "CURSE"
     DOOM = "DOOM"
     DRAIN = "DRAIN"
     EXECUTE = "EXECUTE"
@@ -35,6 +34,7 @@ class Keyword(Enum):
     MANA_REGEN = "MANA_REGEN"
     NOTHING = "NOTHING"
     OIL = "OIL"
+    PAIN = "PAIN"
     PIERCE = "PIERCE"
     POISON = "POISON"
     REGEN = "REGEN"
@@ -91,9 +91,9 @@ def get_keyword_color(keyword: Keyword) -> ColorData:
         foreground_color = Color.AERO
     elif keyword in [Keyword.CONFUSE]:
         foreground_color = Color.HOT_PINK
-    elif keyword in [Keyword.CORRUPT]:
+    elif keyword in [Keyword.CORRUPT, Keyword.DOOM]:
         foreground_color = Color.LILAC
-    elif keyword in [Keyword.CURSE, Keyword.DOOM]:
+    elif keyword in [Keyword.PAIN]:
         foreground_color = Color.VIOLET
     elif keyword in [Keyword.EXECUTE, Keyword.INVISIBLE, Keyword.OIL]:
         background_color = Color.GRAY

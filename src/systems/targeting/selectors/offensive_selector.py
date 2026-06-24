@@ -1,19 +1,20 @@
-"""Random Selector module."""
+"""Offensive Selector module."""
 
 from __future__ import annotations
 
+from random import random
 from typing import TYPE_CHECKING, List
 
-from src.targeting.selectors.selector import Selector
+from src.base.keywords import Keyword
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
-    from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
-class RandomSelector(Selector):
+class OffensiveSelector(Selector):
     """
-    Selects monster targets randomly.
+    Selects monster targets for offensive type effects.
     """
 
     def get_targets_easy(
@@ -26,8 +27,9 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        offensive type effects:
+        * 50% -> random alive enemies
+        * 50% -> alive enemies with most hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -47,19 +49,19 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
-        if enemies:
-            enemies = self._preprocess_enemies(enemies)
-            monsters.extend(enemies)
+        enemies = self._preprocess_enemies(enemies)
 
-        return self._get_targets_random(
-            monsters=monsters,
-            k=k,
-        )
+        if random() < 0.5:
+            return self._get_targets_random(
+                enemies,
+                k=k,
+            )
+
+        else:
+            return self._get_targets_highest_hp(
+                enemies,
+                k=k,
+            )
 
     def get_targets_normal(
         self,
@@ -71,8 +73,9 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        offensive type effects:
+        * 30% -> random alive enemies
+        * 70% -> alive enemies with least effective hp and hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -92,19 +95,19 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
-        if enemies:
-            enemies = self._preprocess_enemies(enemies)
-            monsters.extend(enemies)
+        enemies = self._preprocess_enemies(enemies)
 
-        return self._get_targets_random(
-            monsters=monsters,
-            k=k,
-        )
+        if random() < 0.3:
+            return self._get_targets_random(
+                enemies,
+                k=k,
+            )
+
+        else:
+            return self._get_targets_lowest_hp(
+                enemies,
+                k=k,
+            )
 
     def get_targets_hard(
         self,
@@ -116,8 +119,10 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        offensive type effects:
+        * 10% -> random alive enemies
+        * 90% -> alive enemies without Invisible or Sacred Block effects, and least
+        effective hp and hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -137,16 +142,29 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
-        if enemies:
-            enemies = self._preprocess_enemies(enemies)
-            monsters.extend(enemies)
+        enemies = self._preprocess_enemies(enemies)
+        targets: List[Monster] = []
 
-        return self._get_targets_random(
-            monsters=monsters,
-            k=k,
-        )
+        if random() < 0.1:
+            targets = self._get_targets_random(
+                enemies,
+                k=k,
+            )
+
+        else:
+            targets = self._get_targets_lowest_hp(
+                enemies,
+                k=k,
+                keyword_blacklist=[Keyword.INVISIBLE, Keyword.SACRED_BLOCK],
+            )
+
+            if len(targets) < k:
+                targets.extend(
+                    self._get_targets_lowest_hp(
+                        enemies,
+                        k=k - len(targets),
+                        exclude=[target.local_id for target in targets],
+                    )
+                )
+
+        return targets

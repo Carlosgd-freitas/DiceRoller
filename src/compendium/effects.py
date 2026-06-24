@@ -15,7 +15,6 @@ from src.effects.burn import BurnEffect
 from src.effects.cleanse import CleanseEffect
 from src.effects.confuse import ConfuseEffect
 from src.effects.corrupt import CorruptEffect
-from src.effects.curse import CurseEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
@@ -33,6 +32,7 @@ from src.effects.mana import ManaEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.nothing import NothingEffect
 from src.effects.oil import OilEffect
+from src.effects.pain import PainEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
@@ -62,7 +62,6 @@ ALL_EFFECTS = [
     CleanseEffect(),
     ConfuseEffect(),
     CorruptEffect(),
-    CurseEffect(),
     DoomEffect(),
     DrainEffect(),
     ExecuteEffect(),
@@ -80,6 +79,7 @@ ALL_EFFECTS = [
     ManaRegenEffect(),
     NothingEffect(),
     OilEffect(),
+    PainEffect(),
     PierceEffect(),
     PoisonEffect(),
     RegenEffect(),

@@ -15,7 +15,7 @@ from src.combat.effects import EffectManager
 from src.combat.suffixes import SuffixManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
-from src.targeting.selectors.manager import SelectorManager
+from src.systems.targeting.selectors.manager import SelectorManager
 
 if TYPE_CHECKING:
     from src.combat.team import Team

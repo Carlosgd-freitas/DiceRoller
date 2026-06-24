@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Dict, List
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.effects.stun import StunEffect
-from src.targeting.selectors.random_selector import RandomSelector
+from src.systems.targeting.selectors.random_selector import RandomSelector
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:

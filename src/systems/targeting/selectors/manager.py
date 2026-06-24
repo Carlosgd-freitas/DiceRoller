@@ -8,16 +8,16 @@ from typing import TYPE_CHECKING, List
 from src.base.difficulties import Difficulty
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
-from src.targeting.selectors.buff_selector import BuffSelector
-from src.targeting.selectors.cleanse_selector import CleanseSelector
-from src.targeting.selectors.corrupt_selector import CorruptSelector
-from src.targeting.selectors.curse_selector import CurseSelector
-from src.targeting.selectors.debuff_selector import DebuffSelector
-from src.targeting.selectors.defensive_selector import DefensiveSelector
-from src.targeting.selectors.offensive_selector import OffensiveSelector
-from src.targeting.selectors.random_selector import RandomSelector
-from src.targeting.selectors.revive_selector import ReviveSelector
-from src.targeting.selectors.selector import Selector
+from src.systems.targeting.selectors.buff_selector import BuffSelector
+from src.systems.targeting.selectors.cleanse_selector import CleanseSelector
+from src.systems.targeting.selectors.corrupt_selector import CorruptSelector
+from src.systems.targeting.selectors.curse_selector import CurseSelector
+from src.systems.targeting.selectors.debuff_selector import DebuffSelector
+from src.systems.targeting.selectors.defensive_selector import DefensiveSelector
+from src.systems.targeting.selectors.offensive_selector import OffensiveSelector
+from src.systems.targeting.selectors.random_selector import RandomSelector
+from src.systems.targeting.selectors.revive_selector import ReviveSelector
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster

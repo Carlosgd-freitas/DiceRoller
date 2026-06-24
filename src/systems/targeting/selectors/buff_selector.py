@@ -1,4 +1,4 @@
-"""Debuff Selector module."""
+"""Buff Selector module."""
 
 from __future__ import annotations
 
@@ -6,15 +6,15 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
-from src.targeting.selectors.selector import Selector
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
 
 
-class DebuffSelector(Selector):
+class BuffSelector(Selector):
     """
-    Selects monster targets for debuff type effects.
+    Selects monster targets for buff type effects.
     """
 
     def get_targets_easy(
@@ -27,8 +27,8 @@ class DebuffSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        debuff type effects:
-        * 100% -> random alive enemies
+        buff type effects:
+        * 100% -> self + (k-1) random, alive allies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -48,12 +48,21 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        targets: List[Monster] = []
 
-        return self._get_targets_random(
-            enemies,
-            k=k,
-        )
+        if len(targets) < k:
+            targets.append(source)
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    allies,
+                    k=k - len(targets),
+                    check_taunt=False,
+                )
+            )
+
+        return targets
 
     def get_targets_normal(
         self,
@@ -65,9 +74,9 @@ class DebuffSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        debuff type effects:
-        * 50% -> alive enemies without the debuff
-        * 50% -> alive enemies with the debuff
+        buff type effects:
+        * 50% -> self + (k-1) alive allies without the buff
+        * 50% -> self + (k-1) alive allies with the buff
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -87,28 +96,39 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        targets: List[Monster] = []
 
-        if random() < 0.5:
-            targets = self._get_targets_without_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
+        if len(targets) < k:
+            targets.append(source)
 
-        else:
-            targets = self._get_targets_with_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
+        if len(targets) < k:
+            if random() < 0.5:
+                targets.extend(
+                    self._get_targets_without_effects(
+                        allies,
+                        k=k - len(targets),
+                        effects=[main_keyword],
+                        check_taunt=False,
+                    )
+                )
+
+            else:
+                targets.extend(
+                    self._get_targets_with_effects(
+                        allies,
+                        k=k - len(targets),
+                        effects=[main_keyword],
+                        check_taunt=False,
+                    )
+                )
 
         if len(targets) < k:
             targets.extend(
                 self._get_targets_random(
-                    enemies,
+                    allies,
                     k=k - len(targets),
                     exclude=[target.local_id for target in targets],
+                    check_taunt=False,
                 )
             )
 
@@ -124,9 +144,9 @@ class DebuffSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        debuff type effects:
-        * 50% -> alive enemies without the debuff
-        * 50% -> alive enemies with the debuff
+        buff type effects:
+        * 50% -> self + (k-1) alive allies without the buff
+        * 50% -> self + (k-1) alive allies with the buff
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -146,28 +166,39 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        targets: List[Monster] = []
 
-        if random() < 0.5:
-            targets = self._get_targets_without_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
+        if len(targets) < k:
+            targets.append(source)
 
-        else:
-            targets = self._get_targets_with_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
+        if len(targets) < k:
+            if random() < 0.5:
+                targets.extend(
+                    self._get_targets_without_effects(
+                        allies,
+                        k=k - len(targets),
+                        effects=[main_keyword],
+                        check_taunt=False,
+                    )
+                )
+
+            else:
+                targets.extend(
+                    self._get_targets_with_effects(
+                        allies,
+                        k=k - len(targets),
+                        effects=[main_keyword],
+                        check_taunt=False,
+                    )
+                )
 
         if len(targets) < k:
             targets.extend(
                 self._get_targets_random(
-                    enemies,
+                    allies,
                     k=k - len(targets),
                     exclude=[target.local_id for target in targets],
+                    check_taunt=False,
                 )
             )
 

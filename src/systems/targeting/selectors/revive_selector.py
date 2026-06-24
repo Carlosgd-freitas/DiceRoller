@@ -1,21 +1,20 @@
-"""Cleanse Selector module."""
+"""Revive Selector module."""
 
 from __future__ import annotations
 
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.base.effect import EffectType
-from src.base.keywords import Keyword
-from src.targeting.selectors.selector import Selector
+from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
+    from src.base.keywords import Keyword
     from src.base.monster import Monster
 
 
-class CleanseSelector(Selector):
+class ReviveSelector(Selector):
     """
-    Selects monster targets for the cleanse effect.
+    Selects monster targets for the revive effect.
     """
 
     def get_targets_easy(
@@ -28,8 +27,8 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        the cleanse effect:
-        * 100% -> k monsters between self and alive allies that have the least debuffs
+        the revive effect:
+        * 100% -> k dead allies with least max hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -49,18 +48,16 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        return self._get_targets_least_effects(
-            monsters,
+        targets = self._get_targets_lowest_max_hp(
+            allies,
             k=k,
-            effect_type=EffectType.DEBUFF,
+            life_state="DEAD",
             check_taunt=False,
         )
+
+        return targets
 
     def get_targets_normal(
         self,
@@ -72,9 +69,8 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        the cleanse effect:
-        * 30% -> k random monsters between self and alive allies
-        * 70% -> k monsters between self and alive allies that have the most debuffs
+        the revive effect:
+        * 100% -> k random, dead allies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -94,26 +90,14 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        if random() < 0.3:
-            targets = self._get_targets_random(
-                monsters,
-                k=k,
-                check_taunt=False,
-            )
-
-        else:
-            targets = self._get_targets_most_effects(
-                monsters,
-                k=k,
-                effect_type=EffectType.DEBUFF,
-                check_taunt=False,
-            )
+        targets = self._get_targets_random(
+            allies,
+            k=k,
+            life_state="DEAD",
+            check_taunt=False,
+        )
 
         return targets
 
@@ -127,8 +111,9 @@ class CleanseSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        the cleanse effect:
-        * 100% -> k monsters between self and alive allies that have the most debuffs
+        the revive effect:
+        * 10% -> k random, dead allies
+        * 90% -> k dead allies with most max hp
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -148,15 +133,22 @@ class CleanseSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
+        targets: List[Monster] = []
 
-        return self._get_targets_most_effects(
-            monsters,
-            k=k,
-            effect_type=EffectType.DEBUFF,
-            check_taunt=False,
-        )
+        if random() < 0.1:
+            targets = self._get_targets_random(
+                allies,
+                k=k,
+                life_state="DEAD",
+                check_taunt=False,
+            )
+
+        else:
+            targets = self._get_targets_highest_max_hp(
+                allies,
+                k=k,
+                life_state="DEAD",
+                check_taunt=False,
+            )
+
+        return targets

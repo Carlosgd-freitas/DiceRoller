@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.effects.block import BlockEffect
-from src.effects.curse import CurseEffect
+from src.effects.pain import PainEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_curse(combat: Dict):
+def test_keyword_pain(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster: Monster = combat["monsters"][1]
 
-    curse_effect = CurseEffect(6)
+    pain_effect = PainEffect(6)
     block_effect = BlockEffect(6)
 
     effect_manager.execute_effect(
@@ -27,7 +27,7 @@ def test_keyword_curse(combat: Dict):
     )
 
     effect_manager.execute_effect(
-        curse_effect,
+        pain_effect,
         source=monster,
         target=monster,
     )

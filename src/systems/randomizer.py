@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import dataclass, field
 from random import choice, random, randrange, uniform
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, List, Literal, Tuple
 from uuid import uuid4
 
 from src.base.dice import Dice
@@ -21,6 +22,97 @@ from src.logger.logger import Logger
 if TYPE_CHECKING:
     from src.effects.immunity import ImmunityEffect
     from src.systems.settings import Settings
+
+CHANCE_CALCULATION_METHOD = Literal[
+    "LINEAR_DECAY", "QUADRATIC_DECAY", "EXPONENTIAL_INTERPOLATION"
+]
+
+
+@dataclass
+class RandomizerConfig:
+    """
+    RandomizerConfig dataclass.
+
+    :param team_threshold: Generated Combats will have a number of teams in this
+    closed interval. Default value is [1, 5].
+    :type team_threshold: Tuple[int, int]
+
+    :param member_threshold: Generated Teams will have a number of monsters in this
+    closed interval. Default value is [1, 5].
+    :type member_threshold: Tuple[int, int]
+
+    :param hp_threshold: Generated Monsters will have hp in this closed interval.
+    Default value is [1, 100].
+    :type hp_threshold: Tuple[int, int]
+
+    :param mana_threshold: Generated Monsters will have mana in this closed interval.
+    Default value is [0, 0].
+    :type mana_threshold: Tuple[int, int]
+
+    :param speed_threshold: Generated Monsters will have speed in this closed interval.
+    Default value is [1, 100].
+    :type speed_threshold: Tuple[int, int]
+
+    :param dice_threshold: Generated Monsters will have a number of dice in this closed
+    interval. Default value is [1, 4].
+    :type dice_threshold: Tuple[int, int]
+
+    :param side_threshold: Generated Dice will have a number of sides in this closed
+    interval. Default value is [4, 8].
+    :type side_threshold: Tuple[int, int]
+
+    :param effect_threshold: Generated Sides will have a number of effects in this closed
+    interval. Default value is [1, 3].
+    :type effect_threshold: Tuple[int, int]
+
+    :param immunity_effect_threshold: Generated Immunity Effects will have a number of
+    effects in this closedinterval. Default value is [1, 3].
+    :type immunity_effect_threshold: Tuple[int, int]
+
+    :param value_threshold: Generated Effects will have a value in this closed interval, unless
+    it is Execute or Revive, which have a different threshold. Default value is [1, 100].
+    :type value_threshold: Tuple[int, int]
+
+    :param duration_threshold: Generated Effects will have a duration in this closed
+    interval. Default value is [2, 10].
+    :type duration_threshold: Tuple[int, int]
+
+    :param accuracy_threshold: Generated Effects will have an accuracy in this closed
+    interval. Default value is [0.75, 1].
+    :type accuracy_threshold: Tuple[float, float]
+
+    :param effect_type: Generated Effects can only be of this type.
+    :type effect_type: EffectType
+
+    :param keyword_blacklist: Generated Effects can only have any keywords in this list.
+    :type keyword_whitelist: List[Keyword]
+
+    :param keyword_blacklist: Generated Effects won't have any keywords in this list.
+    :type keyword_blacklist: List[Keyword]
+    """
+
+    # Combat attributes
+    team_threshold: Tuple[int, int] = (1, 5)
+    # Team attributes
+    member_threshold: Tuple[int, int] = (1, 5)
+    # Monster attributes
+    hp_threshold: Tuple[int, int] = (1, 100)
+    mana_threshold: Tuple[int, int] = (0, 0)
+    speed_threshold: Tuple[int, int] = (1, 100)
+    dice_threshold: Tuple[int, int] = (1, 4)
+    # Dice attributes
+    side_threshold: Tuple[int, int] = (4, 8)
+    # Side attributes
+    effect_threshold: Tuple[int, int] = (1, 3)
+    immunity_effect_threshold: Tuple[int, int] = (1, 3)
+    # Effect attributes
+    value_threshold: Tuple[int, int] = (1, 100)
+    duration_threshold: Tuple[int, int] = (1, 10)
+    accuracy_threshold: Tuple[float, float] = (0.75, 1)
+    effect_type: EffectType | None = None
+    # Keyword attributes
+    keyword_whitelist: list[Keyword] = field(default_factory=list)
+    keyword_blacklist: list[Keyword] = field(default_factory=list)
 
 
 class Randomizer:
@@ -96,109 +188,96 @@ class Randomizer:
             "Omega",
         ]
 
+    def _calculate_chance(
+        self,
+        index: int,
+        threshold: Tuple[int, int],
+        method: CHANCE_CALCULATION_METHOD = "QUADRATIC_DECAY",
+    ) -> float:
+        """
+        Calculates the chance of continuing to generate a random object.
+
+        The minimum threshold is always guaranteed. After reaching the minimum,
+        the chance decreases until the maximum threshold is reached.
+
+        :param index: Index of the current random generation attempt.
+        :type index: int
+
+        :param threshold: Threshold containing minimum and maximum values.
+        :type threshold: Tuple[int, int]
+
+        :param method: Chance calculation method.
+        :type method: CHANCE_CALCULATION_METHOD
+
+        :return: Calculated chance.
+        :rtype: float
+        """
+        min_value, max_value = threshold
+
+        # Guarantee minimum amount
+        if index < min_value:
+            return 1.0
+
+        # Progress after minimum threshold.
+        # Example:
+        # threshold=(2, 5)
+        # index=2 -> progress=0.25
+        # index=4 -> progress=0.75
+        progress = (index - min_value + 1) / (max_value - min_value + 1)
+        progress = min(max(progress, 0.0), 1.0)
+
+        if method == "LINEAR_DECAY":
+            return 1.0 - progress
+
+        if method == "QUADRATIC_DECAY":
+            return (1.0 - progress) ** 2
+
+        if method == "EXPONENTIAL_INTERPOLATION":
+            return 0.5**progress
+
+        raise ValueError(f"Unknown chance calculation method: {method}")
+
     def get_random_combat(
         self,
-        n_teams: int = 2,
-        team_members: int = 3,
-        hp_treshold: Tuple[int, int] = (1, 100),
-        speed_treshold: Tuple[int, int] = (1, 100),
-        max_dice: int = 4,
-        max_sides: int = 8,
-        max_effects: int = 3,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> CombatData:
         """
-        Gets a random combat.
+        Gets a random combat. The maximum number of teams is 24.
 
-        :param n_teams: Number of teams. Maximum number is 24.
-        :type n_teams: int
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
-        :param team_members: Number of monsters in the team.
-        :type team_members: int
-
-        :param hp_treshold: The generated Monster will have hp in this closed interval.
-        Default value is [1, 100].
-        :type hp_treshold: Tuple[int, int]
-
-        :param speed_treshold: The generated Monster will have speed in this closed interval.
-        Default value is [1, 100].
-        :type speed_treshold: Tuple[int, int]
-
-        :param max_dice: Maximum number of dice. Default value is 4.
-        :type max_dice: int
-
-        :param max_sides: Maximum number of sides. Default value is 8.
-        :type max_sides: int
-
-        :param max_effects: Maximum number of effects on each side. Default value is 3.
-        :type max_effects: int
-
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param effect_type: If effect_type is passed as a parameter, the returned Dice sides will
-        have effects of that type. Otherwise, each side will have effects of a random type.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
-
-        :return: Random Side.
-        :rtype: Side
+        :return: Random Combat.
+        :rtype: CombatData
         """
-        # Validation
-        if n_teams > 24:
-            raise ValueError("n_teams maximum value is 24.")
+        # Setup
+        config = config or RandomizerConfig()
 
-        # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        # Validation
+        if config.team_threshold[1] > 24:
+            raise ValueError("Maximum number of teams is 24.")
 
         # Randomizing
         teams: List[Team] = []
         team_names = deepcopy(self.team_names)
 
-        for _ in range(n_teams):
-            team = self.get_random_team(
-                team_members=team_members,
-                hp_treshold=hp_treshold,
-                speed_treshold=speed_treshold,
-                max_dice=max_dice,
-                max_sides=max_sides,
-                max_effects=max_effects,
-                value_treshold=value_treshold,
-                duration_treshold=duration_treshold,
-                accuracy_treshold=accuracy_treshold,
-                effect_type=effect_type,
-                keyword_whitelist=keyword_whitelist,
-                keyword_blacklist=keyword_blacklist,
-            )
+        for index in range(config.team_threshold[1]):
+            chance = self._calculate_chance(index, config.team_threshold)
 
-            if team.members:
-                # Guaranteeing an unique team name for each team
-                team.name = choice(team_names)
-                team_names.remove(team.name)
+            if random() <= chance:
+                team = self.get_random_team(config)
 
-                teams.append(team)
+                if team.members:
+                    # Guaranteeing an unique team name for each team
+                    team.name = choice(team_names)
+                    team_names.remove(team.name)
+
+                    teams.append(team)
+                else:
+                    break
+
+            else:
+                break
 
         return {
             "teams": teams,
@@ -206,96 +285,40 @@ class Randomizer:
 
     def get_random_team(
         self,
-        team_members: int = 3,
-        hp_treshold: Tuple[int, int] = (1, 100),
-        speed_treshold: Tuple[int, int] = (1, 100),
-        max_dice: int = 4,
-        max_sides: int = 8,
-        max_effects: int = 3,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Team:
         """
         Gets a random Team with random monsters.
 
-        :param team_members: Number of monsters in the team.
-        :type team_members: int
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
-        :param hp_treshold: The generated Monster will have hp in this closed interval.
-        Default value is [1, 100].
-        :type hp_treshold: Tuple[int, int]
-
-        :param speed_treshold: The generated Monster will have speed in this closed interval.
-        Default value is [1, 100].
-        :type speed_treshold: Tuple[int, int]
-
-        :param max_dice: Maximum number of dice. Default value is 4.
-        :type max_dice: int
-
-        :param max_sides: Maximum number of sides. Default value is 8.
-        :type max_sides: int
-
-        :param max_effects: Maximum number of effects on each side. Default value is 3.
-        :type max_effects: int
-
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param effect_type: If effect_type is passed as a parameter, the returned Dice sides will
-        have effects of that type. Otherwise, each side will have effects of a random type.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
-
-        :return: Random Side.
-        :rtype: Side
+        :return: Random Team.
+        :rtype: Team
         """
-        # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        # Setup
+        config = config or RandomizerConfig()
 
         # Randomizing
         name = choice(self.team_names)
 
-        members: List[Dice] = []
+        members: List[Monster] = []
 
-        for _ in range(team_members):
-            member = self.get_random_monster(
-                hp_treshold=hp_treshold,
-                speed_treshold=speed_treshold,
-                max_dice=max_dice,
-                max_sides=max_sides,
-                max_effects=max_effects,
-                value_treshold=value_treshold,
-                duration_treshold=duration_treshold,
-                accuracy_treshold=accuracy_treshold,
-                effect_type=effect_type,
-                keyword_whitelist=keyword_whitelist,
-                keyword_blacklist=keyword_blacklist,
-            )
+        for index in range(config.member_threshold[1]):
+            chance = self._calculate_chance(index, config.member_threshold)
 
-            if member.dice:
-                members.append(member)
+            if random() <= chance:
+                member = self.get_random_monster(config)
 
+                if member.dice:
+                    members.append(member)
+                else:
+                    break
+
+            else:
+                break
+
+        # Creating object
         team = Team(
             name=name,
             members=members,
@@ -305,103 +328,51 @@ class Randomizer:
 
     def get_random_monster(
         self,
-        hp_treshold: Tuple[int, int] = (1, 100),
-        speed_treshold: Tuple[int, int] = (1, 100),
-        max_dice: int = 4,
-        max_sides: int = 8,
-        max_effects: int = 3,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Monster:
         """
         Gets a random Monster with random Dice.
 
-        :param hp_treshold: The generated Monster will have hp in this closed interval.
-        Default value is [1, 100].
-        :type hp_treshold: Tuple[int, int]
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
-        :param speed_treshold: The generated Monster will have speed in this closed interval.
-        Default value is [1, 100].
-        :type speed_treshold: Tuple[int, int]
-
-        :param max_dice: Maximum number of dice. Default value is 4.
-        :type max_dice: int
-
-        :param max_sides: Maximum number of sides. Default value is 8.
-        :type max_sides: int
-
-        :param max_effects: Maximum number of effects on each side. Default value is 3.
-        :type max_effects: int
-
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param effect_type: If effect_type is passed as a parameter, the returned Dice sides will
-        have effects of that type. Otherwise, each side will have effects of a random type.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
-
-        :return: Random Side.
-        :rtype: Side
+        :return: Random Monster.
+        :rtype: Monster
         """
-        # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        # Setup
+        config = config or RandomizerConfig()
 
         # Randomizing
         name = choice(self.monster_names)
 
-        hp = randrange(hp_treshold[0], hp_treshold[1] + 1)
-        speed = randrange(speed_treshold[0], speed_treshold[1] + 1)
+        hp = randrange(config.hp_threshold[0], config.hp_threshold[1] + 1)
+        mana = randrange(config.mana_threshold[0], config.mana_threshold[1] + 1)
+        speed = randrange(config.speed_threshold[0], config.speed_threshold[1] + 1)
 
         dice: List[Dice] = []
-        chance = 1
 
-        for _ in range(max_dice):
+        for index in range(config.dice_threshold[1]):
+            chance = self._calculate_chance(index, config.dice_threshold)
+
             if random() <= chance:
-                one_dice = self.get_random_dice(
-                    max_sides=max_sides,
-                    max_effects=max_effects,
-                    value_treshold=value_treshold,
-                    duration_treshold=duration_treshold,
-                    accuracy_treshold=accuracy_treshold,
-                    effect_type=effect_type,
-                    keyword_whitelist=keyword_whitelist,
-                    keyword_blacklist=keyword_blacklist,
-                )
+                one_dice = self.get_random_dice(config)
 
                 if one_dice.sides:
                     dice.append(one_dice)
+                else:
+                    break
 
-                chance *= 0.5
+            else:
+                break
 
+        # Creating object
         monster = Monster(
             global_id=uuid4(),
             name=name,
             hp=hp,
             max_hp=hp,
             speed=speed,
-            mana=0,
+            mana=mana,
             dice=dice,
         )
 
@@ -409,262 +380,168 @@ class Randomizer:
 
     def get_random_dice(
         self,
-        max_sides: int = 8,
-        max_effects: int = 3,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Dice:
         """
         Gets a random Dice with random Sides.
 
-        :param max_sides: Maximum number of sides. Default value is 8.
-        :type max_sides: int
-
-        :param max_effects: Maximum number of effects on each side. Default value is 3.
-        :type max_effects: int
-
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param effect_type: If effect_type is passed as a parameter, the returned Dice sides will
-        have effects of that type. Otherwise, each side will have effects of a random type.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
         :return: Random Side.
         :rtype: Side
         """
-        # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        # Setup
+        config = config or RandomizerConfig()
 
         # Randomizing
         sides: List[Side] = []
-        chance = 1
 
-        for _ in range(max_sides):
+        for index in range(config.side_threshold[1]):
+            chance = self._calculate_chance(index, config.side_threshold)
+
             if random() <= chance:
-                side = self.get_random_side(
-                    max_effects=max_effects,
-                    value_treshold=value_treshold,
-                    duration_treshold=duration_treshold,
-                    accuracy_treshold=accuracy_treshold,
-                    effect_type=effect_type,
-                    keyword_whitelist=keyword_whitelist,
-                    keyword_blacklist=keyword_blacklist,
-                )
+                side = self.get_random_side(config)
 
                 if side.effects:
                     sides.append(side)
+                else:
+                    break
 
-                chance *= 0.8
+            else:
+                break
 
+        # Creating object
         dice = Dice(sides)
 
         return dice
 
     def get_random_side(
         self,
-        max_effects: int = 3,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Side:
         """
         Gets a random Side with effects of the same type.
 
-        :param max_effects: Maximum number of effects. Default value is 3.
-        :type max_effects: int
-
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param effect_type: If effect_type is passed as a parameter, the returned Side
-        will have effects of that type. Otherwise, a random type will be chosen.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
         :return: Random Side.
         :rtype: Side
         """
-        # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        # Setup
+        config = deepcopy(config or RandomizerConfig())
 
-        if effect_type is None:
-            effect_type = choice(list(EffectType))
+        if not config.effect_type:
+            config.effect_type = choice(list(EffectType))
 
         # Randomizing
-        new_blacklist = deepcopy(keyword_blacklist)
         effects: List[Effect] = []
-        chance = 1
 
-        for _ in range(max_effects):
+        for index in range(config.effect_threshold[1]):
+            chance = self._calculate_chance(index, config.effect_threshold)
+
             if random() <= chance:
-                effect = self.get_random_effect(
-                    value_treshold=value_treshold,
-                    duration_treshold=duration_treshold,
-                    accuracy_treshold=accuracy_treshold,
-                    effect_type=effect_type,
-                    keyword_whitelist=keyword_whitelist,
-                    keyword_blacklist=new_blacklist,
-                )
+                effect = self.get_random_effect(config)
 
                 if effect:
                     effects.append(effect)
-                    new_blacklist.append(effect.keyword)
+                    config.keyword_blacklist.append(effect.keyword)
+                else:
+                    break
 
-                chance *= 0.5
+            else:
+                break
 
         weight = randrange(1, 6)
 
+        # Creating object
         side = Side(effects, weight)
 
         return side
 
     def get_random_effect(
         self,
-        value_treshold: Tuple[int, int] = (1, 100),
-        duration_treshold: Tuple[int, int] = (1, 10),
-        accuracy_treshold: Tuple[float, float] = (0.75, 1),
-        max_immunity_effects: int = 3,
-        effect_type: EffectType = None,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Effect:
         """
         Gets a random Effect.
 
-        :param value_treshold: The generated Effect will have a value in this closed interval, unless it is
-        Execute or Revive, which have a different treshold. Default value is [1, 100].
-        :type value_treshold: Tuple[int, int]
-
-        :param duration_treshold: The generated Effect will have a duration in this closed
-        interval. Default value is [2, 10].
-        :type duration_treshold: Tuple[int, int]
-
-        :param accuracy_treshold: The generated Effect will have an accuracy in this closed
-        interval. Default value is [0.75, 1].
-        :type accuracy_treshold: Tuple[float, float]
-
-        :param max_immunity_effects: Maximum number of immunity effects. Default value
-        is 3.
-        :type max_immunity_effects: int
-
-        :param effect_type: If effect_type is passed as a parameter, the returned
-        Effect will have the same type.
-        :type effect_type: EffectType
-
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
         :return: Random Effect.
         :rtype: Effect
         """
+        # Setup
+        config = deepcopy(config or RandomizerConfig())
+
         # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        valid_effects = self.all_effects
 
-        valid_effects = deepcopy(self.all_effects)
-
-        if effect_type:
+        if config.effect_type:
             valid_effects = [
-                effect for effect in valid_effects if effect.type == effect_type
+                effect for effect in valid_effects if effect.type == config.effect_type
             ]
 
-        if keyword_whitelist:
+        if config.keyword_whitelist:
             valid_effects = [
                 effect
                 for effect in valid_effects
-                if effect.keyword in keyword_whitelist
+                if effect.keyword in config.keyword_whitelist
             ]
 
-        if keyword_blacklist:
+        if config.keyword_blacklist:
             valid_effects = [
                 effect
                 for effect in valid_effects
-                if effect.keyword not in keyword_blacklist
+                if effect.keyword not in config.keyword_blacklist
             ]
 
         # Randomizing
         if not valid_effects:
             return
 
-        effect = choice(valid_effects)
+        effect = deepcopy(choice(valid_effects))
 
         # Adjusting parameters
         if effect.keyword in [Keyword.EXECUTE]:
-            effect.value = round(uniform(0.05, 0.1), 2)  # [5%, 25%]
+            effect.value = round(uniform(0.05, 0.25), 2)  # [5%, 25%]
         elif effect.keyword in [Keyword.REVIVE]:
             effect.value = round(uniform(0.05, 1), 2)  # [5%, 100%]
         else:
-            effect.value = randrange(value_treshold[0], value_treshold[1] + 1)
+            effect.value = randrange(
+                config.value_threshold[0], config.value_threshold[1] + 1
+            )
 
-        effect.duration = randrange(duration_treshold[0], duration_treshold[1] + 1)
+        effect.duration = randrange(
+            config.duration_threshold[0], config.duration_threshold[1] + 1
+        )
 
-        effect.accuracy = round(uniform(accuracy_treshold[0], accuracy_treshold[1]), 2)
+        effect.accuracy = round(
+            uniform(config.accuracy_threshold[0], config.accuracy_threshold[1]), 2
+        )
 
+        # Adjusting Immunity Effect parameters
         if effect.keyword in [Keyword.IMMUNITY]:
             effect: ImmunityEffect
             immunity_effects: List[Keyword] = []
-            immunity_keyword_blacklist = [Keyword.IMMUNITY]
-            chance = 1
+            config.keyword_blacklist = [Keyword.IMMUNITY]
 
-            for _ in range(max_immunity_effects):
+            for index in range(config.immunity_effect_threshold[1]):
+                chance = self._calculate_chance(index, config.immunity_effect_threshold)
+
                 if random() <= chance:
-                    keyword = self.get_random_keyword(
-                        keyword_blacklist=immunity_keyword_blacklist,
-                    )
+                    keyword = self.get_random_keyword(config)
 
                     if keyword:
                         immunity_effects.append(keyword)
-                        immunity_keyword_blacklist.append(keyword)
+                        config.keyword_blacklist.append(keyword)
+                    else:
+                        break
 
-                    chance /= 2
+                else:
+                    break
 
             effect.effects = immunity_effects
 
@@ -672,45 +549,41 @@ class Randomizer:
 
     def get_random_keyword(
         self,
-        keyword_whitelist: List[Keyword] = None,
-        keyword_blacklist: List[Keyword] = None,
+        config: RandomizerConfig | None = None,
     ) -> Keyword:
         """
         Gets a random Keyword.
 
-        :param keyword_whitelist: If passed, only effects with these keywords will be
-        elligible when generating the Effect.
-        :type keyword_whitelist: List[Keyword]
-
-        :param keyword_blacklist: If passed, only effects without these keywords will be
-        elligible when generating the Effect.
-        :type keyword_blacklist: List[Keyword]
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
 
         :return: Random Keyword.
         :rtype: Keyword
         """
+        # Setup
+        config = config or RandomizerConfig()
+
         # Filtering
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
+        valid_effects = self.all_effects
 
-        valid_effects = deepcopy(self.all_effects)
-
-        if keyword_whitelist:
+        if config.keyword_whitelist:
             valid_effects = [
                 effect
                 for effect in valid_effects
-                if effect.keyword in keyword_whitelist
+                if effect.keyword in config.keyword_whitelist
             ]
 
-        if keyword_blacklist:
+        if config.keyword_blacklist:
             valid_effects = [
                 effect
                 for effect in valid_effects
-                if effect.keyword not in keyword_blacklist
+                if effect.keyword not in config.keyword_blacklist
             ]
 
         # Randomizing
         if not valid_effects:
             return
 
-        return choice(valid_effects).keyword
+        effect = deepcopy(choice(valid_effects))
+
+        return effect.keyword

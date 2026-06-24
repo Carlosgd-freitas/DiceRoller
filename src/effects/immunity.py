@@ -59,6 +59,45 @@ class ImmunityEffect(Effect):
 
         return _str
 
+    def stack(
+        self,
+        new_effect: ImmunityEffect,
+    ):
+        """
+        Modifies the ImmunityEffect parameters based on a new effect, if both are of
+        the same class:
+        * value of both effects are summed.
+        * the highest duration between the two effects is maintained.
+        * decay of both effects are summed.
+        * the highest accuracy between the two effects is maintained.
+        * if the new effect is not removable, then the stacked effect will be also.
+        * all effect immunities from the new effect will be added.
+
+        :param new_effect: A new effect that is being applied to an Entity.
+        :type new_effect: Effect
+        """
+        if type(self) is not type(new_effect):
+            return
+
+        self.value += new_effect.value
+
+        if new_effect.duration > self.duration:
+            self.duration = new_effect.duration
+
+        self.decay += new_effect.decay
+
+        if new_effect.accuracy > self.accuracy:
+            self.accuracy = new_effect.accuracy
+
+        if not new_effect.removable:
+            self.removable = False
+
+        for new_effect_immunity in new_effect.effects:
+            if new_effect_immunity not in self.effects:
+                self.effects.append(new_effect_immunity)
+
+        return
+
     def on_apply(
         self,
         source: Entity,
