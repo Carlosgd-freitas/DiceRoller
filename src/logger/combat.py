@@ -169,7 +169,7 @@ class CombatLogger(Logger):
 
                 message = self.get_message(
                     namespace="base",
-                    message_group="WORDS",
+                    message_group="LEXICON",
                     key="effects",
                 ).capitalize()
 

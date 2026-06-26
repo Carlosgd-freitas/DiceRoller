@@ -50,7 +50,10 @@ class MainMenu(Menu):
 
     def get_title(self) -> str:
         """
-        Returns the Menu's title.
+        Returns the Menu title.
+
+        :return: Menu title.
+        :rtype: str
         """
         return self.logger.get_message(
             namespace="menus", message_group="MAIN", key="title"
@@ -58,7 +61,10 @@ class MainMenu(Menu):
 
     def get_options(self) -> List[Option]:
         """
-        Returns the options that will be used by the Menu.
+        Returns the Menu options.
+
+        :return: Menu options.
+        :rtype: List[Option]
         """
         options = [
             Option(
@@ -105,7 +111,8 @@ class MainMenu(Menu):
                     message_group="BASE",
                     key="exit_message",
                 ),
-                isolate=True,
+                isolate_before=True,
+                isolate_after=True,
             ),
         ]
 
@@ -150,6 +157,12 @@ class MainMenu(Menu):
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
+
+        :param option: Menu's option.
+        :type option: Option
+
+        :return: If the option can be selected.
+        :rtype: bool
         """
         if option.id in ["NEW_GAME"]:
             return False
@@ -159,6 +172,9 @@ class MainMenu(Menu):
     def process_option(self, option: Option):
         """
         Processes an option.
+
+        :param option: Menu's option.
+        :type option: Option
         """
         if option.id == "NEW_GAME":
             pass
@@ -187,7 +203,7 @@ class MainMenu(Menu):
 
     def show_title(self):
         """
-        Shows the Menu's title.
+        Shows the Menu title.
         """
         self.logger.box_message(
             message="DiceRoller v0.1.X",

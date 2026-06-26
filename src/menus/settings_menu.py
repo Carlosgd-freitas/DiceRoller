@@ -47,7 +47,10 @@ class SettingsMenu(Menu):
 
     def get_title(self) -> str:
         """
-        Returns the Menu's title.
+        Returns the Menu title.
+
+        :return: Menu title.
+        :rtype: str
         """
         return self.logger.get_message(
             namespace="settings", message_group="MENU", key="title"
@@ -55,7 +58,10 @@ class SettingsMenu(Menu):
 
     def get_options(self) -> List[Option]:
         """
-        Returns the options that will be used by the Menu.
+        Returns the Menu options.
+
+        :return: Menu options.
+        :rtype: List[Option]
         """
         options = [
             Option(
@@ -84,7 +90,8 @@ class SettingsMenu(Menu):
                     message_group="BASE",
                     key="exit_message",
                 ),
-                isolate=True,
+                isolate_before=True,
+                isolate_after=True,
             ),
         ]
 
@@ -129,12 +136,21 @@ class SettingsMenu(Menu):
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
+
+        :param option: Menu's option.
+        :type option: Option
+
+        :return: If the option can be selected.
+        :rtype: bool
         """
         return True
 
     def process_option(self, option: Option):
         """
         Processes an option.
+
+        :param option: Menu's option.
+        :type option: Option
         """
         if option.id == "LANGUAGE":
             self.settings.switch_setting(
@@ -160,12 +176,12 @@ class SettingsMenu(Menu):
 
     def show_options(self):
         """
-        Shows the Menu's options.
+        Shows the Menu options.
         """
         for option in self.options:
             message = ""
 
-            if option.isolate:
+            if option.isolate_before:
                 message += "\n"
 
             message += f"[{option.key}] {option.message}"
@@ -189,7 +205,7 @@ class SettingsMenu(Menu):
                     intensity="BRIGHT",
                 )
 
-            if option.isolate:
+            if option.isolate_after:
                 message += "\n"
 
             self.logger.log(message=message)

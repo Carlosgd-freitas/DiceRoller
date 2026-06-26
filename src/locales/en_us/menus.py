@@ -26,3 +26,7 @@ SANDBOX = {
     "start_combat_message": "Start Combat",
     "title": "Sandbox Mode",
 }
+
+SORT = {
+    "reverse": "reverse",
+}

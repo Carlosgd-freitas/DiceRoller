@@ -3,7 +3,7 @@
 from importlib import import_module
 from typing import Dict, List, Literal, get_args
 
-from src.base.color import color_string
+from src.base.color import Color, color_string
 from src.base.keywords import Keyword, get_keyword_color
 from src.locales.languages import Language
 
@@ -375,5 +375,44 @@ class Logger:
 
         if isolate:
             self.log(message="")
+
+        return
+
+    def log_boolean(
+        self,
+        message: str,
+        value: bool,
+        end: str = "\n",
+    ) -> None:
+        """
+        Logs a message that has an associated boolean value. If this value is
+        * false, the message will be logged as bright and red.
+        * true, the message will be logged as bright and green.
+
+        :param message: A message.
+        :type message: str
+
+        :param value: The boolean value.
+        :type value: bool
+
+        :param end: What will be printed at the end of the message. Default value is
+        \\n.
+        :type end: str
+        """
+        if not value:
+            message = color_string(
+                message,
+                foreground_color=Color.RED,
+                intensity="BRIGHT",
+            )
+
+        else:
+            message = color_string(
+                message,
+                foreground_color=Color.GREEN,
+                intensity="BRIGHT",
+            )
+
+        self.log(message=message, end=end)
 
         return

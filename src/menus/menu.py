@@ -49,14 +49,20 @@ class Menu(Manager):
     @abstractmethod
     def get_title(self) -> str:
         """
-        Returns the Menu's title.
+        Returns the Menu title.
+
+        :return: Menu title.
+        :rtype: str
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_options(self) -> List[Option]:
         """
-        Returns the options that will be used by the Menu.
+        Returns the Menu options.
+
+        :return: Menu options.
+        :rtype: List[Option]
         """
         raise NotImplementedError
 
@@ -68,11 +74,11 @@ class Menu(Manager):
         """
         Changes the Manager language.
 
-        :var language: A Language.
-        :vartype language: Language
+        :param language: A Language.
+        :type language: Language
 
-        :var _messages: Messages loaded from a locale module.
-        :vartype _messages: Dict
+        :param _messages: Messages loaded from a locale module.
+        :type _messages: Dict
         """
         if self.logger:
             self.logger.change_language(language, _messages)
@@ -110,6 +116,12 @@ class Menu(Manager):
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
+
+        :param option: Menu's option.
+        :type option: Option
+
+        :return: If the option can be selected.
+        :rtype: bool
         """
         raise NotImplementedError
 
@@ -117,6 +129,9 @@ class Menu(Manager):
     def process_option(self, option: Option):
         """
         Processes an option.
+
+        :param option: Menu's option.
+        :type option: Option
         """
         raise NotImplementedError
 
@@ -126,7 +141,7 @@ class Menu(Manager):
 
     def show_title(self):
         """
-        Shows the Menu's title.
+        Shows the Menu title.
         """
         self.logger.box_message(
             message=self.title,
@@ -135,17 +150,17 @@ class Menu(Manager):
 
     def show_options(self):
         """
-        Shows the Menu's options.
+        Shows the Menu options.
         """
         for option in self.options:
             message = ""
 
-            if option.isolate:
+            if option.isolate_before:
                 message += "\n"
 
             message += f"[{option.key}] {option.message}"
 
-            if option.isolate:
+            if option.isolate_after:
                 message += "\n"
 
             if not self.is_option_valid(option):
@@ -153,7 +168,7 @@ class Menu(Manager):
 
             self.logger.log(message=message)
 
-        if not self.options[-1].isolate:
+        if not self.options[-1].isolate_after:
             self.logger.log(message="")
 
         return

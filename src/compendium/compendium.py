@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from enum import Enum
 from math import ceil
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple, TypedDict
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Tuple, TypedDict
 
 from tabulate import tabulate
 
@@ -14,6 +14,7 @@ from src.base.text import normalize
 from src.locales.languages import Language
 from src.menus.menu import Menu
 from src.menus.option import Option
+from src.menus.sort_menu import SortMenu
 
 if TYPE_CHECKING:
     from src.logger.logger import Logger
@@ -62,12 +63,12 @@ class Compendium(Menu):
     :var items: Compendium's main content.
     :vartype items: List
 
-    :var page_headers: Headers of the Compendium's columns.
-    :vartype page_headers: List[str]
+    :var columns: Names of the Compendium's columns (Headers).
+    :vartype columns: List[str]
 
-    :var page_colalign: Alignment of the Compendium's columns. Default value is None
+    :var alignments: Alignments of the Compendium's columns. Default value is None
     (`tabulate` default column alignment).
-    :vartype page_colalign: Tuple[str]
+    :vartype alignments: Tuple[str]
 
     :var page_number: Compendium's current page number. Default value is 1.
     :vartype page_number: int
@@ -85,8 +86,7 @@ class Compendium(Menu):
         logger: Logger,
         settings: Settings,
         items: List,
-        page_headers: List[str],
-        page_colalign: Tuple[str] = None,
+        alignments: Tuple[str] = None,
         page_number: int = 1,
         page_size: int = 15,
     ):
@@ -101,21 +101,62 @@ class Compendium(Menu):
         self.page_number = page_number
         self.page_size = page_size
         self.num_pages = ceil(len(self.items) / self.page_size)
-        self.pages_data = self.get_pages_data(self.items)
 
-        self.page_headers = page_headers
-        self.page_colalign = page_colalign
-
+        # Item Attributes
         self.item_number = 1
 
         # Setup
         self.level: CompendiumLevel = CompendiumLevel.PAGE
+        self.columns = self.get_columns()
+        self.alignments = alignments
         self.options = self.get_options()
         self.messages = self.get_messages()
+
+        # Sort Attributes
+        self.sort_column = self.columns[1]
+        self.reverse = False
+
+        sort_menu_title = (
+            self.title
+            + ": "
+            + self.logger.get_message(
+                namespace="compendium",
+                message_group="BASE",
+                key="sort_message",
+            ).title()
+        )
+
+        self.sort_menu = SortMenu(
+            title=sort_menu_title,
+            columns=self.columns,
+            items=self.items,
+            sort_column=self.sort_column,
+            get_sort_key=self.get_sort_key,
+            reverse=self.reverse,
+            settings=self.settings,
+        )
+
+        # Default pages data
+        self.items = self.sort_menu.sort(self.sort_column, self.reverse)
+        self.pages_data = self.get_pages_data(self.items)
+
+    @abstractmethod
+    def get_columns(self) -> List[str]:
+        """
+        Returns the Compendium's columns.
+
+        :return: List of Compendium's columns.
+        :rtype: List[str]
+        """
+        raise NotImplementedError
 
     def get_options(self) -> Dict:
         """
         Returns the options that will be used by the Compendium.
+
+        :return: Options that can be selected. Each key is a Compendium level and each
+        value are the available options.
+        :rtype: Dict
         """
         options = {
             "ITEM": self.get_item_options(),
@@ -127,6 +168,9 @@ class Compendium(Menu):
     def get_page_options(self) -> List[Option]:
         """
         Returns the options that will be used in the Compendium at PAGE level.
+
+        :return: List of options that can be selected at PAGE level.
+        :rtype: List[Option]
         """
         options = [
             Option(
@@ -157,8 +201,17 @@ class Compendium(Menu):
                 ),
             ),
             Option(
-                id="SHOW_DETAILS",
+                id="SORT",
                 key="4",
+                message=self.logger.get_message(
+                    namespace="compendium",
+                    message_group="BASE",
+                    key="sort_message",
+                ),
+            ),
+            Option(
+                id="SHOW_DETAILS",
+                key="5",
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
@@ -173,7 +226,8 @@ class Compendium(Menu):
                     message_group="BASE",
                     key="exit_message",
                 ),
-                isolate=True,
+                isolate_before=True,
+                isolate_after=True,
             ),
         ]
 
@@ -183,6 +237,9 @@ class Compendium(Menu):
     def get_item_options(self) -> List[Option]:
         """
         Returns the options that will be used in the Compendium at ITEM level.
+
+        :return: List of options that can be selected at ITEM level.
+        :rtype: List[Option]
         """
         raise NotImplementedError
 
@@ -190,6 +247,9 @@ class Compendium(Menu):
     def get_messages(self) -> CompendiumMessages:
         """
         Returns messages that will be used by the Compendium.
+
+        :return: Messages that will be used by the Compendium.
+        :rtype: CompendiumMessages
         """
         raise NotImplementedError
 
@@ -201,12 +261,16 @@ class Compendium(Menu):
         """
         Changes the Compendium's language.
 
-        :var language: A Language.
-        :vartype language: Language
+        :param language: A Language.
+        :type language: Language
+
+        :param _messages: Messages loaded from a locale module.
+        :type _messages: Dict
         """
         self.logger.change_language(language, _messages)
 
         self.title = self.get_title()
+        self.columns = self.get_columns()
         self.options = self.get_options()
         self.messages = self.get_messages()
         self.pages_data = self.get_pages_data(self.items)
@@ -220,8 +284,8 @@ class Compendium(Menu):
         """
         Returns all the tabulated data that will be used on the Compendium.
 
-        :var items: Compendium items.
-        :vartype items: List
+        :param items: Compendium items.
+        :type items: List
 
         :return: Compendium items structured as tabulated data.
         :rtype: List[List]
@@ -232,8 +296,8 @@ class Compendium(Menu):
         """
         Returns the tabulated data from a Compendium's page.
 
-        :var page_number: Compendium's page number.
-        :vartype page_number: int
+        :param page_number: Compendium's page number.
+        :type page_number: int
 
         :return: Compendium items structured as tabulated data for one page.
         :rtype: List[List]
@@ -246,8 +310,8 @@ class Compendium(Menu):
         """
         Returns the items from a Compendium's page.
 
-        :var page_number: Compendium's page number.
-        :vartype page_number: int
+        :param page_number: Compendium's page number.
+        :type page_number: int
 
         :return: Compendium items structured as tabulated data for one page.
         :rtype: List[List]
@@ -260,8 +324,8 @@ class Compendium(Menu):
         """
         Returns the items indexes from a Compendium's page.
 
-        :var page_number: Compendium's page number.
-        :vartype page_number: int
+        :param page_number: Compendium's page number.
+        :type page_number: int
 
         :return: Compendium items structured as tabulated data for one page.
         :rtype: List[int]
@@ -276,8 +340,8 @@ class Compendium(Menu):
         """
         Returns the name of an item.
 
-        :var item: A Compendium's item.
-        :vartype item: Any
+        :param item: A Compendium's item.
+        :type item: Any
 
         :return: The Compendium's item name.
         :rtype: str
@@ -315,6 +379,12 @@ class Compendium(Menu):
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
+
+        :param option: Menu's option.
+        :type option: Option
+
+        :return: If the option can be selected.
+        :rtype: bool
         """
         if option.id == "PREVIOUS_PAGE":
             return self.page_number > 1
@@ -333,6 +403,9 @@ class Compendium(Menu):
     def process_option(self, option: Option):
         """
         Processes an option.
+
+        :param option: Compendium's option.
+        :type option: Option
         """
         if option.id == "PREVIOUS_PAGE":
             if self.page_number > 1:
@@ -354,6 +427,9 @@ class Compendium(Menu):
 
         elif option.id == "SEARCH":
             self.search_item()
+
+        elif option.id == "SORT":
+            self.sort()
 
         elif option.id == "SHOW_DETAILS":
             self.select_item()
@@ -429,6 +505,34 @@ class Compendium(Menu):
 
         return
 
+    @abstractmethod
+    def get_sort_key(self, column: str) -> Callable:
+        """
+        Returns a key (lambda function) to be used in the sort option.
+
+        :param column: Column to sort the Compendium's items by.
+        :type column: str
+
+        :return: Key (lambda function) to sort the Compendium's items.
+        :rtype: Callable
+        """
+        raise NotImplementedError
+
+    def sort(self):
+        """
+        Opens up a Sort Menu, where the user can change the Compendium's sort settings.
+        """
+        sort_data = self.sort_menu.open()
+
+        # Updating attributes
+        self.items = sort_data["items"]
+        self.reverse = sort_data["reverse"]
+        self.sort_column = sort_data["sort_column"]
+
+        self.pages_data = self.get_pages_data(self.items)
+
+        return
+
     # =========================================================================
     # Rendering
     # =========================================================================
@@ -443,19 +547,19 @@ class Compendium(Menu):
         """
         Shows the options based on the Compendium level.
 
-        :var level: Compendium level.
-        :vartype level: CompendiumLevel
+        :param level: Compendium level.
+        :type level: CompendiumLevel
         """
         for option in self.options[level.value]:
             option: Option
             message = ""
 
-            if option.isolate:
+            if option.isolate_before:
                 message += "\n"
 
             message += f"[{option.key}] {option.message}"
 
-            if option.isolate:
+            if option.isolate_after:
                 message += "\n"
 
             if not self.is_option_valid(option):
@@ -463,7 +567,7 @@ class Compendium(Menu):
 
             self.logger.log(message=message)
 
-        if not self.options[level.value][-1].isolate:
+        if not self.options[level.value][-1].isolate_after:
             self.logger.log(message="")
 
         return
@@ -486,8 +590,8 @@ class Compendium(Menu):
 
         table = tabulate(
             page_data,
-            headers=self.page_headers,
-            colalign=self.page_colalign,
+            headers=self.columns,
+            colalign=self.alignments,
             tablefmt="psql",
         )
 

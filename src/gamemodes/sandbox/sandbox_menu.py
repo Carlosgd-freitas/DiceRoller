@@ -128,7 +128,8 @@ class SandboxMenu(Menu):
                     message_group="BASE",
                     key="exit_message",
                 ),
-                isolate=True,
+                isolate_before=True,
+                isolate_after=True,
             ),
         ]
 
@@ -303,12 +304,12 @@ class SandboxMenu(Menu):
         for option in self.options:
             message = ""
 
-            if option.isolate:
+            if option.isolate_before:
                 message += "\n"
 
             message += f"[{option.key}] {option.message}"
 
-            if option.isolate:
+            if option.isolate_after:
                 message += "\n"
 
             if not self.is_option_valid(option):
@@ -316,7 +317,7 @@ class SandboxMenu(Menu):
 
             self.logger.log(message=message)
 
-        if not self.options[-1].isolate:
+        if not self.options[-1].isolate_after:
             self.logger.log(message="")
 
         return

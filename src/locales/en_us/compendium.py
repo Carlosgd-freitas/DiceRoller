@@ -5,6 +5,7 @@ BASE = {
     "page": "Page",
     "previous_page_message": "Previous Page",
     "search_message": "Search",
+    "sort_message": "Sort",
     "show_details_message": "Show Details",
 }
 

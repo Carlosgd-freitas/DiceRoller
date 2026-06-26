@@ -14,9 +14,13 @@ class Option:
     :var message: Message that will be logged when the Option is selected.
     :vartype message: str
 
-    :var isolate: If the Option will be logged before and after a \\n. Default value is
-    False.
-    :vartype isolate: bool
+    :var isolate_before: If a \\n will be logged before the Option's message. Default
+    value is False.
+    :vartype isolate_before: bool
+
+    :var isolate_after: If a \\n will be logged after the Option's message. Default
+    value is False.
+    :vartype isolate_after: bool
     """
 
     def __init__(
@@ -24,9 +28,11 @@ class Option:
         id: str,
         key: str,
         message: str,
-        isolate: bool = False,
+        isolate_before: bool = None,
+        isolate_after: bool = None,
     ):
         self.id = id
         self.key = key
         self.message = message
-        self.isolate = isolate
+        self.isolate_before = isolate_before
+        self.isolate_after = isolate_after

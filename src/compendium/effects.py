@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Callable, List
 
+from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -127,23 +128,57 @@ class EffectCompendium(Compendium):
             logger=logger,
             settings=settings,
             items=items,
-            page_headers=["#", "Name", "Type"],
-            page_colalign=("right", "left", "left"),
+            alignments=("right", "left", "left"),
         )
 
         self.logger: EffectLogger
 
     def get_title(self) -> str:
         """
-        Returns the Compendium's title.
+        Returns the Compendium title.
+
+        :return: Compendium title.
+        :rtype: str
         """
         return self.logger.get_message(
             namespace="compendium", message_group="EFFECTS", key="title"
         )
 
+    def get_columns(self) -> List[str]:
+        """
+        Returns the Compendium columns.
+
+        :return: List of Compendium columns.
+        :rtype: List[str]
+        """
+        columns = ["#"]
+
+        columns.append(
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="name",
+            )
+        )
+
+        columns.append(
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="type",
+            )
+        )
+
+        columns = [column.title() for column in columns]
+
+        return columns
+
     def get_item_options(self) -> List[Option]:
         """
         Returns the options that will be used in the Compendium at ITEM level.
+
+        :return: List of options that can be selected at ITEM level.
+        :rtype: List[Option]
         """
         options = [
             Option(
@@ -181,7 +216,8 @@ class EffectCompendium(Compendium):
                     message_group="BASE",
                     key="return_message",
                 ),
-                isolate=True,
+                isolate_before=True,
+                isolate_after=True,
             ),
         ]
 
@@ -190,6 +226,9 @@ class EffectCompendium(Compendium):
     def get_messages(self) -> CompendiumMessages:
         """
         Returns messages that will be used by the Compendium.
+
+        :return: Messages that will be used by the Compendium.
+        :rtype: CompendiumMessages
         """
         messages = {}
 
@@ -214,8 +253,8 @@ class EffectCompendium(Compendium):
         """
         Returns all the tabulated data that will be used on the Compendium.
 
-        :var items: Compendium items.
-        :vartype items: List
+        :param items: Compendium items.
+        :type items: List
 
         :return: Compendium items structured as tabulated data.
         :rtype: List[List]
@@ -247,10 +286,10 @@ class EffectCompendium(Compendium):
         """
         Returns the name of an item.
 
-        :var item: A Compendium's item.
-        :vartype item: Any
+        :param item: A Compendium item.
+        :type item: Effect
 
-        :return: The Compendium's item name.
+        :return: The Compendium item name.
         :rtype: str
         """
         return self.logger.get_message(
@@ -258,6 +297,50 @@ class EffectCompendium(Compendium):
             message_group="KEYWORDS",
             key=item.keyword.value.lower(),
         )
+
+    # =========================================================================
+    # Options
+    # =========================================================================
+
+    def get_sort_key(self, column: str) -> Callable:
+        """
+        Returns a key (lambda function) to be used in the sort option.
+
+        :param column: Column to sort the Compendium items by.
+        :type column: str
+
+        :return: Key (lambda function) to sort the Compendium items.
+        :rtype: Callable
+        """
+        normalized_column = normalize(column)
+
+        name = normalize(
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="name",
+            )
+        )
+
+        type = normalize(
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="type",
+            )
+        )
+
+        if normalized_column == name:
+            return lambda x: self.get_item_name(x)
+
+        elif normalized_column == type:
+            return lambda x: self.logger.get_message(
+                namespace="effects",
+                message_group="TYPES",
+                key=x.type.value.lower(),
+            )
+
+        return
 
     # =========================================================================
     # Rendering

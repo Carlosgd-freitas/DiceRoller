@@ -74,7 +74,7 @@ class EffectLogger(Logger):
         if effects_remaining > 0:
             effect_word = self.get_message(
                 namespace="base",
-                message_group="WORDS",
+                message_group="LEXICON",
                 key="effects",
             ).capitalize()
 
@@ -599,7 +599,7 @@ class EffectLogger(Logger):
                 ("value", "value_perc"),
             ]:
                 translated_word = self.get_message(
-                    namespace="base", message_group="WORDS", key=word
+                    namespace="base", message_group="LEXICON", key=word
                 )
 
                 kwargs[key] = color_string(
