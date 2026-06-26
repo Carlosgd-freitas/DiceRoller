@@ -5,7 +5,6 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Callable, List
 
-from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -302,38 +301,20 @@ class EffectCompendium(Compendium):
     # Options
     # =========================================================================
 
-    def get_sort_key(self, column: str) -> Callable:
+    def get_sort_key(self, column_index: int) -> Callable:
         """
         Returns a key (lambda function) to be used in the sort option.
 
-        :param column: Column to sort the Compendium items by.
-        :type column: str
+        :param column_index: Index of the column used to sort the Compendium items.
+        :type column_index: int
 
         :return: Key (lambda function) to sort the Compendium items.
         :rtype: Callable
         """
-        normalized_column = normalize(column)
-
-        name = normalize(
-            self.logger.get_message(
-                namespace="base",
-                message_group="LEXICON",
-                key="name",
-            )
-        )
-
-        type = normalize(
-            self.logger.get_message(
-                namespace="base",
-                message_group="LEXICON",
-                key="type",
-            )
-        )
-
-        if normalized_column == name:
+        if column_index == 1:
             return lambda x: self.get_item_name(x)
 
-        elif normalized_column == type:
+        elif column_index == 2:
             return lambda x: self.logger.get_message(
                 namespace="effects",
                 message_group="TYPES",

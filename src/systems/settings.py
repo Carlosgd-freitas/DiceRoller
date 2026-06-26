@@ -17,18 +17,18 @@ class Settings:
     Language.EN_US.
     :vartype language: Language
 
-    :var end_turn_ai_monsters: If ending a AI-controlled monster's turn needs an input
+    :var monster_end_turn: If ending a AI-controlled monster's turn needs an input
     from the player ("MANUAL") or not ("AUTO"). Default value is "MANUAL".
-    :vartype end_turn_ai_monsters: Literal["AUTO", "MANUAL"]
+    :vartype monster_end_turn: Literal["AUTO", "MANUAL"]
     """
 
     def __init__(
         self,
         language: Language = Language.EN_US,
-        end_turn_ai_monsters: Literal["AUTO", "MANUAL"] = "MANUAL",
+        monster_end_turn: Literal["AUTO", "MANUAL"] = "MANUAL",
     ):
         self.language = language
-        self.end_turn_ai_monsters = end_turn_ai_monsters
+        self.monster_end_turn = monster_end_turn
 
     def switch_setting(self, setting_name: str, values: List):
         """

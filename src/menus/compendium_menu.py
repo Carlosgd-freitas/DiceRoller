@@ -1,22 +1,22 @@
-"""Settings Menu module."""
+"""Compendium Menu module."""
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List
 
-from src.base.color import color_string
+from src.compendium.effects import EffectCompendium
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
 from src.menus.option import Option
-from src.systems.file import FileManager
-from src.systems.settings import FILENAME, Settings
+
+if TYPE_CHECKING:
+    from src.systems.settings import Settings
 
 
-class SettingsMenu(Menu):
+class CompendiumMenu(Menu):
     """
-    Settings Menu class.
+    Compendium Menu class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -42,8 +42,7 @@ class SettingsMenu(Menu):
             settings,
         )
 
-        # Managers
-        self.file_manager = FileManager(settings, logging)
+        self.effect_compendium = EffectCompendium(self.settings, self.logger.enabled)
 
     def get_title(self) -> str:
         """
@@ -53,7 +52,7 @@ class SettingsMenu(Menu):
         :rtype: str
         """
         return self.logger.get_message(
-            namespace="settings", message_group="MENU", key="title"
+            namespace="compendium", message_group="BASE", key="title"
         )
 
     def get_options(self) -> List[Option]:
@@ -65,22 +64,31 @@ class SettingsMenu(Menu):
         """
         options = [
             Option(
-                id="LANGUAGE",
+                id="EFFECT_COMPENDIUM",
                 key="1",
                 message=self.logger.get_message(
-                    namespace="settings",
-                    message_group="SETTINGS",
-                    key="language",
-                ),
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="effects",
+                ).title(),
             ),
             Option(
-                id="MONSTER_END_TURN",
+                id="MONSTER_COMPENDIUM",
                 key="2",
                 message=self.logger.get_message(
-                    namespace="settings",
-                    message_group="SETTINGS",
-                    key="monster_end_turn",
-                ),
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="monsters",
+                ).title(),
+            ),
+            Option(
+                id="ITEM_COMPENDIUM",
+                key="3",
+                message=self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="items",
+                ).title(),
             ),
             Option(
                 id="EXIT",
@@ -103,7 +111,7 @@ class SettingsMenu(Menu):
 
     def change_language(self, language: Language, _messages: Dict = None):
         """
-        Changes the Manager language.
+        Changes the Menu's language.
 
         :var language: A Language.
         :vartype language: Language
@@ -117,17 +125,17 @@ class SettingsMenu(Menu):
         self.title = self.get_title()
         self.options = self.get_options()
 
-        self.file_manager.change_language(language, _messages)
+        self.effect_compendium.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
         """
-        Enables or disables the Manager logging.
+        Enables or disables the Menu logging.
 
-        :var enabled: If the Manager logging is enabled or disabled.
+        :var enabled: If the Menu logging is enabled or disabled.
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
-        self.file_manager.toggle_logging(enabled)
+        self.effect_compendium.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -143,6 +151,9 @@ class SettingsMenu(Menu):
         :return: If the option can be selected.
         :rtype: bool
         """
+        if option.id in ["MONSTER_COMPENDIUM", "ITEM_COMPENDIUM"]:
+            return False
+
         return True
 
     def process_option(self, option: Option):
@@ -152,62 +163,16 @@ class SettingsMenu(Menu):
         :param option: Menu's option.
         :type option: Option
         """
-        if option.id == "LANGUAGE":
-            self.settings.switch_setting(
-                "language",
-                [Language.EN_US, Language.PT_BR],
-            )
-            self.change_language(self.settings.language)
+        if option.id == "EFFECT_COMPENDIUM":
+            self.effect_compendium.open()
 
-        elif option.id == "MONSTER_END_TURN":
-            self.settings.switch_setting(
-                "monster_end_turn",
-                ["AUTO", "MANUAL"],
-            )
+        elif option.id == "MONSTER_COMPENDIUM":
+            pass
+
+        elif option.id == "ITEM_COMPENDIUM":
+            pass
 
         elif option.id == "EXIT":
-            self.file_manager.save(self.settings, FILENAME)
-
-        return
-
-    # =========================================================================
-    # Rendering
-    # =========================================================================
-
-    def show_options(self):
-        """
-        Shows the Menu options.
-        """
-        for option in self.options:
-            message = ""
-
-            if option.isolate_before:
-                message += "\n"
-
-            message += f"[{option.key}] {option.message}"
-
-            if option.id != "EXIT":
-                message += ": "
-
-                setting_value = getattr(self.settings, option.id.lower())
-
-                if isinstance(setting_value, str):
-                    setting_value = setting_value.lower()
-                elif isinstance(setting_value, Enum):
-                    setting_value = setting_value.value.lower()
-
-                message += color_string(
-                    self.logger.get_message(
-                        namespace="settings",
-                        message_group="VALUES",
-                        key=setting_value,
-                    ),
-                    intensity="BRIGHT",
-                )
-
-            if option.isolate_after:
-                message += "\n"
-
-            self.logger.log(message=message)
+            pass
 
         return

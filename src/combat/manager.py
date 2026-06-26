@@ -700,7 +700,7 @@ class CombatManager(Manager):
         while combat_status["status"] == "ONGOING":
             # Round Start
             if self.is_round_start():
-                if self.round == 1 or self.settings.end_turn_ai_monsters == "AUTO":
+                if self.round == 1 or self.settings.monster_end_turn == "AUTO":
                     start_line_break = True
                 else:
                     start_line_break = False
@@ -715,7 +715,7 @@ class CombatManager(Manager):
                     break
 
             # Turn Start
-            if (self.settings.end_turn_ai_monsters == "MANUAL") and (
+            if (self.settings.monster_end_turn == "MANUAL") and (
                 not self.is_round_start()
             ):
                 start_line_break = False
@@ -744,7 +744,7 @@ class CombatManager(Manager):
             if combat_status["status"] != "ONGOING":
                 break
 
-            if self.settings.end_turn_ai_monsters == "MANUAL":
+            if self.settings.monster_end_turn == "MANUAL":
                 self.logger.input("")
 
             # Next Turn

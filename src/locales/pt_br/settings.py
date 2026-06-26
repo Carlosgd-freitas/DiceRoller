@@ -12,6 +12,6 @@ VALUES = {
 }
 
 SETTINGS = {
-    "end_turn_ai_monsters": "Fim de turno de monstros controlados por IA",
+    "monster_end_turn": "Fim de turno de monstros",
     "language": "Idioma",
 }

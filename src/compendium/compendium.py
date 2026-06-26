@@ -113,7 +113,7 @@ class Compendium(Menu):
         self.messages = self.get_messages()
 
         # Sort Attributes
-        self.sort_column = self.columns[1]
+        self.column_index = 1
         self.reverse = False
 
         sort_menu_title = (
@@ -130,15 +130,11 @@ class Compendium(Menu):
             title=sort_menu_title,
             columns=self.columns,
             items=self.items,
-            sort_column=self.sort_column,
+            column_index=self.column_index,
             get_sort_key=self.get_sort_key,
             reverse=self.reverse,
             settings=self.settings,
         )
-
-        # Default pages data
-        self.items = self.sort_menu.sort(self.sort_column, self.reverse)
-        self.pages_data = self.get_pages_data(self.items)
 
     @abstractmethod
     def get_columns(self) -> List[str]:
@@ -506,14 +502,14 @@ class Compendium(Menu):
         return
 
     @abstractmethod
-    def get_sort_key(self, column: str) -> Callable:
+    def get_sort_key(self, column_index: int) -> Callable:
         """
         Returns a key (lambda function) to be used in the sort option.
 
-        :param column: Column to sort the Compendium's items by.
-        :type column: str
+        :param column_index: Index of the column used to sort the Compendium items.
+        :type column_index: int
 
-        :return: Key (lambda function) to sort the Compendium's items.
+        :return: Key (lambda function) to sort the Compendium items.
         :rtype: Callable
         """
         raise NotImplementedError
@@ -525,9 +521,9 @@ class Compendium(Menu):
         sort_data = self.sort_menu.open()
 
         # Updating attributes
+        self.column_index = sort_data["column_index"]
         self.items = sort_data["items"]
         self.reverse = sort_data["reverse"]
-        self.sort_column = sort_data["sort_column"]
 
         self.pages_data = self.get_pages_data(self.items)
 
@@ -608,6 +604,10 @@ class Compendium(Menu):
         """
         Opens the Compendium on current page.
         """
+        # Default sorting
+        self.items = self.sort_menu.sort(self.column_index, self.reverse)
+        self.pages_data = self.get_pages_data(self.items)
+
         # Current page showing
         self.show_page()
 

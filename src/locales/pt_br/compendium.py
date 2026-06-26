@@ -7,6 +7,7 @@ BASE = {
     "search_message": "Procurar",
     "sort_message": "Ordenar",
     "show_details_message": "Mostrar Detalhes",
+    "title": "Compêndio",
 }
 
 EFFECTS = {

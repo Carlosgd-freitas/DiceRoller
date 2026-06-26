@@ -16,19 +16,19 @@ class SortData(TypedDict):
     """
     Sort Data.
 
-    :var items: 'Item not found' message.
+    :var column_index: Index of the column used to sort the items.
+    :vartype column_index: int
+
+    :var items: Sortable tabular items.
     :vartype items: List
 
-    :var reverse: Message for the 'Search' input prompt.
+    :var reverse: If the items are sorted reversely.
     :vartype reverse: bool
-
-    :var sort_column: Message for the 'Select Item' input prompt.
-    :vartype sort_column: str
     """
 
+    column_index: int
     items: List
     reverse: bool
-    sort_column: str
 
 
 class SortMenu(Menu):
@@ -44,8 +44,8 @@ class SortMenu(Menu):
     :var items: Items to be sorted.
     :vartype items: List
 
-    :var sort_column: Current column sorting the items.
-    :vartype sort_column: str
+    :param column_index: Current index of the column used to sort the items.
+    :type column_index: int
 
     :var reverse: If the items are currently being sorted in reverse.
     :vartype reverse: bool
@@ -70,7 +70,7 @@ class SortMenu(Menu):
         title: str,
         columns: List[str],
         items: List,
-        sort_column: str,
+        column_index: int,
         reverse: bool,
         get_sort_key: Callable,
         settings: Settings,
@@ -81,7 +81,7 @@ class SortMenu(Menu):
         self.columns = columns
         self.items = items
 
-        self.sort_column = sort_column
+        self.column_index = column_index
         self.reverse = reverse
         self.get_sort_key = get_sort_key
 
@@ -179,23 +179,23 @@ class SortMenu(Menu):
         """
         if option.id == "ORDER":
             self.reverse = not self.reverse
-            self.sort(self.sort_column, self.reverse)
+            self.sort(self.column_index, self.reverse)
 
         elif option.id == "EXIT":
             pass
 
         else:
-            self.sort_column = option.message
-            self.sort(self.sort_column, self.reverse)
+            self.column_index = int(option.key)
+            self.sort(self.column_index, self.reverse)
 
         return
 
-    def sort(self, column: str, reverse: bool) -> List:
+    def sort(self, column_index: int, reverse: bool) -> List:
         """
         Sorts the Menu items.
 
-        :param column: Column name to sort the items.
-        :type column: str
+        :param column_index: Index of the column used to sort the items.
+        :type column_index: int
 
         :param reverse: If the items will be sorted normally or reversely.
         :type reverse: bool
@@ -203,7 +203,7 @@ class SortMenu(Menu):
         :return: Sorted menu items
         :rtype: List
         """
-        key = self.get_sort_key(column)
+        key = self.get_sort_key(column_index)
 
         if key is None:
             raise ValueError("sort key was not defined")
@@ -262,7 +262,7 @@ class SortMenu(Menu):
                     )
 
             # Column options
-            elif option.message == self.sort_column:
+            elif int(option.key) == self.column_index:
                 message = color_string(
                     message,
                     foreground_color=Color.GREEN,
@@ -295,7 +295,7 @@ class SortMenu(Menu):
                 break
 
         return {
-            "sort_column": self.sort_column,
+            "column_index": self.column_index,
             "items": self.items,
             "reverse": self.reverse,
         }

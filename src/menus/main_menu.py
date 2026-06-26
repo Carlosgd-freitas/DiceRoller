@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List
 
-from src.compendium.effects import EffectCompendium
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.logger import Logger
+from src.menus.compendium_menu import CompendiumMenu
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.menus.settings_menu import SettingsMenu
@@ -48,6 +48,11 @@ class MainMenu(Menu):
         # Managers
         self.file_manager = FileManager(settings, logging)
 
+        # Menus
+        self.compendium_menu = CompendiumMenu(self.settings, self.logger.enabled)
+        self.sandbox_menu = SandboxMenu(self.settings, self.logger.enabled)
+        self.settings_menu = SettingsMenu(self.settings, self.logger.enabled)
+
     def get_title(self) -> str:
         """
         Returns the Menu title.
@@ -86,11 +91,11 @@ class MainMenu(Menu):
                 ),
             ),
             Option(
-                id="EFFECT_COMPENDIUM",
+                id="COMPENDIUM",
                 key="3",
                 message=self.logger.get_message(
                     namespace="compendium",
-                    message_group="EFFECTS",
+                    message_group="BASE",
                     key="title",
                 ),
             ),
@@ -138,7 +143,13 @@ class MainMenu(Menu):
         self.title = self.get_title()
         self.options = self.get_options()
 
+        # Managers
         self.file_manager.change_language(language, _messages)
+
+        # Menus
+        self.compendium_menu.change_language(language, _messages)
+        self.sandbox_menu.change_language(language, _messages)
+        self.settings_menu.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
         """
@@ -148,7 +159,14 @@ class MainMenu(Menu):
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
+
+        # Managers
         self.file_manager.toggle_logging(enabled)
+
+        # Menus
+        self.compendium_menu.toggle_logging(enabled)
+        self.sandbox_menu.toggle_logging(enabled)
+        self.settings_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -180,16 +198,13 @@ class MainMenu(Menu):
             pass
 
         elif option.id == "SANDBOX_MODE":
-            sandbox_menu = SandboxMenu(self.settings, self.logger.enabled)
-            sandbox_menu.open()
+            self.sandbox_menu.open()
 
-        elif option.id == "EFFECT_COMPENDIUM":
-            effect_compendium = EffectCompendium(self.settings, self.logger.enabled)
-            effect_compendium.open()
+        elif option.id == "COMPENDIUM":
+            self.compendium_menu.open()
 
         elif option.id == "SETTINGS":
-            settings_menu = SettingsMenu(self.settings, self.logger.enabled)
-            settings_menu.open()
+            self.settings_menu.open()
             self.change_language(self.settings.language)
 
         elif option.id == "EXIT":

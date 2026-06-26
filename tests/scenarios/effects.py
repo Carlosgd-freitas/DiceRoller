@@ -68,7 +68,7 @@ team_b = Team(
 
 combat_manager = CombatManager(
     settings=Settings(
-        end_turn_ai_monsters="AUTO",
+        monster_end_turn="AUTO",
     ),
     teams=[
         team_a,
