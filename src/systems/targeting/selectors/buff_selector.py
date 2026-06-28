@@ -58,7 +58,7 @@ class BuffSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    check_taunt=False,
+                    consider=[],
                 )
             )
 
@@ -108,7 +108,7 @@ class BuffSelector(Selector):
                         allies,
                         k=k - len(targets),
                         effects=[main_keyword],
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -118,7 +118,7 @@ class BuffSelector(Selector):
                         allies,
                         k=k - len(targets),
                         effects=[main_keyword],
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -128,7 +128,7 @@ class BuffSelector(Selector):
                     allies,
                     k=k - len(targets),
                     exclude=[target.local_id for target in targets],
-                    check_taunt=False,
+                    consider=[],
                 )
             )
 
@@ -178,7 +178,7 @@ class BuffSelector(Selector):
                         allies,
                         k=k - len(targets),
                         effects=[main_keyword],
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -188,7 +188,7 @@ class BuffSelector(Selector):
                         allies,
                         k=k - len(targets),
                         effects=[main_keyword],
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -198,7 +198,7 @@ class BuffSelector(Selector):
                     allies,
                     k=k - len(targets),
                     exclude=[target.local_id for target in targets],
-                    check_taunt=False,
+                    consider=[],
                 )
             )
 

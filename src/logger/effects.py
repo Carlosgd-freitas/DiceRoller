@@ -5,7 +5,7 @@ from __future__ import annotations
 from math import ceil
 from typing import TYPE_CHECKING, Dict, List, Literal
 
-from src.base.color import Color, color_string
+from src.base.color import Color, ColorData, color_string
 from src.base.keywords import Keyword, get_keyword
 from src.logger.logger import Logger
 
@@ -27,17 +27,76 @@ class EffectLogger(Logger):
     ):
         super().__init__(**kwargs)
 
+    def get_effect_message(
+        self,
+        keyword: Keyword = None,
+        effect: Effect = None,
+        associated: bool = True,
+        color_data: ColorData = None,
+    ) -> str:
+        """
+        Gets a message for an Effect.
+
+        :param keyword: The effect keyword.
+        :type keyword: Keyword
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param associated: If the associated value or duration will also be logged.
+        Default value is True.
+        :type associated: bool
+
+        :var color_data: Opotional data for coloring parts of the Effect.
+        :vartype color_data: ColorData
+
+        :return: Message containg an effect.
+        :rtype: str
+        """
+        color_data = {} if color_data is None else color_data
+
+        if effect and not keyword:
+            keyword = effect.keyword
+
+        message = self.get_colored_message(
+            namespace="effects",
+            message_group="KEYWORDS",
+            keyword=keyword,
+        )
+
+        if effect and associated:
+            if (
+                effect.keyword
+                in [
+                    Keyword.DOOM,
+                    Keyword.FREEZE,
+                    Keyword.INVISIBLE,
+                    Keyword.INVULNERABLE,
+                    Keyword.REPEL,
+                    Keyword.SLEEP,
+                    Keyword.STUN,
+                    Keyword.TAUNT,
+                ]
+                and effect.duration
+            ):
+                message += color_string(f" {effect.duration}", **color_data)
+
+            elif effect.value:
+                message += color_string(f" {effect.value}", **color_data)
+
+        return message
+
     def get_multiple_effects_message(
         self,
         keywords: List[Keyword] = None,
         effects: List[Effect] = None,
-        limit: int = 3,
+        separator: str = ", ",
+        associated: bool = True,
+        color_data: ColorData = None,
+        limit: int = 5,
     ) -> str:
         """
-        Gets a message composed by multiple effects. If the number of composing effects
-        is:
-        * 1, the message will be its colored keyword.
-        * 2 or more, the message will be their colored keywords separated by ",".
+        Gets a message composed by multiple effects.
 
         :param keywords: The effects keywords.
         :type keywords: List[Keyword]
@@ -45,43 +104,78 @@ class EffectLogger(Logger):
         :param effects: The effects.
         :type effects: List[Effect]
 
+        :param separator: What string will separate each effect. Default value is ", ".
+        :type separator: str
+
+        :param associated: If the associated value or duration will also be logged.
+        Default value is True.
+        :type associated: bool
+
+        :var color_data: Opotional data for coloring parts of the Effect.
+        :vartype color_data: ColorData
+
         :param limit: The limit of effects that will compose the message. If the amount of effects exceeds
-        the limit, "+X Effects..." will be appended at the end of the message. Default value is 3.
+        the limit, "+X Effects..." will be appended at the end of the message. Default value is 5.
         :type limit: int
 
         :return: Composed message containg multiple effects.
         :rtype: str
         """
-        if effects:
-            keywords = [effect.keyword for effect in effects]
-        elif keywords is None:
-            keywords = []
+        color_data = {} if color_data is None else color_data
 
-        effects_remaining = len(keywords) - limit
+        message = ""
 
-        # Multiple effects message
-        keywords = keywords[:limit]
-        keywords = [
-            self.get_colored_message(
-                namespace="effects", message_group="KEYWORDS", keyword=keyword
-            )
-            for keyword in keywords
-        ]
+        # Less details
+        if keywords:
+            effects_remaining = len(keywords) - limit
 
-        message = ", ".join(keywords)
+            for idx, keyword in enumerate(keywords[:limit]):
+                message += self.get_effect_message(
+                    keyword=keyword,
+                    associated=associated,
+                    color_data=color_data,
+                )
+
+                if idx >= limit:
+                    break
+
+                if idx != len(keywords[:limit]) - 1:
+                    message += color_string(separator, **color_data)
+
+        # More details
+        elif effects:
+            effects_remaining = len(effects) - limit
+
+            for idx, effect in enumerate(effects[:limit]):
+                message += self.get_effect_message(
+                    effect=effect,
+                    associated=associated,
+                    color_data=color_data,
+                )
+
+                if idx >= limit:
+                    break
+
+                if idx != len(effects[:limit]) - 1:
+                    message += color_string(separator, **color_data)
 
         # Remaining effects message
         if effects_remaining > 0:
-            effect_word = self.get_message(
+            original_intensity = color_data.get("intensity")
+            color_data["intensity"] = "BRIGHT"
+
+            lexicon_effects = self.get_message(
                 namespace="base",
                 message_group="LEXICON",
                 key="effects",
             ).capitalize()
 
-            message += ", " + color_string(
-                f"+{effects_remaining} {effect_word}...",
-                intensity="BRIGHT",
+            message += color_string(
+                separator + f"+{effects_remaining} {lexicon_effects}...",
+                **color_data,
             )
+
+            color_data["intensity"] = original_intensity
 
         return message
 
@@ -253,7 +347,7 @@ class EffectLogger(Logger):
         effect: ImmunityEffect,
         source: Monster,
         target: Monster,
-        limit: int = 3,
+        limit: int = 5,
         **kwargs,
     ) -> None:
         """
@@ -283,7 +377,9 @@ class EffectLogger(Logger):
             return
 
         # Immune to multiple effects
-        message = self.get_multiple_effects_message(keywords=immune_to, limit=limit)
+        message = self.get_multiple_effects_message(
+            keywords=immune_to, associated=False, limit=limit
+        )
         self.log(message=": " + message, end="")
 
         # Message ending
@@ -300,7 +396,7 @@ class EffectLogger(Logger):
         effect: Effect,
         source: Monster,
         target: Monster,
-        limit: int = 3,
+        limit: int = 5,
         **kwargs,
     ) -> None:
         """
@@ -332,7 +428,9 @@ class EffectLogger(Logger):
 
         # Removed Effects
         message = self.get_multiple_effects_message(
-            effects=removed_effects, limit=limit
+            effects=removed_effects,
+            associated=False,
+            limit=limit,
         )
         self.log(message=": " + message, end="")
 

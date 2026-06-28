@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Dict, List
 
 from src.base.keywords import Keyword
 from src.effects.burn import BurnEffect
+from src.effects.repel import RepelEffect
 from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
 from src.systems.targeting.filters import filter_entities
@@ -212,7 +213,31 @@ def test_filter_keyword_blacklist(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_check_taunt(combat: Dict):
+def test_filter_consider_repel(combat: Dict):
+    monsters: List[Monster] = combat["monsters"]
+
+    monsters[0].apply_effect(RepelEffect())
+    monsters[1].apply_effect(RepelEffect())
+
+    filtered = filter_entities(
+        monsters,
+        k=3,
+        method="FIRST",
+        life_state="ANY",
+        consider=[Keyword.REPEL],
+    )
+
+    conditions = [
+        len(filtered) == 3,
+        filtered[0].local_id == "MONSTER_2",
+        filtered[1].local_id == "MONSTER_3",
+        filtered[2].local_id == "MONSTER_4",
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_filter_consider_taunt(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     monsters[3].apply_effect(TauntEffect())
@@ -223,7 +248,7 @@ def test_filter_check_taunt(combat: Dict):
         k=3,
         method="FIRST",
         life_state="ANY",
-        check_taunt=True,
+        consider=[Keyword.TAUNT],
     )
 
     conditions = [

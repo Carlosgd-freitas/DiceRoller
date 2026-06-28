@@ -82,12 +82,21 @@ class CompendiumMenu(Menu):
                 ).title(),
             ),
             Option(
-                id="ITEM_COMPENDIUM",
+                id="EQUIPMENT_COMPENDIUM",
                 key="3",
                 message=self.logger.get_message(
                     namespace="base",
                     message_group="LEXICON",
-                    key="items",
+                    key="equipment",
+                ).title(),
+            ),
+            Option(
+                id="CONSUMABLES_COMPENDIUM",
+                key="3",
+                message=self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="consumables",
                 ).title(),
             ),
             Option(
@@ -151,7 +160,11 @@ class CompendiumMenu(Menu):
         :return: If the option can be selected.
         :rtype: bool
         """
-        if option.id in ["MONSTER_COMPENDIUM", "ITEM_COMPENDIUM"]:
+        if option.id in [
+            "MONSTER_COMPENDIUM",
+            "EQUIPMENT_COMPENDIUM",
+            "CONSUMABLES_COMPENDIUM",
+        ]:
             return False
 
         return True
@@ -169,7 +182,10 @@ class CompendiumMenu(Menu):
         elif option.id == "MONSTER_COMPENDIUM":
             pass
 
-        elif option.id == "ITEM_COMPENDIUM":
+        elif option.id == "EQUIPMENT_COMPENDIUM":
+            pass
+
+        elif option.id == "CONSUMABLES_COMPENDIUM":
             pass
 
         elif option.id == "EXIT":

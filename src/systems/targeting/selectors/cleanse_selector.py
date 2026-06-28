@@ -59,7 +59,7 @@ class CleanseSelector(Selector):
             monsters,
             k=k,
             effect_type=EffectType.DEBUFF,
-            check_taunt=False,
+            consider=[],
         )
 
     def get_targets_normal(
@@ -104,7 +104,7 @@ class CleanseSelector(Selector):
             targets = self._get_targets_random(
                 monsters,
                 k=k,
-                check_taunt=False,
+                consider=[],
             )
 
         else:
@@ -112,7 +112,7 @@ class CleanseSelector(Selector):
                 monsters,
                 k=k,
                 effect_type=EffectType.DEBUFF,
-                check_taunt=False,
+                consider=[],
             )
 
         return targets
@@ -158,5 +158,5 @@ class CleanseSelector(Selector):
             monsters,
             k=k,
             effect_type=EffectType.DEBUFF,
-            check_taunt=False,
+            consider=[],
         )

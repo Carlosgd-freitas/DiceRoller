@@ -18,10 +18,10 @@ def filter_entities(
     sort_functions: List[Callable] = None,
     life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
     hurt: bool = False,
+    consider: List[Keyword] = None,
     exclude: List[str] = None,
     keyword_whitelist: List[Keyword] = None,
     keyword_blacklist: List[Keyword] = None,
-    check_taunt: bool = True,
 ) -> List[Entity]:
     """
     Copies and filters a list of entities which meet the criteria.
@@ -47,6 +47,10 @@ def filter_entities(
     False.
     :type hurt: bool
 
+    :param consider: A list of target altering effect keywords to be considered when
+    filtering. By default, Repel and Taunt effects are considered.
+    :type consider: List[Keyword]
+
     :param exclude: Only entities without any of the specified local_id will
     be returned.
     :type exclude: List[str]
@@ -59,14 +63,11 @@ def filter_entities(
     returned.
     :type keyword_blacklist: List[Keyword]
 
-    :param check_taunt: Whether to prioritize entities with Taunt effect. Default value
-    is True.
-    :type check_taunt: bool
-
     :return: A list of entities which meets the criteria.
     :rtype: List[Entity]
     """
     sort_functions = [] if sort_functions is None else sort_functions
+    consider = [Keyword.REPEL, Keyword.TAUNT] if consider is None else consider
     exclude = [] if exclude is None else exclude
     keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
     keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
@@ -77,9 +78,13 @@ def filter_entities(
     for sort_function in reversed(sort_functions):
         filtered.sort(key=sort_function)
 
+    # Repel
+    if Keyword.REPEL in consider:
+        filtered.sort(key=lambda entity: entity.has_effect(Keyword.REPEL))
+
     # Taunt
-    if check_taunt:
-        filtered.sort(key=lambda entity: not entity.get_effect(Keyword.TAUNT))
+    if Keyword.TAUNT in consider:
+        filtered.sort(key=lambda entity: not entity.has_effect(Keyword.TAUNT))
 
     # Entity attribute conditions
     if life_state == "ALIVE":

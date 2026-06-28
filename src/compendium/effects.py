@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Callable, List
 
+from src.base.color import color_string
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -36,6 +37,7 @@ from src.effects.pain import PainEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
+from src.effects.repel import RepelEffect
 from src.effects.revive import ReviveEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
@@ -83,6 +85,7 @@ ALL_EFFECTS = [
     PierceEffect(),
     PoisonEffect(),
     RegenEffect(),
+    RepelEffect(),
     ReviveEffect(),
     SacredBlockEffect(),
     SleepEffect(),
@@ -351,6 +354,25 @@ class EffectCompendium(Compendium):
             message_group="KEYWORDS",
             keyword=item.keyword,
         )
+        self.logger.log(message=message + "\n")
+
+        # Type
+        message = (
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="type",
+            ).upper()
+            + ":"
+        )
+        message = color_string(message, intensity="BRIGHT")
+
+        message += " " + self.logger.get_message(
+            namespace="effects",
+            message_group="TYPES",
+            key=item.type.value.lower(),
+        )
+
         self.logger.log(message=message + "\n")
 
         # Description

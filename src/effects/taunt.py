@@ -15,7 +15,7 @@ class TauntEffect(Effect):
     """
     Taunt Effect.
 
-    Makes the target a priority for enemies.
+    Increases the pririority of the target for enemies.
     """
 
     def __init__(

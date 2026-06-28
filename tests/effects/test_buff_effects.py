@@ -18,6 +18,7 @@ from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.regen import RegenEffect
+from src.effects.repel import RepelEffect
 from src.effects.strength import StrengthEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
@@ -465,6 +466,79 @@ def test_keyword_regen(combat: Dict):
             len(monster.effects) == 0,
             monster.get_effect(Keyword.REGEN) is None,
             monster.hp == 11,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_keyword_repel(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    selector = OffensiveSelector()
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+    monster_3: Monster = combat["monsters"][3]
+
+    combat_manager.current_monster = monster_2
+
+    effect_repel = RepelEffect(duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_repel,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    conditions = [
+        monster_2.local_id == "MONSTER_2",
+        len(monster_2.effects) == 1,
+        monster_2.get_effect(Keyword.REPEL).keyword == Keyword.REPEL,
+        monster_2.get_effect(Keyword.REPEL).duration == 1,
+        monster_2.hp == 10,
+    ]
+
+    targets: List[Monster] = selector._get_targets_lowest_hp(
+        monsters=[
+            monster_1,
+            monster_2,
+            monster_3,
+        ],
+        k=2,
+    )
+
+    targets_ids = set([target.local_id for target in targets])
+
+    conditions.extend(
+        [
+            len(targets) == 2,
+            targets_ids == {"MONSTER_1", "MONSTER_3"},
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            len(monster_2.effects) == 0,
+            monster_2.get_effect(Keyword.REPEL) is None,
+        ]
+    )
+
+    targets: List[Monster] = selector._get_targets_lowest_hp(
+        monsters=[
+            monster_1,
+            monster_2,
+            monster_3,
+        ],
+        k=2,
+    )
+
+    targets_ids = set([target.local_id for target in targets])
+
+    conditions.extend(
+        [
+            len(targets) == 2,
+            targets_ids == {"MONSTER_1", "MONSTER_2"},
         ]
     )
 

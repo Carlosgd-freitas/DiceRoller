@@ -78,7 +78,7 @@ class Color(Enum):
     DARK_NAVY = (2, 7, 93)
     LILAC = (204, 153, 255)
     VIOLET = (127, 0, 255)
-    INDIGO = (91, 0, 161)
+    INDIGO = (63, 0, 255)
     PURPLE = (147, 18, 172)
     JAM = (165, 11, 94)
     HOT_PINK = (252, 3, 152)

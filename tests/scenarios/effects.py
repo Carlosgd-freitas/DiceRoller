@@ -153,20 +153,22 @@ monster_a.effects = []
 
 print("\n===== Effect Execution: CLEANSE =====")
 
+effects = []
+for i in range(11):
+    if i % 2 == 0:
+        effect = BlindEffect(value=1, duration=2)
+    else:
+        effect = BurnEffect(value=1, duration=2)
+    effects.append(effect)
+
 for effect in [
     CleanseEffect(0),
     CleanseEffect(1),
     CleanseEffect(2),
     CleanseEffect(5),
+    CleanseEffect(10),
 ]:
-    monster_a.effects = [
-        BlindEffect(1),
-        BurnEffect(1),
-        PoisonEffect(1),
-        BlindEffect(1),
-        BurnEffect(1),
-        PoisonEffect(1),
-    ]
+    monster_a.effects = effects[:i]
 
     combat_manager.effect_manager.execute_effect(
         effect=effect,
@@ -180,20 +182,22 @@ monster_a.effects = []
 
 print("\n===== Effect Execution: CORRUPT =====")
 
+effects = []
+for i in range(11):
+    if i % 2 == 0:
+        effect = ManaRegenEffect(value=1, duration=2)
+    else:
+        effect = RegenEffect(value=1, duration=2)
+    effects.append(effect)
+
 for effect in [
     CorruptEffect(0),
     CorruptEffect(1),
     CorruptEffect(2),
     CorruptEffect(5),
+    CorruptEffect(10),
 ]:
-    monster_a.effects = [
-        ManaRegenEffect(1),
-        RegenEffect(1),
-        ThornsEffect(1),
-        ManaRegenEffect(1),
-        RegenEffect(1),
-        ThornsEffect(1),
-    ]
+    monster_a.effects = effects[:i]
 
     combat_manager.effect_manager.execute_effect(
         effect=effect,
@@ -238,15 +242,15 @@ monster_b.hp = 150
 
 print("\n===== Effect Execution: IMMUNITY =====")
 
-effects = [
-    Keyword.BLEED,
-    Keyword.BLIND,
-    Keyword.BURN,
-    Keyword.FREEZE,
-    Keyword.POISON,
-]
+effects = []
+for i in range(11):
+    if i % 2 == 0:
+        effect = Keyword.BURN
+    else:
+        effect = Keyword.POISON
+    effects.append(effect)
 
-for i in [0, 1, 2, 5]:
+for i in [0, 1, 2, 5, 10]:
     immunity_effect = ImmunityEffect(effects=effects[:i])
 
     combat_manager.effect_manager.execute_effect(
@@ -383,13 +387,15 @@ combat_manager.start_turn()
 print("\n===== Effect Limit =====")
 
 combat_manager.current_monster.effects = []
+effects = []
 
 for i in range(10):
     if i % 2 == 0:
         effect = RegenEffect(value=1, duration=2)
     else:
         effect = InvisibleEffect(value=1, duration=2)
+    effects.append(effect)
 
-    combat_manager.current_monster.effects.append(effect)
-
-combat_manager.logger.log_monster(combat_manager.current_monster)
+for i in [0, 1, 2, 5, 10]:
+    combat_manager.current_monster.effects = effects[:i]
+    combat_manager.logger.log_monster(combat_manager.current_monster)

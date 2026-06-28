@@ -58,7 +58,7 @@ class DefensiveSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k,
-                    check_taunt=False,
+                    consider=[],
                 )
             )
 
@@ -107,7 +107,7 @@ class DefensiveSelector(Selector):
                     self._get_targets_random(
                         allies,
                         k=k - len(targets),
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -116,7 +116,7 @@ class DefensiveSelector(Selector):
                     self._get_targets_lowest_hp(
                         allies,
                         k=k - len(targets),
-                        check_taunt=False,
+                        consider=[],
                     )
                 )
 
@@ -163,7 +163,7 @@ class DefensiveSelector(Selector):
                 self._get_targets_lowest_hp(
                     allies,
                     k=k - len(targets),
-                    check_taunt=False,
+                    consider=[],
                 )
             )
 

@@ -73,7 +73,7 @@ def calculate_damage(
 
     :param consider: A list of defensive effect keywords to be considered on damage
     calculation. By default, only the Invulnerable effect is considered.
-    :type consider_defensive: List[Effect]
+    :type consider: List[Keyword]
 
     The priority of defensive effect activation is:
     * Invulnerable
