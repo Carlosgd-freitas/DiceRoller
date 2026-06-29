@@ -142,6 +142,8 @@ class CombatManager(Manager):
         self.order: List[Monster] = []
         self.current_monster: Monster = None
 
+        self.update_teams()
+
     # =========================================================================
     # Utility
     # =========================================================================

@@ -44,11 +44,19 @@ class StrengthEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            weak = target.remove_effect(Keyword.WEAK)
+            if weak:
+                removed_effects.append(weak)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(

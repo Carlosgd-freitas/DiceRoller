@@ -19,8 +19,11 @@ from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.focus import FocusEffect
+from src.effects.fortify import FortifyEffect
+from src.effects.fragile import FragileEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.frostburn import FrostburnEffect
+from src.effects.haste import HasteEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
 from src.effects.invulnerable import InvulnerableEffect
@@ -28,10 +31,15 @@ from src.effects.mana_regen import ManaRegenEffect
 from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
+from src.effects.repel import RepelEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
+from src.effects.slow import SlowEffect
+from src.effects.strength import StrengthEffect
 from src.effects.stun import StunEffect
+from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
+from src.effects.weak import WeakEffect
 from src.systems.settings import Settings
 
 init()
@@ -273,28 +281,60 @@ print("\n===== Effect Removal =====")
 
 removal_sets = [
     (
-        BlindEffect(1),
-        [FocusEffect(1)],
+        BlindEffect(),
+        [FocusEffect()],
     ),
     (
-        BurnEffect(1),
-        [FreezeEffect(1)],
+        BurnEffect(),
+        [FreezeEffect()],
     ),
     (
-        FocusEffect(1),
-        [BlindEffect(1)],
+        FocusEffect(),
+        [BlindEffect()],
     ),
     (
-        FreezeEffect(1),
-        [BurnEffect(1)],
+        FortifyEffect(),
+        [FragileEffect()],
     ),
     (
-        SleepEffect(1),
+        FragileEffect(),
+        [FortifyEffect()],
+    ),
+    (
+        FreezeEffect(),
+        [BurnEffect()],
+    ),
+    (
+        HasteEffect(),
+        [SlowEffect()],
+    ),
+    (
+        RepelEffect(),
+        [TauntEffect()],
+    ),
+    (
+        SleepEffect(),
         [
-            AttackEffect(1),
-            DrainEffect(1),
-            PierceEffect(1),
+            AttackEffect(),
+            DrainEffect(),
+            PierceEffect(),
         ],
+    ),
+    (
+        SlowEffect(),
+        [HasteEffect()],
+    ),
+    (
+        StrengthEffect(),
+        [WeakEffect()],
+    ),
+    (
+        TauntEffect(),
+        [RepelEffect()],
+    ),
+    (
+        WeakEffect(),
+        [StrengthEffect()],
     ),
 ]
 

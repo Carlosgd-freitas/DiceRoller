@@ -11,6 +11,7 @@ Namespace = Literal[
     "base",
     "combat",
     "compendium",
+    "effect_types",
     "effects",
     "menus",
     "monsters",
@@ -147,12 +148,22 @@ class Logger:
 
     def get_colored_message(
         self,
-        namespace: Namespace,
-        message_group: str,
         keyword: Keyword,
+        message: str = None,
+        namespace: Namespace = None,
+        message_group: str = None,
+        key: str = None,
+        **kwargs,
     ) -> str | None:
         """
         Returns a colored message based on a Keyword.
+
+        :param keyword: A keyword which color will be applied to the message.
+        :type keyword: Keyword
+
+        :param message: If a message is passed as a parameter, it will be logged
+        directly.
+        :type message: str
 
         :param namespace: The namespace.
         :type namespace: Namespace
@@ -160,20 +171,21 @@ class Logger:
         :param message_group: The message group.
         :type message_group: str
 
-        :param keyword: A keyword that serves as the message key. The returned message
-        will have the same colors as this keyword.
-        :type keyword: Keyword
+        :param key: The message key.
+        :type key: str
 
         :return: A colored message based on a Keyword.
         :rtype: str
         """
         color_data = get_keyword_color(keyword)
 
-        message = self.get_message(
-            namespace=namespace,
-            message_group=message_group,
-            key=keyword.value.lower(),
-        )
+        if namespace and message_group and key:
+            message: str = self.get_message(
+                namespace,
+                message_group,
+                key,
+                **kwargs,
+            )
 
         if message:
             message = color_string(

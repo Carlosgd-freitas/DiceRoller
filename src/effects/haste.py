@@ -44,11 +44,19 @@ class HasteEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            slow = target.remove_effect(Keyword.SLOW)
+            if slow:
+                removed_effects.append(slow)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(

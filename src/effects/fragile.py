@@ -44,11 +44,19 @@ class FragileEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            fortify = target.remove_effect(Keyword.FORTIFY)
+            if fortify:
+                removed_effects.append(fortify)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(

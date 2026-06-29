@@ -44,11 +44,19 @@ class RepelEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            taunt = target.remove_effect(Keyword.TAUNT)
+            if taunt:
+                removed_effects.append(taunt)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(

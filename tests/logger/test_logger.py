@@ -56,10 +56,13 @@ def test_get_message(loggers: Dict):
 def test_get_colored_message(loggers: Dict):
     logger: Logger = loggers["logger"]
 
+    keyword = Keyword.BURN
+
     message = logger.get_colored_message(
+        keyword=keyword,
         namespace="effects",
-        message_group="KEYWORDS",
-        keyword=Keyword.BURN,
+        message_group=keyword.name,
+        key="name",
     )
 
     conditions = [

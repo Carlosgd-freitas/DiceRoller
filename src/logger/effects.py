@@ -6,11 +6,11 @@ from math import ceil
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, ColorData, color_string
+from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
-    from src.base.effect import Effect
     from src.base.monster import Monster
     from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
@@ -59,9 +59,10 @@ class EffectLogger(Logger):
             keyword = effect.keyword
 
         message = self.get_colored_message(
-            namespace="effects",
-            message_group="KEYWORDS",
             keyword=keyword,
+            namespace="effects",
+            message_group=keyword.name,
+            key="name",
         )
 
         if effect and associated:
@@ -190,6 +191,12 @@ class EffectLogger(Logger):
         Updates the log parameters with effect, source, target and the data that can be
         derived from that.
         """
+        # Targeting self
+        if source == target:
+            kwargs["targeting_self"] = True
+        else:
+            kwargs["targeting_self"] = False
+
         # Source and target monsters
         if source:
             kwargs["source"] = source.name
@@ -206,33 +213,40 @@ class EffectLogger(Logger):
         # All keywords
         for keyword in Keyword:
             kwargs[keyword.name.lower()] = self.get_colored_message(
-                namespace="effects",
-                message_group="KEYWORDS",
                 keyword=keyword,
+                namespace="effects",
+                message_group=keyword.name,
+                key="name",
             )
 
         # Effect keyword and variations
-        for parameter, category in [
-            (effect.keyword.name.lower(), "KEYWORDS"),
-            ("action", "ACTIONS"),
-            ("status", "STATUS"),
-            ("keyword", "KEYWORDS"),
+        for kwargs_key, key in [
+            ("action", "action"),
+            ("keyword", "name"),
+            ("status", "status"),
         ]:
-            kwargs[parameter] = self.get_colored_message(
-                namespace="effects",
-                message_group=category,
+            kwargs[kwargs_key] = self.get_colored_message(
                 keyword=effect.keyword,
+                namespace="effects",
+                message_group=effect.keyword.name,
+                key=key,
             )
 
         # Removed effect
         if kwargs.get("removed_effect"):
             removed_effect: Effect = kwargs["removed_effect"]
 
-            kwargs["removed_keyword"] = self.get_colored_message(
-                namespace="effects",
-                message_group="KEYWORDS",
-                keyword=removed_effect.keyword,
-            )
+            for kwargs_key, key in [
+                ("removed_action", "action"),
+                ("removed_keyword", "name"),
+                ("removed_status", "status"),
+            ]:
+                kwargs[kwargs_key] = self.get_colored_message(
+                    keyword=removed_effect.keyword,
+                    namespace="effects",
+                    message_group=removed_effect.keyword.name,
+                    key=key,
+                )
 
         # Other parameters
         kwargs.update(
@@ -266,18 +280,18 @@ class EffectLogger(Logger):
         * Defensive messages: which deffensive effects took place
         * Damage message: how the damage was recieved
         """
-        # Part 1: Base message
-        key = "base"
-        if source == target:
-            key += "_self"
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(
-            namespace="effects", message_group="DAMAGE", key=key, end=" ", **kwargs
+        # Base message
+        key = "execution_self" if kwargs["targeting_self"] else "execution"
+
+        message = self.get_message(
+            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
         )
 
-        # Part 2: Defensive messages
+        self.log(message=message, end=" ", **kwargs)
+
+        # Defensive messages
         defended_damage: DefendedDamage = kwargs.get("defended_damage", {})
 
         for key, value in defended_damage.items():
@@ -287,31 +301,32 @@ class EffectLogger(Logger):
             defensive_keyword = get_keyword(key)
 
             # Defensive keyword parameters
-            for parameter, category in [
-                ("action", "ACTIONS"),
-                ("status", "STATUS"),
+            for kwargs_key, key in [
+                ("defensive_action", "action"),
+                ("defensive_status", "status"),
             ]:
-                kwargs[parameter] = self.get_colored_message(
-                    namespace="effects",
-                    message_group=category,
+                kwargs[kwargs_key] = self.get_colored_message(
                     keyword=defensive_keyword,
+                    namespace="effects",
+                    message_group=defensive_keyword.name,
+                    key=key,
                 )
 
             kwargs["defended_damage"] = value
 
             self.log(
                 namespace="effects",
-                message_group="DAMAGE",
-                key=key,
+                message_group=defensive_keyword.name,
+                key="activation",
                 end=" ",
                 **kwargs,
             )
 
-        # Part 3: Damage message
+        # Damage message
         if kwargs.get("damage") and kwargs["damage"] > 0:
             self.log(
-                namespace="effects",
-                message_group="DAMAGE",
+                namespace="combat",
+                message_group="COMBAT",
                 key="damage",
                 end=" ",
                 **kwargs,
@@ -331,14 +346,13 @@ class EffectLogger(Logger):
         """
         Logs a message for a countdown effect activation (e.g. Doom).
         """
-        key = effect.keyword.name.lower()
-
-        if effect.duration > 0:
-            key += "_countdown"
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        self.log(namespace="effects", message_group="ACTIVATION", key=key, **kwargs)
+        key = "countdown" if effect.duration > 0 else "activation"
+
+        self.log(
+            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
+        )
 
         return
 
@@ -353,11 +367,6 @@ class EffectLogger(Logger):
         """
         Logs a message for the Immunity effect execution.
         """
-        # Base message
-        key = effect.keyword.name.lower()
-        if source == target:
-            key += "_self"
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         immune_to: List[Keyword] = effect.effects
@@ -367,8 +376,14 @@ class EffectLogger(Logger):
             intensity="BRIGHT",
         )
 
+        # Base message
+        key = "execution_self" if kwargs["targeting_self"] else "execution"
         self.log(
-            namespace="effects", message_group="EXECUTION", key=key, end="", **kwargs
+            namespace="effects",
+            message_group=effect.keyword.name,
+            key=key,
+            end="",
+            **kwargs,
         )
 
         # Immune to no effects
@@ -403,11 +418,6 @@ class EffectLogger(Logger):
         Logs a message for effects that removes multiple effects at once (e.g.
         Cleanse an Corrupt).
         """
-        # Base message
-        key = effect.keyword.name.lower()
-        if source == target:
-            key += "_self"
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         removed_effects: List[Effect] = kwargs["removed_effects"]
@@ -417,8 +427,14 @@ class EffectLogger(Logger):
             intensity="BRIGHT",
         )
 
+        # Base message
+        key = "execution_self" if kwargs["targeting_self"] else "execution"
         self.log(
-            namespace="effects", message_group="EXECUTION", key=key, end="", **kwargs
+            namespace="effects",
+            message_group=effect.keyword.name,
+            key=key,
+            end="",
+            **kwargs,
         )
 
         # No effects were removed
@@ -465,9 +481,8 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        key = effect.keyword.value.lower()
-
-        if effect.keyword == Keyword.DOOM:
+        # Specific effect logging
+        if effect.keyword in [Keyword.DOOM]:
             return self._log_countdown_effect(
                 effect,
                 source,
@@ -475,14 +490,25 @@ class EffectLogger(Logger):
                 **kwargs,
             )
 
+        # Logging effect activation
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        key = "activation_self" if kwargs["targeting_self"] else "activation"
 
-        return self.log(
-            namespace="effects",
-            message_group="ACTIVATION",
-            key=key,
-            **kwargs,
+        # Specific message
+        message = self.get_message(
+            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
         )
+
+        # Generic message
+        if message is None:
+            message = self.get_message(
+                namespace="effect_types",
+                message_group=effect.type.name,
+                key=key,
+                **kwargs,
+            )
+
+        return self.log(message=message)
 
     def log_effect_execution(
         self,
@@ -506,16 +532,6 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        # Determining logging key
-        message_group = self.get_message_group(
-            namespace="effects", message_group="EXECUTION"
-        )
-
-        if effect.keyword.name.lower() in message_group.keys():
-            key = effect.keyword.value.lower()
-        else:
-            key = effect.type.value.lower()
-
         # Logging failed effect execution
         if kwargs.get("fail"):
             return self.log_effect_execution_fail(
@@ -526,7 +542,7 @@ class EffectLogger(Logger):
             )
 
         # Logging offensive type effect execution
-        if key == "offensive":
+        if effect.type == EffectType.OFFENSIVE:
             return self._log_damage_calculation(
                 effect,
                 source,
@@ -543,7 +559,7 @@ class EffectLogger(Logger):
                 **kwargs,
             )
 
-        elif effect.keyword == Keyword.IMMUNITY:
+        elif effect.keyword in [Keyword.IMMUNITY]:
             return self._log_immunity_effect(
                 effect,
                 source,
@@ -551,18 +567,25 @@ class EffectLogger(Logger):
                 **kwargs,
             )
 
-        # Logging other effect executions
-        if (source) and (target) and (source == target):
-            key += "_self"
-
+        # Logging effect execution
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        key = "execution_self" if kwargs["targeting_self"] else "execution"
 
-        return self.log(
-            namespace="effects",
-            message_group="EXECUTION",
-            key=key,
-            **kwargs,
+        # Specific message
+        message = self.get_message(
+            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
         )
+
+        # Generic message
+        if message is None:
+            message = self.get_message(
+                namespace="effect_types",
+                message_group=effect.type.name,
+                key=key,
+                **kwargs,
+            )
+
+        return self.log(message=message)
 
     def log_effect_execution_fail(
         self,
@@ -586,52 +609,46 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        # Determining logging key
-        message_group = self.get_message_group(
-            namespace="effects", message_group="EXECUTION_FAIL"
-        )
-
-        if effect.keyword.name.lower() in message_group.keys():
-            key = effect.keyword.value.lower()
-        else:
-            key = effect.type.value.lower()
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        if (source) and (target) and (source == target):
-            key += "_self"
+        key = "execution_fail_self" if kwargs["targeting_self"] else "execution_fail"
 
-        # Logging fail base message
-        self.log(
-            namespace="effects",
-            message_group="EXECUTION_FAIL",
-            key=key,
-            end="",
-            **kwargs,
+        # Specific message
+        message = self.get_message(
+            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
         )
-        self.log(message=" ", end="")
 
-        # Logging fail cause
-        key = kwargs["fail"]
+        # Generic message
+        if message is None:
+            message = self.get_message(
+                namespace="effect_types",
+                message_group=effect.type.name,
+                key=key,
+                **kwargs,
+            )
+
+        self.log(message=message, end=" ")
+
+        # Fail cause message
+        key: str = kwargs["fail"]
 
         for keyword in Keyword:
             if key == keyword.name.lower():
                 kwargs["status"] = self.get_colored_message(
-                    namespace="effects",
-                    message_group="STATUS",
                     keyword=keyword,
+                    namespace="effects",
+                    message_group=keyword.name,
+                    key="status",
                 )
                 break
 
-        if (source) and (target) and (source == target):
-            key += "_self"
+        key = key + "_self" if kwargs["targeting_self"] else key
 
-        return self.log(
-            namespace="effects",
-            message_group="FAILS",
-            key=key,
-            **kwargs,
+        message = self.get_message(
+            namespace="combat", message_group="FAILS", key=key, **kwargs
         )
+
+        return self.log(message=message)
 
     def log_effect_removal(
         self,
@@ -656,16 +673,17 @@ class EffectLogger(Logger):
             return
 
         removed_effect: Effect = kwargs["removed_effect"]
-        key = removed_effect.keyword.value.lower()
 
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
-        return self.log(
+        message = self.get_message(
             namespace="effects",
-            message_group="REMOVAL",
-            key=key,
+            message_group=removed_effect.keyword.name,
+            key="removal",
             **kwargs,
         )
+
+        return self.log(message=message)
 
     def log_effect_description(
         self,
@@ -706,11 +724,11 @@ class EffectLogger(Logger):
                     intensity="BRIGHT",
                 )
 
-        key = effect.keyword.value.lower()
-
-        return self.log(
+        message = self.get_message(
             namespace="effects",
-            message_group="DESCRIPTION",
-            key=key,
+            message_group=effect.keyword.name,
+            key="description",
             **kwargs,
         )
+
+        return self.log(message=message)

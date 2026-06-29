@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Callable, List
 
 from src.base.color import color_string
+from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -265,13 +266,12 @@ class EffectCompendium(Compendium):
 
         for idx, item in enumerate(items):
             effect_keyword = self.logger.get_colored_message(
-                namespace="effects",
-                message_group="KEYWORDS",
                 keyword=item.keyword,
+                message=self.get_item_name(item),
             )
 
             effect_type = self.logger.get_message(
-                namespace="effects", message_group="TYPES", key=item.type.value.lower()
+                namespace="effect_types", message_group=item.type.name, key="name"
             )
 
             pages_data.append(
@@ -296,8 +296,8 @@ class EffectCompendium(Compendium):
         """
         return self.logger.get_message(
             namespace="effects",
-            message_group="KEYWORDS",
-            key=item.keyword.value.lower(),
+            message_group=item.keyword.name,
+            key="name",
         )
 
     # =========================================================================
@@ -315,13 +315,13 @@ class EffectCompendium(Compendium):
         :rtype: Callable
         """
         if column_index == 1:
-            return lambda x: self.get_item_name(x)
+            return lambda x: normalize(self.get_item_name(x))
 
         elif column_index == 2:
             return lambda x: self.logger.get_message(
-                namespace="effects",
-                message_group="TYPES",
-                key=x.type.value.lower(),
+                namespace="effect_types",
+                message_group=x.type.name,
+                key="name",
             )
 
         return
@@ -335,13 +335,9 @@ class EffectCompendium(Compendium):
         Shows the current item.
         """
         item: Effect = self.items[self.item_number - 1]
+        item_name = self.get_item_name(item)
 
-        message = self.logger.get_message(
-            namespace="effects",
-            message_group="KEYWORDS",
-            key=item.keyword.value.lower(),
-        )
-        message = self.title + ": " + message
+        message = self.title + ": " + item_name
 
         self.logger.box_message(
             message=message,
@@ -350,9 +346,8 @@ class EffectCompendium(Compendium):
 
         # Keyword
         message = self.logger.get_colored_message(
-            namespace="effects",
-            message_group="KEYWORDS",
             keyword=item.keyword,
+            message=item_name,
         )
         self.logger.log(message=message + "\n")
 
@@ -368,9 +363,9 @@ class EffectCompendium(Compendium):
         message = color_string(message, intensity="BRIGHT")
 
         message += " " + self.logger.get_message(
-            namespace="effects",
-            message_group="TYPES",
-            key=item.type.value.lower(),
+            namespace="effect_types",
+            message_group=item.type.name,
+            key="name",
         )
 
         self.logger.log(message=message + "\n")

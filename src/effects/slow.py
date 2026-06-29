@@ -44,11 +44,19 @@ class SlowEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+        removed_effects = []
+
+        if target.is_alive():
+            haste = target.remove_effect(Keyword.HASTE)
+            if haste:
+                removed_effects.append(haste)
+
+        else:
             fail = "dead"
 
         return {
             "fail": fail,
+            "removed_effects": removed_effects,
         }
 
     def activate(
