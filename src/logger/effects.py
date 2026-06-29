@@ -634,7 +634,7 @@ class EffectLogger(Logger):
 
         for keyword in Keyword:
             if key == keyword.name.lower():
-                kwargs["status"] = self.get_colored_message(
+                kwargs["fail_status"] = self.get_colored_message(
                     keyword=keyword,
                     namespace="effects",
                     message_group=keyword.name,

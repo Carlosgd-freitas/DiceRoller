@@ -47,7 +47,7 @@ BLEED = {
 
 BLIND = {
     "name": "CEGUEIRA",
-    "description": "Diminui a acurácia dos dados e habilidades do alvo que não são usados em si mesmo em {value_perc}%.",
+    "description": "Diminui a acurácia dos dados e habilidades que o alvo não usa m si mesmo em {value_perc}%.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -198,7 +198,7 @@ FOCUS = {
 FORTIFY = {
     "name": "FORTIFICAR",
     "description": "Aumenta a redução de dano de efeitos defensivos em {value}.",
-    "action": None,
+    "action": "FORTIFICAR",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -213,7 +213,7 @@ FORTIFY = {
 FRAGILE = {
     "name": "FRÁGIL",
     "description": "Reduz a redução de dano de efeitos defensivos em {value}.",
-    "action": None,
+    "action": "FRAGILIZAR",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -221,7 +221,7 @@ FRAGILE = {
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
-    "removal": "{target} não está mais {removed_keyword} pelo efeito de {keyword}.",
+    "removal": "{target} não está mais {removed_status} pelo efeito de {keyword}.",
     "status": "FRÁGIL",
 }
 
@@ -241,7 +241,7 @@ FREEZE = {
 }
 
 FROSTBURN = {
-    "name": "QUEIMADURA DE FRIO",
+    "name": "QUEIMADURA FRIA",
     "description": "Inflige {value} de dano em todo início de turno.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
@@ -258,7 +258,7 @@ FROSTBURN = {
 HASTE = {
     "name": "ACELERAÇÃO",
     "description": "Aumenta a velocidade do alvo em {value}.",
-    "action": None,
+    "action": "ACELERAR",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -266,8 +266,8 @@ HASTE = {
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
-    "removal": "{target} teve sua {removed_keyword} removida pelo efeito de {keyword}.",
-    "status": None,
+    "removal": "{target} não está mais {removed_status} pelo efeito de {keyword}.",
+    "status": "ACELERADO",
 }
 
 HEAL = {
@@ -513,7 +513,7 @@ SLEEP = {
 SLOW = {
     "name": "LENTIDÃO",
     "description": "Reduz a velocidade do alvo em {value}.",
-    "action": None,
+    "action": "DESACELEROU",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -521,14 +521,14 @@ SLOW = {
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
-    "removal": "{target} teve sua {removed_keyword} removida pelo efeito de {keyword}.",
-    "status": "LENTIDÃO",
+    "removal": "{target} não está mais {removed_status} pelo efeito de {keyword}.",
+    "status": "LENTO",
 }
 
 STRENGTH = {
     "name": "FORÇA",
     "description": "Aumenta o dano infligido por efeitos ofensivos em {value}.",
-    "action": None,
+    "action": "FORTALECER",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -536,8 +536,8 @@ STRENGTH = {
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
-    "removal": "{target} teve sua {removed_keyword} removida pelo efeito de {keyword}.",
-    "status": None,
+    "removal": "{target} não está mais {removed_status} pelo efeito de {keyword}.",
+    "status": "FORTE",
 }
 
 STUN = {
@@ -588,7 +588,7 @@ THORNS = {
 WEAK = {
     "name": "FRAQUEZA",
     "description": "Reduz o dano infligido por efeitos ofensivos em {value}.",
-    "action": None,
+    "action": "ENFRAQUECER",
     "activation": None,
     "countdown": None,
     "execution": None,
@@ -596,6 +596,6 @@ WEAK = {
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
-    "removal": "{target} teve sua {removed_keyword} removida pelo efeito de {keyword}.",
-    "status": "FRAQUEZA",
+    "removal": "{target} não está mais {removed_status} pelo efeito de {keyword}.",
+    "status": "FRACO",
 }
