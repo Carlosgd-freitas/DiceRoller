@@ -3,8 +3,8 @@
 BUFF = {
     "name": "BUFF",
     "activation": None,
-    "execution": "{source} buffed {target} with {keyword} for {duration} turns.",
-    "execution_self": "{source} buffed themselves with {keyword} for {duration} turns.",
+    "execution": "{source} buffed {target} with {keyword} for {duration} {turns}.",
+    "execution_self": "{source} buffed themselves with {keyword} for {duration} {turns}.",
     "execution_fail": "{source} tried to buff {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to buff themselves with {keyword}, but",
 }
@@ -12,8 +12,8 @@ BUFF = {
 CURSE = {
     "name": "CURSE",
     "activation": None,
-    "execution": "{source} cursed {target} with {keyword} for {duration} turns.",
-    "execution_self": "{source} cursed themselves with {keyword} for {duration} turns.",
+    "execution": "{source} cursed {target} with {keyword} for {duration} {turns}.",
+    "execution_self": "{source} cursed themselves with {keyword} for {duration} {turns}.",
     "execution_fail": "{source} tried to curse {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to curse themselves with {keyword}, but",
 }
@@ -21,8 +21,8 @@ CURSE = {
 DEBUFF = {
     "name": "DEBUFF",
     "activation": None,
-    "execution": "{source} debuffed {target} with {keyword} for {duration} turns.",
-    "execution_self": "{source} debuffed themselves with {keyword} for {duration} turns.",
+    "execution": "{source} debuffed {target} with {keyword} for {duration} {turns}.",
+    "execution_self": "{source} debuffed themselves with {keyword} for {duration} {turns}.",
     "execution_fail": "{source} tried to debuff {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to debuff themselves with {keyword}, but",
 }
@@ -39,8 +39,8 @@ DEFENSIVE = {
 DETERIORATION = {
     "name": "DETERIORATION",
     "activation": None,
-    "execution": "{source} deteriorated {target} with {keyword} for {duration} turns.",
-    "execution_self": "{source} deteriorated themselves with {keyword} for {duration} turns.",
+    "execution": "{source} deteriorated {target} with {keyword} for {duration} {turns}.",
+    "execution_self": "{source} deteriorated themselves with {keyword} for {duration} {turns}.",
     "execution_fail": "{source} tried to deteriorate {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to deteriorate themselves with {keyword}, but",
 }
@@ -66,8 +66,8 @@ OFFENSIVE = {
 RESTORATION = {
     "name": "RESTORATION",
     "activation": None,
-    "execution": "{source} restored {target} with {keyword} for {duration} turns.",
-    "execution_self": "{source} restored themselves with {keyword} for {duration} turns.",
+    "execution": "{source} restored {target} with {keyword} for {duration} {turns}.",
+    "execution_self": "{source} restored themselves with {keyword} for {duration} {turns}.",
     "execution_fail": "{source} tried to restore {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to restore themselves with {keyword}, but",
 }

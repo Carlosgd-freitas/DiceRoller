@@ -196,6 +196,7 @@ def test_keyword_haste(combat: Dict):
                 monster_2.get_effect(Keyword.HASTE).keyword == Keyword.HASTE,
                 monster_2.get_effect(Keyword.HASTE).value == 100,
                 monster_2.get_effect(Keyword.HASTE).duration == 1,
+                monster_2.speed == 1,
                 monster_2.get_effective_speed() == 101,
             ]
 
@@ -212,6 +213,7 @@ def test_keyword_haste(combat: Dict):
             turn_local_ids[3] == "MONSTER_4",
             len(monster_2.effects) == 0,
             monster_2.get_effect(Keyword.HASTE) is None,
+            monster_2.speed == 1,
             monster_2.get_effective_speed() == 1,
         ]
     )

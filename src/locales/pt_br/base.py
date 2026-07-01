@@ -43,6 +43,8 @@ LEXICON = {
     "skill": "habilidade",
     "skills": "habilidades",
     "true": "verdadeiro",
+    "turn": "turno",
+    "turns": "turnos",
     "type": "tipo",
     "value": "valor",
     "weapon": "arma",

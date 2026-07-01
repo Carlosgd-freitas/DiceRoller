@@ -1,5 +1,9 @@
+from copy import deepcopy
+from random import choice
+
 from colorama import init
 
+from src.base.color import Color, ColorData
 from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.monster import Monster
@@ -172,8 +176,8 @@ for i in range(11):
 for effect in [
     CleanseEffect(0),
     CleanseEffect(1),
-    CleanseEffect(2),
     CleanseEffect(5),
+    CleanseEffect(6),
     CleanseEffect(10),
 ]:
     monster_a.effects = effects[:i]
@@ -201,8 +205,8 @@ for i in range(11):
 for effect in [
     CorruptEffect(0),
     CorruptEffect(1),
-    CorruptEffect(2),
     CorruptEffect(5),
+    CorruptEffect(6),
     CorruptEffect(10),
 ]:
     monster_a.effects = effects[:i]
@@ -258,7 +262,7 @@ for i in range(11):
         effect = Keyword.POISON
     effects.append(effect)
 
-for i in [0, 1, 2, 5, 10]:
+for i in [0, 1, 5, 6, 10]:
     immunity_effect = ImmunityEffect(effects=effects[:i])
 
     combat_manager.effect_manager.execute_effect(
@@ -436,6 +440,27 @@ for i in range(10):
         effect = InvisibleEffect(value=1, duration=2)
     effects.append(effect)
 
-for i in [0, 1, 2, 5, 10]:
+for i in [0, 1, 2, 5, 6, 10]:
     combat_manager.current_monster.effects = effects[:i]
     combat_manager.logger.log_monster(combat_manager.current_monster)
+
+# ----------------------------
+
+print("\n===== Alternative colored monster =====")
+
+combat_manager.current_monster.effects = []
+
+color_data: ColorData = {
+    "foreground_color": Color.PURPLE,
+    "background_color": Color.YELLOW,
+    "intensity": "BRIGHT",
+}
+
+effects = []
+
+for _ in range(10):
+    effect = deepcopy(choice(all_effects))
+    effects.append(effect)
+
+combat_manager.current_monster.effects = effects
+combat_manager.logger.log_monster(combat_manager.current_monster, color_data=color_data)

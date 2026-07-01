@@ -195,6 +195,45 @@ class Logger:
 
         return message
 
+    def pluralize(
+        self,
+        number: int,
+        namespace: Namespace,
+        message_group: str,
+        key: str,
+    ) -> str:
+        """
+        Gets a message in either singular or plural format.
+
+        :param number: Number that will determined the message. If equal to 1, the
+        singular format will be returned, and otherwise, the plural format will.
+        :type number: int
+
+        :param namespace: The namespace.
+        :type namespace: Namespace
+
+        :param message_group: The message group.
+        :type message_group: str
+
+        :param key: The message key.
+        :type key: str
+
+        :return: A message in either singular or plural format.
+        :rtype: str
+        """
+        if number == 1:
+            return self.get_message(
+                namespace=namespace,
+                message_group=message_group,
+                key=key,
+            )
+        else:
+            return self.get_message(
+                namespace=namespace,
+                message_group=message_group,
+                key=key + "s",
+            )
+
     def break_message(
         message: str,
         max_length: int,

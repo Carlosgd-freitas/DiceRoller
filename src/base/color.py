@@ -3,6 +3,7 @@ Colored impression of strings.
 Needs a previously executed colorama.init() to work.
 """
 
+from copy import deepcopy
 from enum import Enum
 from typing import Literal, Tuple, TypedDict
 
@@ -159,6 +160,7 @@ def color_string(
     inverted: bool = False,
     concealed: bool = False,
     strikethrough: bool = False,
+    reset: bool = True,
 ) -> str:
     """
     Colors and returns a string.
@@ -193,6 +195,9 @@ def color_string(
 
     :param strikethrough: if the text will be in strikethrough or not. Default value is False.
     :type strikethrough: bool
+
+    :param reset: if an ASCII Reset code will be appended at the end. Default value is True.
+    :type reset: bool
 
     :return: A colored string.
     :rtype: str
@@ -234,4 +239,52 @@ def color_string(
     if background_color:
         parts.append(ANSICode.BACKGROUND.value + get_color_code(background_color))
 
-    return "".join(parts) + string + ANSICode.RESET.value
+    colored_string = "".join(parts) + string
+    if reset:
+        colored_string += ANSICode.RESET.value
+
+    return colored_string
+
+
+def color_priority(
+    string: str,
+    primary: ColorData,
+    fallback: ColorData = None,
+) -> str:
+    """
+    Colors and returns a string. All components present of a primary color data will be
+    applied, and those which are not present can be applied by a fallback color data.
+
+    :param string: string that will be colored. If this parameter is not a string, a
+    cast to string will be attemped so the coloring can be applied.
+    :type string: str
+
+    :var primary: Color data that takes priority on being applied to the string.
+    :vartype primary: ColorData
+
+    :var fallback: Color data that will be applied to the string on the components that
+    are not present on **primary**.
+    :vartype fallback: ColorData
+
+    :return: A colored string.
+    :rtype: str
+    """
+    fallback = {} if fallback is None else fallback
+
+    primary_backup = deepcopy(primary)
+    fallback_backup = deepcopy(fallback)
+
+    try:
+        for key, value in fallback.items():
+            primary.setdefault(key, value)
+
+        return color_string(string, **primary)
+
+    finally:
+        primary.clear()
+        primary.update(primary_backup)
+
+        fallback.clear()
+        fallback.update(fallback_backup)
+
+    return

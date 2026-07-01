@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, inf
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, ColorData, color_string
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
+from src.base.monster import Monster
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
     from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
 
@@ -165,14 +165,15 @@ class EffectLogger(Logger):
             original_intensity = color_data.get("intensity")
             color_data["intensity"] = "BRIGHT"
 
-            lexicon_effects = self.get_message(
+            lexicon_effect = self.pluralize(
+                effects_remaining,
                 namespace="base",
                 message_group="LEXICON",
-                key="effects",
-            ).capitalize()
+                key="effect",
+            ).title()
 
             message += color_string(
-                separator + f"+{effects_remaining} {lexicon_effects}...",
+                separator + f"+{effects_remaining} {lexicon_effect}...",
                 **color_data,
             )
 
@@ -253,6 +254,12 @@ class EffectLogger(Logger):
             {
                 # Effect parameters
                 "duration": effect.duration,
+                "turns": self.pluralize(
+                    effect.duration,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="turn",
+                ),
                 "value": effect.value,
                 "value_perc": ceil(effect.value * 100),
                 # General attributes
@@ -270,8 +277,6 @@ class EffectLogger(Logger):
     def _log_damage_calculation(
         self,
         effect: Effect,
-        source: Monster,
-        target: Monster,
         **kwargs,
     ) -> None:
         """
@@ -280,8 +285,6 @@ class EffectLogger(Logger):
         * Defensive messages: which deffensive effects took place
         * Damage message: how the damage was recieved
         """
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
         # Base message
         key = "execution_self" if kwargs["targeting_self"] else "execution"
 
@@ -339,15 +342,11 @@ class EffectLogger(Logger):
     def _log_countdown_effect(
         self,
         effect: Effect,
-        source: Monster,
-        target: Monster,
         **kwargs,
     ) -> None:
         """
         Logs a message for a countdown effect activation (e.g. Doom).
         """
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
         key = "countdown" if effect.duration > 0 else "activation"
 
         self.log(
@@ -359,16 +358,12 @@ class EffectLogger(Logger):
     def _log_immunity_effect(
         self,
         effect: ImmunityEffect,
-        source: Monster,
-        target: Monster,
         limit: int = 5,
         **kwargs,
     ) -> None:
         """
         Logs a message for the Immunity effect execution.
         """
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
         immune_to: List[Keyword] = effect.effects
         count = len(immune_to)
         kwargs["count"] = color_string(
@@ -409,8 +404,6 @@ class EffectLogger(Logger):
     def _log_multiple_effect_removal(
         self,
         effect: Effect,
-        source: Monster,
-        target: Monster,
         limit: int = 5,
         **kwargs,
     ) -> None:
@@ -418,8 +411,6 @@ class EffectLogger(Logger):
         Logs a message for effects that removes multiple effects at once (e.g.
         Cleanse an Corrupt).
         """
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
-
         removed_effects: List[Effect] = kwargs["removed_effects"]
         count = len(removed_effects)
         kwargs["count"] = color_string(
@@ -481,17 +472,16 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
         # Specific effect logging
         if effect.keyword in [Keyword.DOOM]:
             return self._log_countdown_effect(
                 effect,
-                source,
-                target,
                 **kwargs,
             )
 
         # Logging effect activation
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
         key = "activation_self" if kwargs["targeting_self"] else "activation"
 
         # Specific message
@@ -532,21 +522,12 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        # Logging failed effect execution
-        if kwargs.get("fail"):
-            return self.log_effect_execution_fail(
-                effect=effect,
-                source=source,
-                target=target,
-                **kwargs,
-            )
+        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
 
         # Logging offensive type effect execution
         if effect.type == EffectType.OFFENSIVE:
             return self._log_damage_calculation(
                 effect,
-                source,
-                target,
                 **kwargs,
             )
 
@@ -554,21 +535,16 @@ class EffectLogger(Logger):
         if effect.keyword in [Keyword.CLEANSE, Keyword.CORRUPT]:
             return self._log_multiple_effect_removal(
                 effect,
-                source,
-                target,
                 **kwargs,
             )
 
         elif effect.keyword in [Keyword.IMMUNITY]:
             return self._log_immunity_effect(
                 effect,
-                source,
-                target,
                 **kwargs,
             )
 
         # Logging effect execution
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
         key = "execution_self" if kwargs["targeting_self"] else "execution"
 
         # Specific message
@@ -672,9 +648,9 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        removed_effect: Effect = kwargs["removed_effect"]
-
         kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+
+        removed_effect: Effect = kwargs["removed_effect"]
 
         message = self.get_message(
             namespace="effects",
@@ -689,6 +665,7 @@ class EffectLogger(Logger):
         self,
         effect: Effect,
         params: Literal["name", "value"] = "value",
+        end: str = "\n",
         **kwargs,
     ) -> None:
         """
@@ -700,6 +677,10 @@ class EffectLogger(Logger):
         :param params: If equal to "value", the effect's parameters values will be used to log.
         If equal to "name", their names inside a <> will be used instead. Default value is "value".
         :type params: Literal["name", "value"]
+
+        :param end: What will be printed at the end of the message. Default value is
+        \\n.
+        :type end: str
         """
         if not self.enabled:
             return
@@ -731,4 +712,75 @@ class EffectLogger(Logger):
             **kwargs,
         )
 
-        return self.log(message=message)
+        self.log(message=message, end=end)
+
+        return
+
+    def log_effect_details(
+        self,
+        effect: Effect,
+        source: Monster,
+    ):
+        """
+        Logs an Effect details.
+
+        :param effect: An effect.
+        :type effect: Effect
+
+        :param source: The Monster which has the effect.
+        :type source: Monster
+        """
+        if not self.enabled:
+            return
+
+        # Name
+        message = self.get_colored_message(
+            keyword=effect.keyword,
+            namespace="effects",
+            message_group=effect.keyword.name,
+            key="name",
+        )
+        self.log(message=message, end="")
+
+        message = color_string(
+            ": ",
+            intensity="BRIGHT",
+        )
+        self.log(message=message, end="")
+
+        # Description
+        self.log_effect_description(
+            effect=effect,
+            params="value",
+        )
+
+        # Duration
+        message = (
+            self.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="duration",
+            ).title()
+            + ": "
+        )
+
+        self.log(message=message, end="")
+
+        if effect.duration != inf:
+            message = str(effect.duration)
+        else:
+            message = "∞"
+
+        message += (
+            " "
+            + self.pluralize(
+                effect.duration,
+                namespace="base",
+                message_group="LEXICON",
+                key="turn",
+            ).title()
+        )
+
+        self.log(message=message)
+
+        return

@@ -216,12 +216,21 @@ class EffectManager(Manager):
             )
 
         # Log effect execution
-        self.logger.log_effect_execution(
-            effect=effect,
-            source=source,
-            target=target,
-            **effect_data,
-        )
+        if effect_data.get("fail") is None:
+            self.logger.log_effect_execution(
+                effect=effect,
+                source=source,
+                target=target,
+                **effect_data,
+            )
+        # Log failed effect execution
+        else:
+            self.logger.log_effect_execution_fail(
+                effect=effect,
+                source=source,
+                target=target,
+                **effect_data,
+            )
 
         # Log effect removals
         if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:

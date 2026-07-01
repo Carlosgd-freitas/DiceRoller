@@ -561,6 +561,7 @@ def test_keyword_oil(combat: Dict):
                 monster_2.get_effect(Keyword.OIL).keyword == Keyword.OIL,
                 monster_2.get_effect(Keyword.OIL).value == 5,
                 monster_2.get_effect(Keyword.OIL).duration == 1,
+                monster_2.speed == 1,
                 monster_2.get_effective_speed() == -4,
             ]
 
@@ -578,6 +579,7 @@ def test_keyword_oil(combat: Dict):
             len(monster_2.effects) == 0,
             monster_2.hp == 4,
             monster_2.get_effect(Keyword.OIL) is None,
+            monster_2.speed == 1,
             monster_2.get_effective_speed() == 1,
         ]
     )
@@ -762,6 +764,7 @@ def test_keyword_slow(combat: Dict):
                 monster_2.get_effect(Keyword.SLOW).keyword == Keyword.SLOW,
                 monster_2.get_effect(Keyword.SLOW).value == 100,
                 monster_2.get_effect(Keyword.SLOW).duration == 1,
+                monster_2.speed == 1,
                 monster_2.get_effective_speed() == -99,
             ]
 
@@ -778,6 +781,7 @@ def test_keyword_slow(combat: Dict):
             turn_local_ids[3] == "MONSTER_2",
             len(monster_2.effects) == 0,
             monster_2.get_effect(Keyword.SLOW) is None,
+            monster_2.speed == 1,
             monster_2.get_effective_speed() == 1,
         ]
     )
