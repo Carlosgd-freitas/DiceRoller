@@ -32,8 +32,8 @@ class CompendiumMessages(TypedDict):
     """
     Compendium Messages.
 
-    :var item_not_found_message: 'Item not found' message.
-    :vartype item_not_found_message: str
+    :var item_not_found: 'Item not found' message.
+    :vartype item_not_found: str
 
     :var search_prompt: Message for the 'Search' input prompt.
     :vartype search_prompt: str
@@ -42,7 +42,7 @@ class CompendiumMessages(TypedDict):
     :vartype select_item_prompt: str
     """
 
-    item_not_found_message: str
+    item_not_found: str
     search_prompt: str
     select_item_prompt: str
 
@@ -122,7 +122,7 @@ class Compendium(Menu):
             + self.logger.get_message(
                 namespace="compendium",
                 message_group="BASE",
-                key="sort_message",
+                key="sort",
             ).title()
         )
 
@@ -175,7 +175,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="previous_page_message",
+                    key="previous_page",
                 ),
             ),
             Option(
@@ -184,7 +184,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="next_page_message",
+                    key="next_page",
                 ),
             ),
             Option(
@@ -193,7 +193,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="search_message",
+                    key="search",
                 ),
             ),
             Option(
@@ -202,7 +202,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="sort_message",
+                    key="sort",
                 ),
             ),
             Option(
@@ -211,7 +211,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="show_details_message",
+                    key="show_details",
                 ),
             ),
             Option(
@@ -220,7 +220,7 @@ class Compendium(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="BASE",
-                    key="exit_message",
+                    key="exit",
                 ),
                 isolate_before=True,
                 isolate_after=True,
@@ -463,7 +463,7 @@ class Compendium(Menu):
             self.page_number = ceil(self.item_number / self.page_size)
 
         else:
-            self.logger.log(message=self.messages["item_not_found_message"], end="")
+            self.logger.log(message=self.messages["item_not_found"], end="")
             self.logger.input(message="")
 
         return

@@ -7,25 +7,35 @@ from pytest import fixture
 from src.base.monster import Monster
 from src.combat.manager import CombatManager, OrderStrategy
 from src.combat.team import Team
+from src.locales.languages import Language
+from src.logger.attributes import AttributeLogger
 from src.logger.combat import CombatLogger
+from src.logger.dice import DiceLogger
 from src.logger.effects import EffectLogger
 from src.logger.file import FileLogger
 from src.logger.logger import Logger
+from src.logger.monster import MonsterLogger
 from src.systems.settings import Settings
 
 
 @fixture()
 def loggers() -> Dict:
-    logger = Logger(enabled=False)
-    combat_logger = CombatLogger(enabled=False)
-    effect_logger = EffectLogger(enabled=False)
-    file_logger = FileLogger(enabled=False)
+    logger = Logger(enabled=False, language=Language.EN_US)
+    attribute_logger = AttributeLogger(enabled=False, language=Language.EN_US)
+    combat_logger = CombatLogger(enabled=False, language=Language.EN_US)
+    dice_logger = DiceLogger(enabled=False, language=Language.EN_US)
+    effect_logger = EffectLogger(enabled=False, language=Language.EN_US)
+    file_logger = FileLogger(enabled=False, language=Language.EN_US)
+    monster_logger = MonsterLogger(enabled=False, language=Language.EN_US)
 
     return {
         "logger": logger,
+        "attribute_logger": attribute_logger,
         "combat_logger": combat_logger,
+        "dice_logger": dice_logger,
         "effect_logger": effect_logger,
         "file_logger": file_logger,
+        "monster_logger": monster_logger,
     }
 
 

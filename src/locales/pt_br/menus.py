@@ -1,14 +1,14 @@
 """PT-BR localization for menus module."""
 
 BASE = {
-    "exit_message": "Sair",
+    "exit": "Sair",
     "file": "Arquivo",
-    "file_found_message": "foi encontrado!",
-    "file_load_message": "foi carregado com sucesso!",
-    "file_not_found_message": "não foi encontrado!",
-    "file_save_message": "foi salvo com sucesso!",
+    "file_found": "foi encontrado!",
+    "file_load": "foi carregado com sucesso!",
+    "file_not_found": "não foi encontrado!",
+    "file_save": "foi salvo com sucesso!",
     "filename_prompt": "Digite o nome do arquivo",
-    "return_message": "Retornar",
+    "return": "Retornar",
     "select_option_prompt": "Selecione uma opção",
 }
 
@@ -18,12 +18,21 @@ MAIN = {
     "title": "Menu Principal",
 }
 
+PLAYER_ACTIONS = {
+    "consumables": "Consumíveis",
+    "equipment": "Equipamento",
+    "roll_dice": "Rolar Dados",
+    "show_details": "Mostrar Detalhes",
+    "skills": "Habilidades",
+    "skip_turn": "Pular Turno",
+}
+
 SANDBOX = {
-    "edit_combat_message": "Editar Combate",
-    "export_combat_message": "Exportar Combate",
-    "import_combat_message": "Importar Combate",
-    "randomize_combat_message": "Aleatorizar Combate",
-    "start_combat_message": "Começar Combate",
+    "edit_combat": "Editar Combate",
+    "export_combat": "Exportar Combate",
+    "import_combat": "Importar Combate",
+    "randomize_combat": "Aleatorizar Combate",
+    "start_combat": "Começar Combate",
     "title": "Modo Sandbox",
 }
 

@@ -1,19 +1,19 @@
 """EN-US localization for compendium module."""
 
 BASE = {
-    "next_page_message": "Next Page",
+    "next_page": "Next Page",
     "page": "Page",
-    "previous_page_message": "Previous Page",
-    "search_message": "Search",
-    "sort_message": "Sort",
-    "show_details_message": "Show Details",
+    "previous_page": "Previous Page",
+    "search": "Search",
+    "sort": "Sort",
+    "show_details": "Show Details",
     "title": "Compendium",
 }
 
 EFFECTS = {
-    "item_not_found_message": "Effect not found.",
-    "next_item_message": "Next Effect",
-    "previous_item_message": "Previous Effect",
+    "item_not_found": "Effect not found.",
+    "next_item": "Next Effect",
+    "previous_item": "Previous Effect",
     "search_prompt": "Type an effect's name",
     "select_item_prompt": "Select an effect (or [0] to cancel)",
     "title": "Effect Compendium",

@@ -6,7 +6,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, List
 from uuid import uuid4
 
-from src.base.keywords import Keyword
+from src.base.color import Color, ColorData
+from src.base.keywords import Keyword, get_keyword_color
+from src.base.text import normalize
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
@@ -82,6 +84,20 @@ class Entity:
 
         self.dice = [] if dice is None else dice
         self.effects = [] if effects is None else effects
+
+    def __str__(self) -> str:
+        """String representation of Entity."""
+        _str = f"({self.global_id} | {self.local_id})"
+        _str = f" {self.name} {self.suffix}"
+        _str += f" | HP: {self.hp}/{self.max_hp}"
+        _str += f" | Speed: {self.speed}"
+        _str += f" | Mana: {self.mana}"
+
+        _str += f"\n>>> Dice ({len(self.dice)}):"
+        for one_dice in self.dice:
+            _str += f"\n>> {one_dice}\n"
+
+        return _str
 
     def update_locale_params(self, name: str = None, description: str = None):
         """
@@ -274,3 +290,34 @@ class Entity:
             effective_speed -= slow.value
 
         return effective_speed
+
+
+def get_attribute_color(attribute: str) -> ColorData:
+    """
+    Gets an attribute color data.
+
+    :param attribute: An attribute.
+    :type attribute: str
+
+    :return: The attribute color data.
+    :rtype: ColorData
+    """
+    attribute = normalize(attribute)
+
+    foreground_color = None
+    background_color = None
+    intensity = None
+
+    if attribute in ["hp"]:
+        foreground_color = Color.RED
+    elif attribute in ["mana"]:
+        return get_keyword_color(Keyword.MANA)
+    elif attribute in ["speed"]:
+        foreground_color = Color.WHITE
+        intensity = "BRIGHT"
+
+    return {
+        "background_color": background_color,
+        "foreground_color": foreground_color,
+        "intensity": intensity,
+    }

@@ -114,7 +114,7 @@ class MainMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="BASE",
-                    key="exit_message",
+                    key="exit",
                 ),
                 isolate_before=True,
                 isolate_after=True,

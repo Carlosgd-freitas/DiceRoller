@@ -46,7 +46,7 @@ class Tortuga(Monster):
             ],
             hp=10,
             max_hp=10,
-            speed=1,
+            speed=0,
             mana=0,
             **kwargs
         )

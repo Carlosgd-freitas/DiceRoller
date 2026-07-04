@@ -1,9 +1,13 @@
 """EN-US localization for combat module."""
 
+ACTIONS = {"skip_turn": "{name} decided to do nothing."}
+
 COMBAT = {
+    "ai": "AI",
     "damage": "{damage} damage was done.",
     "died": "died",
     "draw": "It's a draw!",
+    "player": "PLAYER",
     "round": "Round",
     "team": "Team",
     "turn": "Turn",

@@ -41,7 +41,7 @@ class FileLogger(Logger):
         message += " " + self.get_message(
             namespace="menus",
             message_group="BASE",
-            key="file_found_message",
+            key="file_found",
             filename=filename,
         )
 
@@ -60,7 +60,7 @@ class FileLogger(Logger):
         message += " " + self.get_message(
             namespace="menus",
             message_group="BASE",
-            key="file_load_message",
+            key="file_load",
             filename=filename,
         )
 
@@ -79,7 +79,7 @@ class FileLogger(Logger):
         message += " " + self.get_message(
             namespace="menus",
             message_group="BASE",
-            key="file_not_found_message",
+            key="file_not_found",
             filename=filename,
         )
 
@@ -98,7 +98,7 @@ class FileLogger(Logger):
         message += " " + self.get_message(
             namespace="menus",
             message_group="BASE",
-            key="file_save_message",
+            key="file_save",
             filename=filename,
         )
 

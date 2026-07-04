@@ -143,10 +143,11 @@ class Menu(Manager):
         """
         Shows the Menu title.
         """
-        self.logger.box_message(
-            message=self.title,
-            size=50,
-        )
+        if self.title:
+            self.logger.box_message(
+                message=self.title,
+                size=50,
+            )
 
     def show_options(self):
         """

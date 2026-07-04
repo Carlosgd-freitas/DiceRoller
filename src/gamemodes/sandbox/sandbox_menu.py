@@ -7,6 +7,7 @@ from random import choice
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
+from src.base.monster import ControlType
 from src.combat.manager import CombatData, CombatManager
 from src.combat.team import Team
 from src.compendium.effects import get_all_effects
@@ -81,7 +82,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
-                    key="start_combat_message",
+                    key="start_combat",
                 ),
             ),
             Option(
@@ -90,7 +91,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
-                    key="edit_combat_message",
+                    key="edit_combat",
                 ),
             ),
             Option(
@@ -99,7 +100,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
-                    key="import_combat_message",
+                    key="import_combat",
                 ),
             ),
             Option(
@@ -108,7 +109,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
-                    key="export_combat_message",
+                    key="export_combat",
                 ),
             ),
             Option(
@@ -117,7 +118,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
-                    key="randomize_combat_message",
+                    key="randomize_combat",
                 ),
             ),
             Option(
@@ -126,7 +127,7 @@ class SandboxMenu(Menu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="BASE",
-                    key="exit_message",
+                    key="exit",
                 ),
                 isolate_before=True,
                 isolate_after=True,
@@ -201,13 +202,17 @@ class SandboxMenu(Menu):
             "Orange",
         ]
 
-        for _ in range(n_teams):
+        for idx_team in range(n_teams):
             team_name = choice(team_names)
             team_names.remove(team_name)
 
             members = []
             for _ in range(team_size):
-                members.append(deepcopy(choice(self.all_monsters)))
+                member = deepcopy(choice(self.all_monsters))
+                if idx_team == 0:
+                    member.control_type = ControlType.PLAYER
+
+                members.append(member)
 
             message = self.logger.get_message(
                 namespace="combat", message_group="COMBAT", key="team"
@@ -298,7 +303,7 @@ class SandboxMenu(Menu):
         """
         Shows the Menu's options.
         """
-        self.logger.log_teams(self.combat_manager.teams)
+        self.logger.log_teams(self.combat_manager.teams, control_type=True)
         self.logger.log(message="")
 
         for option in self.options:

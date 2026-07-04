@@ -257,7 +257,7 @@ FROSTBURN = {
 
 HASTE = {
     "name": "ACELERAÇÃO",
-    "description": "Aumenta a velocidade do alvo em {value}.",
+    "description": "Aumenta a {speed} do alvo em {value}.",
     "action": "ACELERAR",
     "activation": None,
     "countdown": None,
@@ -377,7 +377,7 @@ NOTHING = {
 
 OIL = {
     "name": "ÓLEO",
-    "description": "Reduz a velocidade do alvo e aumenta o dano infligido por {burn} em {value}.",
+    "description": "Reduz a {speed} do alvo e aumenta o dano infligido por {burn} em {value}.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -512,7 +512,7 @@ SLEEP = {
 
 SLOW = {
     "name": "LENTIDÃO",
-    "description": "Reduz a velocidade do alvo em {value}.",
+    "description": "Reduz a {speed} do alvo em {value}.",
     "action": "DESACELEROU",
     "activation": None,
     "countdown": None,

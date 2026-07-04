@@ -64,10 +64,15 @@ class Monster(Entity):
 
     def __str__(self) -> str:
         """String representation of Monster."""
-        _str = f"{self.name}"
-        _str += f" | HP: {self.hp}/{self.max_hp}"
+        _str = f"({self.global_id} | {self.local_id})"
+        _str = f" {self.name} {self.suffix}"
+
+        _str += f"\nHP: {self.hp}/{self.max_hp}"
         _str += f" | Speed: {self.speed}"
         _str += f" | Mana: {self.mana}"
+
+        _str += f"\n Control Type: {self.control_type.name}"
+        _str += f" | Difficulty: {self.difficulty.name}"
 
         _str += f"\n>>> Dice ({len(self.dice)}):"
         for one_dice in self.dice:

@@ -43,7 +43,7 @@ class GiantSlime(Monster):
             ],
             hp=12,
             max_hp=12,
-            speed=2,
+            speed=1,
             mana=0,
             **kwargs
         )

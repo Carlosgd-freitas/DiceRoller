@@ -190,7 +190,7 @@ class EffectCompendium(Compendium):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="EFFECTS",
-                    key="previous_item_message",
+                    key="previous_item",
                 ),
             ),
             Option(
@@ -199,7 +199,7 @@ class EffectCompendium(Compendium):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="EFFECTS",
-                    key="next_item_message",
+                    key="next_item",
                 ),
             ),
             Option(
@@ -208,7 +208,7 @@ class EffectCompendium(Compendium):
                 message=self.logger.get_message(
                     namespace="compendium",
                     message_group="BASE",
-                    key="search_message",
+                    key="search",
                 ),
             ),
             Option(
@@ -217,7 +217,7 @@ class EffectCompendium(Compendium):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="BASE",
-                    key="return_message",
+                    key="return",
                 ),
                 isolate_before=True,
                 isolate_after=True,
@@ -236,7 +236,7 @@ class EffectCompendium(Compendium):
         messages = {}
 
         for key in [
-            "item_not_found_message",
+            "item_not_found",
             "search_prompt",
             "select_item_prompt",
         ]:

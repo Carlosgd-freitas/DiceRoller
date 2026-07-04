@@ -72,6 +72,15 @@ def get_keyword(name: str) -> Keyword:
 
 
 def get_keyword_color(keyword: Keyword) -> ColorData:
+    """
+    Gets a Keyword color data.
+
+    :param keyword: A Keyword.
+    :type keyword: Keyword
+
+    :return: The keyword color data.
+    :rtype: ColorData
+    """
     foreground_color = None
     background_color = None
     intensity = "BRIGHT"

@@ -33,7 +33,7 @@ TORTUGA = {
 
 WEEKE = {
     "name": "Weeke",
-    "description": "Weak cousing of the Mandrake that looks like weed. Shrieks loudly when it feels scared.",
+    "description": "Weak cousin of the Mandrake that looks like weed. Shrieks loudly when it feels scared.",
 }
 
 MANA_SPIRIT = {

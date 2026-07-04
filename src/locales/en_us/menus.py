@@ -1,14 +1,14 @@
 """EN-US localization for menus module."""
 
 BASE = {
-    "exit_message": "Exit",
+    "exit": "Exit",
     "file": "File",
-    "file_found_message": "was found!",
-    "file_load_message": "was loaded sucessfully!",
-    "file_not_found_message": "was not found!",
-    "file_save_message": "was saved sucessfully!",
+    "file_found": "was found!",
+    "file_load": "was loaded sucessfully!",
+    "file_not_found": "was not found!",
+    "file_save": "was saved sucessfully!",
     "filename_prompt": "Type a filename",
-    "return_message": "Return",
+    "return": "Return",
     "select_option_prompt": "Select an option",
 }
 
@@ -18,12 +18,21 @@ MAIN = {
     "title": "Main Menu",
 }
 
+PLAYER_ACTIONS = {
+    "consumables": "Consumables",
+    "equipment": "Equipment",
+    "roll_dice": "Roll Dice",
+    "show_details": "Show Details",
+    "skills": "Skills",
+    "skip_turn": "Skip Turn",
+}
+
 SANDBOX = {
-    "edit_combat_message": "Edit Combat",
-    "export_combat_message": "Export Combat",
-    "import_combat_message": "Import Combat",
-    "randomize_combat_message": "Randomize Combat",
-    "start_combat_message": "Start Combat",
+    "edit_combat": "Edit Combat",
+    "export_combat": "Export Combat",
+    "import_combat": "Import Combat",
+    "randomize_combat": "Randomize Combat",
+    "start_combat": "Start Combat",
     "title": "Sandbox Mode",
 }
 

@@ -4,18 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Literal
 
-from tabulate import tabulate
-
 from src.base.color import Color, ColorData, color_string
-from src.base.keywords import Keyword
-from src.logger.effects import EffectLogger
+from src.base.monster import ControlType, Monster
+from src.logger.monster import MonsterLogger
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
     from src.combat.team import Team
 
 
-class CombatLogger(EffectLogger):
+class CombatLogger(MonsterLogger):
     """
     CombatLogger class.
     """
@@ -26,7 +23,7 @@ class CombatLogger(EffectLogger):
     ):
         super().__init__(**kwargs)
 
-    def log_round(self, round: int, start_line_break: bool = True):
+    def log_round_start(self, round: int, start_line_break: bool = True):
         """
         Logs the round start.
 
@@ -80,11 +77,9 @@ class CombatLogger(EffectLogger):
             self.log(message="")
 
         message = color_string(f"> {turn}: ", intensity="BRIGHT")
-        message += color_string(f"{monster.name}", intensity="BRIGHT", underlined=True)
-        if monster.suffix:
-            message += color_string(
-                f" {monster.suffix}", intensity="BRIGHT", underlined=True
-            )
+        message += color_string(
+            self.get_monster_name(monster), intensity="BRIGHT", underlined=True
+        )
 
         self.log(message=message)
         self.log(message="")
@@ -92,6 +87,7 @@ class CombatLogger(EffectLogger):
     def log_monster(
         self,
         monster: Monster,
+        control_type: bool = False,
         effect_limit: int = 5,
         color_data: ColorData = None,
     ):
@@ -100,6 +96,10 @@ class CombatLogger(EffectLogger):
 
         :param monster: A monster.
         :type monster: Monster
+
+        :param control_type: If the monster control type will be logged. Default
+        value is False.
+        :type control_type: bool
 
         :param effect_limit: The limit of effects that will be logged. Default value
         is 5.
@@ -112,35 +112,53 @@ class CombatLogger(EffectLogger):
             return
 
         color_data = {} if color_data is None else color_data
+        attribute_params = self._get_attribute_params()
 
-        # Name
-        message = self.get_message(
-            namespace="monsters",
-            message_group=monster.global_id,
-            key="name",
-        )
-        if message is None:
-            message = monster.name
-
-        message = "> " + message
-
-        # Suffix
-        if monster.suffix:
-            message += f" {monster.suffix}"
-        message += " - "
+        # Name + Suffix
+        message = "> " + self.get_monster_name(monster) + " - "
 
         self.log(
             message=color_string(message, **color_data),
             end="",
         )
 
+        # Control Type
+        if control_type:
+            if monster.control_type == ControlType.AI:
+                message = self.get_message(
+                    namespace="combat",
+                    message_group="COMBAT",
+                    key=monster.control_type.name.lower(),
+                )
+
+                foreground_color = Color.RED
+
+            elif monster.control_type == ControlType.PLAYER:
+                message = self.get_message(
+                    namespace="combat",
+                    message_group="COMBAT",
+                    key=monster.control_type.name.lower(),
+                )
+
+                foreground_color = Color.BLUE
+
+            message = (
+                color_string(
+                    message,
+                    foreground_color=foreground_color,
+                    intensity="BRIGHT",
+                )
+                + " - "
+            )
+
+            self.log(
+                message=message,
+                end="",
+            )
+
         # HP
         self.log(
-            message=self.get_message(
-                namespace="base",
-                message_group="ATTRIBUTES",
-                key="hp",
-            ),
+            message=attribute_params["hp"],
             end="",
         )
 
@@ -159,11 +177,7 @@ class CombatLogger(EffectLogger):
             )
 
             self.log(
-                message=self.get_message(
-                    namespace="base",
-                    message_group="ATTRIBUTES",
-                    key="mana",
-                ),
+                message=attribute_params["mana"],
                 end="",
             )
 
@@ -211,10 +225,7 @@ class CombatLogger(EffectLogger):
         if not self.enabled:
             return
 
-        message = monster.name
-
-        if monster.suffix:
-            message += f" {monster.suffix}"
+        message = self.get_monster_name(monster)
 
         message += (
             " "
@@ -228,172 +239,34 @@ class CombatLogger(EffectLogger):
 
         self.log(message=message)
 
-    def log_monster_details(
-        self,
-        monster: Monster,
-        description: bool = False,
-        current_hp: bool = True,
-    ):
+    def log_turn_skip(self, monster: Monster):
         """
-        Logs a Monster details.
+        Logs a monster skipping its turn.
 
         :param monster: A monster.
         :type monster: Monster
-
-        :param description: If the monster description will be logged. Default value
-        is False.
-        :type description: bool
-
-        :param current_hp: If True, "hp/max_hp" will be logged, and "max_hp" only
-        otherwise. Default value is True.
-        :type current_hp: bool
         """
         if not self.enabled:
             return
 
-        # Name
+        name = self.get_monster_name(monster)
+
         message = self.get_message(
-            namespace="monsters",
-            message_group=monster.global_id,
-            key="name",
-        )
-        if message is None:
-            message = monster.name
-
-        # Suffix
-        if monster.suffix:
-            message += f" {monster.suffix}"
-
-        message = color_string(
-            message,
-            intensity="BRIGHT",
-            underlined=True,
-        )
-        self.log(message=message + "\n")
-
-        # Description
-        if description:
-            message = self.get_message(
-                namespace="monsters",
-                message_group=monster.global_id,
-                key="description",
-            )
-
-            if message:
-                self.log(message=message + "\n")
-
-        # Atrributes
-        attributes = []
-
-        # HP
-        row = []
-
-        message = (
-            self.get_message(
-                namespace="base",
-                message_group="ATTRIBUTES",
-                key="hp",
-            )
-            + ":"
+            namespace="combat",
+            message_group="ACTIONS",
+            key="skip_turn",
+            name=name,
         )
 
-        row.append(message)
+        self.log(message=message)
 
-        if current_hp:
-            message = f"{monster.hp}/{monster.max_hp}"
-        else:
-            message = f"{monster.max_hp}"
-
-        row.append(message)
-
-        attributes.append(row)
-
-        # Mana
-        row = []
-
-        message = (
-            self.get_message(
-                namespace="base",
-                message_group="ATTRIBUTES",
-                key="mana",
-            )
-            + ":"
-        )
-
-        row.append(message)
-
-        message = f"{monster.mana}"
-
-        row.append(message)
-
-        attributes.append(row)
-
-        # Speed
-        row = []
-
-        message = (
-            self.get_message(
-                namespace="base",
-                message_group="ATTRIBUTES",
-                key="speed",
-            )
-            + ":"
-        )
-
-        row.append(message)
-
-        message = f"{monster.get_effective_speed()}"
-
-        if monster.has_effect(Keyword.HASTE):
-            message = color_string(message, foreground_color=Color.SPRING_GREEN)
-        elif monster.has_effect(Keyword.SLOW):
-            message = color_string(message, foreground_color=Color.TOMATO)
-
-        row.append(message)
-
-        attributes.append(row)
-
-        # Logging attributes
-        table = tabulate(
-            attributes,
-            colalign=("right", "left"),
-            tablefmt="plain",
-        )
-
-        self.log(message=table)
-
-        # Effects
-        if len(monster.effects) > 0:
-            # Start
-            self.log(message="")
-
-            message = (
-                self.get_message(
-                    namespace="base",
-                    message_group="LEXICON",
-                    key="effects",
-                ).title()
-                + ":"
-            )
-
-            message = color_string(
-                message,
-                intensity="BRIGHT",
-            )
-            self.log(message=message)
-
-            for effect in monster.effects:
-                self.log(message="● ", end="")
-
-                self.log_effect_details(
-                    effect=effect,
-                    source=monster,
-                )
+        return
 
     def log_teams(
         self,
         teams: List[Team],
         life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
+        control_type: bool = False,
     ):
         """
         Logs teams of monsters in combat. Only alive monsters will be logged.
@@ -404,6 +277,10 @@ class CombatLogger(EffectLogger):
         :param life_state: Whether to consider only alive, dead or any type of entities.
         Default value is "ALIVE".
         :type life_state: Literal["ALIVE", "DEAD", "ANY"]
+
+        :param control_type: If the monsters control type will be logged. Default
+        value is False.
+        :type control_type: bool
         """
         if not self.enabled:
             return
@@ -421,10 +298,16 @@ class CombatLogger(EffectLogger):
 
             for monster in team.members:
                 if life_state in ["ALIVE", "ANY"] and monster.is_alive():
-                    self.log_monster(monster, color_data={"foreground_color": None})
+                    self.log_monster(
+                        monster,
+                        control_type=control_type,
+                        color_data={"foreground_color": None},
+                    )
                 elif life_state in ["DEAD", "ANY"] and not monster.is_alive():
                     self.log_monster(
-                        monster, color_data={"foreground_color": Color.GRAY}
+                        monster,
+                        control_type=control_type,
+                        color_data={"foreground_color": Color.GRAY},
                     )
 
             self.log(message="")

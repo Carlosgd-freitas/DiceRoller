@@ -9,14 +9,14 @@ from src.base.color import Color, ColorData, color_string
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
 from src.base.monster import Monster
-from src.logger.logger import Logger
+from src.logger.attributes import AttributeLogger
 
 if TYPE_CHECKING:
     from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
 
 
-class EffectLogger(Logger):
+class EffectLogger(AttributeLogger):
     """
     EffectLogger class.
     """
@@ -26,6 +26,98 @@ class EffectLogger(Logger):
         **kwargs,
     ):
         super().__init__(**kwargs)
+
+    def _get_effect_params(
+        self,
+        effect: Effect = None,
+        source: Monster = None,
+        target: Monster = None,
+        **kwargs,
+    ) -> Dict:
+        """
+        Returns common effect parameters for logging.
+
+        :return: Parameters for logging.
+        :rtype: Dict
+        """
+        params = {}
+
+        # Targeting self
+        if source == target:
+            params["targeting_self"] = True
+        else:
+            params["targeting_self"] = False
+
+        # Source and target monsters
+        if source:
+            params["source"] = source.name
+
+            if source.suffix:
+                params["source"] += " " + source.suffix
+
+        if target:
+            params["target"] = target.name
+
+            if target.suffix:
+                params["target"] += " " + target.suffix
+
+        # All keywords
+        for keyword in Keyword:
+            params[keyword.name.lower()] = self.get_colored_message(
+                keyword=keyword,
+                namespace="effects",
+                message_group=keyword.name,
+                key="name",
+            )
+
+        # Effect keyword and variations
+        for params_key, key in [
+            ("action", "action"),
+            ("keyword", "name"),
+            ("status", "status"),
+        ]:
+            params[params_key] = self.get_colored_message(
+                keyword=effect.keyword,
+                namespace="effects",
+                message_group=effect.keyword.name,
+                key=key,
+            )
+
+        # Removed effect
+        if kwargs.get("removed_effect"):
+            removed_effect: Effect = kwargs["removed_effect"]
+
+            for params_key, key in [
+                ("removed_action", "action"),
+                ("removed_keyword", "name"),
+                ("removed_status", "status"),
+            ]:
+                params[params_key] = self.get_colored_message(
+                    keyword=removed_effect.keyword,
+                    namespace="effects",
+                    message_group=removed_effect.keyword.name,
+                    key=key,
+                )
+
+        # Effect parameters
+        params.update(
+            {
+                "duration": effect.duration,
+                "turns": self.pluralize(
+                    effect.duration,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="turn",
+                ),
+                "value": effect.value,
+                "value_perc": ceil(effect.value * 100),
+            }
+        )
+
+        # Attribute params
+        params.update(self._get_attribute_params())
+
+        return params
 
     def get_effect_message(
         self,
@@ -70,6 +162,7 @@ class EffectLogger(Logger):
                 effect.keyword
                 in [
                     Keyword.DOOM,
+                    Keyword.CONFUSE,
                     Keyword.FREEZE,
                     Keyword.INVISIBLE,
                     Keyword.INVULNERABLE,
@@ -80,10 +173,43 @@ class EffectLogger(Logger):
                 ]
                 and effect.duration
             ):
-                message += color_string(f" {effect.duration}", **color_data)
+                if effect.duration != inf:
+                    message += color_string(f" {effect.duration}", **color_data)
+                else:
+                    message += color_string(" ∞", **color_data)
+
+            elif (
+                effect.keyword
+                in [
+                    Keyword.BLIND,
+                    Keyword.EXECUTE,
+                    Keyword.FOCUS,
+                    Keyword.REVIVE,
+                ]
+                and effect.value
+            ):
+                if effect.value != inf:
+                    message += color_string(f" {effect.value * 100}%", **color_data)
+                else:
+                    message += color_string(" ∞", **color_data)
+
+            elif effect.keyword in [
+                Keyword.IMMUNITY,
+            ]:
+                if effect.duration != inf:
+                    message += color_string(f" {effect.duration}", **color_data)
+                else:
+                    message += color_string(" ∞", **color_data)
+
+                if effect.effects:
+                    effects = self.get_multiple_effects_message(keywords=effect.effects)
+                    message += color_string(f" [ {effects} ]", **color_data)
 
             elif effect.value:
-                message += color_string(f" {effect.value}", **color_data)
+                if effect.value != inf:
+                    message += color_string(f" {effect.value}", **color_data)
+                else:
+                    message += color_string(" ∞", **color_data)
 
         return message
 
@@ -180,99 +306,6 @@ class EffectLogger(Logger):
             color_data["intensity"] = original_intensity
 
         return message
-
-    def _update_log_parameters(
-        self,
-        effect: Effect = None,
-        source: Monster = None,
-        target: Monster = None,
-        **kwargs,
-    ) -> Dict:
-        """
-        Updates the log parameters with effect, source, target and the data that can be
-        derived from that.
-        """
-        # Targeting self
-        if source == target:
-            kwargs["targeting_self"] = True
-        else:
-            kwargs["targeting_self"] = False
-
-        # Source and target monsters
-        if source:
-            kwargs["source"] = source.name
-
-            if source.suffix:
-                kwargs["source"] += " " + source.suffix
-
-        if target:
-            kwargs["target"] = target.name
-
-            if target.suffix:
-                kwargs["target"] += " " + target.suffix
-
-        # All keywords
-        for keyword in Keyword:
-            kwargs[keyword.name.lower()] = self.get_colored_message(
-                keyword=keyword,
-                namespace="effects",
-                message_group=keyword.name,
-                key="name",
-            )
-
-        # Effect keyword and variations
-        for kwargs_key, key in [
-            ("action", "action"),
-            ("keyword", "name"),
-            ("status", "status"),
-        ]:
-            kwargs[kwargs_key] = self.get_colored_message(
-                keyword=effect.keyword,
-                namespace="effects",
-                message_group=effect.keyword.name,
-                key=key,
-            )
-
-        # Removed effect
-        if kwargs.get("removed_effect"):
-            removed_effect: Effect = kwargs["removed_effect"]
-
-            for kwargs_key, key in [
-                ("removed_action", "action"),
-                ("removed_keyword", "name"),
-                ("removed_status", "status"),
-            ]:
-                kwargs[kwargs_key] = self.get_colored_message(
-                    keyword=removed_effect.keyword,
-                    namespace="effects",
-                    message_group=removed_effect.keyword.name,
-                    key=key,
-                )
-
-        # Other parameters
-        kwargs.update(
-            {
-                # Effect parameters
-                "duration": effect.duration,
-                "turns": self.pluralize(
-                    effect.duration,
-                    namespace="base",
-                    message_group="LEXICON",
-                    key="turn",
-                ),
-                "value": effect.value,
-                "value_perc": ceil(effect.value * 100),
-                # General attributes
-                "hp": self.get_message(
-                    namespace="base", message_group="ATTRIBUTES", key="hp"
-                ),
-                "mana": self.get_message(
-                    namespace="base", message_group="ATTRIBUTES", key="mana"
-                ),
-            }
-        )
-
-        return kwargs
 
     def _log_damage_calculation(
         self,
@@ -472,7 +505,7 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
 
         # Specific effect logging
         if effect.keyword in [Keyword.DOOM]:
@@ -522,7 +555,7 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
 
         # Logging offensive type effect execution
         if effect.type == EffectType.OFFENSIVE:
@@ -585,7 +618,7 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
 
         key = "execution_fail_self" if kwargs["targeting_self"] else "execution_fail"
 
@@ -648,7 +681,7 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        kwargs = self._update_log_parameters(effect, source, target, **kwargs)
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
 
         removed_effect: Effect = kwargs["removed_effect"]
 
@@ -685,7 +718,7 @@ class EffectLogger(Logger):
         if not self.enabled:
             return
 
-        kwargs = self._update_log_parameters(effect, **kwargs)
+        kwargs.update(self._get_effect_params(effect, **kwargs))
 
         if params == "name":
             for word, key in [

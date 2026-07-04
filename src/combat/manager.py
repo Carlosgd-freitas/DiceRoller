@@ -12,6 +12,7 @@ from src.base.manager import Manager
 from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
+from src.combat.player_actions import PlayerActionsMenu
 from src.combat.suffixes import SuffixManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
@@ -121,10 +122,10 @@ class CombatManager(Manager):
         self.logger: CombatLogger
 
         # Effect Management
-        self.effect_manager = EffectManager(
-            settings,
-            logging,
-        )
+        self.effect_manager = EffectManager(settings, logging)
+
+        # Player actions
+        self.player_actions_menu = PlayerActionsMenu(settings, logging)
 
         # Suffix Management
         self.suffix_manager = SuffixManager()
@@ -160,10 +161,13 @@ class CombatManager(Manager):
         """
         self.logger.change_language(language, _messages)
         _messages = self.logger._messages
+        self.update_teams()
 
+        # Managers
         self.effect_manager.change_language(language, _messages)
 
-        self.update_teams()
+        # Menus
+        self.player_actions_menu.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
         """
@@ -173,7 +177,12 @@ class CombatManager(Manager):
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
+
+        # Managers
         self.effect_manager.toggle_logging(enabled)
+
+        # Menus
+        self.player_actions_menu.toggle_logging(enabled)
 
     def update_teams(self):
         """
@@ -512,7 +521,7 @@ class CombatManager(Manager):
             self.take_action(self.current_monster)
 
         elif self.current_monster.control_type == ControlType.PLAYER:
-            raise NotImplementedError
+            self.player_actions_menu.open(self.current_monster)
 
         return True
 
@@ -707,7 +716,7 @@ class CombatManager(Manager):
                 else:
                     start_line_break = False
 
-                self.logger.log_round(
+                self.logger.log_round_start(
                     self.round,
                     start_line_break,
                 )
@@ -746,7 +755,10 @@ class CombatManager(Manager):
             if combat_status["status"] != "ONGOING":
                 break
 
-            if self.settings.monster_end_turn == "MANUAL":
+            if (
+                self.settings.monster_end_turn == "MANUAL"
+                and self.current_monster.control_type == ControlType.AI
+            ):
                 self.logger.input("")
 
             # Next Turn

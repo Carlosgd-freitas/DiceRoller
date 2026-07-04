@@ -23,7 +23,7 @@ class TrainingDummy(Monster):
             dice=[dice],
             hp=6,
             max_hp=6,
-            speed=1,
+            speed=0,
             mana=0,
             **kwargs
         )
