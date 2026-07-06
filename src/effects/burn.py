@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
@@ -24,21 +24,25 @@ class BurnEffect(Effect):
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 1,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.BURN,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.DEBUFF,
-            Trigger.TURN_START,
-            True,
-            removable,
+            keyword=Keyword.BURN,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.DEBUFF,
+            trigger=Trigger.TURN_START,
+            persistent=True,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def get_effective_value(

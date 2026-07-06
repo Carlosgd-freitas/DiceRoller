@@ -10,11 +10,11 @@ from src.menus.option import Option
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
-    from src.compendium.effects import EffectCompendium
+    from src.compendium.compendium import Compendium
 
 
 def test_compendium_change_language(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     compendium.change_language(Language.PT_BR)
 
@@ -27,7 +27,7 @@ def test_compendium_change_language(compendiums: Dict):
 
 
 def test_compendium_previous_page(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     option = Option(
         id="PREVIOUS_PAGE",
@@ -55,7 +55,7 @@ def test_compendium_previous_page(compendiums: Dict):
 
 
 def test_compendium_next_page(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     option = Option(
         id="NEXT_PAGE",
@@ -83,7 +83,7 @@ def test_compendium_next_page(compendiums: Dict):
 
 
 def test_compendium_previous_item(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     option = Option(
         id="PREVIOUS_ITEM",
@@ -111,7 +111,7 @@ def test_compendium_previous_item(compendiums: Dict):
 
 
 def test_compendium_next_item(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     option = Option(
         id="NEXT_ITEM",
@@ -139,7 +139,7 @@ def test_compendium_next_item(compendiums: Dict):
 
 
 def test_compendium_exit_options(compendiums: Dict):
-    compendium: EffectCompendium = compendiums["effect_compendium"]
+    compendium: Compendium = compendiums["effect_compendium"]
 
     option_0 = Option(
         id="RETURN",

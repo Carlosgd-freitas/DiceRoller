@@ -14,7 +14,6 @@ from src.systems.manager import Manager
 if TYPE_CHECKING:
     from src.base.entity import Entity
     from src.base.side import Side
-    from src.effects.immunity import ImmunityEffect
     from src.systems.settings import Settings
 
 
@@ -147,9 +146,9 @@ class EffectManager(Manager):
 
         # Check immunity
         if check_immunity:
-            immunity: ImmunityEffect = target.get_effect(Keyword.IMMUNITY)
+            immunity = target.get_effect(Keyword.IMMUNITY)
 
-            if immunity and effect.keyword in immunity.effects:
+            if immunity and effect.keyword in immunity.target_keywords:
                 self.logger.log_effect_execution_fail(
                     effect=effect,
                     source=source,
@@ -166,13 +165,13 @@ class EffectManager(Manager):
             blinded = source.get_effect(Keyword.BLIND)
 
             if blinded and source != target:
-                accuracy -= blinded.value
+                accuracy -= blinded.value_percent
 
             # Focus check
             focusing = source.get_effect(Keyword.FOCUS)
 
             if focusing:
-                accuracy += focusing.value
+                accuracy += focusing.value_percent
 
             # Effect miss
             if random() >= accuracy:

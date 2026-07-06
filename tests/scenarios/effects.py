@@ -243,7 +243,7 @@ print("\n===== Effect Execution: EXECUTE =====")
 monster_b.hp = 100
 
 combat_manager.effect_manager.execute_effect(
-    effect=ExecuteEffect(0.5),
+    effect=ExecuteEffect(value_percent=0.5),
     source=monster_a,
     target=monster_b,
 )
@@ -254,16 +254,16 @@ monster_b.hp = 150
 
 print("\n===== Effect Execution: IMMUNITY =====")
 
-effects = []
+keywords = []
 for i in range(11):
     if i % 2 == 0:
-        effect = Keyword.BURN
+        keyword = Keyword.BURN
     else:
-        effect = Keyword.POISON
-    effects.append(effect)
+        keyword = Keyword.POISON
+    keywords.append(keyword)
 
 for i in [0, 1, 5, 6, 10]:
-    immunity_effect = ImmunityEffect(effects=effects[:i])
+    immunity_effect = ImmunityEffect(target_keywords=keywords[:i])
 
     combat_manager.effect_manager.execute_effect(
         effect=immunity_effect,

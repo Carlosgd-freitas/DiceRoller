@@ -57,25 +57,64 @@ def test_keyword_cleanse(combat: Dict):
 
 def test_keyword_heal(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
-    monster: Monster = combat["monsters"][1]
+    monster_0: Monster = combat["monsters"][0]
+    monster_4: Monster = combat["monsters"][4]
+    monster_4.hp = 1
 
-    effect = HealEffect(6)
-
-    conditions = [
-        monster.local_id == "MONSTER_1",
-        monster.hp == 1,
-    ]
+    effect = HealEffect(9)
 
     effect_manager.execute_effect(
         effect,
-        source=monster,
-        target=monster,
+        source=monster_4,
+        target=monster_4,
+    )
+
+    conditions = [
+        monster_4.local_id == "MONSTER_4",
+        monster_4.is_alive() is True,
+        monster_4.hp == 10,
+        len(monster_4.effects) == 0,
+    ]
+
+    effect = HealEffect(value_percent=0.1)
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_4,
+        target=monster_4,
     )
 
     conditions.extend(
         [
-            monster.hp == 7,
-            len(monster.effects) == 0,
+            monster_4.hp == 30,
+        ]
+    )
+
+    effect = HealEffect(110, value_percent=0.5)
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_4,
+        target=monster_4,
+    )
+
+    conditions.extend(
+        [
+            monster_4.hp == 200,
+        ]
+    )
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_0,
+        target=monster_0,
+    )
+
+    conditions.extend(
+        [
+            monster_0.local_id == "MONSTER_0",
+            monster_0.is_alive() is False,
+            monster_0.hp == 0,
         ]
     )
 
@@ -112,27 +151,64 @@ def test_keyword_mana(combat: Dict):
 def test_keyword_revive(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_0: Monster = combat["monsters"][0]
-    monster_1: Monster = combat["monsters"][1]
+    monster_3: Monster = combat["monsters"][3]
 
-    effect = ReviveEffect(0.25)
-
-    conditions = [
-        monster_0.local_id == "MONSTER_0",
-        monster_0.hp == 0,
-        not monster_0.is_alive(),
-    ]
+    effect = ReviveEffect(10)
 
     effect_manager.execute_effect(
         effect,
-        source=monster_1,
+        source=monster_0,
+        target=monster_0,
+    )
+
+    conditions = [
+        monster_0.local_id == "MONSTER_0",
+        monster_0.is_alive() is True,
+        monster_0.hp == 10,
+        len(monster_0.effects) == 0,
+    ]
+
+    monster_0.hp = 0
+    effect = ReviveEffect(value_percent=0.25)
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_0,
         target=monster_0,
     )
 
     conditions.extend(
         [
             monster_0.hp == 25,
-            monster_0.is_alive(),
-            len(monster_0.effects) == 0,
+        ]
+    )
+
+    monster_0.hp = 0
+    effect = ReviveEffect(60, value_percent=0.50)
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_0,
+        target=monster_0,
+    )
+
+    conditions.extend(
+        [
+            monster_0.hp == 100,
+        ]
+    )
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_3,
+        target=monster_3,
+    )
+
+    conditions.extend(
+        [
+            monster_3.local_id == "MONSTER_3",
+            monster_3.is_alive() is True,
+            monster_3.hp == 100,
         ]
     )
 

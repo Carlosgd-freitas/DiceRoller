@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
@@ -21,21 +21,24 @@ class FocusEffect(Effect):
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.FOCUS,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.BUFF,
-            None,
-            True,
-            removable,
+            keyword=Keyword.FOCUS,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.BUFF,
+            persistent=True,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(

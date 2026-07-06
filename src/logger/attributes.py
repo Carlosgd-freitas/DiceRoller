@@ -35,6 +35,7 @@ class AttributeLogger(Logger):
         for attribute in [
             "hp",
             "mana",
+            "max_hp",
             "speed",
         ]:
             message = self.get_message(

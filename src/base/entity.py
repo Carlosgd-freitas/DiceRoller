@@ -308,13 +308,13 @@ def get_attribute_color(attribute: str) -> ColorData:
     background_color = None
     intensity = None
 
-    if attribute in ["hp"]:
+    if attribute in ["hp", "max_hp"]:
         foreground_color = Color.RED
-    elif attribute in ["mana"]:
-        return get_keyword_color(Keyword.MANA)
     elif attribute in ["speed"]:
         foreground_color = Color.WHITE
         intensity = "BRIGHT"
+    elif attribute in ["mana"]:
+        return get_keyword_color(Keyword.MANA)
 
     return {
         "background_color": background_color,

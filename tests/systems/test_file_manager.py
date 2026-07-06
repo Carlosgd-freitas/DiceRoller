@@ -1,9 +1,13 @@
 """Tests for FileManager class."""
 
-from typing import Dict
+from __future__ import annotations
 
-from src.systems.file import FileManager
+from typing import TYPE_CHECKING, Dict
+
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.systems.file import FileManager
 
 FILENAME = "file_manager_tests.dat"
 FILEDATA = {

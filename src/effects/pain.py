@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
@@ -22,21 +22,24 @@ class PainEffect(Effect):
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.PAIN,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.CURSE,
-            None,
-            False,
-            removable,
+            keyword=Keyword.PAIN,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.CURSE,
+            persistent=False,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(

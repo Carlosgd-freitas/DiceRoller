@@ -20,17 +20,28 @@ monster = Weeke()
 
 logger = CombatLogger()
 
-values = [1, 2, 5, 10]
+values = [1, 2, 5, 10, math.inf]
+value_percents = [0.01, 0.05, 0.25, 1, math.inf]
 durations = [1, 2, 5, math.inf]
 
 all_effects = get_all_effects()
 
 for effect in all_effects:
-    effect.value = choice(values)
     effect.duration = choice(durations)
 
+    if effect.keyword in [Keyword.BLIND, Keyword.EXECUTE, Keyword.FOCUS]:
+        effect.value = 0
+        effect.value_percent = choice(value_percents)
+
+    elif effect.keyword in [Keyword.HEAL, Keyword.REGEN, Keyword.REVIVE]:
+        effect.value = choice(values)
+        effect.value_percent = choice(value_percents)
+
+    elif effect.keyword not in [Keyword.NOTHING]:
+        effect.value = choice(values)
+
     if effect.keyword in [Keyword.IMMUNITY]:
-        effect.effects = [deepcopy(choice(all_effects).keyword)]
+        effect.target_keywords = [deepcopy(choice(all_effects).keyword)]
 
 buffs = [effect for effect in all_effects if effect.type == EffectType.BUFF]
 debuffs = [effect for effect in all_effects if effect.type == EffectType.DEBUFF]

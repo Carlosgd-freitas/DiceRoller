@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from math import ceil
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.processors.healing import calculate_healing
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -16,28 +16,31 @@ class ReviveEffect(Effect):
     """
     Revive Effect.
 
-    Increases the target's HP by (value * 100)% of it's max HP, rounding up, but only
-    if it is dead.
+    If the target is dead, returns it to combat and heals its HP by value and
+    (value_percent * 100) of its max HP, rounding up.
     """
 
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.REVIVE,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.RESTORATION,
-            None,
-            False,
-            removable,
+            keyword=Keyword.REVIVE,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.RESTORATION,
+            persistent=False,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(
@@ -53,16 +56,25 @@ class ReviveEffect(Effect):
         source: Entity | None = None,
     ) -> EffectData:
         fail = None
+        healed = None
 
         if not target.is_alive():
             if target.in_combat:
                 target.in_combat = True
-            target.hp += ceil(target.max_hp * self.value)
+
+            healed = calculate_healing(
+                self,
+                source,
+                target,
+            )
+
+            target.hp += healed
             target.equalize_stats()
+
         else:
             fail = "alive"
 
         return {
-            "attribute": "hp",
             "fail": fail,
+            "healed": healed,
         }

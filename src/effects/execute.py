@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
@@ -15,27 +15,30 @@ class ExecuteEffect(Effect):
     """
     Execute Effect.
 
-    Kills the target if it has hp less than or equal to (value * 100)% of it's max HP.
+    Kills the target if it has hp less than or equal to (value_percent * 100)% of it's max HP.
     """
 
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.EXECUTE,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.DETERIORATION,
-            None,
-            False,
-            removable,
+            keyword=Keyword.EXECUTE,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.DETERIORATION,
+            persistent=False,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(
@@ -53,7 +56,7 @@ class ExecuteEffect(Effect):
         fail = None
 
         if target.is_alive():
-            if target.hp <= (target.max_hp * self.value):
+            if target.hp <= (target.max_hp * self.value_percent):
                 target.hp = 0
             else:
                 fail = "default"

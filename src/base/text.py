@@ -1,4 +1,24 @@
 import unicodedata
+from math import inf
+
+
+def numeric_to_string(value: float) -> str:
+    """
+    Casts a numeric value to string.
+
+    :param value: A numeric value.
+    :type value: float
+
+    :return: A string.
+    :rtype: str
+    """
+    if value is None:
+        return None
+
+    if value != inf:
+        return str(value)
+    else:
+        return "∞"
 
 
 def unaccent(text: str) -> str:
@@ -11,6 +31,9 @@ def unaccent(text: str) -> str:
     :return: An unaccented string.
     :rtype: str
     """
+    if text is None:
+        return None
+
     return "".join(
         c for c in unicodedata.normalize("NFD", text) if not unicodedata.combining(c)
     )
@@ -26,6 +49,9 @@ def normalize(text: str) -> str:
     :return: A normalized string.
     :rtype: str
     """
+    if text is None:
+        return None
+
     return unaccent(text).lower()
 
 
@@ -43,7 +69,10 @@ def normalize_filename(filename: str, extension: str) -> str:
     :return: Normalized filename.
     :rtype: str
     """
-    normalized = normalize(filename)
+    if filename is None or extension is None:
+        return None
+
+    normalized = normalize(filename).replace(" ", "_")
 
     if not normalized.endswith(extension):
         normalized += extension

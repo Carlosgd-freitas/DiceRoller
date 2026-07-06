@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
 from src.base.triggers import Trigger
+from src.processors.healing import calculate_healing
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -23,21 +24,25 @@ class RegenEffect(Effect):
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 2,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.REGEN,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.BUFF,
-            Trigger.TURN_START,
-            True,
-            removable,
+            keyword=Keyword.REGEN,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.BUFF,
+            trigger=Trigger.TURN_START,
+            persistent=True,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(
@@ -59,14 +64,22 @@ class RegenEffect(Effect):
         source: Entity | None = None,
     ) -> EffectData:
         fail = None
+        healed = None
 
         if target.is_alive():
-            target.hp += self.value
+            healed = calculate_healing(
+                self,
+                source,
+                target,
+            )
+
+            target.hp += healed
             target.equalize_stats()
+
         else:
             fail = "dead"
 
         return {
-            "attribute": "hp",
             "fail": fail,
+            "healed": healed,
         }

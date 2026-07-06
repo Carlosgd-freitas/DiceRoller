@@ -23,7 +23,6 @@ from src.logger.monster import MonsterLogger
 from src.menus.compendium_menu import CompendiumMenu
 from src.menus.main_menu import MainMenu
 from src.menus.settings_menu import SettingsMenu
-from src.menus.sort_menu import SortMenu
 from src.systems.file import FileManager
 from src.systems.manager import Manager
 from src.systems.settings import Settings
@@ -132,18 +131,12 @@ def menus(settings: Settings) -> Dict:
         logging=False,
     )
 
-    sort_menu = SortMenu(
-        settings=settings,
-        logging=False,
-    )
-
     return {
         "combat_player_actions_menu": combat_player_actions_menu,
         "compendium_menu": compendium_menu,
         "main_menu": main_menu,
         "sandbox_menu": sandbox_menu,
         "settings_menu": settings_menu,
-        "sort_menu": sort_menu,
     }
 
 

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.processors.healing import calculate_healing
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -15,27 +16,31 @@ class HealEffect(Effect):
     """
     Heal Effect.
 
-    If the target is alive, increases its HP by the effect value.
+    If the target is alive, increases its HP by value and (value_percent * 100) of its
+    max HP, rounding up.
     """
 
     def __init__(
         self,
         value: float = 0,
+        value_percent: float = 0,
         duration: int = 0,
         decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
+        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
-            Keyword.HEAL,
-            value,
-            duration,
-            decay,
-            accuracy,
-            EffectType.RESTORATION,
-            None,
-            False,
-            removable,
+            keyword=Keyword.HEAL,
+            value=value,
+            value_percent=value_percent,
+            duration=duration,
+            decay=decay,
+            accuracy=accuracy,
+            type=EffectType.RESTORATION,
+            persistent=False,
+            removable=removable,
+            target_keywords=target_keywords,
         )
 
     def on_apply(
@@ -51,9 +56,16 @@ class HealEffect(Effect):
         source: Entity | None = None,
     ) -> EffectData:
         fail = None
+        healed = None
 
         if target.is_alive():
-            target.hp += self.value
+            healed = calculate_healing(
+                self,
+                source,
+                target,
+            )
+
+            target.hp += healed
             target.equalize_stats()
 
         else:
@@ -61,4 +73,5 @@ class HealEffect(Effect):
 
         return {
             "fail": fail,
+            "healed": healed,
         }

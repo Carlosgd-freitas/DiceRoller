@@ -1,10 +1,14 @@
 """Tests for Manager class."""
 
-from typing import Dict
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict
 
 from src.locales.languages import Language
-from src.systems.manager import Manager
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.systems.manager import Manager
 
 
 def test_manager_change_language(managers: Dict):

@@ -58,7 +58,7 @@ def test_keyword_execute(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    execute_effect = ExecuteEffect(0.5)
+    execute_effect = ExecuteEffect(value_percent=0.5)
 
     effect_manager.execute_effect(
         execute_effect,

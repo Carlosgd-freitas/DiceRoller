@@ -20,7 +20,6 @@ from src.compendium.monsters import get_all_monsters
 from src.logger.logger import Logger
 
 if TYPE_CHECKING:
-    from src.effects.immunity import ImmunityEffect
     from src.systems.settings import Settings
 
 CHANCE_CALCULATION_METHOD = Literal[
@@ -65,13 +64,17 @@ class RandomizerConfig:
     interval. Default value is [1, 3].
     :type effect_threshold: Tuple[int, int]
 
-    :param immunity_effect_threshold: Generated Immunity Effects will have a number of
-    effects in this closedinterval. Default value is [1, 3].
-    :type immunity_effect_threshold: Tuple[int, int]
+    :param target_keywords_threshold: Generated Effects will have a number of target
+    keywords in this closed interval. Default value is [1, 3].
+    :type target_keywords_threshold: Tuple[int, int]
 
-    :param value_threshold: Generated Effects will have a value in this closed interval, unless
-    it is Execute or Revive, which have a different threshold. Default value is [1, 100].
-    :type value_threshold: Tuple[int, int]
+    :param value_threshold: Generated Effects will have a value in this closed interval.
+    Default value is [1, 100].
+    :type value_threshold: Tuple[float, float]
+
+    :param value_percent_threshold: Generated Effects will have a value (%) in this
+    closed interval. Default value is [0.01, 0.25] (1%, 25%).
+    :type value_percent_threshold: Tuple[float, float]
 
     :param duration_threshold: Generated Effects will have a duration in this closed
     interval. Default value is [2, 10].
@@ -104,9 +107,10 @@ class RandomizerConfig:
     side_threshold: Tuple[int, int] = (4, 8)
     # Side attributes
     effect_threshold: Tuple[int, int] = (1, 3)
-    immunity_effect_threshold: Tuple[int, int] = (1, 3)
+    target_keywords_threshold: Tuple[int, int] = (1, 3)
     # Effect attributes
-    value_threshold: Tuple[int, int] = (1, 100)
+    value_threshold: Tuple[float, float] = (1, 100)
+    value_percent_threshold: Tuple[float, float] = (0.01, 0.25)
     duration_threshold: Tuple[int, int] = (1, 10)
     accuracy_threshold: Tuple[float, float] = (0.75, 1)
     effect_type: EffectType | None = None
@@ -505,14 +509,16 @@ class Randomizer:
         effect = deepcopy(choice(valid_effects))
 
         # Adjusting parameters
-        if effect.keyword in [Keyword.EXECUTE]:
-            effect.value = round(uniform(0.05, 0.25), 2)  # [5%, 25%]
-        elif effect.keyword in [Keyword.REVIVE]:
-            effect.value = round(uniform(0.05, 1), 2)  # [5%, 100%]
-        else:
-            effect.value = randrange(
-                config.value_threshold[0], config.value_threshold[1] + 1
-            )
+        effect.value = randrange(
+            config.value_threshold[0], config.value_threshold[1] + 1
+        )
+
+        effect.value_percent = round(
+            uniform(
+                config.value_percent_threshold[0], config.value_percent_threshold[1]
+            ),
+            2,
+        )
 
         effect.duration = randrange(
             config.duration_threshold[0], config.duration_threshold[1] + 1
@@ -522,28 +528,26 @@ class Randomizer:
             uniform(config.accuracy_threshold[0], config.accuracy_threshold[1]), 2
         )
 
-        # Adjusting Immunity Effect parameters
-        if effect.keyword in [Keyword.IMMUNITY]:
-            effect: ImmunityEffect
-            immunity_effects: List[Keyword] = []
-            config.keyword_blacklist = [Keyword.IMMUNITY]
+        # Adjusting target keywords
+        target_keywords: List[Keyword] = []
+        config.keyword_blacklist = [effect.keyword]
 
-            for index in range(config.immunity_effect_threshold[1]):
-                chance = self._calculate_chance(index, config.immunity_effect_threshold)
+        for index in range(config.target_keywords_threshold[1]):
+            chance = self._calculate_chance(index, config.target_keywords_threshold)
 
-                if random() <= chance:
-                    keyword = self.get_random_keyword(config)
+            if random() <= chance:
+                keyword = self.get_random_keyword(config)
 
-                    if keyword:
-                        immunity_effects.append(keyword)
-                        config.keyword_blacklist.append(keyword)
-                    else:
-                        break
-
+                if keyword:
+                    target_keywords.append(keyword)
+                    config.keyword_blacklist.append(keyword)
                 else:
                     break
 
-            effect.effects = immunity_effects
+            else:
+                break
+
+        effect.target_keywords = target_keywords
 
         return effect
 

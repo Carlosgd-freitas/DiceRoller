@@ -9,6 +9,7 @@ from src.base.color import Color, ColorData, color_string
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
 from src.base.monster import Monster
+from src.base.text import numeric_to_string
 from src.logger.attributes import AttributeLogger
 
 if TYPE_CHECKING:
@@ -100,17 +101,21 @@ class EffectLogger(AttributeLogger):
                 )
 
         # Effect parameters
+        value_percent = effect.value_percent
+        if value_percent != inf:
+            value_percent = ceil(value_percent * 100)
+
         params.update(
             {
-                "duration": effect.duration,
+                "duration": numeric_to_string(effect.duration),
                 "turns": self.pluralize(
                     effect.duration,
                     namespace="base",
                     message_group="LEXICON",
                     key="turn",
                 ),
-                "value": effect.value,
-                "value_perc": ceil(effect.value * 100),
+                "value": numeric_to_string(effect.value),
+                "value_percent": numeric_to_string(value_percent),
             }
         )
 
@@ -176,12 +181,21 @@ class EffectLogger(AttributeLogger):
         )
 
         if effect and associated:
+            duration = numeric_to_string(effect.duration)
+            value = numeric_to_string(effect.value)
+
+            value_percent = effect.value_percent
+            if value_percent != inf:
+                value_percent = ceil(value_percent * 100)
+            value_percent = numeric_to_string(value_percent)
+
             if (
                 effect.keyword
                 in [
                     Keyword.DOOM,
                     Keyword.CONFUSE,
                     Keyword.FREEZE,
+                    Keyword.IMMUNITY,
                     Keyword.INVISIBLE,
                     Keyword.INVULNERABLE,
                     Keyword.REPEL,
@@ -191,43 +205,22 @@ class EffectLogger(AttributeLogger):
                 ]
                 and effect.duration
             ):
-                if effect.duration != inf:
-                    message += color_string(f" {effect.duration}", **color_data)
-                else:
-                    message += color_string(" ∞", **color_data)
+                message += color_string(f" {duration}", **color_data)
 
-            elif (
-                effect.keyword
-                in [
-                    Keyword.BLIND,
-                    Keyword.EXECUTE,
-                    Keyword.FOCUS,
-                    Keyword.REVIVE,
-                ]
-                and effect.value
-            ):
-                if effect.value != inf:
-                    message += color_string(f" {effect.value * 100}%", **color_data)
-                else:
-                    message += color_string(" ∞", **color_data)
+            elif effect.value and not effect.value_percent:
+                message += color_string(f" {value}", **color_data)
 
-            elif effect.keyword in [
-                Keyword.IMMUNITY,
-            ]:
-                if effect.duration != inf:
-                    message += color_string(f" {effect.duration}", **color_data)
-                else:
-                    message += color_string(" ∞", **color_data)
+            elif not effect.value and effect.value_percent:
+                message += color_string(f" {value_percent}%", **color_data)
 
-                if effect.effects:
-                    effects = self.get_multiple_effects_message(keywords=effect.effects)
-                    message += color_string(f" [ {effects} ]", **color_data)
+            elif effect.value and effect.value_percent:
+                message += color_string(f" {value} + {value_percent}%", **color_data)
 
-            elif effect.value:
-                if effect.value != inf:
-                    message += color_string(f" {effect.value}", **color_data)
-                else:
-                    message += color_string(" ∞", **color_data)
+            if effect.target_keywords:
+                keywords = self.get_multiple_effects_message(
+                    keywords=effect.target_keywords
+                )
+                message += color_string(f" [ {keywords} ]", **color_data)
 
         return message
 
@@ -415,7 +408,7 @@ class EffectLogger(AttributeLogger):
         """
         Logs a message for the Immunity effect execution.
         """
-        immune_to: List[Keyword] = effect.effects
+        immune_to: List[Keyword] = effect.target_keywords
         count = len(immune_to)
         kwargs["count"] = color_string(
             str(count),
@@ -744,7 +737,7 @@ class EffectLogger(AttributeLogger):
                 ("decay", "decay"),
                 ("duration", "duration"),
                 ("value", "value"),
-                ("value", "value_perc"),
+                ("value", "value_percent"),
             ]:
                 translated_word = self.get_message(
                     namespace="base", message_group="LEXICON", key=word
@@ -756,12 +749,33 @@ class EffectLogger(AttributeLogger):
                     intensity="BRIGHT",
                 )
 
+            key = "description"
+
+        else:
+            if not effect.value and not effect.value_percent:
+                key = "description"
+            elif effect.value and not effect.value_percent:
+                key = "description_absolute"
+            elif not effect.value and effect.value_percent:
+                key = "description_percent"
+            else:
+                key = "description_both"
+
         message = self.get_message(
             namespace="effects",
             message_group=effect.keyword.name,
-            key="description",
+            key=key,
             **kwargs,
         )
+
+        # Default description
+        if key != "description" and message is None:
+            message = self.get_message(
+                namespace="effects",
+                message_group=effect.keyword.name,
+                key="description",
+                **kwargs,
+            )
 
         self.log(message=message, end=end)
 
@@ -817,11 +831,7 @@ class EffectLogger(AttributeLogger):
 
         self.log(message=message, end="")
 
-        if effect.duration != inf:
-            message = str(effect.duration)
-        else:
-            message = "∞"
-
+        message = numeric_to_string(effect.duration)
         message += (
             " "
             + self.pluralize(

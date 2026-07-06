@@ -3,6 +3,7 @@
 ATTRIBUTES = {
     "hp": "HP",
     "mana": "MANA",
+    "max_hp": "MAX HP",
     "speed": "SPD",
 }
 
@@ -41,6 +42,7 @@ LEXICON = {
     "turns": "turns",
     "type": "type",
     "value": "value",
+    "value_percent": "value (%)",
     "weapon": "weapon",
     "weapons": "weapons",
     "yes": "yes",

@@ -79,20 +79,21 @@ def test_stack_doom_effect(combat: Dict):
 def test_stack_immunity_effect(combat: Dict):
     monster: Monster = combat["monsters"][2]
 
-    effect_0 = ImmunityEffect(effects=[Keyword.BURN, Keyword.BLIND])
-    effect_1 = ImmunityEffect(effects=[Keyword.BURN, Keyword.POISON])
+    effect_0 = ImmunityEffect(target_keywords=[Keyword.BURN, Keyword.BLIND])
+    effect_1 = ImmunityEffect(target_keywords=[Keyword.BURN, Keyword.POISON])
 
     monster.apply_effect(effect_0)
     monster.apply_effect(effect_1)
 
-    stacked_effect: ImmunityEffect = monster.get_effect(Keyword.IMMUNITY)
+    stacked_effect = monster.get_effect(Keyword.IMMUNITY)
 
     conditions = [
         isinstance(stacked_effect, ImmunityEffect),
         len(monster.effects) == 1,
         stacked_effect.keyword == Keyword.IMMUNITY,
-        len(stacked_effect.effects) == 3,
-        set(stacked_effect.effects) == {Keyword.BURN, Keyword.BLIND, Keyword.POISON},
+        len(stacked_effect.target_keywords) == 3,
+        set(stacked_effect.target_keywords)
+        == {Keyword.BURN, Keyword.BLIND, Keyword.POISON},
     ]
 
     assert_conditions(conditions)

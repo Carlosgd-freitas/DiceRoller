@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List
 
+from src.base.constants import VERSION
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.logger import Logger
@@ -60,9 +61,7 @@ class MainMenu(Menu):
         :return: Menu title.
         :rtype: str
         """
-        return self.logger.get_message(
-            namespace="menus", message_group="MAIN", key="title"
-        )
+        return f"DiceRoller v{VERSION}"
 
     def get_options(self) -> List[Option]:
         """
@@ -211,16 +210,3 @@ class MainMenu(Menu):
             pass
 
         return
-
-    # =========================================================================
-    # Rendering
-    # =========================================================================
-
-    def show_title(self):
-        """
-        Shows the Menu title.
-        """
-        self.logger.box_message(
-            message="DiceRoller v0.1.X",
-            size=50,
-        )

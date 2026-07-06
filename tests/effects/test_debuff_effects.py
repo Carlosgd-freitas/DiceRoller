@@ -104,8 +104,8 @@ def test_keyword_blind(combat: Dict):
     monster_1: Monster = combat["monsters"][1]
     monster_2: Monster = combat["monsters"][2]
 
-    effect_blind = BlindEffect(1, duration=1)
-    effect_focus = FocusEffect(1, duration=1)
+    effect_blind = BlindEffect(value_percent=1, duration=1)
+    effect_focus = FocusEffect(value_percent=1, duration=1)
     effect_heal = HealEffect(2)
     effect_attack = AttackEffect(2)
 
@@ -126,7 +126,7 @@ def test_keyword_blind(combat: Dict):
         len(monster_1.effects) == 1,
         monster_1.get_effect(Keyword.FOCUS) is None,
         monster_1.get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
-        monster_1.get_effect(Keyword.BLIND).value == 1,
+        monster_1.get_effect(Keyword.BLIND).value_percent == 1,
         monster_1.get_effect(Keyword.BLIND).duration == 1,
         monster_1.hp == 1,
         monster_2.local_id == "MONSTER_2",

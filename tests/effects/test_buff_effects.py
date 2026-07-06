@@ -35,8 +35,8 @@ def test_keyword_focus(combat: Dict):
     monster_1: Monster = combat["monsters"][1]
     monster_2: Monster = combat["monsters"][2]
 
-    effect_blind = BlindEffect(1, duration=1)
-    effect_focus = FocusEffect(1, duration=1)
+    effect_blind = BlindEffect(value_percent=1, duration=1)
+    effect_focus = FocusEffect(value_percent=1, duration=1)
     effect_heal = HealEffect(2, accuracy=0)
     effect_attack = AttackEffect(2, accuracy=0)
 
@@ -57,7 +57,7 @@ def test_keyword_focus(combat: Dict):
         len(monster_1.effects) == 1,
         monster_1.get_effect(Keyword.BLIND) is None,
         monster_1.get_effect(Keyword.FOCUS).keyword == Keyword.FOCUS,
-        monster_1.get_effect(Keyword.FOCUS).value == 1,
+        monster_1.get_effect(Keyword.FOCUS).value_percent == 1,
         monster_1.get_effect(Keyword.FOCUS).duration == 1,
         monster_1.hp == 1,
         monster_2.local_id == "MONSTER_2",
@@ -245,8 +245,8 @@ def test_keyword_immunity(combat: Dict):
     monster_1: Monster = combat["monsters"][1]
     monster_2: Monster = combat["monsters"][2]
 
-    effect_blind = BlindEffect(1, duration=1)
-    effect_immunity = ImmunityEffect(effects=[Keyword.BLIND], duration=1)
+    effect_blind = BlindEffect(value_percent=1, duration=1)
+    effect_immunity = ImmunityEffect(target_keywords=[Keyword.BLIND], duration=1)
     effect_attack = AttackEffect(2)
 
     combat_manager.effect_manager.execute_effect(
