@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
-from src.base.manager import Manager
 from src.base.triggers import Trigger
 from src.logger.effects import EffectLogger
+from src.systems.manager import Manager
 
 if TYPE_CHECKING:
     from src.base.entity import Entity

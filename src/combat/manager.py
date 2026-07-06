@@ -8,14 +8,14 @@ from random import shuffle
 from typing import TYPE_CHECKING, Callable, Dict, List, Literal, TypedDict
 
 from src.base.keywords import Keyword
-from src.base.manager import Manager
 from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
-from src.combat.player_actions import PlayerActionsMenu
+from src.combat.player_actions import CombatPlayerActionsMenu
 from src.combat.suffixes import SuffixManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
+from src.systems.manager import Manager
 from src.systems.targeting.selectors.manager import SelectorManager
 
 if TYPE_CHECKING:
@@ -125,7 +125,7 @@ class CombatManager(Manager):
         self.effect_manager = EffectManager(settings, logging)
 
         # Player actions
-        self.player_actions_menu = PlayerActionsMenu(settings, logging)
+        self.player_actions_menu = CombatPlayerActionsMenu(settings, logging)
 
         # Suffix Management
         self.suffix_manager = SuffixManager()

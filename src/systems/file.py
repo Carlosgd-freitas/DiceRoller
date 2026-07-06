@@ -1,4 +1,4 @@
-"""File module."""
+"""File Manager module."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import pickle
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from src.base.manager import Manager
 from src.logger.file import FileLogger
+from src.systems.manager import Manager
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings

@@ -6,8 +6,8 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
-from src.base.manager import Manager
 from src.locales.languages import Language
+from src.systems.manager import Manager
 
 if TYPE_CHECKING:
     from src.logger.logger import Logger

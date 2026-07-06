@@ -6,6 +6,36 @@ from src.combat.manager import CombatManager
 from tests.utils import assert_conditions
 
 
+def test_is_round_start(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+
+    for monster in combat_manager.order:
+        monster.turn_taken = False
+
+    value = combat_manager.is_round_start()
+
+    conditions = [
+        value is True,
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_is_round_end(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+
+    for monster in combat_manager.order:
+        monster.turn_taken = True
+
+    value = combat_manager.is_round_end()
+
+    conditions = [
+        value is True,
+    ]
+
+    assert_conditions(conditions)
+
+
 def test_next_turn_simple(combat: Dict):
     combat_manager: CombatManager = combat["combat_manager"]
 

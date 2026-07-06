@@ -1,4 +1,4 @@
-"""Tests for loggers."""
+"""Tests for Logger class."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from src.logger.logger import Logger
 
 
-def test_change_language(loggers: Dict):
+def test_logger_change_language(loggers: Dict):
     logger: Logger = loggers["logger"]
 
     logger.change_language(Language.PT_BR)
@@ -25,7 +25,7 @@ def test_change_language(loggers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_message_group(loggers: Dict):
+def test_logger_get_message_group(loggers: Dict):
     logger: Logger = loggers["logger"]
 
     message_group = logger.get_message_group(
@@ -40,7 +40,7 @@ def test_get_message_group(loggers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_message(loggers: Dict):
+def test_logger_get_message(loggers: Dict):
     logger: Logger = loggers["logger"]
 
     message = logger.get_message(namespace="base", message_group="ATTRIBUTES", key="hp")
@@ -53,7 +53,7 @@ def test_get_message(loggers: Dict):
     assert_conditions(conditions)
 
 
-def test_get_colored_message(loggers: Dict):
+def test_logger_get_colored_message(loggers: Dict):
     logger: Logger = loggers["logger"]
 
     keyword = Keyword.BURN
@@ -69,5 +69,35 @@ def test_get_colored_message(loggers: Dict):
         isinstance(message, str),
         "burn" in message.lower(),
     ]
+
+    assert_conditions(conditions)
+
+
+def test_logger_pluralize(loggers: Dict):
+    logger: Logger = loggers["logger"]
+
+    message = logger.pluralize(
+        1,
+        namespace="base",
+        message_group="LEXICON",
+        key="item",
+    )
+
+    conditions = [
+        message == "item",
+    ]
+
+    message = logger.pluralize(
+        2,
+        namespace="base",
+        message_group="LEXICON",
+        key="item",
+    )
+
+    conditions.extend(
+        [
+            message == "items",
+        ]
+    )
 
     assert_conditions(conditions)

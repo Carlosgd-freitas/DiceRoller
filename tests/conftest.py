@@ -5,8 +5,13 @@ from typing import Dict
 from pytest import fixture
 
 from src.base.monster import Monster
+from src.combat.effects import EffectManager
 from src.combat.manager import CombatManager, OrderStrategy
+from src.combat.player_actions import CombatPlayerActionsMenu
+from src.combat.suffixes import SuffixManager
 from src.combat.team import Team
+from src.compendium.effects import EffectCompendium
+from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.attributes import AttributeLogger
 from src.logger.combat import CombatLogger
@@ -15,7 +20,21 @@ from src.logger.effects import EffectLogger
 from src.logger.file import FileLogger
 from src.logger.logger import Logger
 from src.logger.monster import MonsterLogger
+from src.menus.compendium_menu import CompendiumMenu
+from src.menus.main_menu import MainMenu
+from src.menus.settings_menu import SettingsMenu
+from src.menus.sort_menu import SortMenu
+from src.systems.file import FileManager
+from src.systems.manager import Manager
 from src.systems.settings import Settings
+from src.systems.targeting.selectors.manager import SelectorManager
+
+
+@fixture()
+def settings() -> Settings:
+    settings = Settings()
+
+    return settings
 
 
 @fixture()
@@ -40,7 +59,96 @@ def loggers() -> Dict:
 
 
 @fixture()
-def combat() -> Dict:
+def compendiums(settings: Settings) -> Dict:
+    effect_compendium = EffectCompendium(
+        settings=settings,
+        logging=False,
+    )
+
+    return {
+        "effect_compendium": effect_compendium,
+    }
+
+
+@fixture()
+def managers(settings: Settings) -> Dict:
+    logger = Logger(enabled=False)
+
+    manager = Manager(logger=logger, settings=settings)
+
+    combat_manager = CombatManager(
+        settings=settings,
+        logging=False,
+    )
+
+    effect_manager = EffectManager(
+        settings=settings,
+        logging=False,
+    )
+
+    file_manager = FileManager(
+        settings=settings,
+        logging=False,
+    )
+
+    selector_manager = SelectorManager()
+
+    suffix_manager = SuffixManager()
+
+    return {
+        "manager": manager,
+        "combat_manager": combat_manager,
+        "effect_manager": effect_manager,
+        "file_manager": file_manager,
+        "selector_manager": selector_manager,
+        "suffix_manager": suffix_manager,
+    }
+
+
+@fixture()
+def menus(settings: Settings) -> Dict:
+    compendium_menu = CompendiumMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    combat_player_actions_menu = CombatPlayerActionsMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    main_menu = MainMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    sandbox_menu = SandboxMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    settings_menu = SettingsMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    sort_menu = SortMenu(
+        settings=settings,
+        logging=False,
+    )
+
+    return {
+        "combat_player_actions_menu": combat_player_actions_menu,
+        "compendium_menu": compendium_menu,
+        "main_menu": main_menu,
+        "sandbox_menu": sandbox_menu,
+        "settings_menu": settings_menu,
+        "sort_menu": sort_menu,
+    }
+
+
+@fixture()
+def combat(settings: Settings) -> Dict:
     monster_0 = Monster(
         local_id="MONSTER_0",
         name="Red",
@@ -95,7 +203,7 @@ def combat() -> Dict:
     monsters = [monster for team in teams for monster in team.members]
 
     combat_manager = CombatManager(
-        settings=Settings(),
+        settings=settings,
         teams=teams,
         order_strategy=OrderStrategy.SET,
         logging=False,

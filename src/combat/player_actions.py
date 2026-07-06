@@ -1,4 +1,4 @@
-"""Player Actions module."""
+"""Combat Player Actions module."""
 
 from __future__ import annotations
 
@@ -14,9 +14,9 @@ if TYPE_CHECKING:
     from src.systems.settings import Settings
 
 
-class PlayerActionsMenu(Menu):
+class CombatPlayerActionsMenu(Menu):
     """
-    PlayerActions class.
+    CombatPlayerActionsMenu class.
 
     :var settings: Game settings.
     :vartype settings: Settings

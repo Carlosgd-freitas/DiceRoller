@@ -294,11 +294,7 @@ class EffectCompendium(Compendium):
         :return: The Compendium item name.
         :rtype: str
         """
-        return self.logger.get_message(
-            namespace="effects",
-            message_group=item.keyword.name,
-            key="name",
-        )
+        return self.logger.get_effect_name(item)
 
     # =========================================================================
     # Options

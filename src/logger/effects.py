@@ -119,6 +119,24 @@ class EffectLogger(AttributeLogger):
 
         return params
 
+    def get_effect_name(self, effect: Effect) -> str:
+        """
+        Gets an effect name.
+
+        :param effect: An effect.
+        :type effect: Effect
+
+        :return: Effect name.
+        :rtype: str
+        """
+        name = self.get_message(
+            namespace="effects",
+            message_group=effect.keyword.name,
+            key="name",
+        )
+
+        return name
+
     def get_effect_message(
         self,
         keyword: Keyword = None,
