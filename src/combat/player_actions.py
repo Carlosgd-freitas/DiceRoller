@@ -6,17 +6,22 @@ from math import inf
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, color_string
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
+from src.base.side import Side
 from src.combat.effects import EffectManager
 from src.combat.team_manager import TeamManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
-from src.systems.targeting.filters import filter_monsters
+from src.systems.targeting.filters import (
+    filter_monsters,
+    preprocess_enemies,
+)
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
     from src.systems.settings import Settings
 
 
@@ -184,6 +189,9 @@ class CombatPlayerActionsMenu(Menu):
         :return: If the option can be selected.
         :rtype: bool
         """
+        if option.id == "ROLL_DICE":
+            return len(monster.dice) > 0
+
         if option.id in [
             "SKILLS",
             "CONSUMABLES",
@@ -224,9 +232,10 @@ class CombatPlayerActionsMenu(Menu):
         elif option.id == "SKIP_TURN":
             return self.skip_turn(monster)
 
-    def _select_target(self, valid_indexes: List[int]) -> int:
+    # ToDo: k
+    def _select(self, valid_indexes: List[int], message_key: str, k: int = 1) -> int:
         """
-        Prompts the user to select one of the available targets, and if:
+        Prompts the user with a message, and if:
         * a valid index is selected, is is returned.
         * an invalid index is selected, the prompt will repeat.
         """
@@ -234,7 +243,7 @@ class CombatPlayerActionsMenu(Menu):
             target_number = self.logger.input(
                 namespace="menus",
                 message_group="PLAYER_ACTIONS",
-                key="select_target_prompt",
+                key=message_key,
             )
 
             try:
@@ -247,6 +256,94 @@ class CombatPlayerActionsMenu(Menu):
                 continue
 
         return target_number
+
+    def _get_targets(self, source: Monster, side: Side) -> List[Monster]:
+        """
+        Returns a list of target monsters based on Side's effects.
+
+        :param side: A Side.
+        :type side: Side
+
+        :param source: The source monster which is targeting others.
+        :type source: Monster
+
+        :return: A list of target monsters.
+        :rtype: List[Monster]
+        """
+        targets = []
+        effect_summary = side.get_effect_summary()
+
+        # Determining life state
+        add_alive = False
+        add_dead = False
+
+        for effect in side.effects:
+            if effect.affects() == LifeState.ALIVE:
+                add_alive = True
+            elif effect.affects() == LifeState.DEAD:
+                add_dead = True
+            elif effect.affects() == LifeState.ANY:
+                add_alive = True
+                add_dead = True
+                break
+
+        if add_alive and not add_dead:
+            life_state = LifeState.ALIVE
+        elif not add_alive and add_dead:
+            life_state = LifeState.DEAD
+        else:
+            life_state = LifeState.ANY
+
+        # Determining groups
+        add_self = False
+        add_allies = False
+        add_enemies = False
+
+        for effect_type, _ in effect_summary.items():
+            if effect_type in ["BUFF", "CURSE", "DEFENSIVE", "RESTORATION"]:
+                add_self = True
+                add_allies = True
+            elif effect_type in ["DEBUFF", "OFFENSIVE", "DETERIORATION"]:
+                add_enemies = True
+
+        # Determining targets
+        if add_self:
+            if life_state in [LifeState.ALIVE, LifeState.ANY] and source.is_alive():
+                targets.append(source)
+            elif (
+                life_state in [LifeState.DEAD, LifeState.ANY] and not source.is_alive()
+            ):
+                targets.append(source)
+
+        if add_allies:
+            allies = self.team_manager.get_allies(source, self.teams)
+
+            targets.extend(
+                filter_monsters(
+                    allies,
+                    k=inf,
+                    blacklist=targets,
+                    life_state=life_state,
+                    consider=[],
+                    method="FIRST",
+                )
+            )
+
+        if add_enemies:
+            enemies = self.team_manager.get_enemies(source, self.teams)
+            enemies = preprocess_enemies(enemies)
+
+            targets.extend(
+                filter_monsters(
+                    enemies,
+                    k=inf,
+                    blacklist=targets,
+                    life_state=life_state,
+                    method="FIRST",
+                )
+            )
+
+        return targets
 
     def roll_dice(self, monster: Monster) -> Literal[True]:
         """
@@ -263,12 +360,72 @@ class CombatPlayerActionsMenu(Menu):
         :return: If the player turn has been taken or if it will continue.
         :rtype: Literal[True]
         """
-        # sides = self.effect_manager.roll(monster)
+        sides = self.effect_manager.roll(monster)
 
-        # select_side
-        # select_target
-        # get allies & enemies
-        # proccess
+        while len(sides) > 0:
+            # Logging sides
+            self.logger.log(message="")
+
+            for index, side in enumerate(sides):
+                message = self.logger.get_side_details(side, index + 1)
+                self.logger.log(message=message)
+
+            # Player selecting side
+            valid_indexes = range(1, len(sides) + 1)
+            self.logger.log(message="")
+            side_number = self._select(
+                valid_indexes,
+                message_key="select_side_prompt",
+            )
+            side = sides[side_number - 1]
+
+            # Getting targets
+            targets = self._get_targets(
+                source=monster,
+                side=side,
+            )
+
+            # Logging targets
+            self.logger.log(message="")
+            self.logger.log_teams(
+                teams=self.teams,
+                whitelist=targets,
+                life_state=LifeState.ANY,
+                control_type=False,
+                monster_index=1,
+            )
+
+            # Logging selected side
+            message = (
+                self.logger.get_message(
+                    namespace="menus",
+                    message_group="PLAYER_ACTIONS",
+                    key="selected_side",
+                )
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            message += self.logger.get_side_details(side)
+            self.logger.log(message=message)
+
+            # Player selecting target
+            valid_indexes = range(1, len(targets) + 1)
+            target_number = self._select(
+                valid_indexes,
+                message_key="select_target_prompt",
+            )
+            self.logger.log(message="")
+            target = targets[target_number - 1]
+
+            # Executing effects
+            for effect in side.effects:
+                self.effect_manager.execute_effect(
+                    effect=effect,
+                    source=monster,
+                    target=target,
+                )
+
+            sides.remove(side)
 
         return True
 
@@ -305,7 +462,7 @@ class CombatPlayerActionsMenu(Menu):
 
         # Player selecting target
         valid_indexes = range(1, len(targets) + 1)
-        target_number = self._select_target(valid_indexes)
+        target_number = self._select(valid_indexes, message_key="select_target_prompt")
         target = targets[target_number - 1]
 
         # Logging monster details

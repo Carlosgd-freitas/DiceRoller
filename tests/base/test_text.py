@@ -8,6 +8,7 @@ from src.base.text import (
     numeric_to_string,
     unaccent,
 )
+from tests.utils import assert_conditions
 
 
 def test_numeric_to_string():
@@ -19,7 +20,7 @@ def test_numeric_to_string():
         numeric_to_string(inf) == "∞",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_unaccent():
@@ -31,7 +32,7 @@ def test_unaccent():
         unaccent("ÁRVORE") == "ARVORE",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_normalize():
@@ -43,7 +44,7 @@ def test_normalize():
         normalize("ÁRVORE") == "arvore",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_normalize_filename():
@@ -56,4 +57,4 @@ def test_normalize_filename():
         normalize_filename("ÔNIBUS AZUL", ".dat") == "onibus_azul.dat",
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)

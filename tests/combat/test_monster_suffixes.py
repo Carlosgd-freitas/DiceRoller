@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.monster import Monster
-from src.combat.team import Team
+from src.base.team import Team
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:

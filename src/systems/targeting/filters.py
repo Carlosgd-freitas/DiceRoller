@@ -7,7 +7,25 @@ from random import sample, shuffle
 from typing import Callable, List, Literal
 
 from src.base.keywords import Keyword
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
+
+
+def preprocess_enemies(monsters: List[Monster]) -> List[Monster]:
+    """
+    Preprocesses a list of enemy monsters for future targeting.
+
+    :param monsters: A list of enemy monsters.
+    :type monsters: List[Monster]
+
+    :return: A list of preprocessed enemy monsters.
+    :rtype: List[Monster]
+    """
+    monsters = [
+        monster for monster in monsters if not monster.get_effect(Keyword.INVISIBLE)
+    ]
+
+    return monsters
 
 
 def filter_monsters(

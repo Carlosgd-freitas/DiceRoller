@@ -5,7 +5,8 @@ from __future__ import annotations
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.keywords import Keyword
 
@@ -36,63 +36,37 @@ class Side:
 
         return _str
 
-    def get_effects(
-        self,
-        keyword: Keyword = None,
-        value: float = None,
-        duration: int = None,
-        decay: int = None,
-        accuracy: float = None,
-    ) -> List[Tuple[int, Effect]]:
+    def has_effect(self, keyword: Keyword) -> bool:
         """
-        Returns a list of indexes and effects based on a series of filters.
+        Returns if the entity is currently under the effect.
 
-        :param self: Side object.
-
-        :param keyword: Filters effects that have the same keyword parameter.
+        :param keyword: A keyword.
         :type keyword: Keyword
 
-        :param value: Filters effects that have the same value parameter.
-        :type value: float
-
-        :param duration: Filters effects that have the same duration parameter.
-        :type duration: int
-
-        :param decay: Filters effects that have the same decay parameter.
-        :type decay: int
-
-        :param accuracy: Filters effects that have the same accuracy parameter.
-        :type accuracy: float
-
-        :return: List of Tuples, where the first element is the Side 'effects' parameter's
-        index, and the second is the effect itself.
-        :rtype: List[Tuple[int, Effect]]
+        :return: If the entity has the effect.
+        :rtype: bool
         """
-        result = []
+        for effect in self.effects:
+            if effect.keyword == keyword:
+                return True
+        return False
 
-        for idx, effect in enumerate(self.effects):
-            in_filter = False
+    def get_effect(self, keyword: Keyword) -> Effect | None:
+        """
+        Returns an effect from the entity.
 
-            for comparison_key, comparison_value in [
-                ("keyword", keyword),
-                ("value", value),
-                ("duration", duration),
-                ("decay", decay),
-                ("accuracy", accuracy),
-            ]:
-                if comparison_value is not None:
-                    if effect.__getattribute__(comparison_key) == comparison_value:
-                        in_filter = True
-                    else:
-                        in_filter = False
-                        break
+        :param keyword: A keyword.
+        :type keyword: Keyword
 
-            if in_filter:
-                result.append((idx, effect))
+        :return: An effect.
+        :rtype: Effect
+        """
+        for effect in self.effects:
+            if effect.keyword == keyword:
+                return effect
+        return None
 
-        return result
-
-    def get_effects_summary(self) -> Dict:
+    def get_effect_summary(self) -> Dict:
         """
         Gets a summary of the Side's effects based on their types.
 

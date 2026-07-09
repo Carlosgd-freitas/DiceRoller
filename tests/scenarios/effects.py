@@ -1,3 +1,5 @@
+"""Scenario for testing effect logging."""
+
 from copy import deepcopy
 from random import choice
 
@@ -8,8 +10,8 @@ from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.team import Team
 from src.combat.manager import CombatManager
-from src.combat.team import Team
 from src.compendium.effects import get_all_effects
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
@@ -61,7 +63,7 @@ monster_a = Monster(
 )
 
 team_a = Team(
-    name="Red Team",
+    name="Team A",
     members=[monster_a],
 )
 
@@ -72,7 +74,7 @@ monster_b = Monster(
 )
 
 team_b = Team(
-    name="Blue Team",
+    name="Team B",
     members=[monster_b],
 )
 

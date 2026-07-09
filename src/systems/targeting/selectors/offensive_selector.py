@@ -6,6 +6,7 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
+from src.systems.targeting.filters import preprocess_enemies
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         if random() < 0.5:
             return self._get_targets_random(
@@ -95,7 +96,7 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         if random() < 0.3:
             return self._get_targets_random(
@@ -142,7 +143,7 @@ class OffensiveSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
         targets: List[Monster] = []
 
         if random() < 0.1:

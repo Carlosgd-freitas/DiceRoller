@@ -71,7 +71,7 @@ class SelectorManager:
         main_effect_type = None
         main_count = 0
 
-        for effect_type, keywords in side.get_effects_summary().items():
+        for effect_type, keywords in side.get_effect_summary().items():
             if len(keywords) > main_count:
                 main_keyword = keywords[0]
                 main_effect_type = effect_type

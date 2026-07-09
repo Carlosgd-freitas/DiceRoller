@@ -13,8 +13,8 @@ from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.team import Team
 from src.combat.manager import CombatData
-from src.combat.team import Team
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
 from src.logger.logger import Logger

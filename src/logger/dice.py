@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 
 from tabulate import tabulate
 
-from src.logger.effects import EffectLogger
+from src.logger.side import SideLogger
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
 
 
-class DiceLogger(EffectLogger):
+class DiceLogger(SideLogger):
     """
     DiceLogger class.
     """
@@ -46,13 +46,7 @@ class DiceLogger(EffectLogger):
         # Sides
         rows = []
         for side in dice.sides:
-            message = "● "
-
-            message += self.get_multiple_effects_message(
-                effects=side.effects,
-                separator=" + ",
-            )
-
+            message = "● " + self.get_side_details(side)
             rows.append([message])
 
         table = tabulate(

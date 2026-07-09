@@ -5,10 +5,10 @@ from typing import Dict
 from pytest import fixture
 
 from src.base.monster import Monster
+from src.base.team import Team
 from src.combat.effects import EffectManager
 from src.combat.manager import CombatManager, OrderStrategy
 from src.combat.suffixes import SuffixManager
-from src.combat.team import Team
 from src.combat.team_manager import TeamManager
 from src.compendium.effects import EffectCompendium
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu

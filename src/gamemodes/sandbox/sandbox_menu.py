@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
 from src.base.monster import ControlType
+from src.base.team import Team
 from src.combat.manager import CombatData, CombatManager
-from src.combat.team import Team
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
 from src.locales.languages import Language

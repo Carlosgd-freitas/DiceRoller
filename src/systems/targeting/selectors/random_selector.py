@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
+from src.systems.targeting.filters import preprocess_enemies
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -53,7 +54,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
-            enemies = self._preprocess_enemies(enemies)
+            enemies = preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(
@@ -98,7 +99,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
-            enemies = self._preprocess_enemies(enemies)
+            enemies = preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(
@@ -143,7 +144,7 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
-            enemies = self._preprocess_enemies(enemies)
+            enemies = preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(

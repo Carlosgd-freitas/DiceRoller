@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
+from src.systems.targeting.filters import preprocess_enemies
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -47,7 +48,7 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         targets = self._get_targets_random(
             enemies,
@@ -87,7 +88,7 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         targets = self._get_targets_random(
             enemies,
@@ -127,7 +128,7 @@ class DebuffSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         targets = self._get_targets_random(
             enemies,

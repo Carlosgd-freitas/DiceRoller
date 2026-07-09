@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.effect import EffectType
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
 from src.base.side import Side
 from src.effects.attack import AttackEffect
 from src.effects.stun import StunEffect

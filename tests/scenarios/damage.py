@@ -1,3 +1,5 @@
+"""Scenario for testing damage logging."""
+
 from copy import deepcopy
 
 from colorama import init
@@ -5,8 +7,8 @@ from colorama import init
 from src.base.dice import Dice
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.team import Team
 from src.combat.manager import CombatManager
-from src.combat.team import Team
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
@@ -57,7 +59,7 @@ monster_b = Monster(
 # ----------------------------
 
 team_a = Team(
-    name="Red Team",
+    name="Team A",
     members=[
         deepcopy(monster_a),
         deepcopy(monster_b),
@@ -65,7 +67,7 @@ team_a = Team(
 )
 
 team_b = Team(
-    name="Blue Team",
+    name="Team B",
     members=[
         deepcopy(monster_a),
         deepcopy(monster_b),

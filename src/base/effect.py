@@ -7,6 +7,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, List, TypedDict
 
 from src.base.keywords import Keyword
+from src.base.life_state import LifeState
 from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
@@ -148,6 +149,15 @@ class Effect(ABC):
         _str += f" | Target Keywords: {target_keywords}"
 
         return _str
+
+    def affects(self) -> LifeState:
+        """
+        Returns the life state of monsters that this effect can target.
+
+        :return: The required target life state.
+        :rtype: LifeState
+        """
+        return LifeState.ALIVE
 
     def get_effective_value(
         self,

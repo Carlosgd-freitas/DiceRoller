@@ -1,3 +1,5 @@
+"""Scenario for testing details logging."""
+
 import math
 from copy import deepcopy
 from random import choice

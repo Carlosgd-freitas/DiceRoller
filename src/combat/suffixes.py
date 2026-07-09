@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
 
 
 class SuffixManager:

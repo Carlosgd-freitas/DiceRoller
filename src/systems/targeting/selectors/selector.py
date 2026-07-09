@@ -5,7 +5,8 @@ from typing import List
 
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
 from src.systems.targeting.filters import filter_monsters
 
 
@@ -349,16 +350,3 @@ class Selector(ABC):
             consider=consider,
             method="FIRST",
         )
-
-    def _preprocess_enemies(
-        self,
-        monsters: List[Monster],
-    ) -> List[Monster]:
-        """
-        Preprocesses a list of enemy monsters for future targeting.
-        """
-        monsters = [
-            monster for monster in monsters if not monster.get_effect(Keyword.INVISIBLE)
-        ]
-
-        return monsters

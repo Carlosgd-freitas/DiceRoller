@@ -6,6 +6,7 @@ from src.base.keywords import Keyword
 from src.base.side import Side
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from tests.utils import assert_conditions
 
 
 def test_entity_roll_single():
@@ -23,7 +24,7 @@ def test_entity_roll_single():
         picked_sides[0].effects[0].value == 1,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)
 
 
 def test_entity_roll_multiple():
@@ -60,4 +61,4 @@ def test_entity_roll_multiple():
         picked_sides[1].effects[0].value == 2,
     ]
 
-    assert all(conditions)
+    assert_conditions(conditions)

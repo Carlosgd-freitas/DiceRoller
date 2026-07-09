@@ -2,55 +2,80 @@
 
 from src.base.keywords import Keyword
 from src.base.side import Side
+from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from tests.utils import assert_conditions
 
 
-def test_side_get_effects_single():
+def test_side_has_effect():
     side = Side(
         effects=[
             AttackEffect(1),
-            AttackEffect(2),
-        ]
-    )
-
-    effects = side.get_effects(
-        keyword=Keyword.ATTACK,
-        value=2,
-    )
-
-    conditions = [
-        len(effects) == 1,
-        effects[0][0] == 1,
-        effects[0][1].keyword == Keyword.ATTACK,
-        effects[0][1].value == 2,
-    ]
-
-    assert all(conditions)
-
-
-def test_side_get_effects_multiple():
-    side = Side(
-        effects=[
-            AttackEffect(1),
-            BlockEffect(1),
-            AttackEffect(2),
             BlockEffect(2),
         ]
     )
 
-    effects = side.get_effects(
-        keyword=Keyword.ATTACK,
-    )
+    has_effect = side.has_effect(keyword=Keyword.ATTACK)
 
     conditions = [
-        len(effects) == 2,
-        effects[0][0] == 0,
-        effects[0][1].keyword == Keyword.ATTACK,
-        effects[0][1].value == 1,
-        effects[1][0] == 2,
-        effects[1][1].keyword == Keyword.ATTACK,
-        effects[1][1].value == 2,
+        has_effect is True,
     ]
 
-    assert all(conditions)
+    has_effect = side.has_effect(keyword=Keyword.BURN)
+
+    conditions.extend(
+        [
+            has_effect is False,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_side_get_effect():
+    side = Side(
+        effects=[
+            AttackEffect(1),
+            BlockEffect(2),
+        ]
+    )
+
+    effect = side.get_effect(keyword=Keyword.ATTACK)
+
+    conditions = [
+        effect.keyword == Keyword.ATTACK,
+        effect.value == 1,
+    ]
+
+    effect = side.get_effect(keyword=Keyword.BURN)
+
+    conditions.extend(
+        [
+            effect is None,
+        ]
+    )
+
+    assert_conditions(conditions)
+
+
+def test_side_get_effect_summary():
+    side = Side(
+        effects=[
+            AttackEffect(1),
+            BlockEffect(2),
+            AbsorbEffect(3),
+        ]
+    )
+
+    effect_summary = side.get_effect_summary()
+
+    conditions = [
+        len(effect_summary) == 2,
+        "OFFENSIVE" in effect_summary.keys(),
+        effect_summary["OFFENSIVE"] == [Keyword.ATTACK],
+        "DEFENSIVE" in effect_summary.keys(),
+        effect_summary["DEFENSIVE"] == [Keyword.BLOCK, Keyword.ABSORB],
+    ]
+
+    assert_conditions(conditions)

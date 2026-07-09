@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.life_state import LifeState
 from src.processors.healing import calculate_healing
 
 if TYPE_CHECKING:
@@ -42,6 +43,15 @@ class ReviveEffect(Effect):
             removable=removable,
             target_keywords=target_keywords,
         )
+
+    def affects(self) -> LifeState:
+        """
+        Returns the life state of monsters that this effect can target.
+
+        :return: The required target life state.
+        :rtype: LifeState
+        """
+        return LifeState.DEAD
 
     def on_apply(
         self,

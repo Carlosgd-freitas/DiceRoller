@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, List
 
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
+from src.systems.targeting.filters import preprocess_enemies
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         return self._get_targets_least_effects(
             enemies,
@@ -89,7 +90,7 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         if random() < 0.3:
             targets = self._get_targets_random(
@@ -137,7 +138,7 @@ class CorruptSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        enemies = self._preprocess_enemies(enemies)
+        enemies = preprocess_enemies(enemies)
 
         return self._get_targets_most_effects(
             enemies,

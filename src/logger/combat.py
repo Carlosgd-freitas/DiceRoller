@@ -5,11 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.base.color import Color, ColorData, color_string
-from src.base.monster import ControlType, LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import ControlType, Monster
 from src.logger.monster import MonsterLogger
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
 
 
 class CombatLogger(MonsterLogger):
@@ -325,15 +326,17 @@ class CombatLogger(MonsterLogger):
         self.log(message=message)
 
         for monster in team.members:
+            if (not whitelist) or (whitelist and monster in whitelist):
+                pass
+            else:
+                continue
+
             will_log = False
 
             if monster.is_alive():
                 color_data = {"foreground_color": None}
             else:
                 color_data = {"foreground_color": Color.GRAY}
-
-            if whitelist and monster in whitelist:
-                will_log = True
 
             if life_state in [LifeState.ALIVE, LifeState.ANY] and monster.is_alive():
                 will_log = True

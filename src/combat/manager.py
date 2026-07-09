@@ -21,7 +21,7 @@ from src.systems.manager import Manager
 from src.systems.targeting.selectors.manager import SelectorManager
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
     from src.systems.settings import Settings
 
 

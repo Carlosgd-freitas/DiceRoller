@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Dict, List
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
 
 
 def test_get_team_status(combat: Dict):

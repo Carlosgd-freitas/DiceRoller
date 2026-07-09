@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, List
 from src.base.monster import Monster
 
 if TYPE_CHECKING:
-    from src.combat.team import Team
+    from src.base.team import Team
 
 
 class TeamManager:

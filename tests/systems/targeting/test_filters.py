@@ -3,7 +3,8 @@
 from typing import Dict, List
 
 from src.base.keywords import Keyword
-from src.base.monster import LifeState, Monster
+from src.base.life_state import LifeState
+from src.base.monster import Monster
 from src.effects.burn import BurnEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.repel import RepelEffect
