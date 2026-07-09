@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
@@ -50,10 +49,12 @@ class DebuffSelector(Selector):
         """
         enemies = self._preprocess_enemies(enemies)
 
-        return self._get_targets_random(
+        targets = self._get_targets_random(
             enemies,
             k=k,
         )
+
+        return targets
 
     def get_targets_normal(
         self,
@@ -66,8 +67,7 @@ class DebuffSelector(Selector):
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         debuff type effects:
-        * 50% -> alive enemies without the debuff
-        * 50% -> alive enemies with the debuff
+        * 100% -> random alive enemies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -89,28 +89,10 @@ class DebuffSelector(Selector):
         """
         enemies = self._preprocess_enemies(enemies)
 
-        if random() < 0.5:
-            targets = self._get_targets_without_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
-
-        else:
-            targets = self._get_targets_with_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
-
-        if len(targets) < k:
-            targets.extend(
-                self._get_targets_random(
-                    enemies,
-                    k=k - len(targets),
-                    exclude=[target.local_id for target in targets],
-                )
-            )
+        targets = self._get_targets_random(
+            enemies,
+            k=k,
+        )
 
         return targets
 
@@ -125,8 +107,7 @@ class DebuffSelector(Selector):
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         debuff type effects:
-        * 50% -> alive enemies without the debuff
-        * 50% -> alive enemies with the debuff
+        * 100% -> random alive enemies, prioritizing those that aren't immune to the main keyword
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -148,26 +129,18 @@ class DebuffSelector(Selector):
         """
         enemies = self._preprocess_enemies(enemies)
 
-        if random() < 0.5:
-            targets = self._get_targets_without_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
-
-        else:
-            targets = self._get_targets_with_effects(
-                enemies,
-                k=k,
-                effects=[main_keyword],
-            )
+        targets = self._get_targets_random(
+            enemies,
+            k=k,
+            ignore_immune_to=[main_keyword],
+        )
 
         if len(targets) < k:
             targets.extend(
                 self._get_targets_random(
                     enemies,
-                    k=k - len(targets),
-                    exclude=[target.local_id for target in targets],
+                    k=k,
+                    blacklist=targets,
                 )
             )
 

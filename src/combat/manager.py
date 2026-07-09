@@ -7,12 +7,14 @@ from math import inf
 from random import shuffle
 from typing import TYPE_CHECKING, Callable, Dict, List, Literal, TypedDict
 
+from src.base.color import color_string
 from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
 from src.combat.player_actions import CombatPlayerActionsMenu
 from src.combat.suffixes import SuffixManager
+from src.combat.team_manager import TeamManager
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.systems.manager import Manager
@@ -124,9 +126,6 @@ class CombatManager(Manager):
         # Effect Management
         self.effect_manager = EffectManager(settings, logging)
 
-        # Player actions
-        self.player_actions_menu = CombatPlayerActionsMenu(settings, logging)
-
         # Suffix Management
         self.suffix_manager = SuffixManager()
 
@@ -135,6 +134,8 @@ class CombatManager(Manager):
 
         # Team Management
         self.teams = [] if teams is None else teams
+        self.team_manager = TeamManager()
+        self.update_teams()
 
         # Turn Management
         self.round: int = 1
@@ -143,7 +144,12 @@ class CombatManager(Manager):
         self.order: List[Monster] = []
         self.current_monster: Monster = None
 
-        self.update_teams()
+        # Player actions
+        self.player_actions_menu = CombatPlayerActionsMenu(
+            settings,
+            logging,
+            self.teams,
+        )
 
     # =========================================================================
     # Utility
@@ -237,83 +243,15 @@ class CombatManager(Manager):
     # Team Management
     # =========================================================================
 
-    def get_team(
-        self,
-        member: Monster = None,
-        name: str = None,
-    ) -> Team:
-        """
-        Returns a team.
-
-        :param member: A member of the team.
-        :type member: Monster
-
-        :param name: The name of the team.
-        :type name: str
-
-        :return: A team.
-        :rtype: Team
-        """
-        for team in self.teams:
-            if (name) and (team.name == name):
-                return team
-
-            elif (member) and (member in team.members):
-                return team
-
-        return
-
-    def get_allies(
-        self,
-        monster: Monster,
-    ) -> List[Monster]:
-        """
-        Returns all allies of a monster.
-
-        :param monster: A monster.
-        :type monster: Monster
-
-        :return: A list of monster allies.
-        :rtype: List[Monster]
-        """
-        team = self.get_team(member=monster)
-
-        return [
-            team_monster for team_monster in team.members if team_monster != monster
-        ]
-
-    def get_enemies(
-        self,
-        monster: Monster,
-    ) -> List[Monster]:
-        """
-        Returns all enemies of a monster.
-
-        :param monster: A monster.
-        :type monster: Monster
-
-        :return: A list of monster enemies.
-        :rtype: List[Monster]
-        """
-        enemies = []
-        monster_team = self.get_team(member=monster)
-
-        for team in self.teams:
-            if team != monster_team:
-                enemies.extend(team.members)
-
-        return enemies
-
     def add_monster(
         self,
         monster: Monster,
         team: Team = None,
-        team_name: str = None,
     ) -> None:
         """
         Adds a monster to combat.
 
-        :param monster: The monster which will be added to combat.
+        :param monster: The monster which will be added.
         :type monster: Monster
 
         :param team: The team that the monster will be added to.
@@ -322,12 +260,11 @@ class CombatManager(Manager):
         :param team_name: The name of the team that the monster will be added to.
         :type team_name: str
         """
-        for self_team in self.teams:
-            if (team_name) and (self_team.name == team_name):
-                self_team.members.append(monster)
-
-            elif (team) and (self_team == team):
-                self_team.members.append(monster)
+        self.team_manager.add_monster(
+            monster=monster,
+            teams=self.teams,
+            team=team,
+        )
 
         self.update_teams()
 
@@ -340,12 +277,13 @@ class CombatManager(Manager):
         """
         Removes a monster from combat.
 
-        :param monster: The monster which will be removed from combat.
+        :param monster: The monster which will be removed.
         :type monster: Monster
         """
-        for team in self.teams:
-            if monster in team.members:
-                team.members.remove(monster)
+        self.team_manager.remove_monster(
+            monster=monster,
+            teams=self.teams,
+        )
 
         return
 
@@ -453,12 +391,12 @@ class CombatManager(Manager):
 
         return
 
-    def take_action(
+    def ai_controlled_action(
         self,
         monster: Monster,
     ) -> None:
         """
-        Takes action automatically for a monster:
+        Takes action for an AI controlled monster:
         * Their dice will be rolled
         * Each rolled side will have their targets determined
         * Each effect of the rolled side will be applied onto every target
@@ -468,8 +406,8 @@ class CombatManager(Manager):
         """
         sides = self.effect_manager.roll(monster)
 
-        allies = self.get_allies(monster)
-        enemies = self.get_enemies(monster)
+        allies = self.team_manager.get_allies(monster, self.teams)
+        enemies = self.team_manager.get_enemies(monster, self.teams)
 
         for side in sides:
             targets = self.selector_manager.get_targets(
@@ -488,6 +426,30 @@ class CombatManager(Manager):
                         source=monster,
                         target=target,
                     )
+
+        return
+
+    def player_controlled_action(
+        self,
+        monster: Monster,
+    ) -> None:
+        """
+        Allows a player controlled monster to take action.
+
+        :param monster: The monster which will have its actions taken.
+        :type monster: Monster
+        """
+        self.player_actions_menu.open(monster, self.teams)
+
+        # Syncing loggers
+        if self.player_actions_menu.logger.language != self.logger.language:
+            self.change_language(
+                self.player_actions_menu.logger.language,
+                self.player_actions_menu.logger._messages,
+            )
+
+        if self.player_actions_menu.logger.enabled != self.logger.enabled:
+            self.toggle_logging(self.player_actions_menu.logger.enabled)
 
         return
 
@@ -518,10 +480,10 @@ class CombatManager(Manager):
                 return False
 
         if self.current_monster.control_type == ControlType.AI:
-            self.take_action(self.current_monster)
+            self.ai_controlled_action(self.current_monster)
 
         elif self.current_monster.control_type == ControlType.PLAYER:
-            self.player_actions_menu.open(self.current_monster)
+            self.player_controlled_action(self.current_monster)
 
         return True
 
@@ -631,7 +593,7 @@ class CombatManager(Manager):
         """
         for monster in self.order[:]:
             if monster.in_combat and not monster.is_alive():
-                team = self.get_team(member=monster)
+                team = self.team_manager.get_team(member=monster, teams=self.teams)
                 team.status = team.get_status()
 
                 self.logger.log_monster_death(monster)
@@ -686,11 +648,14 @@ class CombatManager(Manager):
             self.logger.log(namespace="combat", message_group="COMBAT", key="draw")
 
         elif combat_status["status"] == "WINNER":
+            team_name = combat_status["ALIVE"][0].name
+            team_name = color_string(team_name, intensity="BRIGHT")
+
             self.logger.log(
                 namespace="combat",
                 message_group="COMBAT",
                 key="winner",
-                team_name=combat_status["ALIVE"][0].name,
+                team_name=team_name,
             )
 
         return combat_status

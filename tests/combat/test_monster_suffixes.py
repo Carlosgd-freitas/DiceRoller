@@ -97,7 +97,7 @@ def test_monster_suffixes_add_monster(combat: Dict):
         combat_manager.teams[1].members[1].suffix is None,
     ]
 
-    combat_manager.add_monster(monster=monster, team_name="Team Blue")
+    combat_manager.add_monster(monster=monster, team=combat_manager.teams[1])
 
     conditions.extend(
         [
@@ -125,7 +125,7 @@ def test_monster_suffixes_remove_monster(combat: Dict):
         name="Red",
     )
 
-    combat_manager.add_monster(monster=monster, team_name="Team Blue")
+    combat_manager.add_monster(monster=monster, team=combat_manager.teams[1])
 
     conditions = [
         combat_manager.teams[0].members[0].suffix is None,

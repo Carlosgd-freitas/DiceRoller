@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Literal
+from math import inf
+from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, color_string
+from src.base.monster import LifeState, Monster
+from src.combat.effects import EffectManager
+from src.combat.team_manager import TeamManager
+from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
+from src.systems.targeting.filters import filter_monsters
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
+    from src.combat.team import Team
     from src.systems.settings import Settings
 
 
@@ -33,6 +39,7 @@ class CombatPlayerActionsMenu(Menu):
         self,
         settings: Settings,
         logging: bool = True,
+        teams: List[Team] = None,
     ):
         # Initialization
         logger = CombatLogger(enabled=logging, language=settings.language)
@@ -43,6 +50,13 @@ class CombatPlayerActionsMenu(Menu):
         )
 
         self.logger: CombatLogger
+
+        # Effect Management
+        self.effect_manager = EffectManager(settings, logging)
+
+        # Team Management
+        self.teams = [] if teams is None else teams
+        self.team_manager = TeamManager()
 
     def get_title(self) -> None:
         """
@@ -122,6 +136,38 @@ class CombatPlayerActionsMenu(Menu):
         return options
 
     # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
+        """
+        Changes the Menu language.
+
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
+        """
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
+        # Managers
+        self.effect_manager.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Menu logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+
+        # Managers
+        self.effect_manager.toggle_logging(enabled)
+
+    # =========================================================================
     # Options
     # =========================================================================
 
@@ -132,7 +178,7 @@ class CombatPlayerActionsMenu(Menu):
         :param option: Menu's option.
         :type option: Option
 
-        :param monster: Monster being currently controlled by a player.
+        :param monster: Monster being controlled by a player.
         :type monster: Monster
 
         :return: If the option can be selected.
@@ -154,14 +200,14 @@ class CombatPlayerActionsMenu(Menu):
         :param option: Menu's option.
         :type option: Option
 
-        :param monster: Monster being currently controlled by a player.
+        :param monster: Monster being controlled by a player.
         :type monster: Monster
 
-        :return: If the player turn has been taken or if will continue.
+        :return: If the player turn has been taken or if it will continue.
         :rtype: bool
         """
         if option.id == "ROLL_DICE":
-            return True
+            return self.roll_dice(monster)
 
         elif option.id == "SKILLS":
             return True
@@ -173,19 +219,113 @@ class CombatPlayerActionsMenu(Menu):
             return False
 
         elif option.id == "SHOW_DETAILS":
-            return False
+            return self.show_details()
 
         elif option.id == "SKIP_TURN":
             return self.skip_turn(monster)
+
+    def _select_target(self, valid_indexes: List[int]) -> int:
+        """
+        Prompts the user to select one of the available targets, and if:
+        * a valid index is selected, is is returned.
+        * an invalid index is selected, the prompt will repeat.
+        """
+        while True:
+            target_number = self.logger.input(
+                namespace="menus",
+                message_group="PLAYER_ACTIONS",
+                key="select_target_prompt",
+            )
+
+            try:
+                target_number = int(target_number)
+
+                if target_number in valid_indexes:
+                    break
+
+            except Exception:
+                continue
+
+        return target_number
+
+    def roll_dice(self, monster: Monster) -> Literal[True]:
+        """
+        The steps of this method is as follows:
+        1. All dice of a monster are rolled.
+        2. The player selects which side to use.
+        3. The player selects which targets the side will be used on, from available
+        targets.
+        4. Steps 2~3 are repeated until all sides are used.
+
+        :param monster: Monster being controlled by a player.
+        :type monster: Monster
+
+        :return: If the player turn has been taken or if it will continue.
+        :rtype: Literal[True]
+        """
+        # sides = self.effect_manager.roll(monster)
+
+        # select_side
+        # select_target
+        # get allies & enemies
+        # proccess
+
+        return True
+
+    def show_details(self) -> Literal[True]:
+        """
+        The steps of this method is as follows:
+        1. All alive monsters in combat are logged.
+        2. The player selects one of them to have their details logged.
+
+        :param monster: Monster being controlled by a player.
+        :type monster: Monster
+
+        :return: If the player turn has been taken or if it will continue.
+        :rtype: Literal[False]
+        """
+        # Determining targets
+        monsters = [monster for team in self.teams for monster in team.members]
+        targets = filter_monsters(
+            monsters=monsters,
+            k=inf,
+            life_state=LifeState.ALIVE,
+            consider=[],
+            method="FIRST",
+        )
+
+        # Logging valid targets
+        self.logger.log(message="")
+        self.logger.log_teams(
+            teams=self.teams,
+            whitelist=targets,
+            control_type=False,
+            monster_index=1,
+        )
+
+        # Player selecting target
+        valid_indexes = range(1, len(targets) + 1)
+        target_number = self._select_target(valid_indexes)
+        target = targets[target_number - 1]
+
+        # Logging monster details
+        self.logger.log(message="")
+        self.logger.log_monster_details(
+            monster=target,
+            description=False,
+            current_hp=True,
+        )
+
+        return False
 
     def skip_turn(self, monster: Monster) -> Literal[True]:
         """
         Skips a monster's turn.
 
-        :param monster: Monster being currently controlled by a player.
+        :param monster: Monster being controlled by a player.
         :type monster: Monster
 
-        :return: If the player turn has been taken or if will continue.
+        :return: If the player turn has been taken or if it will continue.
         :rtype: Literal[True]
         """
         self.logger.log_turn_skip(monster=monster)
@@ -200,7 +340,7 @@ class CombatPlayerActionsMenu(Menu):
         """
         Shows the Menu options.
 
-        :param monster: Monster being currently controlled by a player.
+        :param monster: Monster being controlled by a player.
         :type monster: Monster
         """
         for option in self.options:
@@ -224,22 +364,29 @@ class CombatPlayerActionsMenu(Menu):
 
         return
 
-    def open(self, monster: Monster):
+    def open(self, monster: Monster, teams: List[Team]):
         """
         Opens the Menu.
 
-        :param monster: Monster being currently controlled by a player.
+        :param monster: Monster being controlled by a player.
         :type monster: Monster
+
+        :param teams: A list of teams in combat.
+        :type teams: List[Team]
         """
+        self.teams = teams
         turn_taken = False
 
         while not turn_taken:
-            self.show_title()
             self.show_options(monster)
             selected = self.select_option()
 
             if self.is_option_valid(selected, monster):
                 turn_taken = self.process_option(selected, monster)
+
+            if not turn_taken:
+                self.logger.log_turn_start(monster)
+                self.logger.log_teams(self.teams)
 
         self.logger.input(message="")
 

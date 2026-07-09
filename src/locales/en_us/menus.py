@@ -22,6 +22,7 @@ PLAYER_ACTIONS = {
     "consumables": "Consumables",
     "equipment": "Equipment",
     "roll_dice": "Roll Dice",
+    "select_target_prompt": "Select a target",
     "show_details": "Show Details",
     "skills": "Skills",
     "skip_turn": "Skip Turn",

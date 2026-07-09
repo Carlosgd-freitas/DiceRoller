@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.effect import EffectType
-from src.base.keywords import Keyword
+from src.base.monster import LifeState, Monster
 from src.base.side import Side
 from src.effects.attack import AttackEffect
 from src.effects.stun import StunEffect
@@ -13,7 +13,6 @@ from src.systems.targeting.selectors.random_selector import RandomSelector
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
     from src.systems.targeting.selectors.manager import SelectorManager
 
 
@@ -47,7 +46,7 @@ def test_get_targets_random(combat: Dict):
     targets = selector._get_targets_random(
         monsters,
         k=1,
-        life_state="ANY",
+        life_state=LifeState.ANY,
     )
 
     conditions = [
@@ -66,7 +65,7 @@ def test_get_targets_lowest_hp(combat: Dict):
     targets = selector._get_targets_lowest_hp(
         monsters,
         k=1,
-        life_state="ALIVE",
+        life_state=LifeState.ALIVE,
     )
 
     conditions = [
@@ -84,7 +83,7 @@ def test_get_targets_highest_hp(combat: Dict):
     targets = selector._get_targets_highest_hp(
         monsters,
         k=1,
-        life_state="ALIVE",
+        life_state=LifeState.ALIVE,
     )
 
     conditions = [
@@ -102,7 +101,7 @@ def test_get_targets_lowest_max_hp(combat: Dict):
     targets = selector._get_targets_lowest_max_hp(
         monsters,
         k=1,
-        life_state="ANY",
+        life_state=LifeState.ANY,
     )
 
     conditions = [
@@ -120,62 +119,12 @@ def test_get_targets_highest_max_hp(combat: Dict):
     targets = selector._get_targets_highest_max_hp(
         monsters,
         k=1,
-        life_state="ANY",
+        life_state=LifeState.ANY,
     )
 
     conditions = [
         len(targets) == 1,
         targets[0].local_id == "MONSTER_4",
-    ]
-
-    assert_conditions(conditions)
-
-
-def test_get_targets_with_effects(combat: Dict):
-    monsters: List[Monster] = combat["monsters"]
-    selector = RandomSelector()
-    effect = StunEffect()
-
-    monsters[0].apply_effect(effect)
-    monsters[1].apply_effect(effect)
-
-    targets = selector._get_targets_with_effects(
-        monsters,
-        k=2,
-        effects=[Keyword.STUN],
-        life_state="ANY",
-    )
-
-    targets_ids = set([target.local_id for target in targets])
-
-    conditions = [
-        len(targets) == 2,
-        targets_ids == {"MONSTER_0", "MONSTER_1"},
-    ]
-
-    assert_conditions(conditions)
-
-
-def test_get_targets_without_effects(combat: Dict):
-    monsters: List[Monster] = combat["monsters"]
-    selector = RandomSelector()
-    effect = StunEffect()
-
-    monsters[0].apply_effect(effect)
-    monsters[1].apply_effect(effect)
-
-    targets = selector._get_targets_without_effects(
-        monsters,
-        k=3,
-        effects=[Keyword.STUN],
-        life_state="ANY",
-    )
-
-    targets_ids = set([target.local_id for target in targets])
-
-    conditions = [
-        len(targets) == 3,
-        targets_ids == {"MONSTER_2", "MONSTER_3", "MONSTER_4"},
     ]
 
     assert_conditions(conditions)
@@ -192,7 +141,7 @@ def test_get_targets_most_effects(combat: Dict):
         monsters,
         effect_type=EffectType.DEBUFF,
         k=2,
-        life_state="ANY",
+        life_state=LifeState.ANY,
     )
 
     conditions = [
@@ -215,7 +164,7 @@ def test_get_targets_least_effects(combat: Dict):
         monsters,
         effect_type=EffectType.DEBUFF,
         k=2,
-        life_state="ANY",
+        life_state=LifeState.ANY,
     )
 
     conditions = [

@@ -7,9 +7,9 @@ from pytest import fixture
 from src.base.monster import Monster
 from src.combat.effects import EffectManager
 from src.combat.manager import CombatManager, OrderStrategy
-from src.combat.player_actions import CombatPlayerActionsMenu
 from src.combat.suffixes import SuffixManager
 from src.combat.team import Team
+from src.combat.team_manager import TeamManager
 from src.compendium.effects import EffectCompendium
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
@@ -94,6 +94,8 @@ def managers(settings: Settings) -> Dict:
 
     suffix_manager = SuffixManager()
 
+    team_manager = TeamManager()
+
     return {
         "manager": manager,
         "combat_manager": combat_manager,
@@ -101,17 +103,13 @@ def managers(settings: Settings) -> Dict:
         "file_manager": file_manager,
         "selector_manager": selector_manager,
         "suffix_manager": suffix_manager,
+        "team_manager": team_manager,
     }
 
 
 @fixture()
 def menus(settings: Settings) -> Dict:
     compendium_menu = CompendiumMenu(
-        settings=settings,
-        logging=False,
-    )
-
-    combat_player_actions_menu = CombatPlayerActionsMenu(
         settings=settings,
         logging=False,
     )
@@ -132,7 +130,6 @@ def menus(settings: Settings) -> Dict:
     )
 
     return {
-        "combat_player_actions_menu": combat_player_actions_menu,
         "compendium_menu": compendium_menu,
         "main_menu": main_menu,
         "sandbox_menu": sandbox_menu,
@@ -213,4 +210,5 @@ def combat(settings: Settings) -> Dict:
         "effect_manager": combat_manager.effect_manager,
         "selector_manager": combat_manager.selector_manager,
         "suffix_manager": combat_manager.suffix_manager,
+        "team_manager": combat_manager.team_manager,
     }

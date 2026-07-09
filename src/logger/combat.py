@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Literal
+from typing import TYPE_CHECKING, List
 
 from src.base.color import Color, ColorData, color_string
-from src.base.monster import ControlType, Monster
+from src.base.monster import ControlType, LifeState, Monster
 from src.logger.monster import MonsterLogger
 
 if TYPE_CHECKING:
@@ -90,6 +90,7 @@ class CombatLogger(MonsterLogger):
         control_type: bool = False,
         effect_limit: int = 5,
         color_data: ColorData = None,
+        index: int = None,
     ):
         """
         Logs a Monster in combat.
@@ -105,8 +106,11 @@ class CombatLogger(MonsterLogger):
         is 5.
         :type effect_limit: int
 
-        :var color_data: Optional color data to be used instead of the default.
+        :var color_data: Color data to be used instead of the default.
         :vartype color_data: ColorData
+
+        :var index: Monster index.
+        :vartype index: int
         """
         if not self.enabled:
             return
@@ -114,8 +118,14 @@ class CombatLogger(MonsterLogger):
         color_data = {} if color_data is None else color_data
         attribute_params = self._get_attribute_params()
 
+        # Index
+        if index is None:
+            message = "> "
+        else:
+            message = f"[{index}] "
+
         # Name + Suffix
-        message = "> " + self.get_monster_name(monster) + " - "
+        message += self.get_monster_name(monster) + " - "
 
         self.log(
             message=color_string(message, **color_data),
@@ -262,52 +272,135 @@ class CombatLogger(MonsterLogger):
 
         return
 
-    def log_teams(
+    def log_team(
         self,
-        teams: List[Team],
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
+        team: Team,
+        whitelist: List[Monster],
+        index: int = None,
+        life_state: LifeState = LifeState.ALIVE,
         control_type: bool = False,
+        monster_index: int = None,
     ):
         """
-        Logs teams of monsters in combat. Only alive monsters will be logged.
+        Logs a team of monsters in combat.
 
-        :param teams: Teams of monsters.
-        :type teams: List[Team]
+        :param team: Team of monsters.
+        :type team: Team
 
-        :param life_state: Whether to consider only alive, dead or any type of entities.
-        Default value is "ALIVE".
-        :type life_state: Literal["ALIVE", "DEAD", "ANY"]
+        :param whitelist: Only monters that are in this list will be considered.
+        :type whitelist: List[Monster]
+
+        :param index: Team index.
+        :type index: int
+
+        :param life_state: Whether to consider only alive, dead or any type of monsters.
+        Default value is LifeState.ALIVE.
+        :type life_state: LifeState
 
         :param control_type: If the monsters control type will be logged. Default
         value is False.
         :type control_type: bool
+
+        :param monster_index: If passed, uses a index when logging monsters. Each
+        subsequent monster will increase this index by 1. Default value is None.
+        :type monster_index: int
+        """
+        if not self.enabled:
+            return
+
+        whitelist = [] if whitelist is None else whitelist
+
+        message = self.get_message(
+            namespace="combat", message_group="COMBAT", key="team"
+        )
+
+        message = color_string(f"{message}", intensity="BRIGHT")
+
+        if index:
+            message += color_string(f" #{index}", intensity="BRIGHT")
+
+        if team.name:
+            message += color_string(f": {team.name}", intensity="BRIGHT")
+
+        self.log(message=message)
+
+        for monster in team.members:
+            will_log = False
+
+            if monster.is_alive():
+                color_data = {"foreground_color": None}
+            else:
+                color_data = {"foreground_color": Color.GRAY}
+
+            if whitelist and monster in whitelist:
+                will_log = True
+
+            if life_state in [LifeState.ALIVE, LifeState.ANY] and monster.is_alive():
+                will_log = True
+            elif (
+                life_state in [LifeState.DEAD, LifeState.ANY] and not monster.is_alive()
+            ):
+                will_log = True
+            else:
+                will_log = False
+
+            if will_log:
+                self.log_monster(
+                    monster,
+                    control_type=control_type,
+                    color_data=color_data,
+                    index=monster_index,
+                )
+
+                if isinstance(monster_index, int):
+                    monster_index += 1
+
+        return {
+            "monster_index": monster_index,
+        }
+
+    def log_teams(
+        self,
+        teams: List[Team],
+        whitelist: List[Monster] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        control_type: bool = False,
+        monster_index: int = None,
+    ):
+        """
+        Logs teams of monsters in combat.
+
+        :param teams: Teams of monsters.
+        :type teams: List[Team]
+
+        :param whitelist: Only monters that are in this list will be considered.
+        :type whitelist: List[Monster]
+
+        :param life_state: Whether to consider only alive, dead or any type of monsters.
+        Default value is LifeState.ALIVE.
+        :type life_state: LifeState
+
+        :param control_type: If the monsters control type will be logged. Default value
+        is False.
+        :type control_type: bool
+
+        :param monster_index: If passed, uses a index when logging monsters. Each
+        subsequent monster will increase this index by 1. Default value is None.
+        :type monster_index: int
         """
         if not self.enabled:
             return
 
         for index, team in enumerate(teams):
-            message = self.get_message(
-                namespace="combat", message_group="COMBAT", key="team"
+            data = self.log_team(
+                team=team,
+                whitelist=whitelist,
+                index=index + 1,
+                life_state=life_state,
+                control_type=control_type,
+                monster_index=monster_index,
             )
 
-            message = color_string(f"{message} #{index+1}", intensity="BRIGHT")
-            if team.name:
-                message += color_string(f": {team.name}", intensity="BRIGHT")
-
-            self.log(message=message)
-
-            for monster in team.members:
-                if life_state in ["ALIVE", "ANY"] and monster.is_alive():
-                    self.log_monster(
-                        monster,
-                        control_type=control_type,
-                        color_data={"foreground_color": None},
-                    )
-                elif life_state in ["DEAD", "ANY"] and not monster.is_alive():
-                    self.log_monster(
-                        monster,
-                        control_type=control_type,
-                        color_data={"foreground_color": Color.GRAY},
-                    )
+            monster_index = data["monster_index"]
 
             self.log(message="")

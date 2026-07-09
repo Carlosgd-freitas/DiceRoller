@@ -19,6 +19,14 @@ class ControlType(Enum):
     PLAYER = "PLAYER"
 
 
+class LifeState(Enum):
+    """State of monster life."""
+
+    ALIVE = "ALIVE"
+    ANY = "ANY"
+    DEAD = "DEAD"
+
+
 class Monster(Entity):
     """
     Monster class.

@@ -3,5 +3,6 @@ __pycache__
 .ruff_cache
 .vscode
 playground.py
+*.csv
 *.dat
 todo.txt

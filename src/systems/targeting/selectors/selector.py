@@ -1,16 +1,12 @@
 """Selector module."""
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, List, Literal
+from typing import List
 
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
-from src.systems.targeting.filters import filter_entities
-
-if TYPE_CHECKING:
-    from src.base.monster import Monster
+from src.base.monster import LifeState, Monster
+from src.systems.targeting.filters import filter_monsters
 
 
 class Selector(ABC):
@@ -118,200 +114,164 @@ class Selector(ABC):
         self,
         monsters: List[Monster],
         k: int,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k random monsters.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="RANDOM",
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="RANDOM",
         )
 
     def _get_targets_highest_hp(
         self,
         monsters: List[Monster],
         k: int,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with most effective hp and hp.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (lambda entity: -entity.get_effective_hp()),
                 (lambda entity: -entity.hp),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="FIRST",
         )
 
     def _get_targets_lowest_hp(
         self,
         monsters: List[Monster],
         k: int,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with least effective hp and hp.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (lambda entity: entity.get_effective_hp()),
                 (lambda entity: entity.hp),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="FIRST",
         )
 
     def _get_targets_highest_max_hp(
         self,
         monsters: List[Monster],
         k: int,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with most max hp.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (lambda entity: -entity.max_hp),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="FIRST",
         )
 
     def _get_targets_lowest_max_hp(
         self,
         monsters: List[Monster],
         k: int,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with least max hp.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (lambda entity: entity.max_hp),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
-        )
-
-    def _get_targets_with_effects(
-        self,
-        monsters: List[Monster],
-        k: int,
-        effects: List[Keyword],
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
-    ):
-        """
-        Returns k random monsters with effects.
-        """
-        exclude = [] if exclude is None else exclude
-        return filter_entities(
-            monsters,
-            k=k,
-            method="RANDOM",
+            ignore_immune_to=ignore_immune_to,
             life_state=life_state,
+            hurt=hurt,
             consider=consider,
-            keyword_whitelist=effects,
-            exclude=exclude,
-        )
-
-    def _get_targets_without_effects(
-        self,
-        monsters: List[Monster],
-        k: int,
-        effects: List[Keyword],
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
-    ):
-        """
-        Returns k random monsters without effects.
-        """
-        exclude = [] if exclude is None else exclude
-        return filter_entities(
-            monsters,
-            k=k,
-            method="RANDOM",
-            life_state=life_state,
-            consider=consider,
-            keyword_blacklist=effects,
-            exclude=exclude,
+            method="FIRST",
         )
 
     def _get_targets_most_effects(
@@ -319,23 +279,21 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effect_type: EffectType,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with most effects of a type.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (
                     lambda entity: -sum(
@@ -343,11 +301,15 @@ class Selector(ABC):
                     )
                 ),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="FIRST",
         )
 
     def _get_targets_least_effects(
@@ -355,23 +317,21 @@ class Selector(ABC):
         monsters: List[Monster],
         k: int,
         effect_type: EffectType,
-        life_state: Literal["ALIVE", "DEAD", "ANY"] = "ALIVE",
-        consider: List[Keyword] = None,
-        exclude: List[str] = None,
+        whitelist: List[Monster] = None,
+        blacklist: List[Monster] = None,
         keyword_whitelist: List[Keyword] = None,
         keyword_blacklist: List[Keyword] = None,
+        ignore_immune_to: List[Keyword] = None,
+        life_state: LifeState = LifeState.ALIVE,
+        hurt: bool = False,
+        consider: List[Keyword] = None,
     ):
         """
         Returns k monsters with least effects of a type.
         """
-        exclude = [] if exclude is None else exclude
-        keyword_whitelist = [] if keyword_whitelist is None else keyword_whitelist
-        keyword_blacklist = [] if keyword_blacklist is None else keyword_blacklist
-
-        return filter_entities(
+        return filter_monsters(
             monsters,
             k=k,
-            method="FIRST",
             sort_functions=[
                 (
                     lambda entity: sum(
@@ -379,11 +339,15 @@ class Selector(ABC):
                     )
                 ),
             ],
-            life_state=life_state,
-            consider=consider,
-            exclude=exclude,
+            whitelist=whitelist,
+            blacklist=blacklist,
             keyword_whitelist=keyword_whitelist,
             keyword_blacklist=keyword_blacklist,
+            ignore_immune_to=ignore_immune_to,
+            life_state=life_state,
+            hurt=hurt,
+            consider=consider,
+            method="FIRST",
         )
 
     def _preprocess_enemies(

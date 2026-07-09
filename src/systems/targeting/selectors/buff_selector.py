@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
@@ -28,7 +27,7 @@ class BuffSelector(Selector):
         """
         Returns a list of target monsters based on EASY difficulty criteria for
         buff type effects:
-        * 100% -> self + (k-1) random, alive allies
+        * 100% -> self + (k-1) random alive allies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -58,6 +57,7 @@ class BuffSelector(Selector):
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
+                    blacklist=targets,
                     consider=[],
                 )
             )
@@ -75,8 +75,7 @@ class BuffSelector(Selector):
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
         buff type effects:
-        * 50% -> self + (k-1) alive allies without the buff
-        * 50% -> self + (k-1) alive allies with the buff
+        * 100% -> self + (k-1) random alive allies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -102,32 +101,11 @@ class BuffSelector(Selector):
             targets.append(source)
 
         if len(targets) < k:
-            if random() < 0.5:
-                targets.extend(
-                    self._get_targets_without_effects(
-                        allies,
-                        k=k - len(targets),
-                        effects=[main_keyword],
-                        consider=[],
-                    )
-                )
-
-            else:
-                targets.extend(
-                    self._get_targets_with_effects(
-                        allies,
-                        k=k - len(targets),
-                        effects=[main_keyword],
-                        consider=[],
-                    )
-                )
-
-        if len(targets) < k:
             targets.extend(
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    exclude=[target.local_id for target in targets],
+                    blacklist=targets,
                     consider=[],
                 )
             )
@@ -145,8 +123,7 @@ class BuffSelector(Selector):
         """
         Returns a list of target monsters based on HARD difficulty criteria for
         buff type effects:
-        * 50% -> self + (k-1) alive allies without the buff
-        * 50% -> self + (k-1) alive allies with the buff
+        * 100% -> self + (k-1) random alive allies, prioritizing those that aren't immune to the main keyword
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -172,32 +149,22 @@ class BuffSelector(Selector):
             targets.append(source)
 
         if len(targets) < k:
-            if random() < 0.5:
-                targets.extend(
-                    self._get_targets_without_effects(
-                        allies,
-                        k=k - len(targets),
-                        effects=[main_keyword],
-                        consider=[],
-                    )
+            targets.extend(
+                self._get_targets_random(
+                    allies,
+                    k=k - len(targets),
+                    blacklist=targets,
+                    ignore_immune_to=[main_keyword],
+                    consider=[],
                 )
-
-            else:
-                targets.extend(
-                    self._get_targets_with_effects(
-                        allies,
-                        k=k - len(targets),
-                        effects=[main_keyword],
-                        consider=[],
-                    )
-                )
+            )
 
         if len(targets) < k:
             targets.extend(
                 self._get_targets_random(
                     allies,
                     k=k - len(targets),
-                    exclude=[target.local_id for target in targets],
+                    blacklist=targets,
                     consider=[],
                 )
             )

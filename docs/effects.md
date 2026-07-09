@@ -3,7 +3,8 @@ An **Effect** is the smallest component of `Sides` and `Skills`, and are applied
 
 ## Attributes
 * **keyword**: a identifier that is unique per effect. Must be part of the `Keyword` enum.
-* **value**: primary attribute that defines the effect's magnitude, behavior, or outcome.
+* **value**: defines the effect's magnitude, in absolute format (e.g. 1, 5, 100).
+* **value_percent**: defines the effect's magnitude, in percentage format (e.g. 0.1, 0.5, 1.0).
 * **duration**: by how many turns the effect will persist in the target.
 * **decay**: by how much the `value` is decreased after each turn.
 * **accuracy**: a number in the [0, 1] interval that represents the chance of the effect being executed.
@@ -11,10 +12,11 @@ An **Effect** is the smallest component of `Sides` and `Skills`, and are applied
 * **trigger**: what combat situation triggers the effect.
 * **persistent**: if the effect will be applied to the entity on execution, and added to their current effects; or if it is instant.
 * **removable**: if the effect can be removed by other effects. The effect will still be removed after its duration expires.
+* **target_keywords**: other keywords that the effect can use in it's behavior.
 
 ## Effect types
 * **BUFF**: a persistent effect that benefits the target.
-* **CURSE**: an instant or persistent effect that harms self.
+* **CURSE**: an instant or persistent effect that harms self and allies.
 * **DEBUFF**: a persistent effect that harms the target.
 * **DEFENSIVE**: a persistent effect that reduces direct damage that the target would recieve.
 * **DETERIORATION**: an instant effect that harms the target.

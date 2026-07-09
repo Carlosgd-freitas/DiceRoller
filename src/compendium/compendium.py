@@ -428,7 +428,7 @@ class Compendium(Menu):
             self.sort()
 
         elif option.id == "SHOW_DETAILS":
-            self.select_item()
+            self.show_details()
 
         elif option.id == "RETURN":
             self.level = CompendiumLevel.PAGE
@@ -468,7 +468,7 @@ class Compendium(Menu):
 
         return
 
-    def select_item(self):
+    def show_details(self):
         """
         Prompts the user to select one of the Compendium page's items, and if:
         * the cancel index is selected, the operation is canceled.

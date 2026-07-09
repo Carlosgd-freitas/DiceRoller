@@ -5,11 +5,11 @@ from __future__ import annotations
 from random import random
 from typing import TYPE_CHECKING, List
 
+from src.base.monster import LifeState, Monster
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
     from src.base.keywords import Keyword
-    from src.base.monster import Monster
 
 
 class ReviveSelector(Selector):
@@ -53,7 +53,7 @@ class ReviveSelector(Selector):
         targets = self._get_targets_lowest_max_hp(
             allies,
             k=k,
-            life_state="DEAD",
+            life_state=LifeState.DEAD,
             consider=[],
         )
 
@@ -95,7 +95,7 @@ class ReviveSelector(Selector):
         targets = self._get_targets_random(
             allies,
             k=k,
-            life_state="DEAD",
+            life_state=LifeState.DEAD,
             consider=[],
         )
 
@@ -139,7 +139,7 @@ class ReviveSelector(Selector):
             targets = self._get_targets_random(
                 allies,
                 k=k,
-                life_state="DEAD",
+                life_state=LifeState.DEAD,
                 consider=[],
             )
 
@@ -147,7 +147,7 @@ class ReviveSelector(Selector):
             targets = self._get_targets_highest_max_hp(
                 allies,
                 k=k,
-                life_state="DEAD",
+                life_state=LifeState.DEAD,
                 consider=[],
             )
 

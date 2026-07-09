@@ -163,7 +163,7 @@ class OffensiveSelector(Selector):
                     self._get_targets_lowest_hp(
                         enemies,
                         k=k - len(targets),
-                        exclude=[target.local_id for target in targets],
+                        blacklist=targets,
                     )
                 )
 

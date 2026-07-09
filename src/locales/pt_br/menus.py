@@ -22,6 +22,7 @@ PLAYER_ACTIONS = {
     "consumables": "Consumíveis",
     "equipment": "Equipamento",
     "roll_dice": "Rolar Dados",
+    "select_target_prompt": "Selecione um alvo",
     "show_details": "Mostrar Detalhes",
     "skills": "Habilidades",
     "skip_turn": "Pular Turno",
