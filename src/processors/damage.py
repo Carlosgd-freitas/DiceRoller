@@ -142,6 +142,8 @@ def calculate_damage(
 
     if damage < 0:
         damage = 0
+    elif target.hp - damage < 0:
+        damage = target.hp
 
     # Total defended damage
     total_defended_damage = 0

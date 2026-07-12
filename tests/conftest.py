@@ -25,6 +25,7 @@ from src.menus.main_menu import MainMenu
 from src.menus.settings_menu import SettingsMenu
 from src.systems.file import FileManager
 from src.systems.manager import Manager
+from src.systems.randomizer import Randomizer
 from src.systems.settings import Settings
 from src.systems.targeting.selectors.manager import SelectorManager
 
@@ -212,3 +213,10 @@ def combat(settings: Settings) -> Dict:
         "suffix_manager": combat_manager.suffix_manager,
         "team_manager": combat_manager.team_manager,
     }
+
+
+@fixture()
+def randomizer() -> Randomizer:
+    randomizer = Randomizer()
+
+    return randomizer

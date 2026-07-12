@@ -1,6 +1,7 @@
 """EN-US localization for menus module."""
 
 BASE = {
+    "cancel": "Cancel",
     "exit": "Exit",
     "file": "File",
     "file_found": "was found!",
@@ -26,6 +27,7 @@ PLAYER_ACTIONS = {
     "select_target_prompt": "Select a target",
     "selected_side": "Selected Side",
     "show_details": "Show Details",
+    "side_no_targets": "There are no selectable targets for this side.",
     "skills": "Skills",
     "skip_turn": "Skip Turn",
 }

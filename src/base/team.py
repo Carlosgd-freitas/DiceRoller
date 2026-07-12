@@ -58,3 +58,16 @@ class Team:
                 break
 
         return status
+
+    def is_member(self, monster: Monster) -> bool:
+        """
+        Returns if a monster is a member of the team or not.
+
+        :return: If the monster is a member of the team or not.
+        :rtype: bool
+        """
+        for member in self.members:
+            if member == monster:
+                return True
+
+        return False

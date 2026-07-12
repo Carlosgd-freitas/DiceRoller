@@ -14,13 +14,11 @@ from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
 from src.base.team import Team
-from src.combat.manager import CombatData
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
-from src.logger.logger import Logger
 
 if TYPE_CHECKING:
-    from src.systems.settings import Settings
+    from src.combat.manager import CombatData
 
 CHANCE_CALCULATION_METHOD = Literal[
     "LINEAR_DECAY", "QUADRATIC_DECAY", "EXPONENTIAL_INTERPOLATION"
@@ -64,10 +62,6 @@ class RandomizerConfig:
     interval. Default value is [1, 3].
     :type effect_threshold: Tuple[int, int]
 
-    :param target_keywords_threshold: Generated Effects will have a number of target
-    keywords in this closed interval. Default value is [1, 3].
-    :type target_keywords_threshold: Tuple[int, int]
-
     :param value_threshold: Generated Effects will have a value in this closed interval.
     Default value is [1, 100].
     :type value_threshold: Tuple[float, float]
@@ -84,10 +78,14 @@ class RandomizerConfig:
     interval. Default value is [0.75, 1].
     :type accuracy_threshold: Tuple[float, float]
 
+    :param target_keywords_threshold: Generated Effects will have a number of target
+    keywords in this closed interval. Default value is [1, 3].
+    :type target_keywords_threshold: Tuple[int, int]
+
     :param effect_type: Generated Effects can only be of this type.
     :type effect_type: EffectType
 
-    :param keyword_blacklist: Generated Effects can only have any keywords in this list.
+    :param keyword_whitelist: Generated Effects can only have any keywords in this list.
     :type keyword_whitelist: List[Keyword]
 
     :param keyword_blacklist: Generated Effects won't have any keywords in this list.
@@ -107,32 +105,53 @@ class RandomizerConfig:
     side_threshold: Tuple[int, int] = (4, 8)
     # Side attributes
     effect_threshold: Tuple[int, int] = (1, 3)
-    target_keywords_threshold: Tuple[int, int] = (1, 3)
     # Effect attributes
     value_threshold: Tuple[float, float] = (1, 100)
     value_percent_threshold: Tuple[float, float] = (0.01, 0.25)
     duration_threshold: Tuple[int, int] = (1, 10)
     accuracy_threshold: Tuple[float, float] = (0.75, 1)
+    target_keywords_threshold: Tuple[int, int] = (1, 3)
     effect_type: EffectType | None = None
     # Keyword attributes
     keyword_whitelist: list[Keyword] = field(default_factory=list)
     keyword_blacklist: list[Keyword] = field(default_factory=list)
 
+    def __str__(self) -> str:
+        """String representation of RandomizerConfig."""
+        type = self.effect_type.value if self.effect_type else None
+        keyword_whitelist = ", ".join(
+            [str(keyword.name) for keyword in self.keyword_whitelist]
+        )
+        keyword_blacklist = ", ".join(
+            [str(keyword.name) for keyword in self.keyword_blacklist]
+        )
+
+        _str = f"Team Threshold: {self.team_threshold}\n"
+        _str += f"Member Threshold: {self.member_threshold}\n"
+        _str += f"HP Threshold: {self.hp_threshold}\n"
+        _str += f"Mana Threshold: {self.mana_threshold}\n"
+        _str += f"Speed Threshold: {self.speed_threshold}\n"
+        _str += f"Dice Threshold: {self.dice_threshold}\n"
+        _str += f"Side Threshold: {self.side_threshold}\n"
+        _str += f"Effect Threshold: {self.effect_threshold}\n"
+        _str += f"Value Threshold: {self.value_threshold}\n"
+        _str += f"Value (%) Threshold: {self.value_percent_threshold}\n"
+        _str += f"Duration Threshold: {self.duration_threshold}\n"
+        _str += f"Accuracy (%) Threshold: {self.accuracy_threshold}\n"
+        _str += f"Target keywords Threshold: {self.target_keywords_threshold}\n"
+        _str += f"Effect Type: {type}\n"
+        _str += f"Keyword whitelist: {keyword_whitelist}\n"
+        _str += f"Keyword blacklist: {keyword_blacklist}"
+
+        return _str
+
 
 class Randomizer:
     """
     Randomizer class.
-
-    :var settings: Game settings.
-    :vartype settings: Settings
     """
 
-    def __init__(
-        self,
-        settings: Settings,
-    ):
-        self.logger = Logger(language=settings.language)
-
+    def __init__(self):
         self.all_effects = get_all_effects()
         self.all_monsters = get_all_monsters()
 

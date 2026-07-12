@@ -1,6 +1,7 @@
 """PT-BR localization for menus module."""
 
 BASE = {
+    "cancel": "Cancelar",
     "exit": "Sair",
     "file": "Arquivo",
     "file_found": "foi encontrado!",
@@ -26,6 +27,7 @@ PLAYER_ACTIONS = {
     "select_target_prompt": "Selecione um alvo",
     "selected_side": "Lado Selecionado",
     "show_details": "Mostrar Detalhes",
+    "side_no_targets": "Não há alvos selecionáveis para esse lado.",
     "skills": "Habilidades",
     "skip_turn": "Pular Turno",
 }

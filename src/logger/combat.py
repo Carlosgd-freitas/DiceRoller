@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import TYPE_CHECKING, List
 
 from src.base.color import Color, ColorData, color_string
 from src.base.life_state import LifeState
 from src.base.monster import ControlType, Monster
 from src.logger.monster import MonsterLogger
+from src.systems.targeting.filters import filter_monsters
 
 if TYPE_CHECKING:
     from src.base.team import Team
@@ -143,6 +145,9 @@ class CombatLogger(MonsterLogger):
                 )
 
                 foreground_color = Color.RED
+
+                # IA Level
+                message += f" ({monster.difficulty.name})"
 
             elif monster.control_type == ControlType.PLAYER:
                 message = self.get_message(
@@ -395,9 +400,20 @@ class CombatLogger(MonsterLogger):
             return
 
         for index, team in enumerate(teams):
+            filtered = filter_monsters(
+                team.members,
+                k=inf,
+                whitelist=whitelist,
+                life_state=life_state,
+                method="FIRST",
+            )
+
+            if not filtered:
+                continue
+
             data = self.log_team(
                 team=team,
-                whitelist=whitelist,
+                whitelist=filtered,
                 index=index + 1,
                 life_state=life_state,
                 control_type=control_type,

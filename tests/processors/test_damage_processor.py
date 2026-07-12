@@ -39,6 +39,26 @@ def test_calculate_damage_no_consider(combat: Dict):
     assert_conditions(conditions)
 
 
+def test_calculate_damage_over(combat: Dict):
+    monster_0: Monster = combat["monsters"][0]
+    monster_4: Monster = combat["monsters"][4]
+
+    effect = AttackEffect(300)
+
+    damage_data = calculate_damage(
+        effect,
+        monster_0,
+        monster_4,
+    )
+
+    conditions = [
+        damage_data["damage"] == 200,
+        damage_data["defended_damage"] == {},
+    ]
+
+    assert_conditions(conditions)
+
+
 def test_calculate_damage_block(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_0: Monster = combat["monsters"][0]
