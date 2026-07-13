@@ -237,7 +237,7 @@ def test_keyword_confuse(combat: Dict):
     monster_2: Monster = combat["monsters"][2]
     monster_3: Monster = combat["monsters"][3]
 
-    effect_confuse = ConfuseEffect(duration=1)
+    effect_confuse = ConfuseEffect(value_percent=1, duration=1)
     effect_attack = AttackEffect(1)
     side = Side(effects=[effect_attack])
 
@@ -251,6 +251,7 @@ def test_keyword_confuse(combat: Dict):
         monster_1.local_id == "MONSTER_1",
         len(monster_1.effects) == 1,
         monster_1.get_effect(Keyword.CONFUSE).keyword == Keyword.CONFUSE,
+        monster_1.get_effect(Keyword.CONFUSE).value_percent == 1,
         monster_1.get_effect(Keyword.CONFUSE).duration == 1,
         monster_1.hp == 1,
     ]

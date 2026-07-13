@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from enum import Enum
 from math import ceil
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Tuple, TypedDict
+from typing import TYPE_CHECKING, Callable, Dict, List, Tuple, TypedDict, TypeVar
 
 from tabulate import tabulate
 
@@ -15,6 +15,8 @@ from src.locales.languages import Language
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.menus.sort_menu import SortMenu
+
+T = TypeVar("T")
 
 if TYPE_CHECKING:
     from src.logger.logger import Logger
@@ -61,7 +63,7 @@ class Compendium(Menu):
     :vartype title: str
 
     :var items: Compendium's main content.
-    :vartype items: List
+    :vartype items: List[T]
 
     :var columns: Names of the Compendium's columns (Headers).
     :vartype columns: List[str]
@@ -85,7 +87,7 @@ class Compendium(Menu):
         self,
         logger: Logger,
         settings: Settings,
-        items: List,
+        items: List[T],
         alignments: Tuple[str] = None,
         page_number: int = 1,
         page_size: int = 15,
@@ -276,12 +278,12 @@ class Compendium(Menu):
     # =========================================================================
 
     @abstractmethod
-    def get_pages_data(self, items: List) -> List[List]:
+    def get_pages_data(self, items: List[T]) -> List[List]:
         """
         Returns all the tabulated data that will be used on the Compendium.
 
         :param items: Compendium items.
-        :type items: List
+        :type items: List[T]
 
         :return: Compendium items structured as tabulated data.
         :rtype: List[List]
@@ -332,12 +334,12 @@ class Compendium(Menu):
         return range(initial_index, initial_index + len(page_items))
 
     @abstractmethod
-    def get_item_name(self, item: Any) -> str:
+    def get_item_name(self, item: T) -> str:
         """
         Returns the name of an item.
 
         :param item: A Compendium's item.
-        :type item: Any
+        :type item: T
 
         :return: The Compendium's item name.
         :rtype: str

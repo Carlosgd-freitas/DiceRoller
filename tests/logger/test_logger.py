@@ -100,4 +100,30 @@ def test_logger_pluralize(loggers: Dict):
         ]
     )
 
+    message = logger.pluralize(
+        1,
+        namespace="base",
+        message_group="LEXICON",
+        key="items",
+    )
+
+    conditions.extend(
+        [
+            message == "item",
+        ]
+    )
+
+    message = logger.pluralize(
+        2,
+        namespace="base",
+        message_group="LEXICON",
+        key="items",
+    )
+
+    conditions.extend(
+        [
+            message == "items",
+        ]
+    )
+
     assert_conditions(conditions)

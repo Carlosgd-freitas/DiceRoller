@@ -11,6 +11,7 @@ from src.base.team import Team
 from src.combat.manager import CombatManager
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from src.effects.confuse import ConfuseEffect
 from src.effects.execute import ExecuteEffect
 from src.effects.heal import HealEffect
 from src.effects.invisible import InvisibleEffect
@@ -106,6 +107,7 @@ player_monster = Monster(
         revive_dice,
     ],
     control_type=ControlType.PLAYER,
+    effects=[],
 )
 
 # ----------------------------
@@ -127,6 +129,9 @@ alive_monster = Monster(
         nothing_dice,
     ],
 )
+
+taunting_monster = deepcopy(alive_monster)
+taunting_monster.effects = [ConfuseEffect(value_percent=1, duration=99)]
 
 invisible_monster = deepcopy(alive_monster)
 invisible_monster.effects = [InvisibleEffect(duration=99)]
@@ -156,6 +161,9 @@ team_b = Team(
     members=[
         deepcopy(dead_monster),
         deepcopy(alive_monster),
+        deepcopy(invisible_monster),
+        deepcopy(repelling_monster),
+        deepcopy(taunting_monster),
     ],
 )
 

@@ -193,7 +193,6 @@ class EffectLogger(AttributeLogger):
                 effect.keyword
                 in [
                     Keyword.DOOM,
-                    Keyword.CONFUSE,
                     Keyword.FREEZE,
                     Keyword.IMMUNITY,
                     Keyword.INVISIBLE,

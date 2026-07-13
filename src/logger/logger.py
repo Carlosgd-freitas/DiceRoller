@@ -222,16 +222,22 @@ class Logger:
         :rtype: str
         """
         if number == 1:
+            if key.endswith("s"):
+                key = key[:-1]
+
             return self.get_message(
                 namespace=namespace,
                 message_group=message_group,
                 key=key,
             )
         else:
+            if not key.endswith("s"):
+                key = key + "s"
+
             return self.get_message(
                 namespace=namespace,
                 message_group=message_group,
-                key=key + "s",
+                key=key,
             )
 
     def break_message(
