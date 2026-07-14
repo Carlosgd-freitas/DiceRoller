@@ -662,7 +662,9 @@ class CombatManager(Manager):
                 self.logger.log_monster_death(monster)
 
                 # Updating monster on death
-                monster.effects = []
+                monster.effects = [
+                    effect for effect in monster.effects if not effect.removable
+                ]
                 monster.in_combat = False
 
                 # Procesing effects on death

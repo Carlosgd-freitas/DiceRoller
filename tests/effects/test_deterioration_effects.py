@@ -55,14 +55,14 @@ def test_keyword_corrupt(combat: Dict):
 
 def test_keyword_execute(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
-    monster_0: Monster = combat["monsters"][0]
+    monster_1: Monster = combat["monsters"][1]
     monster_4: Monster = combat["monsters"][4]
 
     execute_effect = ExecuteEffect(value_percent=0.5)
 
     effect_manager.execute_effect(
         execute_effect,
-        source=monster_0,
+        source=monster_1,
         target=monster_4,
     )
 
@@ -76,7 +76,7 @@ def test_keyword_execute(combat: Dict):
 
     effect_manager.execute_effect(
         execute_effect,
-        source=monster_0,
+        source=monster_1,
         target=monster_4,
     )
 

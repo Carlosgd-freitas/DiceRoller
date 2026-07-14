@@ -148,7 +148,7 @@ taunting_monster.effects = [TauntEffect(duration=99)]
 # ----------------------------
 
 team_a = Team(
-    name="Team A",
+    name="A",
     members=[
         player_monster,
         deepcopy(dead_monster),
@@ -157,7 +157,7 @@ team_a = Team(
 )
 
 team_b = Team(
-    name="Team B",
+    name="B",
     members=[
         deepcopy(dead_monster),
         deepcopy(alive_monster),

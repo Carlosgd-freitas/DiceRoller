@@ -72,6 +72,5 @@ class PainEffect(Effect):
 
         return {
             **damage_data,
-            "attribute": "hp",
             "fail": fail,
         }

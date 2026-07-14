@@ -63,7 +63,7 @@ monster_a = Monster(
 )
 
 team_a = Team(
-    name="Team A",
+    name="A",
     members=[monster_a],
 )
 
@@ -74,7 +74,7 @@ monster_b = Monster(
 )
 
 team_b = Team(
-    name="Team B",
+    name="B",
     members=[monster_b],
 )
 

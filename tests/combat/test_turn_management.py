@@ -1,9 +1,13 @@
 """Tests for combat turn management."""
 
-from typing import Dict
+from __future__ import annotations
 
-from src.combat.manager import CombatManager
+from typing import TYPE_CHECKING, Dict
+
 from tests.utils import assert_conditions
+
+if TYPE_CHECKING:
+    from src.combat.manager import CombatManager
 
 
 def test_is_round_start(combat: Dict):

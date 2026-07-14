@@ -108,6 +108,7 @@ class EffectManager(Manager):
         effect: Effect,
         source: Entity,
         target: Entity,
+        check_alive: bool = True,
         check_can_act: bool = True,
         check_immunity: bool = True,
         check_accuracy: bool = True,
@@ -125,6 +126,10 @@ class EffectManager(Manager):
         :param target: The entity which the effect will be applied.
         :type target: Entity
 
+        :param check_alive: If True, a check if the source is alive will be done
+        before trying do activate the Effect. Default value is True.
+        :type check_alive: bool
+
         :param check_can_act: If True, a check if the source can act will be done
         before trying do activate the Effect. Default value is True.
         :type check_can_act: bool
@@ -140,6 +145,10 @@ class EffectManager(Manager):
         :return: If the effect was executed.
         :rtype: bool
         """
+        # Check alive
+        if (check_alive) and (not source.is_alive()):
+            return False
+
         # Check can act
         if (check_can_act) and (not source.can_act()):
             return False

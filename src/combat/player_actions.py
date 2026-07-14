@@ -488,6 +488,10 @@ class CombatPlayerActionsMenu(Menu):
         K = 1  # Number of targets
 
         while len(sides) > 0:
+            # Check alive
+            if not monster.is_alive():
+                break
+
             # Logging sides
             self.logger.log(message="")
 

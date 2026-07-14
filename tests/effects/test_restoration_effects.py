@@ -151,21 +151,21 @@ def test_keyword_mana(combat: Dict):
 def test_keyword_revive(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_0: Monster = combat["monsters"][0]
+    monster_1: Monster = combat["monsters"][1]
     monster_3: Monster = combat["monsters"][3]
 
     effect = ReviveEffect(10)
 
     effect_manager.execute_effect(
         effect,
-        source=monster_0,
+        source=monster_1,
         target=monster_0,
     )
 
     conditions = [
-        monster_0.local_id == "MONSTER_0",
         monster_0.is_alive() is True,
         monster_0.hp == 10,
-        len(monster_0.effects) == 0,
+        len(monster_1.effects) == 0,
     ]
 
     monster_0.hp = 0
@@ -173,13 +173,15 @@ def test_keyword_revive(combat: Dict):
 
     effect_manager.execute_effect(
         effect,
-        source=monster_0,
+        source=monster_1,
         target=monster_0,
     )
 
     conditions.extend(
         [
+            monster_0.is_alive() is True,
             monster_0.hp == 25,
+            len(monster_1.effects) == 0,
         ]
     )
 
@@ -188,13 +190,15 @@ def test_keyword_revive(combat: Dict):
 
     effect_manager.execute_effect(
         effect,
-        source=monster_0,
+        source=monster_1,
         target=monster_0,
     )
 
     conditions.extend(
         [
+            monster_0.is_alive() is True,
             monster_0.hp == 100,
+            len(monster_1.effects) == 0,
         ]
     )
 
@@ -206,9 +210,9 @@ def test_keyword_revive(combat: Dict):
 
     conditions.extend(
         [
-            monster_3.local_id == "MONSTER_3",
             monster_3.is_alive() is True,
             monster_3.hp == 100,
+            len(monster_0.effects) == 0,
         ]
     )
 

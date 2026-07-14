@@ -59,7 +59,7 @@ monster_b = Monster(
 # ----------------------------
 
 team_a = Team(
-    name="Team A",
+    name="A",
     members=[
         deepcopy(monster_a),
         deepcopy(monster_b),
@@ -67,7 +67,7 @@ team_a = Team(
 )
 
 team_b = Team(
-    name="Team B",
+    name="B",
     members=[
         deepcopy(monster_a),
         deepcopy(monster_b),
