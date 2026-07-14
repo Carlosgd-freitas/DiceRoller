@@ -63,19 +63,11 @@ class SelectorManager:
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-
         selector: Selector = None
 
         # Determining the main properties
-        main_keyword = None
-        main_effect_type = None
-        main_count = 0
-
-        for effect_type, keywords in side.get_effect_summary().items():
-            if len(keywords) > main_count:
-                main_keyword = keywords[0]
-                main_effect_type = effect_type
-                main_count = len(keywords)
+        main_effect_type = side.get_main_effect_type()
+        main_keyword = side.get_main_keyword()
 
         # Confuse check
         confused = source.get_effect(Keyword.CONFUSE)
@@ -100,24 +92,24 @@ class SelectorManager:
 
             # Determining Selector
             if main_effect_type in [
-                EffectType.DETERIORATION.value,
-                EffectType.OFFENSIVE.value,
+                EffectType.DETERIORATION,
+                EffectType.OFFENSIVE,
             ]:
                 selector = OffensiveSelector()
 
             elif main_effect_type in [
-                EffectType.DEFENSIVE.value,
-                EffectType.RESTORATION.value,
+                EffectType.DEFENSIVE,
+                EffectType.RESTORATION,
             ]:
                 selector = DefensiveSelector()
 
-            elif main_effect_type == EffectType.BUFF.value:
+            elif main_effect_type == EffectType.BUFF:
                 selector = BuffSelector()
 
-            elif main_effect_type == EffectType.CURSE.value:
+            elif main_effect_type == EffectType.CURSE:
                 selector = CurseSelector()
 
-            elif main_effect_type == EffectType.DEBUFF.value:
+            elif main_effect_type == EffectType.DEBUFF:
                 selector = DebuffSelector()
 
             else:

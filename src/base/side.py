@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List
+from collections import Counter
+from typing import Dict, List
 
+from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
-
-if TYPE_CHECKING:
-    from src.base.effect import Effect
 
 
 class Side:
@@ -35,21 +34,6 @@ class Side:
         _str += f"\n* Weight: {self.weight}"
 
         return _str
-
-    def has_effect(self, keyword: Keyword) -> bool:
-        """
-        Returns if the entity is currently under the effect.
-
-        :param keyword: A keyword.
-        :type keyword: Keyword
-
-        :return: If the entity has the effect.
-        :rtype: bool
-        """
-        for effect in self.effects:
-            if effect.keyword == keyword:
-                return True
-        return False
 
     def get_effect(self, keyword: Keyword) -> Effect | None:
         """
@@ -83,3 +67,70 @@ class Side:
                 types[effect.type.value].append(effect.keyword)
 
         return types
+
+    def get_main_effect_type(self) -> EffectType:
+        """
+        Gets the Side main effect type.
+
+        :return: The main effect type of the Side.
+        :rtype: EffectType
+        """
+        effect_types = [effect.type for effect in self.effects]
+        counter = Counter(effect_types)
+
+        most_frequent = counter.most_common(1)
+        if most_frequent:
+            return most_frequent[0][0]
+
+    def get_main_keyword(self) -> Keyword:
+        """
+        Gets the Side main keyword.
+
+        :return: The main keyword of the Side.
+        :rtype: Keyword
+        """
+        keywords = [effect.keyword for effect in self.effects]
+        counter = Counter(keywords)
+
+        most_frequent = counter.most_common(1)
+        if most_frequent:
+            return most_frequent[0][0]
+
+    def has_effect(self, keyword: Keyword) -> bool:
+        """
+        Returns if the entity is currently under the effect.
+
+        :param keyword: A keyword.
+        :type keyword: Keyword
+
+        :return: If the entity has the effect.
+        :rtype: bool
+        """
+        for effect in self.effects:
+            if effect.keyword == keyword:
+                return True
+        return False
+
+    def is_equivalent(self, side: Side) -> bool:
+        """
+        Compares two sides and returns if they are equivalent.
+
+        :param side: Side for comparison.
+        :type side: Side
+
+        :return: If the sides are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(side, Side)
+            and len(self.effects) == len(side.effects)
+            and all(
+                [
+                    self_effect.is_equivalent(effect)
+                    for self_effect, effect in zip(
+                        self.effects, side.effects, strict=True
+                    )
+                ]
+            )
+            and self.weight == side.weight
+        )

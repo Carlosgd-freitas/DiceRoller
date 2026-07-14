@@ -1,16 +1,20 @@
 """Pytest configuration file for tests."""
 
+from copy import deepcopy
 from typing import Dict
 
 from pytest import fixture
 
+from src.base.dice import Dice
 from src.base.monster import Monster
+from src.base.side import Side
 from src.base.team import Team
 from src.combat.effects import EffectManager
 from src.combat.manager import CombatManager, OrderStrategy
 from src.combat.suffixes import SuffixManager
 from src.combat.team_manager import TeamManager
 from src.compendium.effects import EffectCompendium
+from src.effects.nothing import NothingEffect
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.attributes import AttributeLogger
@@ -198,6 +202,68 @@ def combat(settings: Settings) -> Dict:
         teams=teams,
         order_strategy=OrderStrategy.SET,
         logging=False,
+    )
+
+    combat_manager.start_combat()
+
+    return {
+        # Variables
+        "monsters": monsters,
+        "teams": teams,
+        # Managers
+        "combat_manager": combat_manager,
+        "effect_manager": combat_manager.effect_manager,
+        "selector_manager": combat_manager.selector_manager,
+        "suffix_manager": combat_manager.suffix_manager,
+        "team_manager": combat_manager.team_manager,
+    }
+
+
+@fixture()
+def combat_softlock(settings: Settings) -> Dict:
+    nothing_dice = Dice(
+        sides=[
+            Side(effects=[NothingEffect()]),
+        ]
+    )
+
+    monster_0 = Monster(
+        local_id="MONSTER_0",
+        name="Blue",
+        hp=1,
+        max_hp=1,
+        speed=1,
+        dice=[deepcopy(nothing_dice)],
+    )
+
+    monster_1 = Monster(
+        local_id="MONSTER_1",
+        name="Red",
+        hp=1,
+        max_hp=1,
+        speed=1,
+        dice=[deepcopy(nothing_dice)],
+    )
+
+    team_0 = Team(
+        name="Team Blue",
+        members=[monster_0],
+    )
+
+    team_1 = Team(
+        name="Team Red",
+        members=[monster_1],
+    )
+
+    teams = [team_0, team_1]
+    monsters = [monster for team in teams for monster in team.members]
+
+    combat_manager = CombatManager(
+        settings=settings,
+        teams=teams,
+        order_strategy=OrderStrategy.SET,
+        logging=False,
+        softlock_limit=3,
     )
 
     combat_manager.start_combat()

@@ -29,6 +29,27 @@ class Dice:
 
         return _str
 
+    def is_equivalent(self, dice: Dice) -> bool:
+        """
+        Compares two dice and returns if they are equivalent.
+
+        :param dice: Dice for comparison.
+        :type dice: Dice
+
+        :return: If the dice are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(dice, Dice)
+            and len(self.sides) == len(dice.sides)
+            and all(
+                [
+                    self_side.is_equivalent(side)
+                    for self_side, side in zip(self.sides, dice.sides, strict=True)
+                ]
+            )
+        )
+
     def roll(self) -> Side:
         """
         Randomly returns one of the Dice's sides, based on each side's weight.

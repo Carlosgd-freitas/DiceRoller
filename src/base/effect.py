@@ -134,7 +134,11 @@ class Effect(ABC):
         """String representation of Effect."""
         type = self.type.value if self.type else None
         trigger = self.trigger.value if self.trigger else None
-        target_keywords = ", ".join([str(keyword) for keyword in self.target_keywords])
+        target_keywords = (
+            ", ".join([str(keyword) for keyword in self.target_keywords])
+            if self.target_keywords
+            else None
+        )
 
         _str = f"{self.keyword}"
         _str += f" | Value: {self.value}"
@@ -279,3 +283,22 @@ class Effect(ABC):
         :rtype: Dict
         """
         raise NotImplementedError
+
+    def is_equivalent(self, effect: Effect) -> bool:
+        """
+        Compares two effects and returns if they are equivalent.
+
+        :param effect: Effect for comparison.
+        :type effect: Effect
+
+        :return: If the effects are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(effect, Effect)
+            and self.keyword == effect.keyword
+            and self.value == effect.value
+            and self.value_percent == effect.value_percent
+            and self.removable == effect.removable
+            and self.target_keywords == effect.target_keywords
+        )

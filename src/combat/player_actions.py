@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from math import inf
 from random import random
 from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict, TypeVar
@@ -339,7 +340,7 @@ class CombatPlayerActionsMenu(Menu):
         :rtype: List[Monster]
         """
         targets = []
-        blacklist = [] if blacklist is None else blacklist.copy()
+        blacklist = [] if blacklist is None else deepcopy(blacklist)
 
         effect_summary = side.get_effect_summary()
 
@@ -521,6 +522,8 @@ class CombatPlayerActionsMenu(Menu):
             automatic = self._is_automatic(side)
             confused = monster.get_effect(Keyword.CONFUSE)
 
+            main_keyword = side.get_main_keyword()
+
             # Automatic target selecting
             if automatic:
                 selected_targets = self._get_targets(
@@ -539,7 +542,7 @@ class CombatPlayerActionsMenu(Menu):
                     allies=allies,
                     enemies=enemies,
                     k=K,
-                    main_keyword=side.effects[0],  ##
+                    main_keyword=main_keyword,
                 )
 
             # Manual target selecting

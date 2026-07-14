@@ -125,6 +125,39 @@ class Entity:
         """
         return self.hp > 0
 
+    def is_equivalent(self, entity: Entity) -> bool:
+        """
+        Compares two entities and returns if they are equivalent.
+
+        :param entity: Entity for comparison.
+        :type entity: Entity
+
+        :return: If the entities are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(entity, Entity)
+            and self.global_id == entity.global_id
+            and self.hp == entity.hp
+            and self.max_hp == entity.max_hp
+            and len(self.dice) == len(entity.dice)
+            and all(
+                [
+                    self_dice.is_equivalent(dice)
+                    for self_dice, dice in zip(self.dice, entity.dice, strict=True)
+                ]
+            )
+            and len(self.effects) == len(entity.effects)
+            and all(
+                [
+                    self_effect.is_equivalent(effect)
+                    for self_effect, effect in zip(
+                        self.effects, entity.effects, strict=True
+                    )
+                ]
+            )
+        )
+
     def roll(self) -> List[Side]:
         """
         Randomly returns list of sides; one for each of this Entity's dice.

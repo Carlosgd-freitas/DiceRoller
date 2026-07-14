@@ -59,6 +59,29 @@ class Team:
 
         return status
 
+    def is_equivalent(self, team: Team) -> bool:
+        """
+        Compares two teams and returns if they are equivalent.
+
+        :param team: Team for comparison.
+        :type team: Team
+
+        :return: If the teams are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(team, Team)
+            and len(self.members) == len(team.members)
+            and all(
+                [
+                    self_member.is_equivalent(member)
+                    for self_member, member in zip(
+                        self.members, team.members, strict=True
+                    )
+                ]
+            )
+        )
+
     def is_member(self, monster: Monster) -> bool:
         """
         Returns if a monster is a member of the team or not.

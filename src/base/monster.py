@@ -79,3 +79,36 @@ class Monster(Entity):
             _str += f"\n>> {one_dice}\n"
 
         return _str
+
+    def is_equivalent(self, monster: Monster) -> bool:
+        """
+        Compares two monsters and returns if they are equivalent.
+
+        :param monster: Monster for comparison.
+        :type monster: Monster
+
+        :return: If the monsters are equivalent.
+        :rtype: bool
+        """
+        return (
+            isinstance(monster, Monster)
+            and self.global_id == monster.global_id
+            and self.hp == monster.hp
+            and self.max_hp == monster.max_hp
+            and len(self.dice) == len(monster.dice)
+            and all(
+                [
+                    self_dice.is_equivalent(dice)
+                    for self_dice, dice in zip(self.dice, monster.dice, strict=True)
+                ]
+            )
+            and len(self.effects) == len(monster.effects)
+            and all(
+                [
+                    self_effect.is_equivalent(effect)
+                    for self_effect, effect in zip(
+                        self.effects, monster.effects, strict=True
+                    )
+                ]
+            )
+        )

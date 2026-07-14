@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from enum import Enum
 from math import inf
 from random import shuffle
@@ -60,6 +61,36 @@ class CombatData(TypedDict):
     turn: int
 
 
+def are_combat_data_equivalent(
+    combat_data_1: CombatData, combat_data_2: CombatData
+) -> bool:
+    """
+    Compares two combat data and returns if they are equivalent.
+
+    :param combat_data_1: Combat data for comparison.
+    :type v: CombatData
+
+    :param combat_data_2: Combat data for comparison.
+    :type combat_data_2: CombatData
+
+    :return: If the combat data are equivalent.
+    :rtype: bool
+    """
+    return (
+        isinstance(combat_data_1, dict)
+        and isinstance(combat_data_2, dict)
+        and len(combat_data_1["teams"]) == len(combat_data_2["teams"])
+        and all(
+            [
+                team_1.is_equivalent(team_2)
+                for team_1, team_2 in zip(
+                    combat_data_1["teams"], combat_data_2["teams"], strict=True
+                )
+            ]
+        )
+    )
+
+
 class CombatStatus(TypedDict):
     """
     The combat's status.
@@ -100,6 +131,10 @@ class CombatManager(Manager):
 
     :var logging: If logging is enabled. Default value is True.
     :vartype logging: bool
+
+    :var softlock_limit: In round ends, if the number of sequentially sotflock states
+    reach this limit, the combat ends in a draw. Default value is 3.
+    :vartype softlock_limit: int
     """
 
     # =========================================================================
@@ -112,6 +147,7 @@ class CombatManager(Manager):
         teams: List[Team] = None,
         order_strategy: OrderStrategy = OrderStrategy.FASTER,
         logging: bool = True,
+        softlock_limit: int = 3,
     ):
         # Initialization
         logger = CombatLogger(enabled=logging)
@@ -122,9 +158,14 @@ class CombatManager(Manager):
         )
 
         self.logger: CombatLogger
+        self.previous_combat_data = None
 
         # Effect Management
         self.effect_manager = EffectManager(settings, logging)
+
+        # Softlock Management
+        self.softlock_count = 0
+        self.softlock_limit = softlock_limit
 
         # Suffix Management
         self.suffix_manager = SuffixManager()
@@ -225,7 +266,7 @@ class CombatManager(Manager):
         """
         return {
             "round": self.round,
-            "teams": self.teams,
+            "teams": deepcopy(self.teams),
             "turn": self.turn,
         }
 
@@ -238,6 +279,22 @@ class CombatManager(Manager):
         """
         self.__dict__.update(combat_data)
         self.update_teams()
+
+    def check_softlock(self) -> bool:
+        """
+        Checks and returns if the combat is currently softlocked.
+
+        :return: If the combat is currently softlocked.
+        :rtype: bool
+        """
+        current_combat_data = self.get_combat_data()
+
+        if are_combat_data_equivalent(current_combat_data, self.previous_combat_data):
+            self.softlock_count += 1
+        else:
+            self.softlock_count = 0
+
+        return self.softlock_count >= self.softlock_limit
 
     # =========================================================================
     # Team Management
@@ -359,6 +416,8 @@ class CombatManager(Manager):
                 )
 
         self.current_monster = self.order[0]
+
+        self.previous_combat_data = self.get_combat_data()
 
         return
 
@@ -566,6 +625,10 @@ class CombatManager(Manager):
                     target=monster,
                 )
 
+        # Softlock check
+        self.check_softlock()
+        self.previous_combat_data = self.get_combat_data()
+
         self.round += 1
 
         return
@@ -626,7 +689,10 @@ class CombatManager(Manager):
             team.status = team.get_status()
             teams_status[team.status].append(team)
 
-        if len(teams_status["ALIVE"]) == 0:
+        if (
+            self.softlock_count >= self.softlock_limit
+            or len(teams_status["ALIVE"]) == 0
+        ):
             teams_status["status"] = "DRAW"
 
         elif len(teams_status["ALIVE"]) == 1:
@@ -637,10 +703,13 @@ class CombatManager(Manager):
 
         return teams_status
 
-    def check_combat_status(self) -> None:
+    def check_combat_status(self) -> CombatStatus:
         """
         Checks and returns the current combat status. If the combat is over, an
         appropiate message will be logged.
+
+        :return: The current combat status.
+        :rtype: CombatStatus
         """
         combat_status = self.get_combat_status()
 
@@ -660,15 +729,27 @@ class CombatManager(Manager):
 
         return combat_status
 
-    def _run_step(self, step: Callable, **kwargs):
-        """Runs a step of combat, check deaths and return the combat status."""
+    def _run_step(self, step: Callable, **kwargs) -> CombatStatus:
+        """
+        Runs a step of combat, check deaths and return the combat status.
+
+        :param step: A combat step method.
+        :type step: Callable
+
+        :return: The current combat status.
+        :rtype: CombatStatus
+        """
         step(**kwargs)
         self.check_deaths()
-        return self.check_combat_status()
+        combat_status = self.check_combat_status()
+        return combat_status
 
-    def run(self) -> Dict:
+    def run(self) -> CombatStatus:
         """
-        Runs combat until only one team remains alive.
+        Runs combat until it is finished.
+
+        :return: The final combat status.
+        :rtype: CombatStatus
         """
         # Combat Start
         combat_status = self._run_step(self.start_combat)
