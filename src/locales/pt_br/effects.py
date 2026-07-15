@@ -201,9 +201,9 @@ DRAIN = {
 EXECUTE = {
     "name": "EXECUTAR",
     "description": "Mata o alvo se o {hp} dele for menor ou igual a {value_percent}% do {hp} máximo.",
-    "description_absolute": None,
+    "description_absolute": "Mata o alvo se o {hp} dele for menor ou igual a {value}.",
     "description_percent": "Mata o alvo se o {hp} dele for menor ou igual a {value_percent}% do {hp} máximo.",
-    "description_both": None,
+    "description_both": "Mata o alvo se o {hp} dele for menor ou igual a {value} ou {value_percent}% do {hp} máximo, qual for maior.",
     "action": "EXECUTOU",
     "activation": None,
     "countdown": None,

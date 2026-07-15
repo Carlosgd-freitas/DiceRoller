@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, TypeVar
 
 from src.base.color import Color, color_string
 from src.locales.languages import Language
@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from src.logger.logger import Logger
     from src.menus.option import Option
     from src.systems.settings import Settings
+
+T = TypeVar("T")
 
 
 class Menu(Manager):
@@ -90,25 +92,28 @@ class Menu(Manager):
     # Options
     # =========================================================================
 
-    def select_option(self) -> Option:
+    def select(
+        self,
+        options: List[Option],
+        message: str = None,
+    ) -> Option:
         """
-        Prompts the user to select one of the Menu's options:
-        * if a valid option is selected, it will be returned.
-        * if an invalid option is selected, the prompt will repeat.
+        Prompts the user to select an option from a list. If an invalid key is selected,
+        the prompt will repeat.
 
-        :return: The option selected by the user.
+        :param options: List of selectable options.
+        :type options: List[Option]
+
+        :param message: Message to use in the input prompt. Default value is None.
+        :type message: str
+
+        :return: Option selected by the user.
         :rtype: Option
         """
         while True:
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="BASE",
-                key="select_option_prompt",
-            )
-
             selected = self.logger.input(message=message)
 
-            for option in self.options:
+            for option in options:
                 if selected == option.key:
                     return option
 
@@ -181,7 +186,13 @@ class Menu(Manager):
         while True:
             self.show_title()
             self.show_options()
-            selected = self.select_option()
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options, message)
 
             if self.is_option_valid(selected):
                 self.process_option(selected)

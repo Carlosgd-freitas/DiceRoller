@@ -511,27 +511,55 @@ class CombatPlayerActionsMenu(Menu):
             self.logger.log(message=message)
 
             # Player selecting side
-            side = self._select(sides, message_key="select_side_prompt")
+            options = [
+                Option(
+                    id="CANCEL",
+                    key="0",
+                    message=None,
+                )
+            ]
+
+            options.extend(
+                [
+                    Option(
+                        id=f"SIDE_{idx+1}",
+                        key=str(idx + 1),
+                        message=None,
+                        obj=side,
+                    )
+                    for idx, side in enumerate(sides)
+                ]
+            )
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="PLAYER_ACTIONS",
+                key="select_side_prompt",
+            )
+
+            selected_option: Option = self.select(options, message)
             self.logger.log(message="")
 
             # Cancelling action
-            if side is None:
+            if selected_option.id == "CANCEL":
                 return {"turn_taken": True, "wait_for_input": False}
+
+            selected_side: Side = selected_option.obj
 
             # Target selecting
             allies = self.team_manager.get_allies(monster, self.teams)
             enemies = self.team_manager.get_enemies(monster, self.teams)
             enemies = preprocess_enemies(enemies)
 
-            automatic = self._is_automatic(side)
+            automatic = self._is_automatic(selected_side)
             confused = monster.get_effect(Keyword.CONFUSE)
 
-            main_keyword = side.get_main_keyword()
+            main_keyword = selected_side.get_main_keyword()
 
             # Automatic target selecting
             if automatic:
                 selected_targets = self._get_targets(
-                    side=side,
+                    side=selected_side,
                     source=monster,
                     allies=allies,
                     enemies=enemies,
@@ -561,7 +589,7 @@ class CombatPlayerActionsMenu(Menu):
 
                     # Getting targets
                     selectable = self._get_targets(
-                        side=side,
+                        side=selected_side,
                         source=monster,
                         allies=allies,
                         enemies=enemies,
@@ -601,7 +629,7 @@ class CombatPlayerActionsMenu(Menu):
                         + ": "
                     )
                     message = color_string(message, intensity="BRIGHT")
-                    message += self.logger.get_side_details(side)
+                    message += self.logger.get_side_details(selected_side)
                     self.logger.log(message=message)
 
                     # Logging selecting progress
@@ -611,17 +639,40 @@ class CombatPlayerActionsMenu(Menu):
                         )
 
                     # Player selecting target
-                    selected_target = self._select(
-                        selectable,
-                        message_key="select_target_prompt",
-                        blacklist=selected_targets,
+                    options = [
+                        Option(
+                            id="CANCEL",
+                            key="0",
+                            message=None,
+                        )
+                    ]
+
+                    options.extend(
+                        [
+                            Option(
+                                id=f"TARGET_{idx+1}",
+                                key=str(idx + 1),
+                                message=None,
+                                obj=target,
+                            )
+                            for idx, target in enumerate(selectable)
+                        ]
                     )
 
-                    if selected_target:
-                        self.logger.log(message="")
-                        selected_targets.append(selected_target)
-                    else:
+                    message = self.logger.get_message(
+                        namespace="menus",
+                        message_group="PLAYER_ACTIONS",
+                        key="select_target_prompt",
+                    )
+
+                    selected_option: Option = self.select(options, message)
+
+                    if selected_option.id == "CANCEL":
                         cancel = True
+                    else:
+                        self.logger.log(message="")
+                        selected_target: Monster = selected_option.obj
+                        selected_targets.append(selected_target)
 
                 # Cancelling target selection
                 if cancel:
@@ -630,7 +681,7 @@ class CombatPlayerActionsMenu(Menu):
             # Executing effects
             if selected_targets:
                 for target in selected_targets:
-                    for effect in side.effects:
+                    for effect in selected_side.effects:
                         self.effect_manager.execute_effect(
                             effect=effect,
                             source=monster,
@@ -646,7 +697,7 @@ class CombatPlayerActionsMenu(Menu):
                 )
                 self.logger.log(message=message)
 
-            sides.remove(side)
+            sides.remove(selected_side)
 
         return {"turn_taken": True, "wait_for_input": True}
 
@@ -693,16 +744,44 @@ class CombatPlayerActionsMenu(Menu):
         self.logger.log(message=message)
 
         # Player selecting target
-        selected = self._select(targets, message_key="select_target_prompt")
+        options = [
+            Option(
+                id="CANCEL",
+                key="0",
+                message=None,
+            )
+        ]
+
+        options.extend(
+            [
+                Option(
+                    id=f"TARGET_{idx+1}",
+                    key=str(idx + 1),
+                    message=None,
+                    obj=target,
+                )
+                for idx, target in enumerate(targets)
+            ]
+        )
+
+        message = self.logger.get_message(
+            namespace="menus",
+            message_group="PLAYER_ACTIONS",
+            key="select_target_prompt",
+        )
+
+        selected_option: Option = self.select(options, message)
 
         # Cancelling action
-        if selected is None:
+        if selected_option.id == "CANCEL":
             return {"turn_taken": False, "wait_for_input": True}
 
         # Logging monster details
+        selected_monster: Monster = selected_option.obj
+
         self.logger.log(message="")
         self.logger.log_monster_details(
-            monster=selected,
+            monster=selected_monster,
             description=False,
             current_hp=True,
         )
@@ -773,7 +852,13 @@ class CombatPlayerActionsMenu(Menu):
 
         while not data["turn_taken"]:
             self.show_options(monster)
-            selected = self.select_option()
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options, message)
 
             if self.is_option_valid(selected, monster):
                 data = self.process_option(selected, monster)

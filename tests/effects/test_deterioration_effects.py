@@ -58,31 +58,68 @@ def test_keyword_execute(combat: Dict):
     monster_1: Monster = combat["monsters"][1]
     monster_4: Monster = combat["monsters"][4]
 
-    execute_effect = ExecuteEffect(value_percent=0.5)
+    effect = ExecuteEffect(value_percent=0.5)
+    monster_4.hp = 100
 
     effect_manager.execute_effect(
-        execute_effect,
+        effect,
         source=monster_1,
         target=monster_4,
     )
 
     conditions = [
-        monster_4.local_id == "MONSTER_4",
-        monster_4.hp == 200,
+        monster_4.is_alive() is False,
+        monster_4.hp == 0,
         len(monster_4.effects) == 0,
     ]
 
-    monster_4.hp = 100
+    effect = ExecuteEffect(value=30)
+    monster_4.hp = 30
 
     effect_manager.execute_effect(
-        execute_effect,
+        effect,
         source=monster_1,
         target=monster_4,
     )
 
     conditions.extend(
         [
+            monster_4.is_alive() is False,
             monster_4.hp == 0,
+            len(monster_4.effects) == 0,
+        ]
+    )
+
+    effect = ExecuteEffect(value_percent=0.25, value=2)
+    monster_4.hp = 50
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_1,
+        target=monster_4,
+    )
+
+    conditions.extend(
+        [
+            monster_4.is_alive() is False,
+            monster_4.hp == 0,
+            len(monster_4.effects) == 0,
+        ]
+    )
+
+    effect = ExecuteEffect(value_percent=0.25, value=2)
+    monster_4.hp = 51
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster_1,
+        target=monster_4,
+    )
+
+    conditions.extend(
+        [
+            monster_4.is_alive() is True,
+            monster_4.hp == 51,
             len(monster_4.effects) == 0,
         ]
     )

@@ -56,7 +56,11 @@ class ExecuteEffect(Effect):
         fail = None
 
         if target.is_alive():
-            if target.hp <= (target.max_hp * self.value_percent):
+            threshold_0 = self.value or 0
+            threshold_1 = (self.value_percent or 0) * target.max_hp
+            threshold = max(threshold_0, threshold_1)
+
+            if target.hp <= threshold:
                 target.hp = 0
             else:
                 fail = "default"

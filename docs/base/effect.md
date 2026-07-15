@@ -1,5 +1,7 @@
-# Effects
-An **Effect** is the smallest component of `Sides` and `Skills`, and are applied from a **source** `Entity` to one or multiple **target** `Entities`. The effect itself will be executed to one target at a time.
+# Effect
+An **Effect** is the smallest component of the game mechanics, and are executed by a **source** [`Entity`](/docs/base/entity.md) to one or multiple **target** `Entities`. The effect itself will be executed to one target at a time.
+
+Each **effect** has its own behavior, and are to be used by "bigger" components, such as [`Sides`](/docs/base/side.md), to "compose" the wanted interaction between `Entities`. Therefore, new interactions require new **effects** to be implemented.
 
 ## Attributes
 * **keyword**: a identifier that is unique per effect. Must be part of the `Keyword` enum.
@@ -9,7 +11,7 @@ An **Effect** is the smallest component of `Sides` and `Skills`, and are applied
 * **decay**: by how much the `value` is decreased after each turn.
 * **accuracy**: a number in the [0, 1] interval that represents the chance of the effect being executed.
 * **type**: type of the effect. Effects with the same type have similar behavior.
-* **trigger**: what combat situation triggers the effect.
+* **trigger**: what combat situation triggers the effect execution.
 * **persistent**: if the effect will be applied to the entity on execution, and added to their current effects; or if it is instant.
 * **removable**: if the effect can be removed by other effects. The effect will still be removed after its duration expires.
 * **target_keywords**: other keywords that the effect can use in it's behavior.
@@ -23,6 +25,12 @@ An **Effect** is the smallest component of `Sides` and `Skills`, and are applied
 * **NOTHING**: does nothing.
 * **OFFENSIVE**: an instant effct directly damages the target.
 * **RESTORATION**: an instant effect that benefits the target.
+
+## Main methods
+* `.affects()`: what type of `Entities` the effect can be executed on.
+* `.on_apply()`: what happens when the effect is first applied on an `Entity`.
+* `.activate()`: what happens when the effect is executed.
+* `.stack()`: how the effect interacts with an `Entity` that is under another effect with the same **keyword**.
 
 ## Creating a new effect
 - [ ] Keyword on `src/keywords`

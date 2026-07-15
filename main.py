@@ -14,12 +14,12 @@ init()
 
 settings = Settings()
 
+# Player settings
 try:
-    # Loading player settings
     file_manager = FileManager(settings, logging=False)
 
     if file_manager.exists(SETTINGS_FILENAME):
-        settings_data = file_manager.load(SETTINGS_FILENAME)
+        settings_data = file_manager.load_file(SETTINGS_FILENAME)
         settings.__dict__.update(settings_data.__dict__)
 
     # Main Menu

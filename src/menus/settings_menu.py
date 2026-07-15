@@ -166,7 +166,7 @@ class SettingsMenu(Menu):
             )
 
         elif option.id == "EXIT":
-            self.file_manager.save(self.settings, FILENAME)
+            self.file_manager.save_file(FILENAME, self.settings)
 
         return
 

@@ -286,7 +286,13 @@ class SortMenu(Menu):
         while True:
             self.show_title()
             self.show_options()
-            selected = self.select_option()
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options, message)
 
             if self.is_option_valid(selected):
                 self.process_option(selected)

@@ -2,7 +2,8 @@ __pycache__
 .pytest_cache
 .ruff_cache
 .vscode
-playground.py
 *.csv
 *.dat
+playground.py
 todo.txt
+sandbox/*

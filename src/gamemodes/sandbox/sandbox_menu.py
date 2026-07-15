@@ -17,9 +17,12 @@ from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.systems.file import FileManager
+from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
+
+EXTENSION = ".combat.dat"
 
 
 class SandboxMenu(Menu):
@@ -57,11 +60,12 @@ class SandboxMenu(Menu):
         self.all_monsters = get_all_monsters()
 
         # Managers
-        self.file_manager = FileManager(settings)
         self.combat_manager = CombatManager(settings)
-
         combat_data = self.get_random_combat()
         self.combat_manager.set_combat_data(combat_data)
+
+        self.file_manager = FileManager(settings)
+        self.randomizer = Randomizer()
 
     def get_title(self) -> str:
         """
@@ -86,7 +90,7 @@ class SandboxMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_COMBAT",
+                id="EDIT_TEAM",
                 key="2",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -174,7 +178,6 @@ class SandboxMenu(Menu):
     # Options
     # =========================================================================
 
-    # Todo: Randomize Dice
     def get_random_combat(self, n_teams: int = 2, team_size: int = 3) -> CombatData:
         """
         Gets a random combat.
@@ -230,10 +233,10 @@ class SandboxMenu(Menu):
         """
         Imports combat from a file.
         """
-        filename = self.file_manager.logger.input_filename()
+        filename = self.file_manager.logger.input_filename(EXTENSION)
 
         if self.file_manager.exists(filename):
-            combat_data: CombatData = self.file_manager.load(filename)
+            combat_data: CombatData = self.file_manager.load_file(filename)
             self.combat_manager.set_combat_data(combat_data)
 
         else:
@@ -246,9 +249,9 @@ class SandboxMenu(Menu):
         """
         Exports the current combat to a file.
         """
-        filename = self.file_manager.logger.input_filename()
+        filename = self.file_manager.logger.input_filename(EXTENSION)
         combat_data = self.combat_manager.get_combat_data()
-        self.file_manager.save(combat_data, filename)
+        self.file_manager.save_file(filename, combat_data)
 
         return
 
@@ -256,9 +259,6 @@ class SandboxMenu(Menu):
         """
         Returns if the option can be selected or not.
         """
-        if option.id in ["EDIT_COMBAT"]:
-            return False
-
         return True
 
     def process_option(self, option: Option):
@@ -268,8 +268,9 @@ class SandboxMenu(Menu):
         if option.id == "START_COMBAT":
             self.start_combat()
 
-        elif option.id == "EDIT_COMBAT":
+        elif option.id == "EDIT_TEAM":
             pass
+            # self.edit_team()
 
         elif option.id == "IMPORT_COMBAT":
             self.import_combat()

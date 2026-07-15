@@ -350,30 +350,6 @@ class Compendium(Menu):
     # Options
     # =========================================================================
 
-    def select_option(self) -> Option:
-        """
-        Prompts the user to select one of the Compendium's options:
-        * if a valid option is selected, it will be returned.
-        * if an invalid option is selected, the prompt will repeat.
-
-        :return: The option selected by the user.
-        :rtype: Option
-        """
-        while True:
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="BASE",
-                key="select_option_prompt",
-            )
-
-            selected = self.logger.input(message=message)
-
-            for option in self.options[self.level.value]:
-                option: Option
-
-                if selected == option.key:
-                    return option
-
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
@@ -616,7 +592,13 @@ class Compendium(Menu):
         while True:
             # Options
             self.show_options(self.level)
-            selected = self.select_option()
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options[self.level.value], message)
 
             # Option processing
             if selected.id == "EXIT":
