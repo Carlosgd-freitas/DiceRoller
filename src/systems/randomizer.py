@@ -549,22 +549,25 @@ class Randomizer:
 
         # Adjusting target keywords
         target_keywords: List[Keyword] = []
-        config.keyword_blacklist = [effect.keyword]
 
-        for index in range(config.target_keywords_threshold[1]):
-            chance = self._calculate_chance(index, config.target_keywords_threshold)
+        if effect.keyword in [Keyword.IMMUNITY]:
+            config.keyword_whitelist = []
+            config.keyword_blacklist = [effect.keyword]
 
-            if random() <= chance:
-                keyword = self.get_random_keyword(config)
+            for index in range(config.target_keywords_threshold[1]):
+                chance = self._calculate_chance(index, config.target_keywords_threshold)
 
-                if keyword:
-                    target_keywords.append(keyword)
-                    config.keyword_blacklist.append(keyword)
+                if random() <= chance:
+                    keyword = self.get_random_keyword(config)
+
+                    if keyword:
+                        target_keywords.append(keyword)
+                        config.keyword_blacklist.append(keyword)
+                    else:
+                        break
+
                 else:
                     break
-
-            else:
-                break
 
         effect.target_keywords = target_keywords
 

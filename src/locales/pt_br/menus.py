@@ -41,6 +41,42 @@ SANDBOX = {
     "title": "Modo Sandbox",
 }
 
+EDIT_DICE = {
+    "title": "Editar Dado",
+    "edit_side": "Editar Lado",
+    "add_side": "Adicionar Lado",
+    "remove_side": "Remover Lado",
+    "randomize_dice": "Aleatorizar Dado",
+    "select_side_prompt": "Selecione um lado",
+}
+
+EDIT_SIDE = {
+    "title": "Editar Lado",
+    "edit_weight": "Editar Peso",
+    "edit_weight_prompt": "Digite um novo peso",
+    "edit_effect": "Editar Efeito",
+    "add_effect": "Adicionar Efeito",
+    "remove_effect": "Remover Efeito",
+    "randomize_side": "Aleatorizar Lado",
+    "select_effect_prompt": "Selecione um efeito",
+}
+
+EDIT_EFFECT = {
+    "title": "Editar Efeito",
+    "change_keyword": "Alterar Palavra-chave",
+    "edit_value": "Editar Valor",
+    "edit_value_prompt": "Digite um novo valor",
+    "edit_value_percent": "Editar Valor (%)",
+    "edit_value_percent_prompt": "Digite um novo valor (%)",
+    "edit_duration": "Editar Duração",
+    "edit_duration_prompt": "Digite uma nova duração",
+    "edit_decay": "Editar Decaimento",
+    "edit_decay_prompt": "Digite um novo decaimento",
+    "edit_accuracy": "Editar Acurácia",
+    "edit_accuracy_prompt": "Digite uma nova acurácia",
+    "randomize_effect": "Aleatorizar Efeito",
+}
+
 SORT = {
     "reverse": "reversa",
 }

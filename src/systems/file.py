@@ -8,13 +8,7 @@ import shutil
 from functools import wraps
 from inspect import signature
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-from src.logger.file import FileLogger
-from src.systems.manager import Manager
-
-if TYPE_CHECKING:
-    from src.systems.settings import Settings
+from typing import Any
 
 
 def treat_path(path: str | Path) -> Path:
@@ -60,31 +54,10 @@ def safe_file_operation(*, default: Any = False):
     return decorator
 
 
-class FileManager(Manager):
+class FileManager:
     """
     FileManager class.
-
-    :var settings: Game settings.
-    :vartype settings: Settings
-
-    :var logging: If logging is enabled. Default value is True.
-    :vartype logging: bool
     """
-
-    def __init__(
-        self,
-        settings: Settings,
-        logging: bool = True,
-    ):
-        # Initialization
-        logger = FileLogger(enabled=logging)
-
-        super().__init__(
-            logger,
-            settings,
-        )
-
-        self.logger: FileLogger
 
     @safe_file_operation()
     def exists(self, path: str | Path) -> bool:

@@ -255,61 +255,6 @@ class CombatPlayerActionsMenu(Menu):
         elif option.id == "SKIP_TURN":
             return self.skip_turn(monster)
 
-    def _select(
-        self,
-        selectables: List[T],
-        message_key: str,
-        cancel_key: str = "0",
-        blacklist: List[T] = None,
-    ) -> T:
-        """
-        Prompts the user with a message to select an object from a list. If an invalid
-        index is selected, the prompt will repeat.
-
-        :param selectables: List of selectable objects.
-        :type selectables: List[T]
-
-        :param k: The number of monsters which will be selected and returned.
-        :type k: int
-
-        :param message_key: Key of the message that will be prompted.
-        :type message_key: str
-
-        :param cancel_key: Keyboard key to cancel the operation. Default value is "0".
-        :type cancel_key: str
-
-        :param blacklist: Only objects that aren't in this list can be selected.
-        :type blacklist: List[T]
-
-        :return: Selected objects.
-        :rtype: List[T]
-        """
-        selected = None
-
-        while True:
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="PLAYER_ACTIONS",
-                key=message_key,
-            )
-
-            index = self.logger.input(message=message)
-
-            if index == cancel_key:
-                return None
-
-            try:
-                index = int(index)
-
-                if index > 0:
-                    selected = selectables[index - 1]
-
-                    if (not blacklist) or (selected not in blacklist):
-                        return selected
-
-            except Exception:
-                continue
-
     def _get_targets(
         self,
         side: Side,
@@ -806,14 +751,22 @@ class CombatPlayerActionsMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self, monster: Monster):
+    def show_options(
+        self, options: List[Option], monster: Monster, validate: bool = True
+    ):
         """
-        Shows the Menu options.
+        Shows options.
+
+        :param options: Options to be showed.
+        :type options: List[Option]
 
         :param monster: Monster being controlled by a player.
         :type monster: Monster
+
+        :param validate: If the options will be validated. Default value is True.
+        :type validate: bool
         """
-        for option in self.options:
+        for option in options:
             message = ""
 
             if option.isolate_before:
@@ -824,7 +777,7 @@ class CombatPlayerActionsMenu(Menu):
             if option.isolate_after:
                 message += "\n"
 
-            if not self.is_option_valid(option, monster):
+            if (validate) and (not self.is_option_valid(option, monster)):
                 message = color_string(message, foreground_color=Color.RED)
 
             self.logger.log(message=message)
@@ -851,7 +804,7 @@ class CombatPlayerActionsMenu(Menu):
         }
 
         while not data["turn_taken"]:
-            self.show_options(monster)
+            self.show_options(self.options, monster)
 
             message = self.logger.get_message(
                 namespace="menus",

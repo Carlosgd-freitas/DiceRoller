@@ -20,7 +20,7 @@ class Side:
     :vartype weight: float
     """
 
-    def __init__(self, effects: List[Effect], weight: float = 1):
+    def __init__(self, effects: List[Effect], weight: float = 1.0):
         self.effects = effects
         self.weight = weight
 

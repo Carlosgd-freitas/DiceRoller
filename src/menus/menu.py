@@ -26,9 +26,6 @@ class Menu(Manager):
 
     :var settings: Game settings.
     :vartype settings: Settings
-
-    :var title: Menu's title.
-    :vartype title: str
     """
 
     # =========================================================================
@@ -154,11 +151,17 @@ class Menu(Manager):
                 size=50,
             )
 
-    def show_options(self):
+    def show_options(self, options: List[Option], validate: bool = True):
         """
-        Shows the Menu options.
+        Shows options.
+
+        :param options: Options to be showed.
+        :type options: List[Option]
+
+        :param validate: If the options will be validated. Default value is True.
+        :type validate: bool
         """
-        for option in self.options:
+        for option in options:
             message = ""
 
             if option.isolate_before:
@@ -169,7 +172,7 @@ class Menu(Manager):
             if option.isolate_after:
                 message += "\n"
 
-            if not self.is_option_valid(option):
+            if (validate) and (not self.is_option_valid(option)):
                 message = color_string(message, foreground_color=Color.RED)
 
             self.logger.log(message=message)
@@ -185,7 +188,7 @@ class Menu(Manager):
         """
         while True:
             self.show_title()
-            self.show_options()
+            self.show_options(self.options)
 
             message = self.logger.get_message(
                 namespace="menus",

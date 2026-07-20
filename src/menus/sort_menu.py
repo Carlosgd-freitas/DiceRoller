@@ -215,9 +215,12 @@ class SortMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self):
+    def show_options(self, options: List[Option]):
         """
-        Shows the Menu options.
+        Shows options.
+
+        :param options: Options to be showed.
+        :type options: List[Option]
         """
         message = color_string(
             self.logger.get_message(
@@ -229,7 +232,7 @@ class SortMenu(Menu):
 
         self.logger.log(message=message)
 
-        for option in self.options:
+        for option in options:
             message = ""
 
             if option.isolate_before:
@@ -285,7 +288,7 @@ class SortMenu(Menu):
         """
         while True:
             self.show_title()
-            self.show_options()
+            self.show_options(self.options)
 
             message = self.logger.get_message(
                 namespace="menus",

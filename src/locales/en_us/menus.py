@@ -41,6 +41,42 @@ SANDBOX = {
     "title": "Sandbox Mode",
 }
 
+EDIT_DICE = {
+    "title": "Edit Dice",
+    "edit_side": "Edit Side",
+    "add_side": "Add Side",
+    "remove_side": "Remove Side",
+    "randomize_dice": "Randomize Dice",
+    "select_side_prompt": "Select a side",
+}
+
+EDIT_SIDE = {
+    "title": "Edit Side",
+    "edit_weight": "Edit Weight",
+    "edit_weight_prompt": "Type a new weight",
+    "edit_effect": "Edit Effect",
+    "add_effect": "Add Effect",
+    "remove_effect": "Remove Effect",
+    "randomize_side": "Randomize Side",
+    "select_effect_prompt": "Select an effect",
+}
+
+EDIT_EFFECT = {
+    "title": "Edit Effect",
+    "change_keyword": "Change Keyword",
+    "edit_value": "Edit Value",
+    "edit_value_prompt": "Type a new value",
+    "edit_value_percent": "Edit Value (%)",
+    "edit_value_percent_prompt": "Type a new value (%)",
+    "edit_duration": "Edit Duration",
+    "edit_duration_prompt": "Type a new duration",
+    "edit_decay": "Edit Decay",
+    "edit_decay_prompt": "Type a new decay",
+    "edit_accuracy": "Edit Accuracy",
+    "edit_accuracy_prompt": "Type a new accuracy",
+    "randomize_effect": "Randomize Effect",
+}
+
 SORT = {
     "reverse": "reverse",
 }

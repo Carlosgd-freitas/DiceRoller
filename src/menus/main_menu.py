@@ -47,7 +47,7 @@ class MainMenu(Menu):
         )
 
         # Managers
-        self.file_manager = FileManager(settings, logging)
+        self.file_manager = FileManager()
 
         # Menus
         self.compendium_menu = CompendiumMenu(self.settings, self.logger.enabled)
@@ -142,9 +142,6 @@ class MainMenu(Menu):
         self.title = self.get_title()
         self.options = self.get_options()
 
-        # Managers
-        self.file_manager.change_language(language, _messages)
-
         # Menus
         self.compendium_menu.change_language(language, _messages)
         self.sandbox_menu.change_language(language, _messages)
@@ -158,9 +155,6 @@ class MainMenu(Menu):
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
-
-        # Managers
-        self.file_manager.toggle_logging(enabled)
 
         # Menus
         self.compendium_menu.toggle_logging(enabled)

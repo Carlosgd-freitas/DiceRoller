@@ -16,7 +16,7 @@ settings = Settings()
 
 # Player settings
 try:
-    file_manager = FileManager(settings, logging=False)
+    file_manager = FileManager()
 
     if file_manager.exists(SETTINGS_FILENAME):
         settings_data = file_manager.load_file(SETTINGS_FILENAME)

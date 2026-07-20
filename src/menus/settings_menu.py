@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List
+from typing import List
 
 from src.base.color import color_string
 from src.locales.languages import Language
@@ -43,7 +43,7 @@ class SettingsMenu(Menu):
         )
 
         # Managers
-        self.file_manager = FileManager(settings, logging)
+        self.file_manager = FileManager()
 
     def get_title(self) -> str:
         """
@@ -98,38 +98,6 @@ class SettingsMenu(Menu):
         return options
 
     # =========================================================================
-    # Utility
-    # =========================================================================
-
-    def change_language(self, language: Language, _messages: Dict = None):
-        """
-        Changes the Manager language.
-
-        :var language: A Language.
-        :vartype language: Language
-
-        :var _messages: Messages loaded from a locale module.
-        :vartype _messages: Dict
-        """
-        self.logger.change_language(language, _messages)
-        _messages = self.logger._messages
-
-        self.title = self.get_title()
-        self.options = self.get_options()
-
-        self.file_manager.change_language(language, _messages)
-
-    def toggle_logging(self, enabled: bool):
-        """
-        Enables or disables the Manager logging.
-
-        :var enabled: If the Manager logging is enabled or disabled.
-        :vartype enabled: bool
-        """
-        self.logger.enabled = enabled
-        self.file_manager.toggle_logging(enabled)
-
-    # =========================================================================
     # Options
     # =========================================================================
 
@@ -174,11 +142,14 @@ class SettingsMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self):
+    def show_options(self, options: List[Option]):
         """
-        Shows the Menu options.
+        Shows options.
+
+        :param options: Options to be showed.
+        :type options: List[Option]
         """
-        for option in self.options:
+        for option in options:
             message = ""
 
             if option.isolate_before:

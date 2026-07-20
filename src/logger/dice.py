@@ -45,8 +45,18 @@ class DiceLogger(SideLogger):
 
         # Sides
         rows = []
-        for side in dice.sides:
-            message = "● " + self.get_side_details(side)
+
+        if dice.sides:
+            for side in dice.sides:
+                message = "● " + self.get_side_details(side)
+                rows.append([message])
+
+        else:
+            message = self.get_message(
+                namespace="base",
+                message_group="DETAILS",
+                key="no_sides",
+            )
             rows.append([message])
 
         table = tabulate(

@@ -40,7 +40,6 @@ def test_get_random_effect(randomizer: Randomizer):
         value_percent_threshold=(0.01, 0.1),
         duration_threshold=(2, 4),
         accuracy_threshold=(0.8, 1),
-        target_keywords_threshold=(3, 6),
         effect_type=EffectType.DETERIORATION,
     )
 
@@ -54,8 +53,27 @@ def test_get_random_effect(randomizer: Randomizer):
         effect_0.accuracy >= 0.8,
         effect_0.accuracy <= 1,
         effect_0.type == EffectType.DETERIORATION,
-        len(effect_0.target_keywords) in range(3, 7),
     ]
+
+    config = RandomizerConfig(
+        duration_threshold=(3, 4),
+        accuracy_threshold=(0.9, 1),
+        target_keywords_threshold=(1, 3),
+        effect_type=EffectType.BUFF,
+        keyword_whitelist=[Keyword.IMMUNITY],
+    )
+
+    effect_1 = randomizer.get_random_effect(config)
+
+    conditions.extend(
+        [
+            effect_1.duration in range(3, 5),
+            effect_1.accuracy >= 0.9,
+            effect_1.accuracy <= 1,
+            effect_1.keyword == Keyword.IMMUNITY,
+            len(effect_1.target_keywords) in range(1, 4),
+        ]
+    )
 
     config = RandomizerConfig(
         value_threshold=(1, 1),
@@ -67,16 +85,16 @@ def test_get_random_effect(randomizer: Randomizer):
         keyword_whitelist=[Keyword.EXECUTE],
     )
 
-    effect_1 = randomizer.get_random_effect(config)
+    effect_2 = randomizer.get_random_effect(config)
 
     conditions.extend(
         [
-            effect_1.value == 1,
-            effect_1.value_percent == 0.02,
-            effect_1.duration == 3,
-            effect_1.accuracy == 0.4,
-            effect_1.keyword == Keyword.EXECUTE,
-            len(effect_1.target_keywords) == 0,
+            effect_2.value == 1,
+            effect_2.value_percent == 0.02,
+            effect_2.duration == 3,
+            effect_2.accuracy == 0.4,
+            effect_2.keyword == Keyword.EXECUTE,
+            len(effect_2.target_keywords) == 0,
         ]
     )
 

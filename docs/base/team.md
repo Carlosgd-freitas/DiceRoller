@@ -5,8 +5,8 @@ A **Team** is composed of [`Monsters`](/docs/base/monster.md) that participate i
 
 ## Attributes
 * **name**: the **team** name.
-* **members**: a list of `Monsters` which are part of the **team**.
+* **members**: a list of `Monsters` which are part of the team.
 
 ## Main methods
 * `.get_status()`: returns if the team is still on combat or if was defeated.
-* `.is_member()`: returns if a `Monster` is one of the **team members**.
+* `.is_member()`: returns if a `Monster` is one of the team members.

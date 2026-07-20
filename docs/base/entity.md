@@ -16,7 +16,7 @@ An **Entity** is a base class inherited by [`Monsters`](/docs/base/monster.md), 
 ## Main methods
 * `.roll()`: rolls all of the entity `Dice` and returns a list containing all of the rolled `Sides`.
 * `.has_effect()`: if the entity is currently under the specified `Effect`.
-* `.get_effect()`: returns the `Effect` if the entity is currently under it.
+* `.get_effect()`: returns the specified `Effect` if the entity is currently under it.
 * `.apply_effect()`: adds an `Effect` to the entity, executing the `Effect` `.on_apply()` and `.stack()` methods.
 * `.remove_effect()`: removes an `Effect` the entity is currently under.
 * `.can_act()`: returns if the entity can act.

@@ -41,15 +41,23 @@ class SideLogger(EffectLogger):
         if not self.enabled:
             return
 
-        # Index
-        if index is None:
-            message = ""
-        else:
-            message = f"[{index}] "
+        if side.effects:
+            # Index
+            if index is None:
+                message = ""
+            else:
+                message = f"[{index}] "
 
-        message += self.get_multiple_effects_message(
-            effects=side.effects,
-            separator=" + ",
-        )
+            message += self.get_multiple_effects_message(
+                effects=side.effects,
+                separator=" + ",
+            )
+
+        else:
+            message = self.get_message(
+                namespace="base",
+                message_group="DETAILS",
+                key="no_effects",
+            )
 
         return message

@@ -29,7 +29,7 @@ def get_rarity_color(rarity: Rarity) -> ColorData:
     elif rarity == Rarity.RARE:
         foreground_color = Color.BLUE
     elif rarity == Rarity.EPIC:
-        foreground_color = Color.RED
+        foreground_color = Color.PURPLE
     elif rarity == Rarity.LEGENDARY:
         foreground_color = Color.GOLD
     else:

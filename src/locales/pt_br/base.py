@@ -7,6 +7,11 @@ ATTRIBUTES = {
     "speed": "VEL",
 }
 
+DETAILS = {
+    "no_sides": "Esse dado não possui lados.",
+    "no_effects": "Esse lado não possui efeitos.",
+}
+
 LEXICON = {
     "accuracy": "precisão",
     "area": "área",

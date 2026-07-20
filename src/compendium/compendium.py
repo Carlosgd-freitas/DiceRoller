@@ -517,14 +517,17 @@ class Compendium(Menu):
         """
         pass
 
-    def show_options(self, level: CompendiumLevel):
+    def show_options(self, options: List[Option], level: CompendiumLevel):
         """
-        Shows the options based on the Compendium level.
+        Shows options.
+
+        :param options: Options to be showed.
+        :type options: List[Option]
 
         :param level: Compendium level.
         :type level: CompendiumLevel
         """
-        for option in self.options[level.value]:
+        for option in options[level.value]:
             option: Option
             message = ""
 
@@ -591,7 +594,7 @@ class Compendium(Menu):
 
         while True:
             # Options
-            self.show_options(self.level)
+            self.show_options(self.options, self.level)
 
             message = self.logger.get_message(
                 namespace="menus",

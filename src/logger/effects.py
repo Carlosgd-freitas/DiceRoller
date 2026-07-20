@@ -261,6 +261,7 @@ class EffectLogger(AttributeLogger):
         color_data = {} if color_data is None else color_data
 
         message = ""
+        effects_remaining = 0
 
         # Less details
         if keywords:

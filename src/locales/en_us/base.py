@@ -7,6 +7,11 @@ ATTRIBUTES = {
     "speed": "SPD",
 }
 
+DETAILS = {
+    "no_sides": "This dice has no sides.",
+    "no_effects": "This side has no effects.",
+}
+
 LEXICON = {
     "accuracy": "accuracy",
     "area": "area",
