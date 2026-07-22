@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from math import ceil
+from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -15,59 +17,100 @@ class BlockEffect(Effect):
     """
     Block Effect.
 
-    This will reduce direct damage done to the target's HP.
+    Reduces direct damage done to the target by its value.
     """
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
+        value: Stat | None = None,
+        min_value: Stat | None = None,
+        max_value: Stat | None = None,
         duration: int = 2,
-        decay: float = 0,
+        delta: Stat | None = None,
         accuracy: float = 1,
         removable: bool = True,
-        target_keywords: List[Keyword] = None,
     ):
+        if min_value is None:
+            min_value = Stat(flat=0, percent=0)
+
         super().__init__(
             keyword=Keyword.BLOCK,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.DEFENSIVE,
+            value=value,
+            min_value=min_value,
+            max_value=max_value,
+            duration=duration,
+            delta=delta,
+            accuracy=accuracy,
             persistent=True,
             removable=removable,
-            target_keywords=target_keywords,
         )
 
     def get_effective_value(
         self,
         source: Entity,
         target: Entity,
-    ) -> float:
+    ) -> Stat:
         """
-        Returns the effects' effective value, taking effects on source and target
-        entities into account.
+        Returns the Effect effective value, that will be used in calculations and the
+        effect execution.
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
 
         :return: The effective value.
         :rtype: float
         """
-        effective_value = self.value
+        if self.value.flat is None and self.value.percent is None:
+            return None
 
+        # Base Value
+        effective_value = 0
+
+        if self.value.flat is not None:
+            effective_value += self.value.flat
+        if self.value.percent is not None:
+            effective_value += self.value.percent * target.max_hp
+
+        # Modifiers
         if source:
+            # Fortify
             fortify = source.get_effect(Keyword.FORTIFY)
             if fortify:
-                effective_value += fortify.value
 
+                if fortify.value.flat:
+                    effective_value += fortify.value.flat
+                if fortify.value.percent:
+                    effective_value += effective_value * fortify.value.percent
+
+            # Fragile
             fragile = source.get_effect(Keyword.FRAGILE)
             if fragile:
-                effective_value -= fragile.value
 
-        if effective_value < 0:
-            effective_value = 0
+                if fragile.value.flat:
+                    effective_value -= fragile.value.flat
+                if fragile.value.percent:
+                    effective_value -= effective_value * fragile.value.percent
 
-        return effective_value
+        # Clamping
+        if (
+            self.min_value
+            and self.min_value.flat
+            and effective_value < self.min_value.flat
+        ):
+            effective_value = self.min_value.flat
+
+        if (
+            self.max_value
+            and self.max_value.flat
+            and effective_value > self.max_value.flat
+        ):
+            effective_value = self.max_value.flat
+
+        return ceil(effective_value)
 
     def on_apply(
         self,
@@ -75,7 +118,12 @@ class BlockEffect(Effect):
         target: Entity,
     ) -> EffectData:
         fail = None
-        if not target.is_alive():
+
+        if target.is_alive():
+            self.value.flat = self.get_effective_value(source=source, target=target)
+            self.value.percent = None
+
+        else:
             fail = "dead"
 
         return {
@@ -87,4 +135,10 @@ class BlockEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }

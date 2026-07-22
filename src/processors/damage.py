@@ -2,55 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, TypedDict
+from typing import TYPE_CHECKING, List
 
 from src.base.keywords import Keyword
 
 if TYPE_CHECKING:
+    from src.base.damage import DamageData, DefendedDamage
     from src.base.effect import Effect
     from src.base.monster import Entity
-
-
-class DefendedDamage(TypedDict):
-    """
-    Defended damage data.
-
-    :var absorb: Damage that was defended by a Monster's Absorb effect.
-    :vartype absorb: int
-
-    :var block: Damage that was defended by a Monster's Block effect.
-    :vartype block: int
-
-    :var invulnerable: Damage that was defended by a Monster's Invulnerable effect.
-    :vartype invulnerable: int
-
-    :var sacred_block: Damage that was defended by a Monster's Sacred Block effect.
-    :vartype sacred_block: int
-
-    :var total: Total damage that was defended by a Monster's defensive effects.
-    :vartype total: int
-    """
-
-    absorb: int
-    block: int
-    invulnerable: int
-    sacred_block: int
-    total: int
-
-
-class DamageData(TypedDict):
-    """
-    Data when calculating damage.
-
-    :var damage: Damage done to a Monster.
-    :vartype damage: int
-
-    :var defended_damage: Defended damage data.
-    :vartype defended_damage: DefendedDamage
-    """
-
-    damage: int
-    defended_damage: DefendedDamage
 
 
 def calculate_damage(
@@ -104,9 +63,9 @@ def calculate_damage(
             defended_damage["sacred_block"] = damage
             damage = 0
 
-            sacred_blocking.value -= 1
+            sacred_blocking.value.flat -= 1
 
-            if sacred_blocking.value <= 0:
+            if sacred_blocking.value.flat <= 0:
                 target.effects.remove(sacred_blocking)
 
     # Absorb
@@ -114,16 +73,16 @@ def calculate_damage(
         absorbing = target.get_effect(Keyword.ABSORB)
 
         if (damage > 0) and (absorbing):
-            absorbed_damage = min(damage, absorbing.value)
+            absorbed_damage = min(damage, absorbing.value.flat)
             defended_damage["absorb"] = absorbed_damage
 
             damage -= absorbed_damage
-            absorbing.value -= absorbed_damage
+            absorbing.value.flat -= absorbed_damage
 
             target.hp += absorbed_damage
             target.equalize_stats()
 
-            if absorbing.value <= 0:
+            if absorbing.value.flat <= 0:
                 target.effects.remove(absorbing)
 
     # Block
@@ -131,13 +90,13 @@ def calculate_damage(
         blocking = target.get_effect(Keyword.BLOCK)
 
         if (damage > 0) and (blocking):
-            blocked_damage = min(damage, blocking.value)
+            blocked_damage = min(damage, blocking.value.flat)
             defended_damage["block"] = blocked_damage
 
             damage -= blocked_damage
-            blocking.value -= blocked_damage
+            blocking.value.flat -= blocked_damage
 
-            if blocking.value <= 0:
+            if blocking.value.flat <= 0:
                 target.effects.remove(blocking)
 
     if damage < 0:
@@ -146,13 +105,13 @@ def calculate_damage(
         damage = target.hp
 
     # Total defended damage
-    total_defended_damage = 0
+    total = 0
 
     for value in defended_damage.values():
-        total_defended_damage += value
+        total += value
 
-    if total_defended_damage:
-        defended_damage["total"] = total_defended_damage
+    if total:
+        defended_damage["total"] = total
 
     return {
         "damage": damage,

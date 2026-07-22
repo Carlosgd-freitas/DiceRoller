@@ -20,22 +20,18 @@ class ImmunityEffect(Effect):
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
         duration: int = 2,
-        decay: float = 0,
         accuracy: float = 1,
         removable: bool = True,
         target_keywords: List[Keyword] = None,
     ):
+        target_keywords = [] if target_keywords is None else target_keywords
+
         super().__init__(
             keyword=Keyword.IMMUNITY,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.BUFF,
+            duration=duration,
+            accuracy=accuracy,
             persistent=True,
             removable=removable,
             target_keywords=target_keywords,

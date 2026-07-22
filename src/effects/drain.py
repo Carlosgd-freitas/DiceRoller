@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from math import ceil
+from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 from src.processors.damage import calculate_damage
 
 if TYPE_CHECKING:
@@ -16,67 +18,107 @@ class DrainEffect(Effect):
     """
     Drain Effect.
 
-    Will reduce the target's HP by the effect value, while increasing the source's HP
-    and remove Sleep from it. The damage done will be affected by the target's Block.
+    Reduces the target HP and removes Sleep. Increases the source HP by the damage done.
     """
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
-        duration: int = 0,
-        decay: float = 0,
+        value: Stat | None = None,
+        min_value: Stat | None = None,
+        max_value: Stat | None = None,
         accuracy: float = 1,
-        removable: bool = True,
-        target_keywords: List[Keyword] = None,
     ):
+        if min_value is None:
+            min_value = Stat(flat=0, percent=0)
+
         super().__init__(
             keyword=Keyword.DRAIN,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.OFFENSIVE,
+            value=value,
+            min_value=min_value,
+            max_value=max_value,
+            accuracy=accuracy,
             persistent=False,
-            removable=removable,
-            target_keywords=target_keywords,
         )
 
     def get_effective_value(
         self,
         source: Entity,
         target: Entity,
-    ) -> float:
+    ) -> Stat:
         """
-        Returns the effects' effective value, taking effects on source and target
-        entities into account.
+        Returns the Effect effective value, that will be used in calculations and the
+        effect execution.
+
+        :param source: The Entity object where the effect is from.
+        :type source: Entity
+
+        :param target: An Entity object which the effect will be applied.
+        :type target: Entity
 
         :return: The effective value.
         :rtype: float
         """
-        effective_value = self.value
+        if self.value.flat is None and self.value.percent is None:
+            return None
 
+        # Base Value
+        effective_value = 0
+
+        if self.value.flat is not None:
+            effective_value += self.value.flat
+        if self.value.percent is not None:
+            effective_value += self.value.percent * target.max_hp
+
+        # Modifiers
         if source:
+            # Strength
             strength = source.get_effect(Keyword.STRENGTH)
             if strength:
-                effective_value += strength.value
 
+                if strength.value.flat:
+                    effective_value += strength.value.flat
+                if strength.value.percent:
+                    effective_value += effective_value * strength.value.percent
+
+            # Weak
             weak = source.get_effect(Keyword.WEAK)
             if weak:
-                effective_value -= weak.value
 
-        if effective_value < 0:
-            effective_value = 0
+                if weak.value.flat:
+                    effective_value -= weak.value.flat
+                if weak.value.percent:
+                    effective_value -= effective_value * weak.value.percent
 
-        return effective_value
+        # Clamping
+        if (
+            self.min_value
+            and self.min_value.flat
+            and effective_value < self.min_value.flat
+        ):
+            effective_value = self.min_value.flat
+
+        if (
+            self.max_value
+            and self.max_value.flat
+            and effective_value > self.max_value.flat
+        ):
+            effective_value = self.max_value.flat
+
+        return ceil(effective_value)
 
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        return {}
+        fail = None
+        if not target.is_alive():
+            fail = "dead"
+
+        return {
+            "fail": fail,
+        }
 
     def activate(
         self,

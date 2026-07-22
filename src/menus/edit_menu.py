@@ -100,6 +100,10 @@ class EditMenu(Menu):
             try:
                 value = self.logger.input(message=message)
                 value = type_cast(value)
+
+                if type_cast is float:
+                    value = round(value, 2)
+
                 break
             except Exception:
                 continue

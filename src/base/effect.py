@@ -11,37 +11,35 @@ from src.base.life_state import LifeState
 from src.base.triggers import Trigger
 
 if TYPE_CHECKING:
+    from src.base.damage import DefendedDamage
     from src.base.entity import Entity
+    from src.base.stat import Stat
 
 
 class EffectData(TypedDict):
     """
     Data when applying or activating an Effect.
 
-    :var absorbed_damage: Damage that was absorbed by a Monster.
-    :vartype absorbed_damage: int
-
-    :var attribute: Attribute of a Monster that was affected.
-    :vartype attribute: str
-
-    :var blocked_damage: Damage that was blocked by a Monster.
-    :vartype blocked_damage: int
-
     :var damage: Damage done to a Monster.
     :vartype damage: int
+
+    :var defended_damage: Defended damage data.
+    :vartype defended_damage: DefendedDamage
 
     :var fail: The cause of the effect failing.
     :vartype fail: str
 
-    :var removed_effects: A list of effects that were removed on effect apply.
+    :var healed: Healing done to a Monster.
+    :vartype healed: int
+
+    :var removed_effects: A list of effects that were removed.
     :vartype removed_effects: List[Effect]
     """
 
-    absorbed_damage: int
-    attribute: str
-    blocked_damage: int
     damage: int
+    defended_damage: DefendedDamage
     fail: str
+    healed: int
     removed_effects: List[Effect]
 
 
@@ -62,78 +60,79 @@ class Effect(ABC):
     """
     Effect class.
 
-    :var keyword: Effect's keyword.
+    :var keyword: Effect keyword, which acts as an identifier.
     :vartype keyword: Keyword
 
-    :var value: Effect's value. Default value is 0.
-    :vartype value: float
+    :var type: Effect type.
+    :vartype type: EffectType
 
-    :var value_percent: Effect's value in percentage format, usually inside [0, 1]
-    interval. Default value is 0 (0%).
-    :vartype value_percent: float
+    :var value: Effect value.
+    :vartype value: Stat | None
 
-    :var duration: Effect's duration in turns, in relation to the Entity the Effect
-    will be applied to. Default value is 0.
-    :vartype duration: int
+    :var min_value: Minimum threshold for Effect value.
+    :vartype min_value: Stat | None
 
-    :var decay: Effect's value decay for each turn. A negative decay will increase the
-    Effect's value instead. Default value is 0.
-    :vartype decay: float
+    :var max_value: Maximum threshold for Effect value.
+    :vartype max_value: Stat | None
 
-    :var accuracy: Effect's chance of being applied in percentage format, usually
+    :var duration: Effect duration in turns, in relation to the Entity the Effect
+    will be applied to.
+    :vartype duration: int | None
+
+    :var delta: Increases or decreases Effect value at each turn end.
+    :vartype delta: Stat | None
+
+    :var accuracy: Effect chance of being applied in percentage format, usually
     inside [0, 1] interval. Default value is 1 (100%).
     :vartype accuracy: float
 
-    :var type: Effect's type.
-    :vartype type: EffectType
+    :var trigger: Effect triggering condition.
+    :vartype trigger: Trigger | None
 
-    :var trigger: Effect's triggering condition.
-    :vartype trigger: Trigger
-
-    :var persistent: If the Effect is persistent or instant. Default value is False.
+    :var persistent: If the Effect is persistent or instant. Default value is False,
+    meaning the Effect is instant.
     :vartype persistent: bool
 
     :var removable: If the Effect is removable by other Effects. Default value is True.
     :vartype removable: bool
 
-    var removable: If the Effect is removable by other Effects. Default value is True.
-    :vartype removable: bool
-
     var target_keywords: What others keywords the Effect targets on its execution.
-    Default value is an empty list.
-    :vartype target_keywords: List[Keyword]
+    :vartype target_keywords: List[Keyword] | None
     """
 
     def __init__(
         self,
         keyword: Keyword,
-        value: float = 0,
-        value_percent: float = 0,
-        duration: float = 0,
-        decay: float = 0,
+        type: EffectType,
+        value: Stat | None = None,
+        min_value: Stat | None = None,
+        max_value: Stat | None = None,
+        duration: int | None = None,
+        delta: Stat | None = None,
         accuracy: float = 1,
-        type: EffectType = None,
-        trigger: Trigger = None,
+        trigger: Trigger | None = None,
         persistent: bool = False,
         removable: bool = True,
         target_keywords: List[Keyword] = None,
     ):
         self.keyword = keyword
-        self.value = value
-        self.value_percent = value_percent
-        self.duration = duration
-        self.decay = decay
-        self.accuracy = accuracy
         self.type = type
+        self.value = value
+        self.min_value = min_value
+        self.max_value = max_value
+        self.duration = duration
+        self.delta = delta
+        self.accuracy = accuracy
         self.trigger = trigger
         self.persistent = persistent
         self.removable = removable
-        self.target_keywords = [] if target_keywords is None else target_keywords
+        self.target_keywords = target_keywords
 
     def __str__(self) -> str:
         """String representation of Effect."""
         type = self.type.value if self.type else None
         trigger = self.trigger.value if self.trigger else None
+        on_execute = "Persistent" if self.persistent else "Instant"
         target_keywords = (
             ", ".join([str(keyword) for keyword in self.target_keywords])
             if self.target_keywords
@@ -141,14 +140,15 @@ class Effect(ABC):
         )
 
         _str = f"{self.keyword}"
-        _str += f" | Value: {self.value}"
-        _str += f" | Value (%): {self.value_percent}"
-        _str += f" | Duration: {self.duration}"
-        _str += f" | Decay: {self.decay}"
-        _str += f" | Acc (%): {self.accuracy}"
         _str += f" | Type: {type}"
+        _str += f" | Value: {str(self.value)}"
+        _str += f" | Min Value: {str(self.min_value)}"
+        _str += f" | Max Value: {str(self.max_value)}"
+        _str += f" | Duration: {self.duration}"
+        _str += f" | Delta: {str(self.delta)}"
+        _str += f" | Acc: {self.accuracy * 100}%"
         _str += f" | Trigger: {trigger}"
-        _str += f" | Persistent: {self.persistent}"
+        _str += f" | {on_execute}"
         _str += f" | Removable: {self.removable}"
         _str += f" | Target Keywords: {target_keywords}"
 
@@ -167,10 +167,10 @@ class Effect(ABC):
         self,
         source: Entity = None,
         target: Entity = None,
-    ) -> float:
+    ) -> float | None:
         """
-        Returns the effects' effective value, taking effects on source and target
-        entities into account.
+        Returns the Effect effective value, that will be used in calculations and the
+        effect execution.
 
         :param source: The Entity object where the effect is from.
         :type source: Entity
@@ -181,27 +181,32 @@ class Effect(ABC):
         :return: The effective value.
         :rtype: float
         """
-        return self.value
+        # Base Value
+        if self.value is None:
+            return None
+        elif self.value.flat is not None:
+            effective_value = self.value.flat
+        elif self.value.percent is not None:
+            effective_value = self.value.percent
+        else:
+            return None
 
-    def get_effective_value_percent(
-        self,
-        source: Entity = None,
-        target: Entity = None,
-    ) -> float:
-        """
-        Returns the effects' effective value percent, taking effects on source and
-        target entities into account.
+        # Clamping
+        if (
+            self.min_value
+            and self.min_value.flat
+            and effective_value < self.min_value.flat
+        ):
+            effective_value = self.min_value.flat
 
-        :param source: The Entity object where the effect is from.
-        :type source: Entity
+        if (
+            self.max_value
+            and self.max_value.flat
+            and effective_value > self.max_value.flat
+        ):
+            effective_value = self.max_value.flat
 
-        :param target: An Entity object which the effect will be applied.
-        :type target: Entity
-
-        :return: The effective value percent.
-        :rtype: float
-        """
-        return self.value_percent
+        return effective_value
 
     def stack(
         self,
@@ -211,7 +216,8 @@ class Effect(ABC):
         Modifies the Effect parameters based on a new effect, if both are of the same
         class:
         * value of both effects are summed.
-        * value (percentage) of both effects are summed.
+        * the lowest min value between the two effects is maintained.
+        * the highest max value between the two effects is maintained.
         * the highest duration between the two effects is maintained.
         * decay of both effects are summed.
         * the highest accuracy between the two effects is maintained.
@@ -224,23 +230,49 @@ class Effect(ABC):
         if type(self) is not type(new_effect):
             return
 
-        self.value += new_effect.value
-        self.value_percent += new_effect.value_percent
+        # Value
+        if self.value is not None and new_effect.value is not None:
+            self.value.add(new_effect.value, "flat")
+            self.value.add(new_effect.value, "percent")
 
-        if new_effect.duration > self.duration:
+        # Min Value
+        if self.min_value is not None and new_effect.min_value is not None:
+            self.min_value.lowest(new_effect.min_value, "flat")
+            self.min_value.lowest(new_effect.min_value, "percent")
+
+        # Max Value
+        if self.max_value is not None and new_effect.max_value is not None:
+            self.max_value.highest(new_effect.max_value, "flat")
+            self.max_value.highest(new_effect.max_value, "percent")
+
+        # Duration
+        if (
+            self.duration is not None
+            and new_effect.duration is not None
+            and new_effect.duration > self.duration
+        ):
             self.duration = new_effect.duration
 
-        self.decay += new_effect.decay
+        # Delta
+        if self.delta is not None and new_effect.delta is not None:
+            self.delta.add(new_effect.delta, "flat")
+            self.delta.add(new_effect.delta, "percent")
 
+        # Accuracy
         if new_effect.accuracy > self.accuracy:
             self.accuracy = new_effect.accuracy
 
+        # Removable
         if not new_effect.removable:
             self.removable = False
 
-        for new_target_keyword in new_effect.target_keywords:
-            if new_target_keyword not in self.target_keywords:
-                self.target_keywords.append(new_target_keyword)
+        # Target Keywords
+        if isinstance(self.target_keywords, list) and isinstance(
+            new_effect.target_keywords, list
+        ):
+            for new_target_keyword in new_effect.target_keywords:
+                if new_target_keyword not in self.target_keywords:
+                    self.target_keywords.append(new_target_keyword)
 
         return
 
@@ -298,7 +330,6 @@ class Effect(ABC):
             isinstance(effect, Effect)
             and self.keyword == effect.keyword
             and self.value == effect.value
-            and self.value_percent == effect.value_percent
             and self.removable == effect.removable
             and self.target_keywords == effect.target_keywords
         )

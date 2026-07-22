@@ -54,5 +54,6 @@ LEXICON = {
     "value_percent": "valor (%)",
     "weapon": "arma",
     "weapons": "armas",
+    "weight": "peso",
     "yes": "sim",
 }

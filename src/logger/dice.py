@@ -48,7 +48,7 @@ class DiceLogger(SideLogger):
 
         if dice.sides:
             for side in dice.sides:
-                message = "● " + self.get_side_details(side)
+                message = "● " + self.get_side_effects_message(side)
                 rows.append([message])
 
         else:

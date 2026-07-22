@@ -5,29 +5,19 @@ from copy import deepcopy
 from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from tests.utils import assert_conditions
 
 
 def test_dice_is_equivalent():
-    effect_0 = AttackEffect()
-    effect_1 = AttackEffect(
-        value=10,
-        value_percent=11,
-        duration=12,
-        decay=13,
-        accuracy=0.14,
-        removable=False,
-        target_keywords=[Keyword.BURN],
-    )
+    effect = AttackEffect(Stat(flat=1))
+    side = Side(effects=[effect])
 
-    side_0 = Side(effects=[effect_0])
-    side_1 = Side(effects=[effect_1])
-
-    dice_0 = Dice(sides=[deepcopy(side_0)])
-    dice_1 = Dice(sides=[deepcopy(side_0)])
-    dice_2 = Dice(sides=[deepcopy(side_1)])
+    dice_0 = Dice(sides=[deepcopy(side)])
+    dice_1 = Dice(sides=[deepcopy(side)])
+    dice_2 = Dice(sides=[deepcopy(side), deepcopy(side)])
 
     conditions = [
         dice_0.is_equivalent(dice_0) is True,
@@ -39,7 +29,7 @@ def test_dice_is_equivalent():
 
 
 def test_dice_roll_single():
-    side = Side(effects=[AttackEffect(1)])
+    side = Side(effects=[AttackEffect(Stat(flat=1))])
 
     dice = Dice(sides=[side])
 
@@ -47,16 +37,15 @@ def test_dice_roll_single():
 
     conditions = [
         picked_side.effects[0].keyword == Keyword.ATTACK,
-        picked_side.effects[0].value == 1,
+        picked_side.effects[0].value == Stat(flat=1, percent=None),
     ]
 
     assert_conditions(conditions)
 
 
 def test_dice_roll_multiple():
-    side_0 = Side(effects=[BlockEffect(2)], weight=0)
-
-    side_1 = Side(effects=[AttackEffect(1)], weight=1)
+    side_0 = Side(effects=[BlockEffect(Stat(flat=2))], weight=0)
+    side_1 = Side(effects=[AttackEffect(Stat(flat=1))], weight=1)
 
     dice = Dice(
         sides=[
@@ -69,7 +58,7 @@ def test_dice_roll_multiple():
 
     conditions = [
         picked_side.effects[0].keyword == Keyword.ATTACK,
-        picked_side.effects[0].value == 1,
+        picked_side.effects[0].value == Stat(flat=1, percent=None),
     ]
 
     assert_conditions(conditions)

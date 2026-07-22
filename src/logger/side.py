@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.base.color import color_string
 from src.logger.effects import EffectLogger
 
 if TYPE_CHECKING:
@@ -21,13 +22,13 @@ class SideLogger(EffectLogger):
     ):
         super().__init__(**kwargs)
 
-    def get_side_details(
+    def get_side_effects_message(
         self,
         side: Side,
         index: int = None,
     ) -> str:
         """
-        Logs a Side details.
+        Gets a message for a Side effects.
 
         :param side: A side.
         :type side: Side
@@ -35,7 +36,7 @@ class SideLogger(EffectLogger):
         :var index: Side index.
         :vartype index: int
 
-        :return: Side details.
+        :return: Message containg the Side effects.
         :rtype: str
         """
         if not self.enabled:
@@ -61,3 +62,41 @@ class SideLogger(EffectLogger):
             )
 
         return message
+
+    def log_side_details(
+        self,
+        side: Side,
+        index: int = None,
+        weight: bool = True,
+    ):
+        """
+        Logs a Side details.
+
+        :param side: A side.
+        :type side: Side
+
+        :var index: Side index.
+        :vartype index: int
+
+        :param weight: If the side weight will be logged. Default value is True.
+        :type weight: bool
+        """
+        if not self.enabled:
+            return
+
+        # Effects
+        message = self.get_side_effects_message(side, index)
+        self.log(message=message)
+
+        # Weight
+        if weight:
+            message = self.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="weight",
+            ).capitalize()
+            message = color_string(message, intensity="BRIGHT")
+
+            message += f": {side.weight}"
+
+            self.log(message=message)

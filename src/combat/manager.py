@@ -579,8 +579,11 @@ class CombatManager(Manager):
                     target=self.current_monster,
                 )
 
-            if effect.decay:
-                effect.value -= effect.decay
+            if effect.delta:
+                if effect.delta.flat:
+                    effect.value.flat += effect.delta.flat
+                if effect.delta.percent:
+                    effect.value.flat += effect.value.flat * effect.delta.percent
 
             if effect.duration <= 0:
                 to_remove.append(effect.keyword)

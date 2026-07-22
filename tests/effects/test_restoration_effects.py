@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 from src.effects.bleed import BleedEffect
 from src.effects.burn import BurnEffect
 from src.effects.cleanse import CleanseEffect
@@ -20,17 +21,17 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_cleanse(combat: Dict):
+def test_cleanse_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster: Monster = combat["monsters"][1]
 
-    cleanse_effect = CleanseEffect(2)
+    cleanse_effect = CleanseEffect(Stat(flat=2))
 
     monster.effects = [
-        BleedEffect(1),
-        RegenEffect(1),
-        BurnEffect(1, removable=False),
-        PoisonEffect(1),
+        BleedEffect(),
+        RegenEffect(),
+        BurnEffect(removable=False),
+        PoisonEffect(),
     ]
 
     conditions = [
@@ -55,13 +56,13 @@ def test_keyword_cleanse(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_heal(combat: Dict):
+def test_heal_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
     monster_4.hp = 1
 
-    effect = HealEffect(9)
+    effect = HealEffect(Stat(flat=9))
 
     effect_manager.execute_effect(
         effect,
@@ -76,7 +77,7 @@ def test_keyword_heal(combat: Dict):
         len(monster_4.effects) == 0,
     ]
 
-    effect = HealEffect(value_percent=0.1)
+    effect = HealEffect(Stat(percent=0.1))
 
     effect_manager.execute_effect(
         effect,
@@ -90,7 +91,7 @@ def test_keyword_heal(combat: Dict):
         ]
     )
 
-    effect = HealEffect(110, value_percent=0.5)
+    effect = HealEffect(Stat(flat=110, percent=0.5))
 
     effect_manager.execute_effect(
         effect,
@@ -121,11 +122,11 @@ def test_keyword_heal(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_mana(combat: Dict):
+def test_mana_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster: Monster = combat["monsters"][1]
 
-    effect = ManaEffect(2)
+    effect = ManaEffect(Stat(flat=2))
 
     conditions = [
         monster.local_id == "MONSTER_1",
@@ -145,16 +146,31 @@ def test_keyword_mana(combat: Dict):
         ]
     )
 
+    effect = ManaEffect(Stat(percent=0.5))
+
+    effect_manager.execute_effect(
+        effect,
+        source=monster,
+        target=monster,
+    )
+
+    conditions.extend(
+        [
+            monster.mana == 3,
+            len(monster.effects) == 0,
+        ]
+    )
+
     assert_conditions(conditions)
 
 
-def test_keyword_revive(combat: Dict):
+def test_revive_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_0: Monster = combat["monsters"][0]
     monster_1: Monster = combat["monsters"][1]
     monster_3: Monster = combat["monsters"][3]
 
-    effect = ReviveEffect(10)
+    effect = ReviveEffect(Stat(flat=10))
 
     effect_manager.execute_effect(
         effect,
@@ -169,7 +185,7 @@ def test_keyword_revive(combat: Dict):
     ]
 
     monster_0.hp = 0
-    effect = ReviveEffect(value_percent=0.25)
+    effect = ReviveEffect(Stat(percent=0.25))
 
     effect_manager.execute_effect(
         effect,
@@ -186,7 +202,7 @@ def test_keyword_revive(combat: Dict):
     )
 
     monster_0.hp = 0
-    effect = ReviveEffect(60, value_percent=0.50)
+    effect = ReviveEffect(Stat(flat=60, percent=0.5))
 
     effect_manager.execute_effect(
         effect,

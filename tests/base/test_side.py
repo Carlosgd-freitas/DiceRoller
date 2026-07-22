@@ -5,6 +5,7 @@ from copy import deepcopy
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
@@ -14,8 +15,8 @@ from tests.utils import assert_conditions
 def test_side_get_effect():
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
         ]
     )
 
@@ -23,7 +24,8 @@ def test_side_get_effect():
 
     conditions = [
         effect.keyword == Keyword.ATTACK,
-        effect.value == 1,
+        effect.value.flat == 1,
+        effect.value.percent is None,
     ]
 
     effect = side.get_effect(keyword=Keyword.BURN)
@@ -40,9 +42,9 @@ def test_side_get_effect():
 def test_side_get_effect_summary():
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
-            AbsorbEffect(3),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
+            AbsorbEffect(Stat(flat=3)),
         ]
     )
 
@@ -62,9 +64,9 @@ def test_side_get_effect_summary():
 def test_side_get_main_effect_type():
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
-            AbsorbEffect(3),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
+            AbsorbEffect(Stat(flat=3)),
         ]
     )
 
@@ -76,8 +78,8 @@ def test_side_get_main_effect_type():
 
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
         ]
     )
 
@@ -105,9 +107,9 @@ def test_side_get_main_effect_type():
 def test_side_get_main_keyword():
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
-            AbsorbEffect(3),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
+            AbsorbEffect(Stat(flat=3)),
         ]
     )
 
@@ -119,9 +121,9 @@ def test_side_get_main_keyword():
 
     side = Side(
         effects=[
-            AbsorbEffect(1),
-            BlockEffect(2),
-            AbsorbEffect(3),
+            AbsorbEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
+            AbsorbEffect(Stat(flat=3)),
         ]
     )
 
@@ -149,8 +151,8 @@ def test_side_get_main_keyword():
 def test_side_has_effect():
     side = Side(
         effects=[
-            AttackEffect(1),
-            BlockEffect(2),
+            AttackEffect(Stat(flat=1)),
+            BlockEffect(Stat(flat=2)),
         ]
     )
 
@@ -172,16 +174,8 @@ def test_side_has_effect():
 
 
 def test_side_is_equivalent():
-    effect_0 = AttackEffect()
-    effect_1 = AttackEffect(
-        value=10,
-        value_percent=11,
-        duration=12,
-        decay=13,
-        accuracy=0.14,
-        removable=False,
-        target_keywords=[Keyword.BURN],
-    )
+    effect_0 = AttackEffect(Stat(flat=1))
+    effect_1 = AttackEffect(Stat(flat=2))
 
     side_0 = Side(effects=[deepcopy(effect_0)])
     side_1 = Side(effects=[deepcopy(effect_0)])

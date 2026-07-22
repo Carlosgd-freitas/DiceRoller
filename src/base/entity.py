@@ -227,7 +227,6 @@ class Entity:
         :rtype: EffectData
         """
         new_effect = deepcopy(effect)
-        new_effect.value = new_effect.get_effective_value(source, source)
         current_effect = self.get_effect(effect.keyword)
 
         # Stack existing effect

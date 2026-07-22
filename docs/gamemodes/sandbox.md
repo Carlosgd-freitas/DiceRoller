@@ -8,6 +8,7 @@ The **Sandbox Mode** allows players to start [combats](/docs/base/combat.md) and
 * [Dice](/docs/base/dice.md)
 * [Sides](/docs/base/side.md)
 * [Effects](/docs/base/effect.md)
-
+* [Stats](/docs/base/stat.md)
+  
 ## Import & Exporting
 Combats, teams, monsters, items and skills can be **exported** to and **imported** from files to facilitate repeating combat scenarios (or some of its parts) and sharing.

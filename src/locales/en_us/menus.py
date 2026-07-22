@@ -41,6 +41,26 @@ SANDBOX = {
     "title": "Sandbox Mode",
 }
 
+EDIT_TEAM = {
+    "title": "Edit Team",
+    "edit_name": "Edit Name",
+    "edit_name_prompt": "Type a new name",
+    "edit_monster": "Edit Monster",
+    "add_monster": "Add Monster",
+    "remove_monster": "Remove Monster",
+    "import_team": "Import Team",
+    "import_team_success": "Team was imported successfully.",
+    "import_team_fail": "Team could not be imported.",
+    "export_team": "Export Team",
+    "export_team_success": "Team was exported successfully.",
+    "export_team_fail": "Team could not be exported.",
+    "randomize_team": "Randomize Team",
+}
+
+EDIT_MONSTER = {
+    "title": "Edit Monster",
+}
+
 EDIT_DICE = {
     "title": "Edit Dice",
     "edit_side": "Edit Side",

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from math import ceil
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -31,8 +30,6 @@ def calculate_healing(
     :rtype: int
     """
     healed = effect.get_effective_value(source, target)
-
-    healed += ceil(target.max_hp * effect.get_effective_value_percent(source, target))
 
     if healed < 0:
         healed = 0

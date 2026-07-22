@@ -1,12 +1,13 @@
-"""Edit Side Menu module."""
+"""Edit Stat Menu module."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, TypeVar
 
-from src.base.side import Side
-from src.effects.nothing import NothingEffect
-from src.gamemodes.sandbox.edit_effect_menu import EditEffectMenu
+from src.base.life_state import LifeState
+from src.base.monster import Monster
+from src.base.team import Team
+from src.gamemodes.sandbox.edit_monster_menu import EditMonsterMenu
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
 from src.systems.randomizer import Randomizer
@@ -14,10 +15,12 @@ from src.systems.randomizer import Randomizer
 if TYPE_CHECKING:
     from src.systems.settings import Settings
 
+T = TypeVar("T")
 
-class EditSideMenu(EditMenu):
+
+class EditStatMenu(EditMenu):
     """
-    Edit Side Menu class.
+    Edit Team Menu class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -44,13 +47,13 @@ class EditSideMenu(EditMenu):
     ):
         super().__init__(
             settings,
-            message_group="EDIT_SIDE",
+            message_group="EDIT_TEAM",
             logging=logging,
             randomizer=randomizer,
         )
-        self.editing: Side = None
+        self.editing: Team = None
 
-        self.edit_effect_menu = EditEffectMenu(
+        self.edit_monster_menu = EditMonsterMenu(
             settings,
             logging=logging,
             randomizer=randomizer,
@@ -65,49 +68,68 @@ class EditSideMenu(EditMenu):
         """
         options = [
             Option(
-                id="EDIT_WEIGHT",
+                id="EDIT_NAME",
                 key="1",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_weight",
+                    key="edit_name",
                 ),
             ),
             Option(
-                id="EDIT_EFFECT",
+                id="EDIT_MONSTER",
                 key="2",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_effect",
+                    key="edit_monster",
                 ),
             ),
             Option(
-                id="ADD_EFFECT",
+                id="ADD_MONSTER",
                 key="3",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="add_effect",
+                    key="add_monster",
                 ),
             ),
             Option(
-                id="REMOVE_EFFECT",
+                id="REMOVE_MONSTER",
                 key="4",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="remove_effect",
+                    key="remove_monster",
                 ),
                 isolate_after=True,
             ),
             Option(
-                id="RANDOMIZE_SIDE",
+                id="IMPORT_TEAM",
+                key="I",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="import_team",
+                ),
+                isolate_before=True,
+            ),
+            Option(
+                id="EXPORT_TEAM",
+                key="X",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="export_team",
+                ),
+            ),
+            Option(
+                id="RANDOMIZE_TEAM",
                 key="R",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="randomize_side",
+                    key="randomize_team",
                 ),
                 isolate_after=True,
             ),
@@ -125,34 +147,6 @@ class EditSideMenu(EditMenu):
 
         return options
 
-    def _effects_as_options(self) -> List[Option]:
-        """
-        Returns the effects of the Side being edited as Options.
-
-        :return: Side effects as options.
-        :rtype: List[Option]
-        """
-        options = [
-            Option(
-                id=f"EFFECT_{idx+1}",
-                key=str(idx + 1),
-                message=self.logger.get_effect_message(effect=effect),
-                obj=effect,
-            )
-            for idx, effect in enumerate(self.editing.effects)
-        ]
-
-        options.append(
-            Option(
-                id="CANCEL",
-                key="0",
-                message=None,
-                isolate_before=True,
-            )
-        )
-
-        return options
-
     # =========================================================================
     # Options
     # =========================================================================
@@ -161,8 +155,8 @@ class EditSideMenu(EditMenu):
         """
         Returns if the option can be selected or not.
         """
-        if option.id in ["EDIT_EFFECT", "REMOVE_EFFECT"]:
-            return len(self.editing.effects) > 0
+        if option.id in ["EDIT_MONSTER", "REMOVE_MONSTER"]:
+            return len(self.editing.members) > 0
 
         return True
 
@@ -173,30 +167,30 @@ class EditSideMenu(EditMenu):
         :param side: Side to be edited.
         :type side: Side
         """
-        if option.id == "EDIT_WEIGHT":
-            self.edit_attribute("weight", float)
+        if option.id == "EDIT_NAME":
+            self.edit_attribute("name", str)
 
-        elif option.id == "EDIT_EFFECT":
-            self.edit_effect()
+        if option.id == "EDIT_MONSTER":
+            self.edit_monster()
 
-        elif option.id == "ADD_EFFECT":
-            self.add_effect()
+        elif option.id == "ADD_MONSTER":
+            self.add_monster()
 
-        elif option.id == "REMOVE_EFFECT":
-            self.remove_effect()
+        elif option.id == "REMOVE_MONSTER":
+            self.remove_monster()
 
-        elif option.id == "RANDOMIZE_SIDE":
-            randomized_side = self.randomizer.get_random_side()
-            self.editing = randomized_side
+        elif option.id == "RANDOMIZE_TEAM":
+            randomized_team = self.randomizer.get_random_team()
+            self.editing = randomized_team
 
         elif option.id == "RETURN":
             pass
 
         return
 
-    def _select_effect(self) -> Option:
+    def _select_monster(self) -> Option:
         """
-        Shows the effects of the side being edited and prompts the user to select one of
+        Shows the monsters of the team being edited and prompts the user to select one of
         them, returning the option that corresponds to them.
 
         :return: Option selected by the user.
@@ -207,12 +201,12 @@ class EditSideMenu(EditMenu):
         # Defining options
         self.logger.log(message="")
 
-        for index, effect in enumerate(self.editing.effects):
+        for index, member in enumerate(self.editing.members):
             option = Option(
-                id=f"EFFECT_{index + 1}",
+                id=f"MONSTER_{index + 1}",
                 key=str(index + 1),
-                message=self.logger.get_effect_message(effect=effect),
-                obj=effect,
+                message=self.logger.get_monster_name(member),
+                obj=member,
             )
             options.append(option)
 
@@ -234,42 +228,42 @@ class EditSideMenu(EditMenu):
         self.show_options(options, validate=True)
 
         # Selecting option
-        selected_option = self.select_attribute_option(options, "effect")
+        selected_option = self.select_attribute_option(options, "monster")
 
         return selected_option
 
-    def edit_effect(self):
+    def edit_monster(self):
         """
-        Edits an Effect of the Side being edited.
+        Edits a Monster of the Team being edited.
         """
-        selected_option = self._select_effect()
+        selected_option = self._select_monster()
 
         if selected_option.id != "CANCEL":
-            selected_effect = selected_option.obj
-            selected_effect = self.edit_effect_menu.open(selected_effect)
+            selected_monster = selected_option.obj
+            selected_monster = self.edit_monster_menu.open(selected_monster)
 
         return
 
-    def add_effect(self):
+    def add_monster(self):
         """
-        Adds a new Nothing Effect to the Side being edited, and opens the Edit Effect
+        Adds a new Monster to the Team being edited, and opens the Edit Monster
         Menu with it.
         """
-        new_effect = NothingEffect()
-        new_effect = self.edit_effect_menu.open(new_effect)
-        self.editing.effects.append(new_effect)
+        new_monster = Monster()
+        new_monster = self.edit_monster_menu.open(new_monster)
+        self.editing.members.append(new_monster)
 
         return
 
-    def remove_effect(self):
+    def remove_monster(self):
         """
-        Removes an Effect from the Side being edited.
+        Removes a Monster from the Team being edited.
         """
-        selected_option = self._select_effect()
+        selected_option = self._select_monster()
 
         if selected_option.id != "CANCEL":
-            selected_effect = selected_option.obj
-            self.editing.effects.remove(selected_effect)
+            selected_monster = selected_option.obj
+            self.editing.members.remove(selected_monster)
 
         return
 
@@ -281,4 +275,8 @@ class EditSideMenu(EditMenu):
         """
         Shows the details of the object being edited.
         """
-        self.logger.log_side_details(self.editing, weight=True)
+        self.logger.log_team(
+            self.editing,
+            life_state=LifeState.ANY,
+            control_type=True,
+        )

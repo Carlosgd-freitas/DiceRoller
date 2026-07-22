@@ -174,13 +174,13 @@ class EffectManager(Manager):
             blinded = source.get_effect(Keyword.BLIND)
 
             if blinded and source != target:
-                accuracy -= blinded.value_percent
+                accuracy -= blinded.value.percent
 
             # Focus check
             focusing = source.get_effect(Keyword.FOCUS)
 
             if focusing:
-                accuracy += focusing.value_percent
+                accuracy += focusing.value.percent
 
             # Effect miss
             if random() >= accuracy:

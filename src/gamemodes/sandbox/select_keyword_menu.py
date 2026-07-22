@@ -146,7 +146,7 @@ class SelectKeywordMenu(Menu):
                 Option(
                     id=f"SIDE_{idx+1}",
                     key=str(idx + 1),
-                    message=self.logger.get_side_details(side),
+                    message=self.logger.get_side_effects_message(side),
                     obj=side,
                 )
                 for idx, side in enumerate(self.dice.sides)

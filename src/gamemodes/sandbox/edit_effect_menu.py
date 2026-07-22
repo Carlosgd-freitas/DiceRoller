@@ -201,6 +201,9 @@ class EditEffectMenu(EditMenu):
         """
         Returns if the option can be selected or not.
         """
+        ## Discuir com o GPT: Efeitos possuem apenas alguns atributos, e esses podem ser editados.
+        ## Ex.: Heal pode ter value/value_percentage; Attack apenas value; etc.
+
         if option.id in ["REMOVE_TARGET_KEYWORD"]:
             return len(self.editing.target_keywords) > 0
 

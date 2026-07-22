@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
@@ -15,31 +15,22 @@ class ConfuseEffect(Effect):
     """
     Confuse Effect.
 
-    This is a debuff which makes the target to target randomly when using dice or
-    skills.
+    Makes the target select targets randomly.
     """
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
-        duration: int = 1,
-        decay: float = 0,
+        duration: int = 2,
         accuracy: float = 1,
         removable: bool = True,
-        target_keywords: List[Keyword] = None,
     ):
         super().__init__(
             keyword=Keyword.CONFUSE,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.DEBUFF,
+            duration=duration,
+            accuracy=accuracy,
             persistent=True,
             removable=removable,
-            target_keywords=target_keywords,
         )
 
     def on_apply(

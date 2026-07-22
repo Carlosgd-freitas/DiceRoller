@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 
 if TYPE_CHECKING:
     from src.base.entity import Entity
@@ -15,30 +16,34 @@ class BlindEffect(Effect):
     """
     Blind Effect.
 
-    Debuff that reduces the target's accuracies. Removes Focus when applied.
+    Decreases the target's accuracies when it targets something other then themselves.
+    Removes Focus.
     """
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
-        duration: int = 1,
-        decay: float = 0,
+        value: Stat | None = None,
+        min_value: Stat | None = None,
+        max_value: Stat | None = None,
+        duration: int = 2,
+        delta: Stat | None = None,
         accuracy: float = 1,
         removable: bool = True,
-        target_keywords: List[Keyword] = None,
     ):
+        if min_value is None:
+            min_value = Stat(percent=0)
+
         super().__init__(
             keyword=Keyword.BLIND,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.DEBUFF,
+            value=value,
+            min_value=min_value,
+            max_value=max_value,
+            duration=duration,
+            delta=delta,
+            accuracy=accuracy,
             persistent=True,
             removable=removable,
-            target_keywords=target_keywords,
         )
 
     def on_apply(

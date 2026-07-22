@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import Dict, List
 
 from src.base.dice import Dice
-from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.base.team import Team
 from src.effects.attack import AttackEffect
 from tests.utils import assert_conditions
@@ -32,35 +32,22 @@ def test_get_team_status(combat: Dict):
 
 
 def test_team_is_equivalent():
-    effect_0 = AttackEffect()
-    effect_1 = AttackEffect(
-        value=10,
-        value_percent=11,
-        duration=12,
-        decay=13,
-        accuracy=0.14,
-        removable=False,
-        target_keywords=[Keyword.BURN],
-    )
-
-    side_0 = Side(effects=[effect_0])
-    side_1 = Side(effects=[effect_1])
-
-    dice_0 = Dice(sides=[side_0])
-    dice_1 = Dice(sides=[side_1])
+    effect = AttackEffect(Stat(flat=1))
+    side = Side(effects=[effect])
+    dice = Dice(sides=[side])
 
     monster_0 = Monster(
         global_id="ID_0",
         hp=1,
         max_hp=2,
-        dice=[dice_0],
+        dice=[dice],
     )
 
     monster_1 = Monster(
         global_id="ID_1",
         hp=1,
         max_hp=2,
-        dice=[dice_1],
+        dice=[dice],
     )
 
     team_0 = Team(

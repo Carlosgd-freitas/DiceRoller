@@ -441,7 +441,7 @@ class CombatPlayerActionsMenu(Menu):
             self.logger.log(message="")
 
             for index, side in enumerate(sides):
-                message = self.logger.get_side_details(side, index + 1)
+                message = self.logger.get_side_effects_message(side, index + 1)
                 self.logger.log(message=message)
 
             message = (
@@ -574,7 +574,7 @@ class CombatPlayerActionsMenu(Menu):
                         + ": "
                     )
                     message = color_string(message, intensity="BRIGHT")
-                    message += self.logger.get_side_details(selected_side)
+                    message += self.logger.get_side_effects_message(selected_side)
                     self.logger.log(message=message)
 
                     # Logging selecting progress

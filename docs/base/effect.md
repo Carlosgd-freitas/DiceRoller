@@ -1,16 +1,17 @@
 # Effect
-An **Effect** is the smallest component of the game mechanics, and are executed by a **source** [`Entity`](/docs/base/entity.md) to one or multiple **target** `Entities`. The effect itself will be executed to one target at a time.
+An **Effect** is the smallest component of the game mechanics, and is executed by a **source** [`Entity`](/docs/base/entity.md) to one or multiple **target** `Entities`. The effect itself will be executed to one target at a time.
 
 Each **effect** has its own behavior, and are to be used by "bigger" components, such as [`Sides`](/docs/base/side.md), to "compose" the wanted interaction between `Entities`. Therefore, new interactions require new **effects** to be implemented.
 
 ## Attributes
 * **keyword**: a identifier that is unique per effect. Must be part of the `Keyword` enum.
-* **value**: effect's magnitude, in absolute format (e.g. 1, 5, 100).
-* **value_percent**: effect's magnitude, in percentage format (e.g. 0.1, 0.5, 1.0).
-* **duration**: by how many turns the effect will persist in the target.
-* **decay**: by how much the `value` is decreased after each turn. If decay is negative, `value` will be increased instead.
-* **accuracy**: a floating-point number in the [0, 1] interval that represents the chance of the effect being executed.
 * **type**: type of the effect. Effects with the same type have similar behavior.
+* **value**: effect magnitude.
+* **min_value**: minimum threshold for effect value.
+* **max_value**: maximum threshold for effect value.
+* **duration**: by how many turns the effect will persist in the target.
+* **delta**: increases or decreases effect value at each turn end.
+* **accuracy**: a floating-point number in the [0, 1] interval that represents the chance of the effect being executed.
 * **trigger**: what combat situation triggers the effect execution.
 * **persistent**: if the effect will be applied to the entity on execution, and added to their current effects; or if it is instant.
 * **removable**: if the effect can be removed by other effects. The effect will still be removed after its duration expires.

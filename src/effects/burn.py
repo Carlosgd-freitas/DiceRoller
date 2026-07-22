@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from math import ceil
+from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 from src.base.triggers import Trigger
 from src.processors.damage import calculate_damage
 
@@ -17,32 +19,34 @@ class BurnEffect(Effect):
     """
     Burn Effect.
 
-    This is a debuff which will reduce the target's HP by the effect value at the start
-    of each of the target's turn. Removes Freeze when applied.
+    Reduces the target HP each turn start and removes Freeze.
     """
 
     def __init__(
         self,
-        value: float = 0,
-        value_percent: float = 0,
-        duration: int = 1,
-        decay: float = 0,
+        value: Stat | None = None,
+        min_value: Stat | None = None,
+        max_value: Stat | None = None,
+        duration: int = 2,
+        delta: Stat | None = None,
         accuracy: float = 1,
         removable: bool = True,
-        target_keywords: List[Keyword] = None,
     ):
+        if min_value is None:
+            min_value = Stat(percent=0)
+
         super().__init__(
             keyword=Keyword.BURN,
-            value=value,
-            value_percent=value_percent,
-            duration=duration,
-            decay=decay,
-            accuracy=accuracy,
             type=EffectType.DEBUFF,
+            value=value,
+            min_value=min_value,
+            max_value=max_value,
+            duration=duration,
+            delta=delta,
+            accuracy=accuracy,
             trigger=Trigger.TURN_START,
             persistent=True,
             removable=removable,
-            target_keywords=target_keywords,
         )
 
     def get_effective_value(
@@ -57,14 +61,44 @@ class BurnEffect(Effect):
         :return: The effective value.
         :rtype: float
         """
-        effective_value = self.value
+        if self.value.flat is None and self.value.percent is None:
+            return None
 
+        # Base Value
+        effective_value = 0
+
+        if self.value.flat is not None:
+            effective_value += self.value.flat
+        if self.value.percent is not None:
+            effective_value += self.value.percent * target.max_hp
+
+        # Modifiers
         if target:
+            # Oil
             oil = target.get_effect(Keyword.OIL)
             if oil:
-                effective_value += oil.value
 
-        return effective_value
+                if oil.value.flat:
+                    effective_value += oil.value.flat
+                if oil.value.percent:
+                    effective_value += effective_value * oil.value.percent
+
+        # Clamping
+        if (
+            self.min_value
+            and self.min_value.flat
+            and effective_value < self.min_value.flat
+        ):
+            effective_value = self.min_value.flat
+
+        if (
+            self.max_value
+            and self.max_value.flat
+            and effective_value > self.max_value.flat
+        ):
+            effective_value = self.max_value.flat
+
+        return ceil(effective_value)
 
     def on_apply(
         self,

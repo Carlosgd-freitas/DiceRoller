@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, TypeVar
+from typing import TYPE_CHECKING, List
 
 from src.base.dice import Dice
 from src.base.side import Side
@@ -13,8 +13,6 @@ from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
-
-T = TypeVar("T")
 
 
 class EditDiceMenu(EditMenu):
@@ -173,7 +171,7 @@ class EditDiceMenu(EditMenu):
             option = Option(
                 id=f"SIDE_{index + 1}",
                 key=str(index + 1),
-                message=self.logger.get_side_details(side),
+                message=self.logger.get_side_effects_message(side),
                 obj=side,
             )
             options.append(option)

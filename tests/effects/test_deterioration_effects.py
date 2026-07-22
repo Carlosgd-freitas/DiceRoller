@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 from src.effects.bleed import BleedEffect
 from src.effects.corrupt import CorruptEffect
 from src.effects.execute import ExecuteEffect
@@ -18,17 +19,17 @@ if TYPE_CHECKING:
     from src.combat.effects import EffectManager
 
 
-def test_keyword_corrupt(combat: Dict):
+def test_corrupt_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster: Monster = combat["monsters"][1]
 
-    corrupt_effect = CorruptEffect(2)
+    corrupt_effect = CorruptEffect(Stat(flat=2))
 
     monster.effects = [
-        ManaRegenEffect(1),
-        BleedEffect(1),
-        RegenEffect(1, removable=False),
-        ThornsEffect(1),
+        ManaRegenEffect(),
+        BleedEffect(),
+        RegenEffect(removable=False),
+        ThornsEffect(),
     ]
 
     conditions = [
@@ -53,12 +54,12 @@ def test_keyword_corrupt(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_keyword_execute(combat: Dict):
+def test_execute_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_1: Monster = combat["monsters"][1]
     monster_4: Monster = combat["monsters"][4]
 
-    effect = ExecuteEffect(value_percent=0.5)
+    effect = ExecuteEffect(Stat(percent=0.5))
     monster_4.hp = 100
 
     effect_manager.execute_effect(
@@ -73,7 +74,7 @@ def test_keyword_execute(combat: Dict):
         len(monster_4.effects) == 0,
     ]
 
-    effect = ExecuteEffect(value=30)
+    effect = ExecuteEffect(Stat(flat=30))
     monster_4.hp = 30
 
     effect_manager.execute_effect(
@@ -90,8 +91,8 @@ def test_keyword_execute(combat: Dict):
         ]
     )
 
-    effect = ExecuteEffect(value_percent=0.25, value=2)
-    monster_4.hp = 50
+    effect = ExecuteEffect(Stat(flat=2, percent=0.25))
+    monster_4.hp = 52
 
     effect_manager.execute_effect(
         effect,
@@ -107,8 +108,7 @@ def test_keyword_execute(combat: Dict):
         ]
     )
 
-    effect = ExecuteEffect(value_percent=0.25, value=2)
-    monster_4.hp = 51
+    monster_4.hp = 53
 
     effect_manager.execute_effect(
         effect,
@@ -119,7 +119,7 @@ def test_keyword_execute(combat: Dict):
     conditions.extend(
         [
             monster_4.is_alive() is True,
-            monster_4.hp == 51,
+            monster_4.hp == 53,
             len(monster_4.effects) == 0,
         ]
     )

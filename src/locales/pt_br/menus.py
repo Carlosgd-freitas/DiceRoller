@@ -41,6 +41,26 @@ SANDBOX = {
     "title": "Modo Sandbox",
 }
 
+EDIT_TEAM = {
+    "title": "Editar Time",
+    "edit_name": "Editar Nome",
+    "edit_name_prompt": "Digite um novo nome",
+    "edit_monster": "Editar Monstro",
+    "add_monster": "Adicionar Monstro",
+    "remove_monster": "Remover Monstro",
+    "import_team": "Importar Time",
+    "import_team_success": "Time foi importado com sucesso.",
+    "import_team_fail": "Time não pôde ser importado.",
+    "export_team": "Exportar Time",
+    "export_team_success": "Time foi exportado com sucesso.",
+    "export_team_fail": "Time não pôde ser exportado.",
+    "randomize_team": "Aleatorizar Time",
+}
+
+EDIT_MONSTER = {
+    "title": "Editar Monstro",
+}
+
 EDIT_DICE = {
     "title": "Editar Dado",
     "edit_side": "Editar Lado",
