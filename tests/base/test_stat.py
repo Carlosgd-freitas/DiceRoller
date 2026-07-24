@@ -1,5 +1,7 @@
 """Tests for Stat class."""
 
+from math import isclose
+
 from src.base.stat import Stat
 from tests.utils import assert_conditions
 
@@ -20,7 +22,7 @@ def test_stat_add():
 
     conditions = [
         stat_0.flat == 4,
-        stat_0.percent == 0.6,
+        isclose(stat_0.percent, 0.6),
     ]
 
     assert_conditions(conditions)
@@ -42,7 +44,7 @@ def test_stat_subtract():
 
     conditions = [
         stat_0.flat == 7,
-        stat_0.percent == 0.5,
+        isclose(stat_0.percent, 0.5),
     ]
 
     assert_conditions(conditions)
@@ -64,7 +66,7 @@ def test_stat_lowest():
 
     conditions = [
         stat_1.flat == 1,
-        stat_1.percent == 0.2,
+        isclose(stat_1.percent, 0.2),
     ]
 
     assert_conditions(conditions)
@@ -86,7 +88,7 @@ def test_stat_highest():
 
     conditions = [
         stat_0.flat == 3,
-        stat_0.percent == 0.4,
+        isclose(stat_0.percent, 0.4),
     ]
 
     assert_conditions(conditions)

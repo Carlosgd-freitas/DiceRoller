@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.attack import AttackEffect
 from src.effects.pain import PainEffect
 from tests.utils import assert_conditions
@@ -21,8 +22,8 @@ def test_effect_interrupt(combat: Dict):
 
     side = Side(
         effects=[
-            PainEffect(100),
-            AttackEffect(100),
+            PainEffect(Stat(flat=100)),
+            AttackEffect(Stat(flat=100)),
         ]
     )
 

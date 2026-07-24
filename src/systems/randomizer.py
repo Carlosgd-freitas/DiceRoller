@@ -13,6 +13,7 @@ from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.base.team import Team
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
@@ -613,3 +614,22 @@ class Randomizer:
         effect = deepcopy(choice(valid_effects))
 
         return effect.keyword
+
+    def get_random_stat(
+        self,
+        config: RandomizerConfig | None = None,
+    ) -> Stat:
+        """
+        Gets a random Stat.
+
+        :param config: Randomizer Configuration.
+        :type config: RandomizerConfig
+
+        :return: Random Stat.
+        :rtype: Stat
+        """
+        # Setup
+        config = config or RandomizerConfig()
+
+        # Filtering
+        return

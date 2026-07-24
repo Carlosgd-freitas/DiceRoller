@@ -9,6 +9,7 @@ from src.base.side import Side
 from src.base.triggers import Trigger
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from src.effects.nothing import NothingEffect
 from tests.utils import assert_conditions
 
 if TYPE_CHECKING:
@@ -42,7 +43,7 @@ def test_effect_manager_execute_effect(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster_1: Monster = combat["monsters"][1]
     monster_2: Monster = combat["monsters"][2]
-    effect = AttackEffect(1)
+    effect = NothingEffect()
 
     executed = effect_manager.execute_effect(
         effect,
@@ -62,8 +63,8 @@ def test_effect_manager_execute_effect(combat: Dict):
 def test_effect_manager_roll(combat: Dict):
     effect_manager: EffectManager = combat["effect_manager"]
     monster: Monster = combat["monsters"][0]
-    dice_0 = Dice(sides=[Side(effects=[AttackEffect(1)])])
-    dice_1 = Dice(sides=[Side(effects=[BlockEffect(1)])])
+    dice_0 = Dice(sides=[Side(effects=[AttackEffect()])])
+    dice_1 = Dice(sides=[Side(effects=[BlockEffect()])])
 
     monster.dice = [dice_0, dice_1]
 

@@ -97,6 +97,15 @@ EDIT_EFFECT = {
     "randomize_effect": "Aleatorizar Efeito",
 }
 
+EDIT_STAT = {
+    "title": "Editar Atributo",
+    "edit_flat": "Editar Valor Fixo",
+    "edit_flat_prompt": "Digite um novo valor fixo",
+    "edit_percent": "Editar Valor em Porcentagem",
+    "edit_percent_prompt": "Digite um novo valor em porcentagem",
+    "randomize_stat": "Aleatorizar Atributo",
+}
+
 SORT = {
     "reverse": "reversa",
 }

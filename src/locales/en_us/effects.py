@@ -2,8 +2,8 @@
 
 ABSORB = {
     "name": "ABSORB",
-    "description": "Reduces up to {value} recieved direct damage. Any blocked damage restores {hp}.",
-    "description_absolute": "Reduces up to {value} recieved direct damage. Any blocked damage restores {hp}.",
+    "description": "Reduces up to {value_flat} recieved direct damage. Any blocked damage restores {hp}.",
+    "description_flat": "Reduces up to {value_flat} recieved direct damage. Any blocked damage restores {hp}.",
     "description_percent": None,
     "description_both": None,
     "action": "ABSORBED",
@@ -20,8 +20,8 @@ ABSORB = {
 
 ATTACK = {
     "name": "ATTACK",
-    "description": "Deals {value} damage.",
-    "description_absolute": "Deals {value} damage.",
+    "description": "Deals {value_flat} damage.",
+    "description_flat": "Deals {value_flat} damage.",
     "description_percent": None,
     "description_both": None,
     "action": "ATTACKED",
@@ -38,8 +38,8 @@ ATTACK = {
 
 BLEED = {
     "name": "BLEED",
-    "description": "Deals {value} damage every time the target rolls a dice.",
-    "description_absolute": "Deals {value} damage every time the target rolls a dice.",
+    "description": "Deals {value_flat} damage every time the target rolls a dice.",
+    "description_flat": "Deals {value_flat} damage every time the target rolls a dice.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -57,7 +57,7 @@ BLEED = {
 BLIND = {
     "name": "BLIND",
     "description": "Reduces the accuracy of dice and skills that the target not use in themselves by {value_percent}%.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": "Reduces the accuracy of dice and skills that the target not use in themselves by {value_percent}%.",
     "description_both": None,
     "action": None,
@@ -74,8 +74,8 @@ BLIND = {
 
 BLOCK = {
     "name": "BLOCK",
-    "description": "Reduces up to {value} recieved direct damage.",
-    "description_absolute": "Reduces up to {value} recieved direct damage.",
+    "description": "Reduces up to {value_flat} recieved direct damage.",
+    "description_flat": "Reduces up to {value_flat} recieved direct damage.",
     "description_percent": None,
     "description_both": None,
     "action": "BLOCKED",
@@ -92,8 +92,8 @@ BLOCK = {
 
 BURN = {
     "name": "BURN",
-    "description": "Deals {value} damage every turn start. Removes {freeze}.",
-    "description_absolute": "Deals {value} damage every turn start. Removes {freeze}.",
+    "description": "Deals {value_flat} damage every turn start. Removes {freeze}.",
+    "description_flat": "Deals {value_flat} damage every turn start. Removes {freeze}.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -110,8 +110,8 @@ BURN = {
 
 CLEANSE = {
     "name": "CLEANSE",
-    "description": "Removes up to {value} debuffs from the target, starting from the oldest.",
-    "description_absolute": "Removes up to {value} debuffs from the target, starting from the oldest.",
+    "description": "Removes up to {value_flat} debuffs from the target, starting from the oldest.",
+    "description_flat": "Removes up to {value_flat} debuffs from the target, starting from the oldest.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -129,7 +129,7 @@ CLEANSE = {
 CONFUSE = {
     "name": "CONFUSE",
     "description": "Makes the target use their dice and skills randomly.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -146,8 +146,8 @@ CONFUSE = {
 
 CORRUPT = {
     "name": "CORRUPT",
-    "description": "Removes up to {value} buffs from the target, starting from the oldest.",
-    "description_absolute": "Removes up to {value} buffs from the target, starting from the oldest.",
+    "description": "Removes up to {value_flat} buffs from the target, starting from the oldest.",
+    "description_flat": "Removes up to {value_flat} buffs from the target, starting from the oldest.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -165,7 +165,7 @@ CORRUPT = {
 DOOM = {
     "name": "DOOM",
     "description": "Kills the target after {duration} turns.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": "DOOMED",
@@ -182,8 +182,8 @@ DOOM = {
 
 DRAIN = {
     "name": "DRAIN",
-    "description": "Deals {value} damage. Any dealt damage restores {hp}.",
-    "description_absolute": "Deals {value} damage. Any dealt damage restores {hp}.",
+    "description": "Deals {value_flat} damage. Any dealt damage restores {hp}.",
+    "description_flat": "Deals {value_flat} damage. Any dealt damage restores {hp}.",
     "description_percent": None,
     "description_both": None,
     "action": "DRAINED",
@@ -201,9 +201,9 @@ DRAIN = {
 EXECUTE = {
     "name": "EXECUTE",
     "description": "Kills the target if their {hp} is less than or equal to {value_percent}% of {max_hp}.",
-    "description_absolute": "Kills the target if their {hp} is less than or equal to {value}.",
+    "description_flat": "Kills the target if their {hp} is less than or equal to {value_flat}.",
     "description_percent": "Kills the target if their {hp} is less than or equal to {value_percent}% of {max_hp}.",
-    "description_both": "Kills the target if their {hp} is less than or equal to {value} or {value_percent}% of {max_hp}, whichever is higher.",
+    "description_both": "Kills the target if their {hp} is less than or equal to {value_flat} or {value_percent}% of {max_hp}, whichever is higher.",
     "action": "EXECUTED",
     "activation": None,
     "countdown": None,
@@ -219,7 +219,7 @@ EXECUTE = {
 FOCUS = {
     "name": "FOCUS",
     "description": "Increases the accuracy of dice and skills of the target by {value_percent}%.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": "Increases the accuracy of dice and skills of the target by {value_percent}%.",
     "description_both": None,
     "action": None,
@@ -236,8 +236,8 @@ FOCUS = {
 
 FORTIFY = {
     "name": "FORTIFY",
-    "description": "Increases damage reduction from defensive effects by {value}.",
-    "description_absolute": "Increases damage reduction from defensive effects by {value}.",
+    "description": "Increases damage reduction from defensive effects by {value_flat}.",
+    "description_flat": "Increases damage reduction from defensive effects by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "FORTIFY",
@@ -254,8 +254,8 @@ FORTIFY = {
 
 FRAGILE = {
     "name": "FRAGILE",
-    "description": "Decreases damage reduction from defensive effects by {value}.",
-    "description_absolute": "Decreases damage reduction from defensive effects by {value}.",
+    "description": "Decreases damage reduction from defensive effects by {value_flat}.",
+    "description_flat": "Decreases damage reduction from defensive effects by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "FRAGILIZED",
@@ -273,7 +273,7 @@ FRAGILE = {
 FREEZE = {
     "name": "FREEZE",
     "description": "Makes target unable to act. Removes {burn}.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -290,8 +290,8 @@ FREEZE = {
 
 FROSTBURN = {
     "name": "FROSTBURN",
-    "description": "Deals {value} damage every turn start.",
-    "description_absolute": "Deals {value} damage every turn start.",
+    "description": "Deals {value_flat} damage every turn start.",
+    "description_flat": "Deals {value_flat} damage every turn start.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -308,8 +308,8 @@ FROSTBURN = {
 
 HASTE = {
     "name": "HASTE",
-    "description": "Increases the target {speed} by {value}.",
-    "description_absolute": "Increases the target {speed} by {value}.",
+    "description": "Increases the target {speed} by {value_flat}.",
+    "description_flat": "Increases the target {speed} by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "HASTEN",
@@ -327,9 +327,9 @@ HASTE = {
 HEAL = {
     "name": "HEAL",
     "description": "Restores {hp}.",
-    "description_absolute": "Restores {value} {hp}.",
+    "description_flat": "Restores {value_flat} {hp}.",
     "description_percent": "Restores {hp} by {value_percent}% of {max_hp}.",
-    "description_both": "Restores {hp} by {value} + {value_percent}% of {max_hp}.",
+    "description_both": "Restores {hp} by {value_flat} + {value_percent}% of {max_hp}.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -345,7 +345,7 @@ HEAL = {
 IMMUNITY = {
     "name": "IMMUNITY",
     "description": "Makes target immune to other effects. Any effects the target is under will still continue to be applied.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -363,7 +363,7 @@ IMMUNITY = {
 INVISIBLE = {
     "name": "INVISIBLE",
     "description": "Makes the target untargetable by enemies.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -381,7 +381,7 @@ INVISIBLE = {
 INVULNERABLE = {
     "name": "INVULNERABLE",
     "description": "Negates any damage that would be done to the target.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -398,12 +398,12 @@ INVULNERABLE = {
 
 MANA_REGEN = {
     "name": "MANA REGEN",
-    "description": "Increases {mana} by {value} every turn start.",
-    "description_absolute": "Increases {mana} by {value} every turn start.",
+    "description": "Increases {mana} by {value_flat} every turn start.",
+    "description_flat": "Increases {mana} by {value_flat} every turn start.",
     "description_percent": None,
     "description_both": None,
     "action": None,
-    "activation": "{target} restored {value} {mana} of themselves through {keyword}.",
+    "activation": "{target} restored {value_flat} {mana} of themselves through {keyword}.",
     "countdown": None,
     "execution": None,
     "execution_self": None,
@@ -416,15 +416,15 @@ MANA_REGEN = {
 
 MANA = {
     "name": "MANA",
-    "description": "Increases {mana} by {value}.",
-    "description_absolute": "Increases {mana} by {value}.",
+    "description": "Increases {mana} by {value_flat}.",
+    "description_flat": "Increases {mana} by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": None,
     "activation": None,
     "countdown": None,
-    "execution": "{source} restored {value} {mana} of {target} through {keyword}.",
-    "execution_self": "{source} restored {value} {mana} of themselves through {keyword}.",
+    "execution": "{source} restored {value_flat} {mana} of {target} through {keyword}.",
+    "execution_self": "{source} restored {value_flat} {mana} of themselves through {keyword}.",
     "execution_fail": None,
     "execution_fail_self": None,
     "fail": None,
@@ -435,7 +435,7 @@ MANA = {
 NOTHING = {
     "name": "NOTHING",
     "description": "Does nothing.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -452,8 +452,8 @@ NOTHING = {
 
 OIL = {
     "name": "OIL",
-    "description": "Reduces the target {speed} and increases damage dealt by {burn} by {value}.",
-    "description_absolute": "Reduces the target {speed} and increases damage dealt by {burn} by {value}.",
+    "description": "Reduces the target {speed} and increases damage dealt by {burn} by {value_flat}.",
+    "description_flat": "Reduces the target {speed} and increases damage dealt by {burn} by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -470,15 +470,15 @@ OIL = {
 
 PAIN = {
     "name": "PAIN",
-    "description": "Deals {value} damage to self. Ignores defensive effects.",
-    "description_absolute": "Deals {value} damage to self. Ignores defensive effects.",
+    "description": "Deals {value_flat} damage to self. Ignores defensive effects.",
+    "description_flat": "Deals {value_flat} damage to self. Ignores defensive effects.",
     "description_percent": None,
     "description_both": None,
     "action": None,
     "activation": None,
     "countdown": None,
-    "execution": "{source} inflicted {value} damage to {target} through {keyword}.",
-    "execution_self": "{source} inflicted {value} damage to themselves through {keyword}.",
+    "execution": "{source} inflicted {value_flat} damage to {target} through {keyword}.",
+    "execution_self": "{source} inflicted {value_flat} damage to themselves through {keyword}.",
     "execution_fail": "{source} would cause {keyword} on {target}, but",
     "execution_fail_self": "{source} would feel {keyword}, but",
     "fail": None,
@@ -488,8 +488,8 @@ PAIN = {
 
 PIERCE = {
     "name": "PIERCE",
-    "description": "Deals {value} damage. Ignores {absorb}, {block} and {sacred_block}.",
-    "description_absolute": "Deals {value} damage. Ignores {absorb}, {block} and {sacred_block}.",
+    "description": "Deals {value_flat} damage. Ignores {absorb}, {block} and {sacred_block}.",
+    "description_flat": "Deals {value_flat} damage. Ignores {absorb}, {block} and {sacred_block}.",
     "description_percent": None,
     "description_both": None,
     "action": "PIERCED",
@@ -506,8 +506,8 @@ PIERCE = {
 
 POISON = {
     "name": "POISON",
-    "description": "Deals {value} damage every turn start.",
-    "description_absolute": "Deals {value} damage every turn start.",
+    "description": "Deals {value_flat} damage every turn start.",
+    "description_flat": "Deals {value_flat} damage every turn start.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -525,11 +525,11 @@ POISON = {
 REGEN = {
     "name": "REGEN",
     "description": "Restores {hp} every turn start.",
-    "description_absolute": "Restores {value} {hp} every turn start.",
+    "description_flat": "Restores {value_flat} {hp} every turn start.",
     "description_percent": "Restores {hp} by {value_percent}% of {max_hp} every turn start.",
-    "description_both": "Restores {hp} by {value} + {value_percent}% of {max_hp} every turn start.",
+    "description_both": "Restores {hp} by {value_flat} + {value_percent}% of {max_hp} every turn start.",
     "action": None,
-    "activation": "{target} restored {value} {hp} of themselves through {keyword}.",
+    "activation": "{target} restored {value_flat} {hp} of themselves through {keyword}.",
     "countdown": None,
     "execution": None,
     "execution_self": None,
@@ -543,7 +543,7 @@ REGEN = {
 REPEL = {
     "name": "REPEL",
     "description": "Decreases the pririority of the target for enemies.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": "REPELLED",
@@ -561,9 +561,9 @@ REPEL = {
 REVIVE = {
     "name": "REVIVE",
     "description": "If the target is dead, revives them and restores their {hp}.",
-    "description_absolute": "If the target is dead, revives them and restores {value} {hp}.",
+    "description_flat": "If the target is dead, revives them and restores {value_flat} {hp}.",
     "description_percent": "If the target is dead, revives them and restores their {hp} by {value_percent}% of their {max_hp}.",
-    "description_both": "If the target is dead, revives them and restores their {hp} by {value} + {value_percent}% of their {max_hp}.",
+    "description_both": "If the target is dead, revives them and restores their {hp} by {value_flat} + {value_percent}% of their {max_hp}.",
     "action": "REVIVED",
     "activation": None,
     "countdown": None,
@@ -578,8 +578,8 @@ REVIVE = {
 
 SACRED_BLOCK = {
     "name": "SACRED BLOCK",
-    "description": "Reduces all recieved direct damage up to {value} times.",
-    "description_absolute": "Reduces all recieved direct damage up to {value} times.",
+    "description": "Reduces all recieved direct damage up to {value_flat} times.",
+    "description_flat": "Reduces all recieved direct damage up to {value_flat} times.",
     "description_percent": None,
     "description_both": None,
     "action": "SACRED BLOCKED",
@@ -597,7 +597,7 @@ SACRED_BLOCK = {
 SLEEP = {
     "name": "SLEEP",
     "description": "Makes target unable to act. Any direct damage will wake up the target.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -614,8 +614,8 @@ SLEEP = {
 
 SLOW = {
     "name": "SLOW",
-    "description": "Reduces the target {speed} by {value}.",
-    "description_absolute": "Reduces the target {speed} by {value}.",
+    "description": "Reduces the target {speed} by {value_flat}.",
+    "description_flat": "Reduces the target {speed} by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "SLOWED",
@@ -632,8 +632,8 @@ SLOW = {
 
 STRENGTH = {
     "name": "STRENGTH",
-    "description": "Increases damage dealt by offensive effects by {value}.",
-    "description_absolute": "Increases damage dealt by offensive effects by {value}.",
+    "description": "Increases damage dealt by offensive effects by {value_flat}.",
+    "description_flat": "Increases damage dealt by offensive effects by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "STRENGTHEN",
@@ -651,7 +651,7 @@ STRENGTH = {
 STUN = {
     "name": "STUN",
     "description": "Makes target unable to act.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -669,7 +669,7 @@ STUN = {
 TAUNT = {
     "name": "TAUNT",
     "description": "Increases the pririority of the target for enemies.",
-    "description_absolute": None,
+    "description_flat": None,
     "description_percent": None,
     "description_both": None,
     "action": "TAUNTED",
@@ -686,8 +686,8 @@ TAUNT = {
 
 THORNS = {
     "name": "THORNS",
-    "description": "When attacked directly, deals {value} damage to the attacker.",
-    "description_absolute": "When attacked directly, deals {value} damage to the attacker.",
+    "description": "When attacked directly, deals {value_flat} damage to the attacker.",
+    "description_flat": "When attacked directly, deals {value_flat} damage to the attacker.",
     "description_percent": None,
     "description_both": None,
     "action": None,
@@ -704,8 +704,8 @@ THORNS = {
 
 WEAK = {
     "name": "WEAK",
-    "description": "Reduces damage dealt by offensive effects by {value}.",
-    "description_absolute": "Reduces damage dealt by offensive effects by {value}.",
+    "description": "Reduces damage dealt by offensive effects by {value_flat}.",
+    "description_flat": "Reduces damage dealt by offensive effects by {value_flat}.",
     "description_percent": None,
     "description_both": None,
     "action": "WEAKEN",

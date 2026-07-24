@@ -173,14 +173,14 @@ class EffectManager(Manager):
             # Blind check
             blinded = source.get_effect(Keyword.BLIND)
 
-            if blinded and source != target:
-                accuracy -= blinded.value.percent
+            if blinded and blinded.get_effective_value() and source != target:
+                accuracy -= blinded.get_effective_value()
 
             # Focus check
             focusing = source.get_effect(Keyword.FOCUS)
 
-            if focusing:
-                accuracy += focusing.value.percent
+            if focusing and focusing.get_effective_value() and focusing.value.percent:
+                accuracy += focusing.get_effective_value()
 
             # Effect miss
             if random() >= accuracy:
@@ -209,12 +209,21 @@ class EffectManager(Manager):
                 )
                 break
 
+        effect_data = None
+
         # Persistent effects
         if effect.persistent:
-            effect_data = target.apply_effect(
-                effect,
-                source=source,
-            )
+            if (
+                effect.value is not None
+                and effect.get_effective_value(source, target) == 0
+            ):
+                pass
+
+            else:
+                effect_data = target.apply_effect(
+                    effect,
+                    source=source,
+                )
 
         # Instant effects
         else:
@@ -223,32 +232,34 @@ class EffectManager(Manager):
                 target=target,
             )
 
-        # Log effect execution
-        if effect_data.get("fail") is None:
-            self.logger.log_effect_execution(
-                effect=effect,
-                source=source,
-                target=target,
-                **effect_data,
-            )
-        # Log failed effect execution
-        else:
-            self.logger.log_effect_execution_fail(
-                effect=effect,
-                source=source,
-                target=target,
-                **effect_data,
-            )
-
-        # Log effect removals
-        if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:
-            for removed_effect in effect_data.get("removed_effects", []):
-                self.logger.log_effect_removal(
+        if effect_data is not None:
+            # Log effect execution
+            if effect_data.get("fail") is None:
+                self.logger.log_effect_execution(
                     effect=effect,
                     source=source,
                     target=target,
-                    removed_effect=removed_effect,
+                    **effect_data,
                 )
+
+            # Log failed effect execution
+            else:
+                self.logger.log_effect_execution_fail(
+                    effect=effect,
+                    source=source,
+                    target=target,
+                    **effect_data,
+                )
+
+            # Log effect removals
+            if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:
+                for removed_effect in effect_data.get("removed_effects", []):
+                    self.logger.log_effect_removal(
+                        effect=effect,
+                        source=source,
+                        target=target,
+                        removed_effect=removed_effect,
+                    )
 
         # Procesing effects after effect execution
         for effect_type, trigger in [

@@ -3,6 +3,7 @@
 from src.base.dice import Dice
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.poison import PoisonEffect
@@ -16,21 +17,29 @@ class Venenobra(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([PoisonEffect(1, duration=3)]),
-                Side([PoisonEffect(2, duration=3)]),
-                Side([AttackEffect(1), PoisonEffect(1, duration=3)]),
-                Side([AttackEffect(1), PoisonEffect(2, duration=3)]),
-                Side([AttackEffect(2), PoisonEffect(1, duration=3)]),
-                Side([AttackEffect(2), PoisonEffect(2, duration=3)]),
+                Side([PoisonEffect(Stat(flat=1), duration=3)]),
+                Side([PoisonEffect(Stat(flat=2), duration=3)]),
+                Side(
+                    [AttackEffect(Stat(flat=1)), PoisonEffect(Stat(flat=1), duration=3)]
+                ),
+                Side(
+                    [AttackEffect(Stat(flat=1)), PoisonEffect(Stat(flat=2), duration=3)]
+                ),
+                Side(
+                    [AttackEffect(Stat(flat=2)), PoisonEffect(Stat(flat=1), duration=3)]
+                ),
+                Side(
+                    [AttackEffect(Stat(flat=2)), PoisonEffect(Stat(flat=2), duration=3)]
+                ),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([BlockEffect(1)]),
-                Side([BlockEffect(1)]),
-                Side([BlockEffect(2)]),
-                Side([BlockEffect(2)]),
+                Side([BlockEffect(Stat(flat=1))]),
+                Side([BlockEffect(Stat(flat=1))]),
+                Side([BlockEffect(Stat(flat=2))]),
+                Side([BlockEffect(Stat(flat=2))]),
             ]
         )
 

@@ -30,8 +30,8 @@ DEBUFF = {
 DEFENSIVE = {
     "name": "DEFENSIVE",
     "activation": None,
-    "execution": "{source} protected {target}. {target} recieved {value} {keyword}.",
-    "execution_self": "{source} protected themselves and recieved {value} {keyword}.",
+    "execution": "{source} protected {target}. {target} recieved {effective_value} {keyword}.",
+    "execution_self": "{source} protected themselves and recieved {effective_value} {keyword}.",
     "execution_fail": "{source} tried to protect {target} with {keyword}, but",
     "execution_fail_self": "{source} tried to protect themselves with {keyword}, but",
 }

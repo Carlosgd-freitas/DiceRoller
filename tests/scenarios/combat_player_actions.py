@@ -7,6 +7,7 @@ from colorama import init
 from src.base.dice import Dice
 from src.base.monster import ControlType, Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.base.team import Team
 from src.combat.manager import CombatManager
 from src.effects.attack import AttackEffect
@@ -31,43 +32,43 @@ init()
 
 offensive_dice = Dice(
     sides=[
-        Side(effects=[AttackEffect(1)]),
-        Side(effects=[AttackEffect(100)]),
+        Side(effects=[AttackEffect(Stat(flat=1))]),
+        Side(effects=[AttackEffect(Stat(flat=100))]),
     ]
 )
 
 defensive_dice = Dice(
     sides=[
-        Side(effects=[BlockEffect(1)]),
-        Side(effects=[BlockEffect(100)]),
+        Side(effects=[BlockEffect(Stat(flat=1))]),
+        Side(effects=[BlockEffect(Stat(flat=100))]),
     ]
 )
 
 restoration_dice = Dice(
     sides=[
-        Side(effects=[HealEffect(1)]),
-        Side(effects=[HealEffect(100)]),
+        Side(effects=[HealEffect(Stat(flat=1))]),
+        Side(effects=[HealEffect(Stat(flat=100))]),
     ]
 )
 
 deterioration_dice = Dice(
     sides=[
-        Side(effects=[ExecuteEffect(value_percent=0.01)]),
-        Side(effects=[ExecuteEffect(value_percent=1)]),
+        Side(effects=[ExecuteEffect(Stat(percent=0.01))]),
+        Side(effects=[ExecuteEffect(Stat(percent=1))]),
     ]
 )
 
 buff_dice = Dice(
     sides=[
-        Side(effects=[StrengthEffect(1)]),
-        Side(effects=[StrengthEffect(100)]),
+        Side(effects=[StrengthEffect(Stat(flat=1))]),
+        Side(effects=[StrengthEffect(Stat(flat=100))]),
     ]
 )
 
 debuff_dice = Dice(
     sides=[
-        Side(effects=[WeakEffect(1)]),
-        Side(effects=[WeakEffect(100)]),
+        Side(effects=[WeakEffect(Stat(flat=1))]),
+        Side(effects=[WeakEffect(Stat(flat=100))]),
     ]
 )
 
@@ -79,15 +80,15 @@ nothing_dice = Dice(
 
 curse_dice = Dice(
     sides=[
-        Side(effects=[PainEffect(1)]),
-        Side(effects=[PainEffect(100)]),
+        Side(effects=[PainEffect(Stat(flat=1))]),
+        Side(effects=[PainEffect(Stat(flat=100))]),
     ]
 )
 
 revive_dice = Dice(
     sides=[
-        Side(effects=[ReviveEffect(value_percent=0.01)]),
-        Side(effects=[ReviveEffect(value_percent=1)]),
+        Side(effects=[ReviveEffect(Stat(percent=0.01))]),
+        Side(effects=[ReviveEffect(Stat(percent=1))]),
     ]
 )
 
@@ -131,7 +132,7 @@ alive_monster = Monster(
 )
 
 taunting_monster = deepcopy(alive_monster)
-taunting_monster.effects = [ConfuseEffect(value_percent=1, duration=99)]
+taunting_monster.effects = [ConfuseEffect(Stat(percent=1), duration=99)]
 
 invisible_monster = deepcopy(alive_monster)
 invisible_monster.effects = [InvisibleEffect(duration=99)]

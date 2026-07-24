@@ -71,7 +71,12 @@ class SelectorManager:
 
         # Confuse check
         confused = source.get_effect(Keyword.CONFUSE)
-        if confused and random() < confused.value_percent:
+        if (
+            confused
+            and confused.value
+            and confused.value.percent
+            and random() < confused.value.percent
+        ):
             selector = RandomSelector()
 
         # Specific Keywords

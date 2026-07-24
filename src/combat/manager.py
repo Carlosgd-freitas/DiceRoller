@@ -565,7 +565,7 @@ class CombatManager(Manager):
             target=self.current_monster,
         )
 
-        # Decaying and removing effects
+        # Applying delta and removing effects
         to_remove = []
         removed_effects = []
 

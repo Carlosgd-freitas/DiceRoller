@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
+from src.base.stat import Stat
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
@@ -22,7 +23,7 @@ def test_calculate_damage_no_consider(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
+    attack_effect = AttackEffect(Stat(flat=6))
 
     damage_data = calculate_damage(
         attack_effect,
@@ -43,7 +44,7 @@ def test_calculate_damage_over(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    effect = AttackEffect(300)
+    effect = AttackEffect(Stat(flat=300))
 
     damage_data = calculate_damage(
         effect,
@@ -64,8 +65,8 @@ def test_calculate_damage_block(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
-    block_effect = BlockEffect(1)
+    attack_effect = AttackEffect(Stat(flat=6))
+    block_effect = BlockEffect(Stat(flat=1))
 
     effect_manager.execute_effect(
         block_effect,
@@ -95,8 +96,8 @@ def test_calculate_damage_absorb(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
-    absorb_effect = AbsorbEffect(2)
+    attack_effect = AttackEffect(Stat(flat=6))
+    absorb_effect = AbsorbEffect(Stat(flat=2))
 
     effect_manager.execute_effect(
         absorb_effect,
@@ -126,8 +127,8 @@ def test_calculate_damage_sacred_block(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
-    sacred_block_effect = SacredBlockEffect(1)
+    attack_effect = AttackEffect(Stat(flat=6))
+    sacred_block_effect = SacredBlockEffect(Stat(flat=1))
 
     effect_manager.execute_effect(
         sacred_block_effect,
@@ -157,8 +158,8 @@ def test_calculate_damage_invulnerable(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
-    invulnerable_effect = InvulnerableEffect(1)
+    attack_effect = AttackEffect(Stat(flat=6))
+    invulnerable_effect = InvulnerableEffect(Stat(flat=1))
 
     effect_manager.execute_effect(
         invulnerable_effect,
@@ -188,9 +189,9 @@ def test_calculate_damage_multiple(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_4: Monster = combat["monsters"][4]
 
-    attack_effect = AttackEffect(6)
-    block_effect = BlockEffect(1)
-    absorb_effect = AbsorbEffect(2)
+    attack_effect = AttackEffect(Stat(flat=6))
+    block_effect = BlockEffect(Stat(flat=1))
+    absorb_effect = AbsorbEffect(Stat(flat=2))
 
     effect_manager.execute_effect(
         block_effect,

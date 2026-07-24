@@ -3,6 +3,7 @@
 from src.base.dice import Dice
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.pierce import PierceEffect
@@ -16,25 +17,25 @@ class Tortuga(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([AttackEffect(1)]),
-                Side([AttackEffect(1)]),
-                Side([AttackEffect(2)]),
-                Side([AttackEffect(2)]),
-                Side([AttackEffect(2)]),
-                Side([PierceEffect(4)]),
+                Side([AttackEffect(Stat(flat=1))]),
+                Side([AttackEffect(Stat(flat=1))]),
+                Side([AttackEffect(Stat(flat=2))]),
+                Side([AttackEffect(Stat(flat=2))]),
+                Side([AttackEffect(Stat(flat=2))]),
+                Side([PierceEffect(Stat(flat=4))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([BlockEffect(1)]),
-                Side([BlockEffect(2)]),
-                Side([BlockEffect(3)]),
-                Side([BlockEffect(4)]),
-                Side([BlockEffect(5)]),
-                Side([BlockEffect(6)]),
-                Side([BlockEffect(7)]),
-                Side([BlockEffect(8)]),
+                Side([BlockEffect(Stat(flat=1))]),
+                Side([BlockEffect(Stat(flat=2))]),
+                Side([BlockEffect(Stat(flat=3))]),
+                Side([BlockEffect(Stat(flat=4))]),
+                Side([BlockEffect(Stat(flat=5))]),
+                Side([BlockEffect(Stat(flat=6))]),
+                Side([BlockEffect(Stat(flat=7))]),
+                Side([BlockEffect(Stat(flat=8))]),
             ]
         )
 

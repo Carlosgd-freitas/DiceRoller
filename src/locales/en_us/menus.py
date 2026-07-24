@@ -97,6 +97,15 @@ EDIT_EFFECT = {
     "randomize_effect": "Randomize Effect",
 }
 
+EDIT_STAT = {
+    "title": "Edit Stat",
+    "edit_flat": "Edit Flat Value",
+    "edit_flat_prompt": "Type a new flat value",
+    "edit_percent": "Edit Percent Value",
+    "edit_percent_prompt": "Type a new percent value",
+    "randomize_stat": "Randomize Stat",
+}
+
 SORT = {
     "reverse": "reverse",
 }

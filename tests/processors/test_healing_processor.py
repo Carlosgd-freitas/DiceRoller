@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict
 
+from src.base.stat import Stat
 from src.effects.heal import HealEffect
 from src.processors.healing import calculate_healing
 from tests.utils import assert_conditions
@@ -16,7 +17,7 @@ def test_calculate_healing_absolute(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_1: Monster = combat["monsters"][1]
 
-    effect = HealEffect(9)
+    effect = HealEffect(Stat(flat=9))
 
     healed = calculate_healing(
         effect,
@@ -39,7 +40,7 @@ def test_calculate_healing_percent(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_1: Monster = combat["monsters"][1]
 
-    effect = HealEffect(value_percent=0.25)
+    effect = HealEffect(Stat(percent=0.25))
 
     healed = calculate_healing(
         effect,
@@ -62,7 +63,7 @@ def test_calculate_healing_both(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_1: Monster = combat["monsters"][1]
 
-    effect = HealEffect(20, value_percent=0.25)
+    effect = HealEffect(Stat(flat=20, percent=0.25))
 
     healed = calculate_healing(
         effect,
@@ -85,7 +86,7 @@ def test_calculate_healing_over(combat: Dict):
     monster_0: Monster = combat["monsters"][0]
     monster_1: Monster = combat["monsters"][1]
 
-    effect = HealEffect(80, value_percent=1)
+    effect = HealEffect(Stat(flat=80, percent=1))
 
     healed = calculate_healing(
         effect,

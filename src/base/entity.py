@@ -295,8 +295,8 @@ class Entity:
 
         for keyword in [Keyword.ABSORB, Keyword.BLOCK]:
             effect = self.get_effect(keyword)
-            if effect:
-                effective_hp += effect.value
+            if effect and effect.value.flat:
+                effective_hp += effect.value.flat
 
         return effective_hp
 
@@ -308,18 +308,34 @@ class Entity:
         :rtype: int
         """
         effective_speed = self.speed
+        positive = 0
+        negative = 0
 
+        # Haste
         haste = self.get_effect(Keyword.HASTE)
-        if haste:
-            effective_speed += haste.value
+        if haste and haste.value:
+            if haste.value.flat:
+                positive += haste.value.flat
+            if haste.value.percent:
+                positive += effective_speed * haste.value.percent
 
+        # Oil
         oil = self.get_effect(Keyword.OIL)
-        if oil:
-            effective_speed -= oil.value
+        if oil and oil.value:
+            if oil.value.flat:
+                negative += oil.value.flat
+            if oil.value.percent:
+                negative += effective_speed * oil.value.percent
 
+        # Slow
         slow = self.get_effect(Keyword.SLOW)
-        if slow:
-            effective_speed -= slow.value
+        if slow and slow.value:
+            if slow.value.flat:
+                negative += slow.value.flat
+            if slow.value.percent:
+                negative += effective_speed * slow.value.percent
+
+        effective_speed += positive - negative
 
         return effective_speed
 

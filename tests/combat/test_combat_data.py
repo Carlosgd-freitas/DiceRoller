@@ -3,7 +3,6 @@
 from copy import deepcopy
 
 from src.base.dice import Dice
-from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
 from src.base.team import Team
@@ -13,50 +12,26 @@ from tests.utils import assert_conditions
 
 
 def test_combat_data_is_equivalent():
-    effect_0 = AttackEffect()
-    effect_1 = AttackEffect(
-        value=10,
-        value_percent=11,
-        duration=12,
-        decay=13,
-        accuracy=0.14,
-        removable=False,
-        target_keywords=[Keyword.BURN],
-    )
+    effect = AttackEffect()
+    side = Side(effects=[effect])
+    dice = Dice(sides=[side])
 
-    side_0 = Side(effects=[effect_0])
-    side_1 = Side(effects=[effect_1])
-
-    dice_0 = Dice(sides=[side_0])
-    dice_1 = Dice(sides=[side_1])
-
-    monster_0 = Monster(
+    monster = Monster(
         global_id="ID_0",
         hp=1,
         max_hp=2,
-        dice=[dice_0],
+        dice=[dice],
     )
 
-    monster_1 = Monster(
-        global_id="ID_1",
-        hp=1,
-        max_hp=2,
-        dice=[dice_1],
+    team = Team(
+        members=[monster],
     )
 
-    team_0 = Team(
-        members=[monster_0],
-    )
+    combat_data_0: CombatData = {"teams": [deepcopy(team)]}
 
-    team_1 = Team(
-        members=[monster_1],
-    )
+    combat_data_1: CombatData = {"teams": [deepcopy(team)]}
 
-    combat_data_0: CombatData = {"teams": [deepcopy(team_0)]}
-
-    combat_data_1: CombatData = {"teams": [deepcopy(team_0)]}
-
-    combat_data_2: CombatData = {"teams": [deepcopy(team_1)]}
+    combat_data_2: CombatData = {"teams": [deepcopy(team), deepcopy(team)]}
 
     conditions = [
         are_combat_data_equivalent(combat_data_0, combat_data_0) is True,

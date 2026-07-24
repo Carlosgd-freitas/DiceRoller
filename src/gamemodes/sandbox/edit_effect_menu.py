@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, TypeVar
+from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect
+from src.gamemodes.sandbox.edit_stat_menu import EditStatMenu
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
 from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
-
-T = TypeVar("T")
 
 
 class EditEffectMenu(EditMenu):
@@ -50,6 +49,12 @@ class EditEffectMenu(EditMenu):
         )
         self.editing: Effect = None
 
+        self.edit_stat_menu = EditStatMenu(
+            settings,
+            logging=logging,
+            randomizer=randomizer,
+        )
+
     def get_options(self) -> List[Option]:
         """
         Returns the options that will be used by the Menu.
@@ -77,17 +82,26 @@ class EditEffectMenu(EditMenu):
                 ),
             ),
             Option(
-                id="EDIT_VALUE_PERCENT",
+                id="EDIT_MIN_VALUE",
                 key="3",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_value_percent",
+                    key="edit_min_value",
+                ),
+            ),
+            Option(
+                id="EDIT_MAX_VALUE",
+                key="4",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="edit_max_value",
                 ),
             ),
             Option(
                 id="EDIT_DURATION",
-                key="4",
+                key="5",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -95,17 +109,17 @@ class EditEffectMenu(EditMenu):
                 ),
             ),
             Option(
-                id="EDIT_DECAY",
-                key="5",
+                id="EDIT_DELTA",
+                key="6",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_decay",
+                    key="edit_delta",
                 ),
             ),
             Option(
                 id="EDIT_ACCURACY",
-                key="6",
+                key="7",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -114,7 +128,7 @@ class EditEffectMenu(EditMenu):
             ),
             Option(
                 id="EDIT_REMOVABLE",
-                key="7",
+                key="8",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -123,7 +137,7 @@ class EditEffectMenu(EditMenu):
             ),
             Option(
                 id="ADD_TARGET_KEYWORD",
-                key="8",
+                key="9",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -132,7 +146,7 @@ class EditEffectMenu(EditMenu):
             ),
             Option(
                 id="REMOVE_TARGET_KEYWORD",
-                key="9",
+                key="10",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -201,11 +215,35 @@ class EditEffectMenu(EditMenu):
         """
         Returns if the option can be selected or not.
         """
-        ## Discuir com o GPT: Efeitos possuem apenas alguns atributos, e esses podem ser editados.
-        ## Ex.: Heal pode ter value/value_percentage; Attack apenas value; etc.
+        if option.id == "EDIT_VALUE":
+            return self.editing.value is not None
 
-        if option.id in ["REMOVE_TARGET_KEYWORD"]:
-            return len(self.editing.target_keywords) > 0
+        elif option.id == "EDIT_MIN_VALUE":
+            return self.editing.min_value is not None
+
+        elif option.id == "EDIT_MAX_VALUE":
+            return self.editing.max_value is not None
+
+        elif option.id == "EDIT_DURATION":
+            return self.editing.duration is not None
+
+        elif option.id == "EDIT_DELTA":
+            return self.editing.delta is not None
+
+        elif option.id == "EDIT_ACCURACY":
+            return self.editing.accuracy is not None
+
+        elif option.id == "EDIT_REMOVABLE":
+            return self.editing.removable is not None
+
+        elif option.id == "ADD_TARGET_KEYWORD":
+            return self.editing.target_keywords is not None
+
+        elif option.id == "REMOVE_TARGET_KEYWORD":
+            return (
+                self.editing.target_keywords is not None
+                and len(self.editing.target_keywords) > 0
+            )
 
         return True
 
@@ -220,19 +258,22 @@ class EditEffectMenu(EditMenu):
             pass
 
         elif option.id == "EDIT_VALUE":
-            self.edit_attribute("value", int)
+            self.edit_stat_menu.open(self.editing.value)
 
-        elif option.id == "EDIT_VALUE_PERCENT":
-            self.edit_attribute("value_percent", float)
+        elif option.id == "EDIT_MIN_VALUE":
+            self.edit_stat_menu.open(self.editing.min_value)
+
+        elif option.id == "EDIT_MAX_VALUE":
+            self.edit_stat_menu.open(self.editing.max_value)
 
         elif option.id == "EDIT_DURATION":
             self.edit_attribute("duration", int)
 
-        elif option.id == "EDIT_DECAY":
-            self.edit_attribute("decay", int)
+        elif option.id == "EDIT_DELTA":
+            self.edit_stat_menu.open(self.editing.delta)
 
         elif option.id == "EDIT_ACCURACY":
-            self.edit_attribute("accuracy", int)
+            self.edit_attribute("accuracy", float)
 
         elif option.id == "EDIT_REMOVABLE":
             pass

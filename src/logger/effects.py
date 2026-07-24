@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from math import ceil, inf
 from typing import TYPE_CHECKING, Dict, List, Literal
 
 from src.base.color import Color, ColorData, color_string
@@ -10,14 +9,14 @@ from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
 from src.base.monster import Monster
 from src.base.text import numeric_to_string
-from src.logger.attributes import AttributeLogger
+from src.logger.stat import StatLogger
 
 if TYPE_CHECKING:
     from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
 
 
-class EffectLogger(AttributeLogger):
+class EffectLogger(StatLogger):
     """
     EffectLogger class.
     """
@@ -100,22 +99,89 @@ class EffectLogger(AttributeLogger):
                     key=key,
                 )
 
-        # Effect parameters
-        value_percent = effect.value_percent
-        if value_percent != inf:
-            value_percent = ceil(value_percent * 100)
+        # Value
+        value_flat = None
+        value_percent = None
 
+        if effect.value is not None:
+            if effect.value.flat is not None:
+                value_flat = numeric_to_string(effect.value.flat)
+
+            if effect.value.percent is not None:
+                value_percent = numeric_to_string(effect.value.percent * 100)
+
+        # Min Value
+        min_value_flat = None
+        min_value_percent = None
+
+        if effect.min_value is not None:
+            if effect.min_value.flat is not None:
+                min_value_flat = numeric_to_string(effect.min_value.flat)
+
+            if effect.min_value.percent is not None:
+                min_value_percent = numeric_to_string(effect.min_value.percent * 100)
+
+        # Max Value
+        max_value_flat = None
+        max_value_percent = None
+
+        if effect.max_value is not None:
+            if effect.max_value.flat is not None:
+                max_value_flat = numeric_to_string(effect.max_value.flat)
+
+            if effect.max_value.percent is not None:
+                max_value_percent = numeric_to_string(effect.max_value.percent * 100)
+
+        # Effective value
+        effective_value = effect.get_effective_value(source=None, target=None)
+        if effective_value is not None:
+            effective_value = str(effective_value)
+
+        # Delta
+        delta_flat = None
+        delta_percent = None
+
+        if effect.delta is not None:
+            if effect.delta.flat is not None:
+                delta_flat = numeric_to_string(effect.delta.flat)
+
+            if effect.delta.percent is not None:
+                delta_percent = numeric_to_string(effect.delta.percent * 100)
+
+        # Duration
+        duration = None
+        turns = None
+
+        if effect.duration is not None:
+            duration = numeric_to_string(effect.duration)
+            turns = self.pluralize(
+                effect.duration,
+                namespace="base",
+                message_group="LEXICON",
+                key="turn",
+            )
+
+        # Accuracy
+        accuracy = None
+
+        if effect.accuracy is not None:
+            accuracy = numeric_to_string(effect.accuracy * 100)
+
+        # Effect params
         params.update(
             {
-                "duration": numeric_to_string(effect.duration),
-                "turns": self.pluralize(
-                    effect.duration,
-                    namespace="base",
-                    message_group="LEXICON",
-                    key="turn",
-                ),
-                "value": numeric_to_string(effect.value),
-                "value_percent": numeric_to_string(value_percent),
+                "accuracy": accuracy,
+                "delta_flat": delta_flat,
+                "delta_percent": delta_percent,
+                "duration": duration,
+                "effective_value": effective_value,
+                "max_value_flat": max_value_flat,
+                "max_value_percent": max_value_percent,
+                "min_value_flat": min_value_flat,
+                "min_value_percent": min_value_percent,
+                "turns": turns,
+                "value_flat": value_flat,
+                "value_percent": value_percent,
             }
         )
 
@@ -181,13 +247,7 @@ class EffectLogger(AttributeLogger):
         )
 
         if effect and associated:
-            duration = numeric_to_string(effect.duration)
-            value = numeric_to_string(effect.value)
-
-            value_percent = effect.value_percent
-            if value_percent != inf:
-                value_percent = ceil(value_percent * 100)
-            value_percent = numeric_to_string(value_percent)
+            params = self._get_effect_params(effect)
 
             if (
                 effect.keyword
@@ -204,16 +264,20 @@ class EffectLogger(AttributeLogger):
                 ]
                 and effect.duration
             ):
-                message += color_string(f" {duration}", **color_data)
+                message += " " + color_string(params["duration"], **color_data)
 
-            elif effect.value and not effect.value_percent:
-                message += color_string(f" {value}", **color_data)
+            else:
+                values = []
 
-            elif not effect.value and effect.value_percent:
-                message += color_string(f" {value_percent}%", **color_data)
+                if params["value_flat"] is not None:
+                    values.append(color_string(params["value_flat"], **color_data))
 
-            elif effect.value and effect.value_percent:
-                message += color_string(f" {value} + {value_percent}%", **color_data)
+                elif params["value_percent"] is not None:
+                    values.append(
+                        color_string(params["value_percent"] + "%", **color_data)
+                    )
+
+                message += " " + color_string(" + ", **color_data).join(values)
 
             if effect.target_keywords:
                 keywords = self.get_multiple_effects_message(
@@ -370,7 +434,7 @@ class EffectLogger(AttributeLogger):
             )
 
         # Damage message
-        if kwargs.get("damage") and kwargs["damage"] > 0:
+        if kwargs.get("damage"):
             self.log(
                 namespace="combat",
                 message_group="COMBAT",
@@ -732,19 +796,24 @@ class EffectLogger(AttributeLogger):
         kwargs.update(self._get_effect_params(effect, **kwargs))
 
         if params == "name":
-            for word, key in [
-                ("accuracy", "accuracy"),
-                ("decay", "decay"),
-                ("duration", "duration"),
-                ("value", "value"),
-                ("value", "value_percent"),
+            for key in [
+                "accuracy",
+                "delta_flat",
+                "delta_percent",
+                "duration",
+                "max_value_flat",
+                "max_value_percent",
+                "min_value_flat",
+                "min_value_percent",
+                "value_flat",
+                "value_percent",
             ]:
                 translated_word = self.get_message(
-                    namespace="base", message_group="LEXICON", key=word
+                    namespace="base", message_group="LEXICON", key=key
                 )
 
                 kwargs[key] = color_string(
-                    f"<{translated_word.upper()}>",
+                    f"<{translated_word.title()}>",
                     foreground_color=Color.WHITE,
                     intensity="BRIGHT",
                 )
@@ -752,14 +821,22 @@ class EffectLogger(AttributeLogger):
             key = "description"
 
         else:
-            if not effect.value and not effect.value_percent:
-                key = "description"
-            elif effect.value and not effect.value_percent:
-                key = "description_absolute"
-            elif not effect.value and effect.value_percent:
-                key = "description_percent"
+            if effect.value is not None:
+                if (effect.value.flat is None) and effect.value.percent is not None:
+                    key = "description"
+                elif (
+                    effect.value.flat is not None
+                ) and effect.value.percent is not None:
+                    key = "description_flat"
+                elif (effect.value.flat is None) and not (
+                    effect.value.percent is not None
+                ):
+                    key = "description_percent"
+                else:
+                    key = "description_both"
+
             else:
-                key = "description_both"
+                key = "description"
 
         message = self.get_message(
             namespace="effects",

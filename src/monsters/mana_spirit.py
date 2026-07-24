@@ -3,6 +3,7 @@
 from src.base.dice import Dice
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.effects.block import BlockEffect
 from src.effects.cleanse import CleanseEffect
 from src.effects.heal import HealEffect
@@ -17,31 +18,31 @@ class ManaSpirit(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([ManaEffect(1)]),
-                Side([ManaEffect(1)]),
-                Side([ManaEffect(2)]),
-                Side([ManaEffect(2)]),
-                Side([ManaEffect(3)]),
+                Side([ManaEffect(Stat(flat=1))]),
+                Side([ManaEffect(Stat(flat=1))]),
+                Side([ManaEffect(Stat(flat=2))]),
+                Side([ManaEffect(Stat(flat=2))]),
+                Side([ManaEffect(Stat(flat=3))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([HealEffect(1)]),
-                Side([HealEffect(2)]),
-                Side([HealEffect(2)]),
-                Side([HealEffect(3)]),
-                Side([HealEffect(2), CleanseEffect(1)]),
+                Side([HealEffect(Stat(flat=1))]),
+                Side([HealEffect(Stat(flat=2))]),
+                Side([HealEffect(Stat(flat=2))]),
+                Side([HealEffect(Stat(flat=3))]),
+                Side([HealEffect(Stat(flat=2)), CleanseEffect(Stat(flat=1))]),
             ]
         )
 
         dice_2 = Dice(
             sides=[
-                Side([BlockEffect(1)]),
-                Side([BlockEffect(1)]),
-                Side([BlockEffect(2)]),
-                Side([BlockEffect(2)]),
-                Side([BlockEffect(3)]),
+                Side([BlockEffect(Stat(flat=1))]),
+                Side([BlockEffect(Stat(flat=1))]),
+                Side([BlockEffect(Stat(flat=2))]),
+                Side([BlockEffect(Stat(flat=2))]),
+                Side([BlockEffect(Stat(flat=3))]),
             ]
         )
 

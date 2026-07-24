@@ -511,7 +511,12 @@ class CombatPlayerActionsMenu(Menu):
                 )[:K]
 
             # Confuse target selecting
-            elif confused and random() < confused.value_percent:
+            elif (
+                confused
+                and confused.value
+                and confused.value.percent
+                and random() < confused.value.percent
+            ):
                 selector = RandomSelector()
 
                 selected_targets = selector.get_targets_hard(

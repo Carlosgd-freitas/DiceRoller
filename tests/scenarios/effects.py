@@ -10,6 +10,7 @@ from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
+from src.base.stat import Stat
 from src.base.team import Team
 from src.combat.manager import CombatManager
 from src.compendium.effects import get_all_effects
@@ -53,6 +54,17 @@ init()
 # ----------------------------
 
 all_effects = get_all_effects()
+
+for effect in all_effects:
+    if effect.value is not None:
+        if effect.value.flat is not None:
+            effect.value.flat = 1
+
+        if effect.value.percent is not None:
+            effect.value.percent = 1
+
+    if effect.duration is not None:
+        effect.duration = 2
 
 # ----------------------------
 
@@ -153,7 +165,7 @@ monster_b.hp = 150
 print("\n===== Effect Execution: Target missing =====")
 
 for effect in all_effects:
-    monster_a.effects = [BlindEffect(1)]
+    monster_a.effects = [BlindEffect(Stat(flat=1))]
 
     combat_manager.effect_manager.execute_effect(
         effect=effect,
@@ -170,17 +182,17 @@ print("\n===== Effect Execution: CLEANSE =====")
 effects = []
 for i in range(11):
     if i % 2 == 0:
-        effect = BlindEffect(value=1, duration=2)
+        effect = BlindEffect(Stat(flat=1), duration=2)
     else:
-        effect = BurnEffect(value=1, duration=2)
+        effect = BurnEffect(Stat(flat=1), duration=2)
     effects.append(effect)
 
 for effect in [
-    CleanseEffect(0),
-    CleanseEffect(1),
-    CleanseEffect(5),
-    CleanseEffect(6),
-    CleanseEffect(10),
+    CleanseEffect(Stat(flat=0)),
+    CleanseEffect(Stat(flat=1)),
+    CleanseEffect(Stat(flat=5)),
+    CleanseEffect(Stat(flat=6)),
+    CleanseEffect(Stat(flat=10)),
 ]:
     monster_a.effects = effects[:i]
 
@@ -199,17 +211,17 @@ print("\n===== Effect Execution: CORRUPT =====")
 effects = []
 for i in range(11):
     if i % 2 == 0:
-        effect = ManaRegenEffect(value=1, duration=2)
+        effect = ManaRegenEffect(Stat(flat=1), duration=2)
     else:
-        effect = RegenEffect(value=1, duration=2)
+        effect = RegenEffect(Stat(flat=1), duration=2)
     effects.append(effect)
 
 for effect in [
-    CorruptEffect(0),
-    CorruptEffect(1),
-    CorruptEffect(5),
-    CorruptEffect(6),
-    CorruptEffect(10),
+    CorruptEffect(Stat(flat=0)),
+    CorruptEffect(Stat(flat=1)),
+    CorruptEffect(Stat(flat=5)),
+    CorruptEffect(Stat(flat=6)),
+    CorruptEffect(Stat(flat=10)),
 ]:
     monster_a.effects = effects[:i]
 
@@ -245,7 +257,7 @@ print("\n===== Effect Execution: EXECUTE =====")
 monster_b.hp = 100
 
 combat_manager.effect_manager.execute_effect(
-    effect=ExecuteEffect(value_percent=0.5),
+    effect=ExecuteEffect(Stat(percent=0.5)),
     source=monster_a,
     target=monster_b,
 )
@@ -361,9 +373,9 @@ print("\n===== Effect Activation: Act Disabling =====")
 combat_manager.current_monster = monster_a
 
 for effect in [
-    FreezeEffect(1),
-    SleepEffect(1),
-    StunEffect(1),
+    FreezeEffect(Stat(flat=1)),
+    SleepEffect(Stat(flat=1)),
+    StunEffect(Stat(flat=1)),
 ]:
     monster_a.effects = [effect]
 
@@ -376,16 +388,16 @@ monster_a.effects = []
 print("\n===== Effect Activation: Being Attacked =====")
 
 for effect in [
-    AbsorbEffect(1),
-    BlockEffect(1),
+    AbsorbEffect(Stat(flat=1)),
+    BlockEffect(Stat(flat=1)),
     InvulnerableEffect(),
-    SacredBlockEffect(1),
-    ThornsEffect(1),
+    SacredBlockEffect(Stat(flat=1)),
+    ThornsEffect(Stat(flat=1)),
 ]:
     monster_b.effects = [effect]
 
     combat_manager.effect_manager.execute_effect(
-        AttackEffect(2),
+        AttackEffect(Stat(flat=2)),
         source=monster_a,
         target=monster_b,
     )
@@ -397,11 +409,11 @@ monster_b.effects = []
 print("\n===== Effect Activation: Dice Roll =====")
 
 combat_manager.current_monster.dice = [
-    Dice(sides=[Side(effects=[AttackEffect(1)])]),
+    Dice(sides=[Side(effects=[AttackEffect(Stat(flat=1))])]),
 ]
 
 for effect in [
-    BleedEffect(1),
+    BleedEffect(Stat(flat=1)),
 ]:
     combat_manager.current_monster.effects = []
     combat_manager.current_monster.apply_effect(effect)
@@ -418,11 +430,11 @@ print("\n===== Effect Activation: Turn Start =====")
 combat_manager.current_monster.effects = []
 
 for effect in [
-    BurnEffect(1),
-    FrostburnEffect(1),
-    ManaRegenEffect(1),
-    PoisonEffect(1),
-    RegenEffect(1),
+    BurnEffect(Stat(flat=1)),
+    FrostburnEffect(Stat(flat=1)),
+    ManaRegenEffect(Stat(flat=1)),
+    PoisonEffect(Stat(flat=1)),
+    RegenEffect(Stat(flat=1)),
 ]:
     combat_manager.current_monster.apply_effect(effect)
 
@@ -437,9 +449,9 @@ effects = []
 
 for i in range(10):
     if i % 2 == 0:
-        effect = RegenEffect(value=1, duration=2)
+        effect = RegenEffect(Stat(flat=1), duration=2)
     else:
-        effect = InvisibleEffect(value=1, duration=2)
+        effect = InvisibleEffect(Stat(flat=1), duration=2)
     effects.append(effect)
 
 for i in [0, 1, 2, 5, 6, 10]:
