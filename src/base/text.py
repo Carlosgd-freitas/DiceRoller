@@ -15,8 +15,10 @@ def numeric_to_string(value: float) -> str:
     if value is None:
         return None
 
-    if value != inf:
-        return str(value)
+    if isinstance(value, str):
+        return value
+    elif value != inf:
+        return f"{value:g}"
     else:
         return "∞"
 

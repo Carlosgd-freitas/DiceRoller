@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -32,8 +32,12 @@ class BurnEffect(Effect):
         accuracy: float = 1,
         removable: bool = True,
     ):
+        if value is None:
+            value = Stat(flat=0, percent=0)
         if min_value is None:
-            min_value = Stat(percent=0)
+            min_value = Stat(flat=0, percent=0)
+        if max_value is None:
+            max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
             keyword=Keyword.BURN,
@@ -100,24 +104,35 @@ class BurnEffect(Effect):
 
         return ceil(effective_value)
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if (not self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (not self.value.flat) and (self.value.percent):
+            return "description_percent"
+        else:
+            return "description_both"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
-            freeze = target.remove_effect(Keyword.FREEZE)
-            if freeze:
-                removed_effects.append(freeze)
-
-        else:
-            fail = "dead"
+        freeze = target.remove_effect(Keyword.FREEZE)
+        if freeze:
+            removed_effects.append(freeze)
 
         return {
-            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -126,23 +141,13 @@ class BurnEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = {}
-        fail = None
+        damage_data = calculate_damage(
+            self,
+            source,
+            target,
+        )
 
-        if target.is_alive():
-            damage_data = calculate_damage(
-                self,
-                source,
-                target,
-            )
+        target.hp -= damage_data["damage"]
+        target.equalize_stats()
 
-            target.hp -= damage_data["damage"]
-            target.equalize_stats()
-
-        else:
-            fail = "dead"
-
-        return {
-            **damage_data,
-            "fail": fail,
-        }
+        return damage_data

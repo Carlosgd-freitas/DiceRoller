@@ -18,31 +18,33 @@ class ManaSpirit(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([ManaEffect(Stat(flat=1))]),
-                Side([ManaEffect(Stat(flat=1))]),
-                Side([ManaEffect(Stat(flat=2))]),
-                Side([ManaEffect(Stat(flat=2))]),
-                Side([ManaEffect(Stat(flat=3))]),
+                Side([ManaEffect(Stat(flat=1, percent=0))]),
+                Side([ManaEffect(Stat(flat=1, percent=0))]),
+                Side([ManaEffect(Stat(flat=2, percent=0))]),
+                Side([ManaEffect(Stat(flat=2, percent=0))]),
+                Side([ManaEffect(Stat(flat=3, percent=0))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([HealEffect(Stat(flat=1))]),
-                Side([HealEffect(Stat(flat=2))]),
-                Side([HealEffect(Stat(flat=2))]),
-                Side([HealEffect(Stat(flat=3))]),
-                Side([HealEffect(Stat(flat=2)), CleanseEffect(Stat(flat=1))]),
+                Side([HealEffect(Stat(flat=1, percent=0))]),
+                Side([HealEffect(Stat(flat=2, percent=0))]),
+                Side([HealEffect(Stat(flat=2, percent=0))]),
+                Side([HealEffect(Stat(flat=3, percent=0))]),
+                Side(
+                    [HealEffect(Stat(flat=2, percent=0)), CleanseEffect(Stat(flat=1))]
+                ),
             ]
         )
 
         dice_2 = Dice(
             sides=[
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=3))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=3, percent=0))]),
             ]
         )
 

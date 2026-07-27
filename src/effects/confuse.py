@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -28,8 +29,12 @@ class ConfuseEffect(Effect):
         accuracy: float = 1,
         removable: bool = True,
     ):
+        if value is None:
+            value = Stat(percent=0)
         if min_value is None:
             min_value = Stat(percent=0)
+        if max_value is None:
+            max_value = Stat(percent=inf)
 
         super().__init__(
             keyword=Keyword.CONFUSE,
@@ -48,23 +53,11 @@ class ConfuseEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

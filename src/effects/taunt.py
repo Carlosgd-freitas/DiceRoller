@@ -38,19 +38,13 @@ class TauntEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
-            repel = target.remove_effect(Keyword.REPEL)
-            if repel:
-                removed_effects.append(repel)
-
-        else:
-            fail = "dead"
+        repel = target.remove_effect(Keyword.REPEL)
+        if repel:
+            removed_effects.append(repel)
 
         return {
-            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -59,10 +53,4 @@ class TauntEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

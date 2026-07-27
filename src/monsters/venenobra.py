@@ -17,29 +17,41 @@ class Venenobra(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([PoisonEffect(Stat(flat=1), duration=3)]),
-                Side([PoisonEffect(Stat(flat=2), duration=3)]),
+                Side([PoisonEffect(Stat(flat=1, percent=0), duration=3)]),
+                Side([PoisonEffect(Stat(flat=2, percent=0), duration=3)]),
                 Side(
-                    [AttackEffect(Stat(flat=1)), PoisonEffect(Stat(flat=1), duration=3)]
+                    [
+                        AttackEffect(Stat(flat=1, percent=0)),
+                        PoisonEffect(Stat(flat=1, percent=0), duration=3),
+                    ]
                 ),
                 Side(
-                    [AttackEffect(Stat(flat=1)), PoisonEffect(Stat(flat=2), duration=3)]
+                    [
+                        AttackEffect(Stat(flat=1, percent=0)),
+                        PoisonEffect(Stat(flat=2, percent=0), duration=3),
+                    ]
                 ),
                 Side(
-                    [AttackEffect(Stat(flat=2)), PoisonEffect(Stat(flat=1), duration=3)]
+                    [
+                        AttackEffect(Stat(flat=2, percent=0)),
+                        PoisonEffect(Stat(flat=1, percent=0), duration=3),
+                    ]
                 ),
                 Side(
-                    [AttackEffect(Stat(flat=2)), PoisonEffect(Stat(flat=2), duration=3)]
+                    [
+                        AttackEffect(Stat(flat=2, percent=0)),
+                        PoisonEffect(Stat(flat=2, percent=0), duration=3),
+                    ]
                 ),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=2))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
             ]
         )
 

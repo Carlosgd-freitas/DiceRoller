@@ -343,11 +343,7 @@ class CombatLogger(MonsterLogger):
             else:
                 color_data = {"foreground_color": Color.GRAY}
 
-            if life_state in [LifeState.ALIVE, LifeState.ANY] and monster.is_alive():
-                will_log = True
-            elif (
-                life_state in [LifeState.DEAD, LifeState.ANY] and not monster.is_alive()
-            ):
+            if life_state == LifeState.ANY or life_state == monster.get_life_state():
                 will_log = True
             else:
                 will_log = False

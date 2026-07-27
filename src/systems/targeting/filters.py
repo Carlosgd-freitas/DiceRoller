@@ -142,10 +142,10 @@ def filter_monsters(
         ]
 
     # Monster attribute conditions
-    if life_state == LifeState.ALIVE:
-        filtered = [monster for monster in filtered if monster.is_alive()]
-    elif life_state == LifeState.DEAD:
-        filtered = [monster for monster in filtered if not monster.is_alive()]
+    if life_state in [LifeState.ALIVE, LifeState.DEAD]:
+        filtered = [
+            monster for monster in filtered if monster.get_life_state() == life_state
+        ]
 
     if hurt:
         filtered = [monster for monster in filtered if monster.hp < monster.max_hp]

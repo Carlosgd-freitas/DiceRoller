@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -27,8 +27,12 @@ class ManaEffect(Effect):
         max_value: Stat | None = None,
         accuracy: float = 1,
     ):
+        if value is None:
+            value = Stat(flat=0, percent=0)
         if min_value is None:
             min_value = Stat(flat=0, percent=0)
+        if max_value is None:
+            max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
             keyword=Keyword.MANA,
@@ -86,31 +90,35 @@ class ManaEffect(Effect):
 
         return ceil(effective_value)
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if (not self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (not self.value.flat) and (self.value.percent):
+            return "description_percent"
+        else:
+            return "description_both"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
+        target.mana += self.get_effective_value(source=source, target=target)
 
-        if target.is_alive():
-            target.mana += self.get_effective_value(source=source, target=target)
-        else:
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

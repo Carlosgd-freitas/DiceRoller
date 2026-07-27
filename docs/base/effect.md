@@ -28,7 +28,7 @@ Each **effect** has its own behavior, and are to be used by "bigger" components,
 * **RESTORATION**: an instant effect that benefits the target.
 
 ## Main methods
-* `.affects()`: what type of `Entities` the effect can be executed on.
+* `.get_requirements()`: returns the requirements for executing the effect.
 * `.on_apply()`: what happens when the effect is first applied on an `Entity`.
 * `.activate()`: what happens when the effect is executed.
 * `.stack()`: how the effect interacts with an `Entity` that is under another effect with the same keyword.

@@ -75,26 +75,14 @@ class DoomEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-
-        if (target.is_alive()) and (self.duration == 0):
+        if self.duration == 0:
             target.hp = 0
-        else:
-            fail = "dead"
 
-        return {
-            "fail": fail,
-        }
+        return {}

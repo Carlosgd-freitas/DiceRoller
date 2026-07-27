@@ -10,6 +10,7 @@ from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.invulnerable import InvulnerableEffect
+from src.effects.pierce import PierceEffect
 from src.effects.sacred_block import SacredBlockEffect
 from tests.utils import assert_conditions
 
@@ -198,7 +199,8 @@ def test_invulnerable_effect(combat: Dict):
 
     attack_effect_1 = AttackEffect(Stat(flat=1))
     attack_effect_99 = AttackEffect(Stat(flat=99))
-    invulnerable_effect = InvulnerableEffect(duration=1)
+    pierce_effect = PierceEffect(Stat(flat=1))
+    invulnerable_effect = InvulnerableEffect(target_keywords=[Keyword.ALL], duration=1)
 
     combat_manager.effect_manager.execute_effect(
         invulnerable_effect,
@@ -220,6 +222,12 @@ def test_invulnerable_effect(combat: Dict):
         target=monster_2,
     )
 
+    combat_manager.effect_manager.execute_effect(
+        pierce_effect,
+        source=monster_1,
+        target=monster_2,
+    )
+
     conditions.extend(
         [
             monster_2.hp == 10,
@@ -229,15 +237,58 @@ def test_invulnerable_effect(combat: Dict):
 
     combat_manager.end_turn()
 
+    combat_manager.current_monster = monster_2
+
+    invulnerable_effect = InvulnerableEffect(
+        target_keywords=[Keyword.ATTACK], duration=1
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        invulnerable_effect,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        attack_effect_99,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        pierce_effect,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.end_turn()
+
+    conditions.extend(
+        [
+            monster_2.hp == 9,
+            monster_2.get_effect(Keyword.INVULNERABLE) is None,
+        ]
+    )
+
+    invulnerable_effect = InvulnerableEffect(duration=1)
+
     combat_manager.effect_manager.execute_effect(
         attack_effect_1,
         source=monster_1,
         target=monster_2,
     )
 
+    combat_manager.effect_manager.execute_effect(
+        pierce_effect,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.end_turn()
+
     conditions.extend(
         [
-            monster_2.hp == 9,
+            monster_2.hp == 7,
             monster_2.get_effect(Keyword.INVULNERABLE) is None,
         ]
     )

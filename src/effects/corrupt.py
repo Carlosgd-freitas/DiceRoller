@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -26,8 +27,12 @@ class CorruptEffect(Effect):
         max_value: Stat | None = None,
         accuracy: float = 1,
     ):
+        if value is None:
+            value = Stat(flat=0)
         if min_value is None:
             min_value = Stat(flat=0)
+        if max_value is None:
+            max_value = Stat(flat=inf)
 
         super().__init__(
             keyword=Keyword.CORRUPT,
@@ -44,39 +49,28 @@ class CorruptEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
+        removed_effects = [
+            effect
+            for effect in target.effects
+            if (effect.type == EffectType.BUFF) and (effect.removable)
+        ]
+        if self.value != inf:
+            removed_effects = removed_effects[: self.value.flat]
 
-            removed_effects = [
-                effect
-                for effect in target.effects
-                if (effect.type == EffectType.BUFF) and (effect.removable)
-            ][: self.value.flat]
+        for buff in removed_effects:
+            target.effects.remove(buff)
 
-            for buff in removed_effects:
-                target.effects.remove(buff)
-
-            target.equalize_stats()
-
-        else:
-            fail = "dead"
+        target.equalize_stats()
 
         return {
-            "fail": fail,
             "removed_effects": removed_effects,
         }

@@ -37,28 +37,31 @@ class ImmunityEffect(Effect):
             target_keywords=target_keywords,
         )
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if not self.target_keywords:
+            return "description"
+        elif Keyword.ALL in self.target_keywords:
+            return "description_all"
+        else:
+            return "description_specific"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

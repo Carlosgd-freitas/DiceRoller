@@ -159,7 +159,7 @@ def test_calculate_damage_invulnerable(combat: Dict):
     monster_4: Monster = combat["monsters"][4]
 
     attack_effect = AttackEffect(Stat(flat=6))
-    invulnerable_effect = InvulnerableEffect(Stat(flat=1))
+    invulnerable_effect = InvulnerableEffect(target_keywords=[Keyword.ALL], duration=1)
 
     effect_manager.execute_effect(
         invulnerable_effect,

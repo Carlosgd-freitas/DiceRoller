@@ -43,6 +43,21 @@ class EffectData(TypedDict):
     removed_effects: List[Effect]
 
 
+class EffectRequirements(TypedDict):
+    """
+    Data containing requirements for executing an Effect.
+
+    :var source_life_state: Life state required by the source monster.
+    :vartype source_life_state: LifeState
+
+    :var target_life_state: Life state required by the target monster.
+    :vartype target_life_state: LifeState
+    """
+
+    source_life_state: LifeState
+    target_life_state: LifeState
+
+
 class EffectType(Enum):
     """Type of Effect."""
 
@@ -154,14 +169,17 @@ class Effect(ABC):
 
         return _str
 
-    def affects(self) -> LifeState:
+    def get_requirements(self) -> EffectRequirements:
         """
-        Returns the life state of monsters that this effect can target.
+        Returns the requirements for executing the Effect.
 
-        :return: The required target life state.
-        :rtype: LifeState
+        :return: Effect requirements.
+        :rtype: EffectRequirements
         """
-        return LifeState.ALIVE
+        return {
+            "source_life_state": LifeState.ALIVE,
+            "target_life_state": LifeState.ALIVE,
+        }
 
     def get_effective_value(
         self,
@@ -207,6 +225,16 @@ class Effect(ABC):
             effective_value = self.max_value.flat
 
         return effective_value
+
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        return "description_variable"
 
     def stack(
         self,

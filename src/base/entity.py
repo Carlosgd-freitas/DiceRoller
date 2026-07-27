@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from src.base.color import Color, ColorData
 from src.base.keywords import Keyword, get_keyword_color
+from src.base.life_state import LifeState
 from src.base.text import normalize
 
 if TYPE_CHECKING:
@@ -116,6 +117,18 @@ class Entity:
             self.description = description
         return
 
+    def get_life_state(self) -> LifeState:
+        """
+        Returns the entity life state.
+
+        :return: Entity life state.
+        :rtype: LifeState
+        """
+        if self.hp > 0:
+            return LifeState.ALIVE
+        else:
+            return LifeState.DEAD
+
     def is_alive(self) -> bool:
         """
         Returns if the monster is alive or not.
@@ -123,7 +136,16 @@ class Entity:
         :return: If the Monster is alive or not.
         :rtype: bool
         """
-        return self.hp > 0
+        return self.get_life_state() == LifeState.ALIVE
+
+    def is_dead(self) -> bool:
+        """
+        Returns if the monster is dead or not.
+
+        :return: If the Monster is dead or not.
+        :rtype: bool
+        """
+        return self.get_life_state() == LifeState.DEAD
 
     def is_equivalent(self, entity: Entity) -> bool:
         """

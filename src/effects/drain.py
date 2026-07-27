@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -28,8 +28,12 @@ class DrainEffect(Effect):
         max_value: Stat | None = None,
         accuracy: float = 1,
     ):
+        if value is None:
+            value = Stat(flat=0, percent=0)
         if min_value is None:
             min_value = Stat(flat=0, percent=0)
+        if max_value is None:
+            max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
             keyword=Keyword.DRAIN,
@@ -107,56 +111,60 @@ class DrainEffect(Effect):
 
         return ceil(effective_value)
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if (not self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (not self.value.flat) and (self.value.percent):
+            return "description_percent"
+        else:
+            return "description_both"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        damage_data = {}
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
-            sleep = target.remove_effect(Keyword.SLEEP)
-            if sleep:
-                removed_effects.append(sleep)
+        sleep = target.remove_effect(Keyword.SLEEP)
+        if sleep:
+            removed_effects.append(sleep)
 
-            damage_data = calculate_damage(
-                self,
-                source,
-                target,
-                consider=[
-                    Keyword.ABSORB,
-                    Keyword.BLOCK,
-                    Keyword.INVULNERABLE,
-                    Keyword.SACRED_BLOCK,
-                ],
-            )
+        damage_data = calculate_damage(
+            self,
+            source,
+            target,
+            consider=[
+                Keyword.ABSORB,
+                Keyword.BLOCK,
+                Keyword.INVULNERABLE,
+                Keyword.SACRED_BLOCK,
+            ],
+        )
 
-            target.hp -= damage_data["damage"]
-            target.equalize_stats()
+        target.hp -= damage_data["damage"]
+        target.equalize_stats()
 
-            source.hp += damage_data["damage"]
-            source.equalize_stats()
-
-        else:
-            fail = "dead"
+        source.hp += damage_data["damage"]
+        source.equalize_stats()
 
         return {
             **damage_data,
-            "fail": fail,
             "removed_effects": removed_effects,
         }

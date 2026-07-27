@@ -6,10 +6,15 @@ from src.effects.nothing import NothingEffect
 from tests.utils import assert_conditions
 
 
-def test_effect_affects():
+def test_effect_get_requirements():
     effect = NothingEffect()
 
-    conditions = [isinstance(effect.affects(), LifeState)]
+    requirements = effect.get_requirements()
+
+    conditions = [
+        isinstance(requirements["source_life_state"], LifeState),
+        isinstance(requirements["target_life_state"], LifeState),
+    ]
 
     assert_conditions(conditions)
 

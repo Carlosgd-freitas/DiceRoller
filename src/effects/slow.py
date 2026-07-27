@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -29,8 +30,12 @@ class SlowEffect(Effect):
         accuracy: float = 1,
         removable: bool = True,
     ):
+        if value is None:
+            value = Stat(flat=0, percent=0)
         if min_value is None:
             min_value = Stat(flat=0, percent=0)
+        if max_value is None:
+            max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
             keyword=Keyword.SLOW,
@@ -45,24 +50,35 @@ class SlowEffect(Effect):
             removable=removable,
         )
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if (not self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (not self.value.flat) and (self.value.percent):
+            return "description_percent"
+        else:
+            return "description_both"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
-            haste = target.remove_effect(Keyword.HASTE)
-            if haste:
-                removed_effects.append(haste)
-
-        else:
-            fail = "dead"
+        haste = target.remove_effect(Keyword.HASTE)
+        if haste:
+            removed_effects.append(haste)
 
         return {
-            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -71,10 +87,4 @@ class SlowEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

@@ -294,11 +294,13 @@ class CombatPlayerActionsMenu(Menu):
         add_dead = False
 
         for effect in side.effects:
-            if effect.affects() == LifeState.ALIVE:
+            requirements = effect.get_requirements()
+
+            if requirements["target_life_state"] == LifeState.ALIVE:
                 add_alive = True
-            elif effect.affects() == LifeState.DEAD:
+            elif requirements["target_life_state"] == LifeState.DEAD:
                 add_dead = True
-            elif effect.affects() == LifeState.ANY:
+            elif requirements["target_life_state"] == LifeState.ANY:
                 add_alive = True
                 add_dead = True
                 break

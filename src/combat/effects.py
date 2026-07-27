@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword
+from src.base.life_state import LifeState
 from src.base.triggers import Trigger
 from src.logger.effects import EffectLogger
 from src.systems.manager import Manager
@@ -108,10 +109,12 @@ class EffectManager(Manager):
         effect: Effect,
         source: Entity,
         target: Entity,
-        check_alive: bool = True,
+        check_source_life_state: bool = True,
+        check_target_life_state: bool = True,
         check_can_act: bool = True,
         check_immunity: bool = True,
         check_accuracy: bool = True,
+        check_persistable: bool = True,
     ) -> bool:
         """
         Executes an Effect through a series of checks. If the Effect is persistent, it
@@ -126,48 +129,74 @@ class EffectManager(Manager):
         :param target: The entity which the effect will be applied.
         :type target: Entity
 
-        :param check_alive: If True, a check if the source is alive will be done
-        before trying do activate the Effect. Default value is True.
-        :type check_alive: bool
+        :param check_source_life_state: If True, checks if the source has the life state
+        required by the Effect. Default value is True.
+        :type check_source_life_state: bool
 
-        :param check_can_act: If True, a check if the source can act will be done
-        before trying do activate the Effect. Default value is True.
+        :param check_target_life_state: If True, checks if the target has the life state
+        required by the Effect. Default value is True.
+        :type check_target_life_state: bool
+
+        :param check_can_act: If True, checks if the source can act. Default value is
+        True.
         :type check_can_act: bool
 
-        :param check_immunity: If True, an immunity check will be done before
-        trying do activate the Effect. Default value is True.
+        :param check_immunity: If True, checks if the target is immune to the Effect.
+        Default value is True.
         :type check_immunity: bool
 
-        :param check_accuracy: If True, an accuracy check will be done before
-        trying do activate the Effect. Default value is True.
+        :param check_accuracy: If True, checks if the Effect will hit the target with
+        accuracy calculations. Default value is True.
         :type check_accuracy: bool
+
+        :param check_persistable: If True, checks if the Effect can persist in the
+        target. Default value is True.
+        :type check_persistable: bool
 
         :return: If the effect was executed.
         :rtype: bool
         """
-        # Check alive
-        if (check_alive) and (not source.is_alive()):
-            return False
+        fail = None
+        requirements = effect.get_requirements()
 
-        # Check can act
-        if (check_can_act) and (not source.can_act()):
-            return False
+        # Check source life state
+        if (
+            check_source_life_state
+            and requirements["source_life_state"] != LifeState.ANY
+            and requirements["source_life_state"] != source.get_life_state()
+        ):
+            life_state = source.get_life_state().value.lower()
+            fail = f"source_{life_state}"
 
-        # Check immunity
-        if check_immunity:
+        # Check if source can act
+        if fail is None and check_can_act and (not source.can_act()):
+            fail = "act_disabled"
+
+        # Check target immunity
+        if fail is None and check_immunity:
             immunity = target.get_effect(Keyword.IMMUNITY)
 
-            if immunity and effect.keyword in immunity.target_keywords:
-                self.logger.log_effect_execution_fail(
-                    effect=effect,
-                    source=source,
-                    target=target,
-                    fail="immunity",
-                )
-                return False
+            if immunity and (
+                Keyword.ALL in immunity.target_keywords
+                or effect.keyword in immunity.target_keywords
+            ):
+                if source == target:
+                    fail = "source_immunity"
+                else:
+                    fail = "target_immunity"
 
-        # Check accuracy
-        if check_accuracy:
+        # Check target life state
+        if (
+            fail is None
+            and check_target_life_state
+            and requirements["target_life_state"] != LifeState.ANY
+            and requirements["target_life_state"] != target.get_life_state()
+        ):
+            life_state = target.get_life_state().value.lower()
+            fail = f"target_{life_state}"
+
+        # Check effect accuracy
+        if fail is None and check_accuracy:
             accuracy = effect.accuracy
 
             # Blind check
@@ -184,13 +213,20 @@ class EffectManager(Manager):
 
             # Effect miss
             if random() >= accuracy:
-                self.logger.log_effect_execution_fail(
-                    effect=effect,
-                    source=source,
-                    target=target,
-                    fail="miss",
-                )
-                return False
+                if source == target:
+                    fail = "source_miss"
+                else:
+                    fail = "target_miss"
+
+        # Check Persistable
+        if (
+            fail is None
+            and check_persistable
+            and effect.persistent
+            and effect.value is not None
+            and effect.get_effective_value(source, target) == 0
+        ):
+            fail = "non-persistable"
 
         # Procesing effects before effect execution
         for effect_type, trigger in [
@@ -209,57 +245,50 @@ class EffectManager(Manager):
                 )
                 break
 
-        effect_data = None
-
-        # Persistent effects
-        if effect.persistent:
-            if (
-                effect.value is not None
-                and effect.get_effective_value(source, target) == 0
-            ):
-                pass
-
-            else:
+        if fail is None:
+            # Persistent effects
+            if effect.persistent:
                 effect_data = target.apply_effect(
                     effect,
                     source=source,
                 )
 
-        # Instant effects
-        else:
-            effect_data = effect.activate(
+            # Instant effects
+            else:
+                effect_data = effect.activate(
+                    source=source,
+                    target=target,
+                )
+
+            fail = effect_data.get("fail")
+
+        # Log failed effect execution
+        if fail is not None:
+            self.logger.log_effect_execution_fail(
+                effect=effect,
                 source=source,
                 target=target,
+                fail=fail,
             )
+            return False
 
-        if effect_data is not None:
-            # Log effect execution
-            if effect_data.get("fail") is None:
-                self.logger.log_effect_execution(
+        # Log effect execution
+        self.logger.log_effect_execution(
+            effect=effect,
+            source=source,
+            target=target,
+            **effect_data,
+        )
+
+        # Log effect removals
+        if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:
+            for removed_effect in effect_data.get("removed_effects", []):
+                self.logger.log_effect_removal(
                     effect=effect,
                     source=source,
                     target=target,
-                    **effect_data,
+                    removed_effect=removed_effect,
                 )
-
-            # Log failed effect execution
-            else:
-                self.logger.log_effect_execution_fail(
-                    effect=effect,
-                    source=source,
-                    target=target,
-                    **effect_data,
-                )
-
-            # Log effect removals
-            if effect.keyword not in [Keyword.CLEANSE, Keyword.CORRUPT]:
-                for removed_effect in effect_data.get("removed_effects", []):
-                    self.logger.log_effect_removal(
-                        effect=effect,
-                        source=source,
-                        target=target,
-                        removed_effect=removed_effect,
-                    )
 
         # Procesing effects after effect execution
         for effect_type, trigger in [

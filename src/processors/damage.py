@@ -51,7 +51,10 @@ def calculate_damage(
     if Keyword.INVULNERABLE in consider:
         invulnerable = target.get_effect(Keyword.INVULNERABLE)
 
-        if invulnerable:
+        if invulnerable and (
+            Keyword.ALL in invulnerable.target_keywords
+            or effect.keyword in invulnerable.target_keywords
+        ):
             defended_damage["invulnerable"] = damage
             damage = 0
 

@@ -9,6 +9,7 @@ class Keyword(Enum):
     """Effect keywords (identifiers)."""
 
     ABSORB = "ABSORB"
+    ALL = "ALL"
     ATTACK = "ATTACK"
     BLEED = "BLEED"
     BLIND = "BLIND"
@@ -130,7 +131,7 @@ def get_keyword_color(keyword: Keyword) -> ColorData:
         foreground_color = Color.TOMATO
     elif keyword in [Keyword.PAIN]:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.IMMUNITY, Keyword.NOTHING, Keyword.STUN]:
+    elif keyword in [Keyword.ALL, Keyword.IMMUNITY, Keyword.NOTHING, Keyword.STUN]:
         foreground_color = Color.WHITE
 
     return {

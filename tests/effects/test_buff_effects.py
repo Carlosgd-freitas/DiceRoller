@@ -11,6 +11,7 @@ from src.combat.manager import CombatManager, OrderStrategy
 from src.effects.attack import AttackEffect
 from src.effects.blind import BlindEffect
 from src.effects.block import BlockEffect
+from src.effects.burn import BurnEffect
 from src.effects.focus import FocusEffect
 from src.effects.fortify import FortifyEffect
 from src.effects.haste import HasteEffect
@@ -18,6 +19,7 @@ from src.effects.heal import HealEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invisible import InvisibleEffect
 from src.effects.mana_regen import ManaRegenEffect
+from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.repel import RepelEffect
 from src.effects.slow import SlowEffect
@@ -330,72 +332,105 @@ def test_immunity_effect(combat: Dict):
     monster_1: Monster = combat["monsters"][1]
     monster_2: Monster = combat["monsters"][2]
 
-    effect_blind = BlindEffect(Stat(percent=1), duration=1)
-    effect_immunity = ImmunityEffect(target_keywords=[Keyword.BLIND], duration=1)
-    effect_attack = AttackEffect(Stat(flat=2))
+    combat_manager.current_monster = monster_2
+
+    effect_burn = BurnEffect(Stat(flat=1), duration=1)
+    effect_poison = PoisonEffect(Stat(flat=1), duration=1)
+    effect_immunity = ImmunityEffect(target_keywords=[Keyword.ALL], duration=1)
 
     combat_manager.effect_manager.execute_effect(
         effect_immunity,
-        source=monster_1,
-        target=monster_1,
+        source=monster_2,
+        target=monster_2,
     )
 
     combat_manager.effect_manager.execute_effect(
-        effect_blind,
+        effect_burn,
         source=monster_1,
-        target=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
+        source=monster_1,
+        target=monster_2,
     )
 
     conditions = [
         monster_1.local_id == "MONSTER_1",
-        len(monster_1.effects) == 1,
-        monster_1.get_effect(Keyword.BLIND) is None,
-        monster_1.get_effect(Keyword.IMMUNITY).keyword == Keyword.IMMUNITY,
-        monster_1.get_effect(Keyword.IMMUNITY).duration == 1,
-        monster_1.hp == 1,
+        len(monster_1.effects) == 0,
         monster_2.local_id == "MONSTER_2",
-        len(monster_2.effects) == 0,
-        monster_2.get_effect(Keyword.IMMUNITY) is None,
-        monster_2.hp == 10,
+        len(monster_2.effects) == 1,
+        monster_2.get_effect(Keyword.IMMUNITY).keyword == Keyword.IMMUNITY,
+        monster_2.get_effect(Keyword.IMMUNITY).duration == 1,
     ]
 
+    combat_manager.end_turn()
+
+    combat_manager.current_monster = monster_2
+
+    effect_immunity = ImmunityEffect(target_keywords=[Keyword.BURN], duration=1)
+
     combat_manager.effect_manager.execute_effect(
-        effect_attack,
+        effect_immunity,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
         source=monster_1,
         target=monster_2,
     )
 
     conditions.extend(
         [
-            monster_1.hp == 1,
-            monster_2.hp == 8,
+            len(monster_2.effects) == 2,
+            monster_2.has_effect(Keyword.IMMUNITY),
+            monster_2.has_effect(Keyword.POISON),
         ]
     )
 
     combat_manager.end_turn()
 
+    combat_manager.current_monster = monster_2
+
+    effect_immunity = ImmunityEffect(duration=1)
+
     combat_manager.effect_manager.execute_effect(
-        effect_blind,
-        source=monster_1,
-        target=monster_1,
+        effect_immunity,
+        source=monster_2,
+        target=monster_2,
     )
 
     combat_manager.effect_manager.execute_effect(
-        effect_attack,
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
         source=monster_1,
         target=monster_2,
     )
 
     conditions.extend(
         [
-            len(monster_1.effects) == 1,
-            monster_1.get_effect(Keyword.IMMUNITY) is None,
-            monster_1.get_effect(Keyword.BLIND).keyword == Keyword.BLIND,
-            monster_1.get_effect(Keyword.BLIND).duration == 1,
-            monster_1.hp == 1,
-            monster_2.hp == 8,
+            len(monster_2.effects) == 3,
+            monster_2.has_effect(Keyword.IMMUNITY),
+            monster_2.has_effect(Keyword.BURN),
+            monster_2.has_effect(Keyword.POISON),
         ]
     )
+
+    combat_manager.end_turn()
 
     assert_conditions(conditions)
 

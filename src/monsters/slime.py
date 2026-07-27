@@ -16,19 +16,19 @@ class Slime(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([AttackEffect(Stat(flat=1))]),
-                Side([AttackEffect(Stat(flat=2))]),
-                Side([AttackEffect(Stat(flat=3))]),
-                Side([AttackEffect(Stat(flat=4))]),
+                Side([AttackEffect(Stat(flat=1, percent=0))]),
+                Side([AttackEffect(Stat(flat=2, percent=0))]),
+                Side([AttackEffect(Stat(flat=3, percent=0))]),
+                Side([AttackEffect(Stat(flat=4, percent=0))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=3))]),
-                Side([BlockEffect(Stat(flat=4))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=3, percent=0))]),
+                Side([BlockEffect(Stat(flat=4, percent=0))]),
             ]
         )
 

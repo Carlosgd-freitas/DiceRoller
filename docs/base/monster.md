@@ -16,4 +16,6 @@ Only `Entity` attributes whose meaning depends on the child class will be covere
 * **suffix**: a suffix to differentiate monsters that have the same name.
 
 ## Main methods
-* `.is_alive()`: if the monster is alive or dead.
+* `.get_life_state()`: returns the monster life state (alive or dead).
+* `.is_alive()`: if the monster is alive or not.
+* `.is_dead()`: if the monster is dead or not.

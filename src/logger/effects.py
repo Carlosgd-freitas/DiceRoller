@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List, Literal
 
-from src.base.color import Color, ColorData, color_string
+from src.base.color import ColorData, color_string
 from src.base.effect import Effect, EffectType
 from src.base.keywords import Keyword, get_keyword
 from src.base.monster import Monster
@@ -132,11 +132,6 @@ class EffectLogger(StatLogger):
             if effect.max_value.percent is not None:
                 max_value_percent = numeric_to_string(effect.max_value.percent * 100)
 
-        # Effective value
-        effective_value = effect.get_effective_value(source=None, target=None)
-        if effective_value is not None:
-            effective_value = str(effective_value)
-
         # Delta
         delta_flat = None
         delta_percent = None
@@ -174,7 +169,6 @@ class EffectLogger(StatLogger):
                 "delta_flat": delta_flat,
                 "delta_percent": delta_percent,
                 "duration": duration,
-                "effective_value": effective_value,
                 "max_value_flat": max_value_flat,
                 "max_value_percent": max_value_percent,
                 "min_value_flat": min_value_flat,
@@ -279,7 +273,7 @@ class EffectLogger(StatLogger):
 
                 message += " " + color_string(" + ", **color_data).join(values)
 
-            if effect.target_keywords:
+            if (effect.target_keywords) and (Keyword.ALL not in effect.target_keywords):
                 keywords = self.get_multiple_effects_message(
                     keywords=effect.target_keywords
                 )
@@ -434,7 +428,7 @@ class EffectLogger(StatLogger):
             )
 
         # Damage message
-        if kwargs.get("damage"):
+        if kwargs.get("damage") is not None:
             self.log(
                 namespace="combat",
                 message_group="COMBAT",
@@ -634,6 +628,11 @@ class EffectLogger(StatLogger):
 
         # Logging offensive type effect execution
         if effect.type == EffectType.OFFENSIVE:
+            # Effective value
+            effective_value = effect.get_effective_value(source=source, target=target)
+            if effective_value is not None:
+                kwargs["effective_value"] = str(effective_value)
+
             return self._log_damage_calculation(
                 effect,
                 **kwargs,
@@ -714,10 +713,10 @@ class EffectLogger(StatLogger):
         self.log(message=message, end=" ")
 
         # Fail cause message
-        key: str = kwargs["fail"]
+        fail: str = kwargs["fail"]
 
         for keyword in Keyword:
-            if key == keyword.name.lower():
+            if fail == keyword.name.lower():
                 kwargs["fail_status"] = self.get_colored_message(
                     keyword=keyword,
                     namespace="effects",
@@ -726,10 +725,8 @@ class EffectLogger(StatLogger):
                 )
                 break
 
-        key = key + "_self" if kwargs["targeting_self"] else key
-
         message = self.get_message(
-            namespace="combat", message_group="FAILS", key=key, **kwargs
+            namespace="combat", message_group="FAILS", key=fail, **kwargs
         )
 
         return self.log(message=message)
@@ -795,48 +792,30 @@ class EffectLogger(StatLogger):
 
         kwargs.update(self._get_effect_params(effect, **kwargs))
 
-        if params == "name":
-            for key in [
-                "accuracy",
-                "delta_flat",
-                "delta_percent",
-                "duration",
-                "max_value_flat",
-                "max_value_percent",
-                "min_value_flat",
-                "min_value_percent",
-                "value_flat",
-                "value_percent",
-            ]:
-                translated_word = self.get_message(
-                    namespace="base", message_group="LEXICON", key=key
-                )
+        # if params == "name":
+        #     for key in [
+        #         "accuracy",
+        #         "delta_flat",
+        #         "delta_percent",
+        #         "duration",
+        #         "max_value_flat",
+        #         "max_value_percent",
+        #         "min_value_flat",
+        #         "min_value_percent",
+        #         "value_flat",
+        #         "value_percent",
+        #     ]:
+        #         translated_word = self.get_message(
+        #             namespace="base", message_group="LEXICON", key=key
+        #         )
 
-                kwargs[key] = color_string(
-                    f"<{translated_word.title()}>",
-                    foreground_color=Color.WHITE,
-                    intensity="BRIGHT",
-                )
+        #         kwargs[key] = color_string(
+        #             f"<{translated_word.title()}>",
+        #             foreground_color=Color.WHITE,
+        #             intensity="BRIGHT",
+        #         )
 
-            key = "description"
-
-        else:
-            if effect.value is not None:
-                if (effect.value.flat is None) and effect.value.percent is not None:
-                    key = "description"
-                elif (
-                    effect.value.flat is not None
-                ) and effect.value.percent is not None:
-                    key = "description_flat"
-                elif (effect.value.flat is None) and not (
-                    effect.value.percent is not None
-                ):
-                    key = "description_percent"
-                else:
-                    key = "description_both"
-
-            else:
-                key = "description"
+        key = effect.get_description_key()
 
         message = self.get_message(
             namespace="effects",
@@ -844,15 +823,6 @@ class EffectLogger(StatLogger):
             key=key,
             **kwargs,
         )
-
-        # Default description
-        if key != "description" and message is None:
-            message = self.get_message(
-                namespace="effects",
-                message_group=effect.keyword.name,
-                key="description",
-                **kwargs,
-            )
 
         self.log(message=message, end=end)
 

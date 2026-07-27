@@ -21,17 +21,17 @@ class Weeke(Monster):
     def __init__(self, **kwargs):
         dice_0 = Dice(
             sides=[
-                Side([HealEffect(Stat(flat=1))]),
-                Side([HealEffect(Stat(flat=2))]),
-                Side([ManaEffect(Stat(flat=1))]),
-                Side([ManaEffect(Stat(flat=2))]),
+                Side([HealEffect(Stat(flat=1, percent=0))]),
+                Side([HealEffect(Stat(flat=2, percent=0))]),
+                Side([ManaEffect(Stat(flat=1, percent=0))]),
+                Side([ManaEffect(Stat(flat=2, percent=0))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([WeakEffect(Stat(flat=1), duration=3)]),
-                Side([FragileEffect(Stat(flat=1), duration=3)]),
+                Side([WeakEffect(Stat(flat=1, percent=0), duration=3)]),
+                Side([FragileEffect(Stat(flat=1, percent=0), duration=3)]),
                 Side([ConfuseEffect(Stat(percent=0.5), duration=2)]),
                 Side([CorruptEffect(Stat(flat=1))]),
             ]
@@ -39,11 +39,11 @@ class Weeke(Monster):
 
         dice_2 = Dice(
             sides=[
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=1))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=2))]),
-                Side([BlockEffect(Stat(flat=3))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=1, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side([BlockEffect(Stat(flat=3, percent=0))]),
             ]
         )
 

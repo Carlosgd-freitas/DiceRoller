@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, inf
 from typing import TYPE_CHECKING
 
-from src.base.effect import Effect, EffectData, EffectType
+from src.base.effect import Effect, EffectData, EffectRequirements, EffectType
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
 from src.base.stat import Stat
@@ -29,8 +29,12 @@ class ReviveEffect(Effect):
         max_value: Stat | None = None,
         accuracy: float = 1,
     ):
+        if value is None:
+            value = Stat(flat=0, percent=0)
         if min_value is None:
             min_value = Stat(flat=0, percent=0)
+        if max_value is None:
+            max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
             keyword=Keyword.REVIVE,
@@ -42,14 +46,17 @@ class ReviveEffect(Effect):
             persistent=False,
         )
 
-    def affects(self) -> LifeState:
+    def get_requirements(self) -> EffectRequirements:
         """
-        Returns the life state of monsters that this effect can target.
+        Returns the requirements for executing the Effect.
 
-        :return: The required target life state.
-        :rtype: LifeState
+        :return: Effect requirements.
+        :rtype: EffectRequirements
         """
-        return LifeState.DEAD
+        return {
+            "source_life_state": LifeState.ALIVE,
+            "target_life_state": LifeState.DEAD,
+        }
 
     def get_effective_value(
         self,
@@ -97,44 +104,49 @@ class ReviveEffect(Effect):
 
         return ceil(effective_value)
 
+    def get_description_variable_key(self) -> str:
+        """
+        Returns a message key for the Effect description that takes the parameters into
+        consideration.
+
+        :return: The message key.
+        :rtype: str
+        """
+        if (not self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (self.value.flat) and (not self.value.percent):
+            return "description_flat"
+        elif (not self.value.flat) and (self.value.percent):
+            return "description_percent"
+        else:
+            return "description_both"
+
     def on_apply(
         self,
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
-        if target.is_alive():
-            fail = "alive"
-
-        return {
-            "fail": fail,
-        }
+        return {}
 
     def activate(
         self,
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
         healed = None
 
-        if not target.is_alive():
-            if target.in_combat:
-                target.in_combat = True
+        if target.in_combat:
+            target.in_combat = True
 
-            healed = calculate_healing(
-                self,
-                source,
-                target,
-            )
+        healed = calculate_healing(
+            self,
+            source,
+            target,
+        )
 
-            target.hp += healed
-            target.equalize_stats()
-
-        else:
-            fail = "alive"
+        target.hp += healed
+        target.equalize_stats()
 
         return {
-            "fail": fail,
             "healed": healed,
         }

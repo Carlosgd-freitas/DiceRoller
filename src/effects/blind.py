@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import TYPE_CHECKING
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -30,8 +31,12 @@ class BlindEffect(Effect):
         accuracy: float = 1,
         removable: bool = True,
     ):
+        if value is None:
+            value = Stat(percent=0)
         if min_value is None:
             min_value = Stat(percent=0)
+        if max_value is None:
+            max_value = Stat(percent=inf)
 
         super().__init__(
             keyword=Keyword.BLIND,
@@ -51,19 +56,13 @@ class BlindEffect(Effect):
         source: Entity,
         target: Entity,
     ) -> EffectData:
-        fail = None
         removed_effects = []
 
-        if target.is_alive():
-            focus = target.remove_effect(Keyword.FOCUS)
-            if focus:
-                removed_effects.append(focus)
-
-        else:
-            fail = "dead"
+        focus = target.remove_effect(Keyword.FOCUS)
+        if focus:
+            removed_effects.append(focus)
 
         return {
-            "fail": fail,
             "removed_effects": removed_effects,
         }
 
@@ -72,10 +71,4 @@ class BlindEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        fail = None
-        if not target.is_alive():
-            fail = "dead"
-
-        return {
-            "fail": fail,
-        }
+        return {}

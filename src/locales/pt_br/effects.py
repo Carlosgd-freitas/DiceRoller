@@ -1,11 +1,15 @@
 """PT-BR localization for effects module."""
 
+ALL = {
+    "name": "TODOS",
+}
+
 ABSORB = {
     "name": "ABSORÇÃO",
-    "description": "Reduz até {value_flat} de dano direto recebido. Qualquer dano bloqueado restaura {hp}.",
+    "description": "Reduz dano direto recebido. Qualquer dano bloqueado restaura {hp}.",
     "description_flat": "Reduz até {value_flat} de dano direto recebido. Qualquer dano bloqueado restaura {hp}.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Reduz dano direto recebido até {value_percent}% do {max_hp} do alvo. Qualquer dano bloqueado restaura {hp}.",
+    "description_both": "Reduz dano direto recebido até {value_flat} + {value_percent}% do {max_hp} do alvo. Qualquer dano bloqueado restaura {hp}.",
     "action": "ABSORVIDO",
     "activation": "{defended_damage} de dano foi {defensive_action}.",
     "countdown": None,
@@ -20,10 +24,10 @@ ABSORB = {
 
 ATTACK = {
     "name": "ATACAR",
-    "description": "Inflige {value_flat} de dano.",
+    "description": "Inflige dano.",
     "description_flat": "Inflige {value_flat} de dano.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo.",
     "action": "ATACOU",
     "activation": None,
     "countdown": None,
@@ -38,10 +42,10 @@ ATTACK = {
 
 BLEED = {
     "name": "SANGRAMENTO",
-    "description": "Inflige {value_flat} de dano toda vez que o alvo rola um dado.",
+    "description": "Inflige dano toda vez que o alvo rola um dado.",
     "description_flat": "Inflige {value_flat} de dano toda vez que o alvo rola um dado.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo toda vez que ele rola um dado.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo toda vez que ele rola um dado.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
     "countdown": None,
@@ -56,10 +60,8 @@ BLEED = {
 
 BLIND = {
     "name": "CEGUEIRA",
-    "description": "Diminui a acurácia dos dados e habilidades que o alvo não usa em si mesmo em {value_percent}%.",
-    "description_flat": None,
-    "description_percent": "Diminui a acurácia dos dados e habilidades que o alvo não usa em si mesmo em {value_percent}%.",
-    "description_both": None,
+    "description": "Diminui a acurácia dos dados que o alvo não usa em si mesmo.",
+    "description_variable": "Diminui a acurácia dos dados que o alvo não usa em si mesmo em {value_percent}%.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -74,10 +76,10 @@ BLIND = {
 
 BLOCK = {
     "name": "BLOQUEIO",
-    "description": "Reduz até {value_flat} de dano direto recebido.",
+    "description": "Reduz dano direto recebido.",
     "description_flat": "Reduz até {value_flat} de dano direto recebido.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Reduz dano direto recebido até {value_percent}% do {max_hp} do alvo.",
+    "description_both": "Reduz dano direto recebido até {value_flat} + {value_percent}% do {max_hp} do alvo.",
     "action": "BLOQUEADO",
     "activation": "{defended_damage} de dano foi {defensive_action}.",
     "countdown": None,
@@ -92,10 +94,10 @@ BLOCK = {
 
 BURN = {
     "name": "QUEIMADURA",
-    "description": "Inflige {value_flat} de dano em todo início de turno. Remove {freeze}.",
-    "description_flat": "Inflige {value_flat} de dano em todo início de turno. Remove {freeze}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Inflige dano no alvo no início de seus turnos. Remove {freeze}.",
+    "description_flat": "Inflige {value_flat} de dano no alvo no início de seus turnos. Remove {freeze}.",
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo no início de seus turnos. Remove {freeze}.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo no início de seus turnos. Remove {freeze}.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
     "countdown": None,
@@ -110,10 +112,8 @@ BURN = {
 
 CLEANSE = {
     "name": "PURIFICAR",
-    "description": "Remove até {value_flat} enfraquecimentos do alvo, começando pelo mais antigo.",
-    "description_flat": "Remove até {value_flat} enfraquecimentos do alvo, começando pelo mais antigo.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Remove enfraquecimentos, começando pelo mais antigo.",
+    "description_variable": "Remove até {value_flat} enfraquecimentos, começando pelo mais antigo.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -128,10 +128,8 @@ CLEANSE = {
 
 CONFUSE = {
     "name": "CONFUSÃO",
-    "description": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
-    "description_flat": "Faz com que o alvo use seus dados e habilidades aleatoriamente.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo tem uma chance de escolher ações e alvos aleatoriamente.",
+    "description_variable": "O alvo tem {value_percent}% de chance de escolher ações e alvos aleatoriamente.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -146,10 +144,8 @@ CONFUSE = {
 
 CORRUPT = {
     "name": "CORROMPER",
-    "description": "Remove até {value_flat} fortalecimentos do alvo, começando pelo mais antigo.",
-    "description_flat": "Remove até {value_flat} fortalecimentos do alvo, começando pelo mais antigo.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Remove fortalecimentos, começando pelo mais antigo.",
+    "description_variable": "Remove até {value_flat} fortalecimentos, começando pelo mais antigo.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -164,10 +160,8 @@ CORRUPT = {
 
 DOOM = {
     "name": "CONDENAÇÃO",
-    "description": "Mata o alvo após {duration} turnos.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "Mata o alvo quando o efeito expira.",
+    "description_variable": "Mata o alvo após {duration} turnos.",
     "action": "CONDENOU",
     "activation": "{target} foi morto pela {keyword}.",
     "countdown": "Restam {duration} turnos para que {target} morra pela {keyword}.",
@@ -182,10 +176,10 @@ DOOM = {
 
 DRAIN = {
     "name": "DRENAR",
-    "description": "Inflige {value_flat} de dano. Qualquer dano infligido restaura {hp}.",
+    "description": "Inflige dano. Qualquer dano infligido restaura {hp}.",
     "description_flat": "Inflige {value_flat} de dano. Qualquer dano infligido restaura {hp}.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo. Qualquer dano infligido restaura {hp}.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo. Qualquer dano infligido restaura {hp}.",
     "action": "DRENOU",
     "activation": None,
     "countdown": None,
@@ -200,10 +194,10 @@ DRAIN = {
 
 EXECUTE = {
     "name": "EXECUTAR",
-    "description": "Mata o alvo se o {hp} dele for menor ou igual a {value_percent}% do {hp} máximo.",
+    "description": "Mata o alvo se o {hp} dele for menor ou igual a um limiar.",
     "description_flat": "Mata o alvo se o {hp} dele for menor ou igual a {value_flat}.",
     "description_percent": "Mata o alvo se o {hp} dele for menor ou igual a {value_percent}% do {hp} máximo.",
-    "description_both": "Mata o alvo se o {hp} dele for menor ou igual a {value_flat} ou {value_percent}% do {hp} máximo, qual for maior.",
+    "description_both": "Mata o alvo se o {hp} dele for menor ou igual a {value_flat} + {value_percent}% do {hp} máximo.",
     "action": "EXECUTOU",
     "activation": None,
     "countdown": None,
@@ -218,10 +212,8 @@ EXECUTE = {
 
 FOCUS = {
     "name": "FOCO",
-    "description": "Aumenta a acurácia dos dados e habilidades do alvo em {value_percent}%.",
-    "description_flat": None,
-    "description_percent": "Aumenta a acurácia dos dados e habilidades do alvo em {value_percent}%.",
-    "description_both": None,
+    "description": "Aumenta a acurácia dos dados usados pelo alvo.",
+    "description_variable": "Aumenta a acurácia dos dados usados pelo alvo em {value_percent}%.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -236,10 +228,10 @@ FOCUS = {
 
 FORTIFY = {
     "name": "FORTIFICAR",
-    "description": "Aumenta a redução de dano de efeitos defensivos em {value_flat}.",
+    "description": "Aumenta a redução de dano de efeitos defensivos.",
     "description_flat": "Aumenta a redução de dano de efeitos defensivos em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Aumenta a redução de dano de efeitos defensivos em {value_percent}%.",
+    "description_both": "Aumenta a redução de dano de efeitos defensivos em {value_flat} + {value_percent}%.",
     "action": "FORTIFICAR",
     "activation": None,
     "countdown": None,
@@ -254,10 +246,10 @@ FORTIFY = {
 
 FRAGILE = {
     "name": "FRÁGIL",
-    "description": "Reduz a redução de dano de efeitos defensivos em {value_flat}.",
+    "description": "Reduz a redução de dano de efeitos defensivos.",
     "description_flat": "Reduz a redução de dano de efeitos defensivos em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description_percent": "Reduz a redução de dano de efeitos defensivos em {value_percent}%.",
+    "description_both": "Reduz a redução de dano de efeitos defensivos em {value_flat} + {value_percent}%.",
     "action": "FRAGILIZAR",
     "activation": None,
     "countdown": None,
@@ -272,10 +264,8 @@ FRAGILE = {
 
 FREEZE = {
     "name": "CONGELAMENTO",
-    "description": "Impede que o alvo aja. Remove {burn}.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo não pode agir em seu turno. Remove {burn}.",
+    "description_variable": "O alvo não pode agir em seu turno por {duration} {turns}. Remove {burn}.",
     "action": None,
     "activation": "{source} não pôde agir porque estava {status}.",
     "countdown": None,
@@ -290,10 +280,10 @@ FREEZE = {
 
 FROSTBURN = {
     "name": "QUEIMADURA FRIA",
-    "description": "Inflige {value_flat} de dano em todo início de turno.",
-    "description_flat": "Inflige {value_flat} de dano em todo início de turno.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Inflige dano no alvo no início de seus turnos.",
+    "description_flat": "Inflige {value_flat} de dano no alvo no início de seus turnos.",
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo no início de seus turnos.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo no início de seus turnos.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
     "countdown": None,
@@ -308,10 +298,10 @@ FROSTBURN = {
 
 HASTE = {
     "name": "ACELERAÇÃO",
-    "description": "Aumenta a {speed} do alvo em {value_flat}.",
-    "description_flat": "Aumenta a {speed} do alvo em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Aumenta a {speed}.",
+    "description_flat": "Aumenta a {speed} em {value_flat}.",
+    "description_percent": "Aumenta a {speed} em {value_percent}%.",
+    "description_both": "Aumenta a {speed} em {value_flat} + {value_percent}%.",
     "action": "ACELERAR",
     "activation": None,
     "countdown": None,
@@ -344,10 +334,9 @@ HEAL = {
 
 IMMUNITY = {
     "name": "IMUNIDADE",
-    "description": "Faz com que o alvo seja imune a outros efeitos. Quaisquer efeitos que o alvo esteja sobre continuarão a ser aplicados.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo não pode ter efeitos aplicados a si.",
+    "description_all": "O alvo não pode ter nenhum efeito aplicado a si.",
+    "description_specific": "O alvo não pode ter esses efeitos aplicados a si: {target_keywords}.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -362,10 +351,8 @@ IMMUNITY = {
 
 INVISIBLE = {
     "name": "INVISÍVEL",
-    "description": "Faz o alvo inalvejável pelos inimigos.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo se torna inalvejável pelos inimigos.",
+    "description_variable": "O alvo se torna inalvejável pelos inimigos por {duration} {turns}.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -380,10 +367,9 @@ INVISIBLE = {
 
 INVULNERABLE = {
     "name": "INVULNERÁVEL",
-    "description": "Nega qualquer dano que seria infligido ao {hp} do alvo.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "Nega o dano que seria infligido ao alvo.",
+    "description_all": "Nega o dano que seria infligido ao alvo por qualquer efeito.",
+    "description_specific": "Nega o dano que seria infligido ao alvo por {target_keywords}.",
     "action": None,
     "activation": "{defended_damage} de dano foi negado porque {target} estava {defensive_status}.",
     "countdown": None,
@@ -398,10 +384,10 @@ INVULNERABLE = {
 
 MANA_REGEN = {
     "name": "REGENERAÇÃO DE MANA",
-    "description": "Aumenta {mana} em {value_flat} em todo início de turno.",
-    "description_flat": "Aumenta {mana} em {value_flat} em todo início de turno.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Aumenta a {mana} do alvo no início de seus turnos.",
+    "description_flat": "Aumenta a {mana} do alvo em {value_flat} no início de seus turnos.",
+    "description_percent": "Aumenta a {mana} do alvo em {value_percent}% no início de seus turnos.",
+    "description_both": "Aumenta a {mana} do alvo em {value_flat} + {value_percent}% no início de seus turnos.",
     "action": None,
     "activation": "{target} restaurou {value_flat} de {mana} de si mesmo através da {keyword}.",
     "countdown": None,
@@ -416,10 +402,10 @@ MANA_REGEN = {
 
 MANA = {
     "name": "MANA",
-    "description": "Aumenta {mana} em {value_flat}.",
-    "description_flat": "Aumenta {mana} em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Aumenta a {mana}.",
+    "description_flat": "Aumenta a {mana} em {value_flat}.",
+    "description_percent": "Aumenta a {mana} em {value_percent}%.",
+    "description_both": "Aumenta a {mana} em {value_flat} + {value_percent}%.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -434,10 +420,8 @@ MANA = {
 
 NOTHING = {
     "name": "NADA",
-    "description": "Não faz nada.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description_static": "Não faz nada.",
+    "description_variable": "Não faz nada.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -452,10 +436,10 @@ NOTHING = {
 
 OIL = {
     "name": "ÓLEO",
-    "description": "Reduz a {speed} do alvo e aumenta o dano infligido por {burn} em {value_flat}.",
-    "description_flat": "Reduz a {speed} do alvo e aumenta o dano infligido por {burn} em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Diminui a {speed} e aumenta o dano infligido por {burn}.",
+    "description_flat": "Diminui a {speed} e aumenta o dano infligido por {burn} em {value_flat}.",
+    "description_percent": "Diminui a {speed} e aumenta o dano infligido por {burn} em {value_percent}%.",
+    "description_both": "Diminui a {speed} e aumenta o dano infligido por {burn} em {value_flat} + {value_percent}%.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -470,10 +454,10 @@ OIL = {
 
 PAIN = {
     "name": "DOR",
-    "description": "Inflige {value_flat} de dano a si mesmo. Ignora efeitos defensivos.",
-    "description_flat": "Inflige {value_flat} de dano a si mesmo. Ignora efeitos defensivos.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Inflige dano em si mesmo. Ignora a maioria dos efeitos defensivos.",
+    "description_flat": "Inflige {value_flat} de dano em si mesmo. Ignora a maioria dos efeitos defensivos.",
+    "description_percent": "Inflige dano em si mesmo igual a {value_percent}% do {max_hp}. Ignora a maioria dos efeitos defensivos.",
+    "description_both": "Inflige dano em si mesmo igual a {value_flat} + {value_percent}% do {max_hp}. Ignora a maioria dos efeitos defensivos.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -488,10 +472,10 @@ PAIN = {
 
 PIERCE = {
     "name": "PERFURAR",
-    "description": "Inflige {value_flat} de dano. Ignora {absorb}, {block} e {sacred_block}.",
-    "description_flat": "Inflige {value_flat} de dano. Ignora {absorb}, {block} e {sacred_block}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Inflige dano. Ignora a maioria dos efeitos defensivos.",
+    "description_flat": "Inflige {value_flat} de dano. Ignora a maioria dos efeitos defensivos.",
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo. Ignora a maioria dos efeitos defensivos.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo. Ignora a maioria dos efeitos defensivos.",
     "action": "PERFUROU",
     "activation": None,
     "countdown": None,
@@ -506,10 +490,10 @@ PIERCE = {
 
 POISON = {
     "name": "VENENO",
-    "description": "Inflige {value_flat} de dano em todo início de turno.",
-    "description_flat": "Inflige {value_flat} de dano em todo início de turno.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Inflige dano no alvo no início de seus turnos.",
+    "description_flat": "Inflige {value_flat} de dano no alvo no início de seus turnos.",
+    "description_percent": "Inflige dano igual a {value_percent}% do {max_hp} do alvo no início de seus turnos.",
+    "description_both": "Inflige dano igual a {value_flat} + {value_percent}% do {max_hp} do alvo no início de seus turnos.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
     "countdown": None,
@@ -524,10 +508,10 @@ POISON = {
 
 REGEN = {
     "name": "REGENERAÇÃO",
-    "description": "Restaura {hp} em todo início de turno.",
-    "description_flat": "Restaura {value_flat} de {hp} em todo início de turno.",
-    "description_percent": "Restaura {hp} em {value_percent}% do {max_hp} em todo início de turno.",
-    "description_both": "Restaura {hp} em {value_flat} + {value_percent}% do {max_hp} em todo início de turno.",
+    "description": "Restaura o {hp} do alvo no início de seus turnos.",
+    "description_flat": "Restaura o {hp} do alvo em {value_flat} no início de seus turnos.",
+    "description_percent": "Restaura o {hp} do alvo em {value_percent}% no início de seus turnos.",
+    "description_both": "Restaura o {hp} do alvo em {value_flat} + {value_percent}% no início de seus turnos.",
     "action": None,
     "activation": "{target} restaurou {value_flat} de {hp} de si mesmo através da {keyword}.",
     "countdown": None,
@@ -542,10 +526,8 @@ REGEN = {
 
 REPEL = {
     "name": "REPELIR",
-    "description": "Diminui a prioridade do alvo para os inimigos.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "Diminui a prioridade do alvo ser alvejado pelos inimigos.",
+    "description_variable": "Diminui a prioridade do alvo ser alvejado pelos inimigos por {duration} {turns}.",
     "action": "REPELIU",
     "activation": None,
     "countdown": None,
@@ -560,10 +542,10 @@ REPEL = {
 
 REVIVE = {
     "name": "REVIVER",
-    "description": "Se o alvo estiver morto, o revive e restaura seu {hp}.",
-    "description_flat": "Se o alvo estiver morto, o revive e restaura {value_flat} de {hp}.",
-    "description_percent": "Se o alvo estiver morto, o revive e restaura seu {hp} em {value_percent}% de seu {max_hp}.",
-    "description_both": "Se o alvo estiver morto, o revive e restaura seu {hp} em {value_flat} + {value_percent}% de seu {max_hp}.",
+    "description": "Se o alvo estiver morto, restaura o {hp}.",
+    "description_flat": "Se o alvo estiver morto, restaura {value_flat} de {hp}.",
+    "description_percent": "Se o alvo estiver morto, restaura o {hp} por {value_percent}% do {max_hp}.",
+    "description_both": "Se o alvo estiver morto, restaura o {hp} por {value_flat} + {value_percent}% do {max_hp}.",
     "action": "REVIVEU",
     "activation": None,
     "countdown": None,
@@ -578,10 +560,8 @@ REVIVE = {
 
 SACRED_BLOCK = {
     "name": "BLOQUEIO SAGRADO",
-    "description": "Reduz todo o dano direto recebido até {value_flat} vezes.",
-    "description_flat": "Reduz todo o dano direto recebido até {value_flat} vezes.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Reduz todo o dano direto recebido.",
+    "description_variable": "Reduz todo o dano direto recebido até {value_flat} vezes.",
     "action": "SAGRADAMENTE BLOQUEADO",
     "activation": "{defended_damage} de dano foi {defensive_action}.",
     "countdown": None,
@@ -596,10 +576,8 @@ SACRED_BLOCK = {
 
 SLEEP = {
     "name": "SONO",
-    "description": "Impede que o alvo aja. Qualquer dano direto irá acordar o alvo.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo não pode agir em seu turno. Infligir dano direto remove o efeito.",
+    "description_variable": "O alvo não pode agir em seu turno por {duration} {turns}. Infligir dano direto remove o efeito.",
     "action": None,
     "activation": "{source} não pôde agir porque estava {status}.",
     "countdown": None,
@@ -614,10 +592,10 @@ SLEEP = {
 
 SLOW = {
     "name": "LENTIDÃO",
-    "description": "Reduz a {speed} do alvo em {value_flat}.",
-    "description_flat": "Reduz a {speed} do alvo em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Diminui a {speed}.",
+    "description_flat": "Diminui a {speed} em {value_flat}.",
+    "description_percent": "Diminui a {speed} em {value_percent}%.",
+    "description_both": "Diminui a {speed} em {value_flat} + {value_percent}%.",
     "action": "DESACELEROU",
     "activation": None,
     "countdown": None,
@@ -632,10 +610,10 @@ SLOW = {
 
 STRENGTH = {
     "name": "FORÇA",
-    "description": "Aumenta o dano infligido por efeitos ofensivos em {value_flat}.",
-    "description_flat": "Aumenta o dano infligido por efeitos ofensivos em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Aumenta o dano de efeitos ofensivos.",
+    "description_flat": "Aumenta o dano de efeitos ofensivos em {value_flat}.",
+    "description_percent": "Aumenta o dano de efeitos ofensivos em {value_percent}%.",
+    "description_both": "Aumenta o dano de efeitos ofensivos em {value_flat} + {value_percent}%.",
     "action": "FORTALECER",
     "activation": None,
     "countdown": None,
@@ -650,10 +628,8 @@ STRENGTH = {
 
 STUN = {
     "name": "ATORDOAMENTO",
-    "description": "Impede que o alvo aja.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "O alvo não pode agir em seu turno.",
+    "description_variable": "O alvo não pode agir em seu turno por {duration} {turns}.",
     "action": None,
     "activation": "{source} não pôde agir porque estava {status}.",
     "countdown": None,
@@ -668,10 +644,8 @@ STUN = {
 
 TAUNT = {
     "name": "PROVOCAR",
-    "description": "Aumenta a prioridade do alvo para os inimigos.",
-    "description_flat": None,
-    "description_percent": None,
-    "description_both": None,
+    "description": "Aumenta a prioridade do alvo ser alvejado pelos inimigos.",
+    "description_variable": "Aumenta a prioridade do alvo ser alvejado pelos inimigos por {duration} {turns}.",
     "action": "PROVOCOU",
     "activation": None,
     "countdown": None,
@@ -686,10 +660,10 @@ TAUNT = {
 
 THORNS = {
     "name": "ESPINHOS",
-    "description": "Quando atacado diretamente, inflige {value_flat} de dano ao atacante.",
-    "description_flat": "Quando atacado diretamente, inflige {value_flat} de dano ao atacante.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Quando atacado diretamente, inflige dano de volta.",
+    "description_flat": "Quando atacado diretamente, inflige {value_flat} de dano de volta.",
+    "description_percent": "Quando atacado diretamente, inflige dano de volta igual a {value_percent}% do {max_hp} do alvo.",
+    "description_both": "Quando atacado diretamente, inflige dano de volta igual a {value_flat} + {value_percent}% do {max_hp} do alvo.",
     "action": None,
     "activation": "{target} recebeu {damage} de dano de {keyword}.",
     "countdown": None,
@@ -704,10 +678,10 @@ THORNS = {
 
 WEAK = {
     "name": "FRAQUEZA",
-    "description": "Reduz o dano infligido por efeitos ofensivos em {value_flat}.",
-    "description_flat": "Reduz o dano infligido por efeitos ofensivos em {value_flat}.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Reduz o dano de efeitos ofensivos.",
+    "description_flat": "Reduz o dano de efeitos ofensivos em {value_flat}.",
+    "description_percent": "Reduz o dano de efeitos ofensivos em {value_percent}%.",
+    "description_both": "Reduz o dano de efeitos ofensivos em {value_flat} + {value_percent}%.",
     "action": "ENFRAQUECER",
     "activation": None,
     "countdown": None,
