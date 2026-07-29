@@ -1,6 +1,9 @@
 """PT-BR localization for combat module."""
 
-ACTIONS = {"skip_turn": "{name} decidiu não fazer nada."}
+ACTIONS = {
+    "roll_dice": "{name} rolou seus dados e tirou:",
+    "skip_turn": "{name} decidiu não fazer nada.",
+}
 
 COMBAT = {
     "ai": "IA",
@@ -17,7 +20,7 @@ COMBAT = {
 FAILS = {
     "act_disabled": "não pôde agir.",
     "default": "falhou.",
-    "non-persistable": "falhou.",
+    "non-persistable": "foi ineficaz.",
     "source_alive": "estava vivo.",
     "source_dead": "estava morto.",
     "source_freeze": "estava {fail_status}.",

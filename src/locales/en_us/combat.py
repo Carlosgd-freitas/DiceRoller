@@ -1,6 +1,9 @@
 """EN-US localization for combat module."""
 
-ACTIONS = {"skip_turn": "{name} decided to do nothing."}
+ACTIONS = {
+    "roll_dice": "{name} rolled their dice and got:",
+    "skip_turn": "{name} decided to do nothing.",
+}
 
 COMBAT = {
     "ai": "AI",
@@ -17,7 +20,7 @@ COMBAT = {
 FAILS = {
     "act_disabled": "they could not act.",
     "default": "failed.",
-    "non-persistable": "failed.",
+    "non-persistable": "it was ineffective.",
     "source_alive": "they were alive.",
     "source_dead": "they were dead.",
     "source_freeze": "they were {fail_status}.",

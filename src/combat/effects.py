@@ -224,7 +224,7 @@ class EffectManager(Manager):
             and check_persistable
             and effect.persistent
             and effect.value is not None
-            and effect.get_effective_value(source, target) == 0
+            and effect.get_effective_value(source, target) <= 0
         ):
             fail = "non-persistable"
 

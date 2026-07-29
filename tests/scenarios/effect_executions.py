@@ -1,4 +1,4 @@
-"""Scenario for testing effect logging."""
+"""Scenario for testing effect execution logging."""
 
 from copy import deepcopy
 from random import choice
@@ -7,6 +7,7 @@ from colorama import init
 
 from src.base.color import Color, ColorData
 from src.base.dice import Dice
+from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.monster import Monster
 from src.base.side import Side
@@ -32,7 +33,6 @@ from src.effects.freeze import FreezeEffect
 from src.effects.frostburn import FrostburnEffect
 from src.effects.haste import HasteEffect
 from src.effects.immunity import ImmunityEffect
-from src.effects.invisible import InvisibleEffect
 from src.effects.invulnerable import InvulnerableEffect
 from src.effects.mana_regen import ManaRegenEffect
 from src.effects.pierce import PierceEffect
@@ -60,8 +60,11 @@ for effect in all_effects:
         if effect.value.flat is not None:
             effect.value.flat = 1
 
-        if effect.value.percent is not None:
-            effect.value.percent = 1
+        if effect.value.percent is not None and effect.type in [
+            EffectType.BUFF,
+            EffectType.DEBUFF,
+        ]:
+            effect.value.percent = 0.5
 
     if effect.duration is not None:
         effect.duration = 2
@@ -172,6 +175,30 @@ for effect in all_effects:
         source=monster_a,
         target=monster_b,
     )
+
+monster_a.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: Non-Persistable =====")
+
+effect = FragileEffect(Stat(flat=99))
+
+combat_manager.effect_manager.execute_effect(
+    effect=effect,
+    source=monster_a,
+    target=monster_a,
+)
+
+effect = BlockEffect(Stat(flat=1))
+
+combat_manager.effect_manager.execute_effect(
+    effect=effect,
+    source=monster_a,
+    target=monster_a,
+)
+
+combat_manager.logger.log_monster(monster_a)
 
 monster_a.effects = []
 
@@ -366,6 +393,8 @@ for removed, removers in removal_sets:
             target=monster_b,
         )
 
+monster_b.effects = []
+
 # ----------------------------
 
 print("\n===== Effect Activation: Act Disabling =====")
@@ -373,9 +402,9 @@ print("\n===== Effect Activation: Act Disabling =====")
 combat_manager.current_monster = monster_a
 
 for effect in [
-    FreezeEffect(Stat(flat=1)),
-    SleepEffect(Stat(flat=1)),
-    StunEffect(Stat(flat=1)),
+    FreezeEffect(),
+    SleepEffect(),
+    StunEffect(),
 ]:
     monster_a.effects = [effect]
 
@@ -390,7 +419,7 @@ print("\n===== Effect Activation: Being Attacked =====")
 for effect in [
     AbsorbEffect(Stat(flat=1)),
     BlockEffect(Stat(flat=1)),
-    InvulnerableEffect(),
+    InvulnerableEffect(target_keywords=[Keyword.ALL]),
     SacredBlockEffect(Stat(flat=1)),
     ThornsEffect(Stat(flat=1)),
 ]:
@@ -422,12 +451,11 @@ for effect in [
     combat_manager.take_turn()
 
 combat_manager.current_monster.dice = []
+combat_manager.current_monster.effects = []
 
 # ----------------------------
 
 print("\n===== Effect Activation: Turn Start =====")
-
-combat_manager.current_monster.effects = []
 
 for effect in [
     BurnEffect(Stat(flat=1)),
@@ -440,29 +468,27 @@ for effect in [
 
 combat_manager.start_turn()
 
+combat_manager.current_monster.effects = []
+
 # ----------------------------
 
 print("\n===== Effect Limit =====")
 
-combat_manager.current_monster.effects = []
-effects = []
-
-for i in range(10):
-    if i % 2 == 0:
-        effect = RegenEffect(Stat(flat=1), duration=2)
-    else:
-        effect = InvisibleEffect(Stat(flat=1), duration=2)
-    effects.append(effect)
-
 for i in [0, 1, 2, 5, 6, 10]:
-    combat_manager.current_monster.effects = effects[:i]
+    effects = []
+
+    for _ in range(i):
+        effect = deepcopy(choice(all_effects))
+        effects.append(effect)
+
+    combat_manager.current_monster.effects = effects
     combat_manager.logger.log_monster(combat_manager.current_monster)
+
+combat_manager.current_monster.effects = []
 
 # ----------------------------
 
 print("\n===== Alternative colored monster =====")
-
-combat_manager.current_monster.effects = []
 
 color_data: ColorData = {
     "foreground_color": Color.PURPLE,
@@ -478,3 +504,5 @@ for _ in range(10):
 
 combat_manager.current_monster.effects = effects
 combat_manager.logger.log_monster(combat_manager.current_monster, color_data=color_data)
+
+combat_manager.current_monster.effects = []

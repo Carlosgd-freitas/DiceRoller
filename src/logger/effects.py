@@ -103,9 +103,26 @@ class EffectLogger(StatLogger):
         value_flat = None
         value_percent = None
 
+        buffs = None
+        debuffs = None
+
         if effect.value is not None:
             if effect.value.flat is not None:
                 value_flat = numeric_to_string(effect.value.flat)
+
+                buffs = self.pluralize(
+                    effect.value.flat,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="buff",
+                )
+
+                debuffs = self.pluralize(
+                    effect.value.flat,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="debuff",
+                )
 
             if effect.value.percent is not None:
                 value_percent = numeric_to_string(effect.value.percent * 100)
@@ -131,6 +148,11 @@ class EffectLogger(StatLogger):
 
             if effect.max_value.percent is not None:
                 max_value_percent = numeric_to_string(effect.max_value.percent * 100)
+
+        # Effective value
+        effective_value = effect.get_effective_value(source=source, target=target)
+        if effective_value is not None:
+            effective_value = numeric_to_string(effective_value)
 
         # Delta
         delta_flat = None
@@ -162,20 +184,42 @@ class EffectLogger(StatLogger):
         if effect.accuracy is not None:
             accuracy = numeric_to_string(effect.accuracy * 100)
 
+        # Target Keywords
+        target_keywords = None
+
+        if effect.target_keywords is not None:
+            target_keywords = self.get_multiple_effects_message(
+                keywords=effect.target_keywords
+            )
+
         # Effect params
         params.update(
             {
-                "accuracy": accuracy,
-                "delta_flat": delta_flat,
-                "delta_percent": delta_percent,
-                "duration": duration,
-                "max_value_flat": max_value_flat,
-                "max_value_percent": max_value_percent,
-                "min_value_flat": min_value_flat,
-                "min_value_percent": min_value_percent,
+                "accuracy": color_string(accuracy, intensity="BRIGHT"),
+                "delta_flat": color_string(delta_flat, intensity="BRIGHT"),
+                "delta_percent": color_string(delta_percent, intensity="BRIGHT"),
+                "duration": color_string(duration, intensity="BRIGHT"),
+                "effective_value": color_string(effective_value, intensity="BRIGHT"),
+                "max_value_flat": color_string(max_value_flat, intensity="BRIGHT"),
+                "max_value_percent": color_string(
+                    max_value_percent, intensity="BRIGHT"
+                ),
+                "min_value_flat": color_string(min_value_flat, intensity="BRIGHT"),
+                "min_value_percent": color_string(
+                    min_value_percent, intensity="BRIGHT"
+                ),
+                "target_keywords": target_keywords,
+                "value_flat": color_string(value_flat, intensity="BRIGHT"),
+                "value_percent": color_string(value_percent, intensity="BRIGHT"),
+            }
+        )
+
+        # Lexicon words
+        params.update(
+            {
+                "buffs": buffs,
+                "debuffs": debuffs,
                 "turns": turns,
-                "value_flat": value_flat,
-                "value_percent": value_percent,
             }
         )
 
@@ -243,6 +287,7 @@ class EffectLogger(StatLogger):
         if effect and associated:
             params = self._get_effect_params(effect)
 
+            # Duration-based effects
             if (
                 effect.keyword
                 in [
@@ -260,22 +305,28 @@ class EffectLogger(StatLogger):
             ):
                 message += " " + color_string(params["duration"], **color_data)
 
-            else:
-                values = []
+            # Value-based effects
+            elif effect.value and (effect.value.flat or effect.value.percent):
+                message += " "
 
-                if params["value_flat"] is not None:
-                    values.append(color_string(params["value_flat"], **color_data))
+                if not effect.value.flat and not effect.value.percent:
+                    message += color_string(params["value_flat"], **color_data)
 
-                elif params["value_percent"] is not None:
-                    values.append(
-                        color_string(params["value_percent"] + "%", **color_data)
-                    )
+                elif effect.value.flat and not effect.value.percent:
+                    message += color_string(params["value_flat"], **color_data)
 
-                message += " " + color_string(" + ", **color_data).join(values)
+                elif not effect.value.flat and effect.value.percent:
+                    message += color_string(params["value_percent"] + "%", **color_data)
 
+                else:
+                    message += color_string(params["value_flat"] + " + ", **color_data)
+                    message += color_string(params["value_percent"] + "%", **color_data)
+
+            # Effects with target keywords
             if (effect.target_keywords) and (Keyword.ALL not in effect.target_keywords):
                 keywords = self.get_multiple_effects_message(
-                    keywords=effect.target_keywords
+                    keywords=effect.target_keywords,
+                    associated=False,
                 )
                 message += color_string(f" [ {keywords} ]", **color_data)
 
@@ -628,11 +679,6 @@ class EffectLogger(StatLogger):
 
         # Logging offensive type effect execution
         if effect.type == EffectType.OFFENSIVE:
-            # Effective value
-            effective_value = effect.get_effective_value(source=source, target=target)
-            if effective_value is not None:
-                kwargs["effective_value"] = str(effective_value)
-
             return self._log_damage_calculation(
                 effect,
                 **kwargs,
@@ -714,9 +760,10 @@ class EffectLogger(StatLogger):
 
         # Fail cause message
         fail: str = kwargs["fail"]
+        possible_fail_keyword = fail.removeprefix("source_").removeprefix("target_")
 
         for keyword in Keyword:
-            if fail == keyword.name.lower():
+            if possible_fail_keyword == keyword.name.lower():
                 kwargs["fail_status"] = self.get_colored_message(
                     keyword=keyword,
                     namespace="effects",
@@ -769,7 +816,8 @@ class EffectLogger(StatLogger):
     def log_effect_description(
         self,
         effect: Effect,
-        params: Literal["name", "value"] = "value",
+        variation: Literal["static", "variable"] = "static",
+        key: str = None,
         end: str = "\n",
         **kwargs,
     ) -> None:
@@ -779,9 +827,12 @@ class EffectLogger(StatLogger):
         :param effect: An Effect.
         :type effect: Effect
 
-        :param params: If equal to "value", the effect's parameters values will be used to log.
-        If equal to "name", their names inside a <> will be used instead. Default value is "value".
-        :type params: Literal["name", "value"]
+        :param variation: If equal to "variable" the effect description that takes its parameters into
+        consideration will be logged; if equal to "static", they will not be. Default value is "static".
+        :type variation: Literal["static", "variable"]
+
+        :param key: The message key.
+        :type key: str
 
         :param end: What will be printed at the end of the message. Default value is
         \\n.
@@ -792,30 +843,10 @@ class EffectLogger(StatLogger):
 
         kwargs.update(self._get_effect_params(effect, **kwargs))
 
-        # if params == "name":
-        #     for key in [
-        #         "accuracy",
-        #         "delta_flat",
-        #         "delta_percent",
-        #         "duration",
-        #         "max_value_flat",
-        #         "max_value_percent",
-        #         "min_value_flat",
-        #         "min_value_percent",
-        #         "value_flat",
-        #         "value_percent",
-        #     ]:
-        #         translated_word = self.get_message(
-        #             namespace="base", message_group="LEXICON", key=key
-        #         )
-
-        #         kwargs[key] = color_string(
-        #             f"<{translated_word.title()}>",
-        #             foreground_color=Color.WHITE,
-        #             intensity="BRIGHT",
-        #         )
-
-        key = effect.get_description_key()
+        if (key is None) and (variation == "static"):
+            key = "description"
+        elif (key is None) and (variation == "variable"):
+            key = effect.get_description_variable_key()
 
         message = self.get_message(
             namespace="effects",
@@ -863,7 +894,7 @@ class EffectLogger(StatLogger):
         # Description
         self.log_effect_description(
             effect=effect,
-            params="value",
+            variation="variable",
         )
 
         # Duration

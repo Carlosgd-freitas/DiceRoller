@@ -464,6 +464,7 @@ class CombatManager(Manager):
         :type monster: Monster
         """
         sides = self.effect_manager.roll(monster)
+        self.logger.log_roll_dice(monster, sides)
 
         allies = self.team_manager.get_allies(monster, self.teams)
         enemies = self.team_manager.get_enemies(monster, self.teams)

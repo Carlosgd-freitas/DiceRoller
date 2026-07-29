@@ -8,6 +8,7 @@ from tabulate import tabulate
 
 from src.base.color import Color, color_string
 from src.base.keywords import Keyword
+from src.base.text import numeric_to_string
 from src.logger.dice import DiceLogger
 
 if TYPE_CHECKING:
@@ -136,7 +137,8 @@ class MonsterLogger(DiceLogger):
         message = attribute_params["speed"] + ":"
         row.append(message)
 
-        message = f"{monster.get_effective_speed()}"
+        speed = monster.get_effective_speed()
+        message = numeric_to_string(speed)
 
         if monster.has_effect(Keyword.HASTE):
             message = color_string(message, foreground_color=Color.SPRING_GREEN)

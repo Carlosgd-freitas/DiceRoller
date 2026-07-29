@@ -225,7 +225,7 @@ class EditMenu(Menu):
             key=f"select_{attribute}_prompt",
         )
 
-        selected_option: Option = self.select(options, message)
+        selected_option: Option = self.select(options, message, validate=False)
 
         return selected_option
 
@@ -263,9 +263,7 @@ class EditMenu(Menu):
                 key="select_option_prompt",
             )
             selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected):
-                self.process_option(selected)
+            self.process_option(selected)
 
             if selected.id in ["EXIT", "RETURN"]:
                 break

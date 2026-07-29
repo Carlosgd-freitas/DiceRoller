@@ -76,7 +76,7 @@ class BlockEffect(Effect):
 
         if self.value.flat is not None:
             effective_value += self.value.flat
-        if self.value.percent is not None:
+        if (self.value.percent is not None) and (target is not None):
             effective_value += self.value.percent * target.max_hp
 
         # Modifiers
@@ -114,7 +114,10 @@ class BlockEffect(Effect):
         ):
             effective_value = self.max_value.flat
 
-        return ceil(effective_value)
+        if (effective_value != inf) and (effective_value != -inf):
+            effective_value = ceil(effective_value)
+
+        return effective_value
 
     def get_description_variable_key(self) -> str:
         """

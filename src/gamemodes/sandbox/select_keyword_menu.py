@@ -171,7 +171,7 @@ class SelectKeywordMenu(Menu):
             key="select_side_prompt",
         )
 
-        selected_option: Option = self.select(options, message)
+        selected_option: Option = self.select(options, message, validate=False)
 
         return selected_option.obj
 
@@ -309,9 +309,7 @@ class SelectKeywordMenu(Menu):
                 key="select_option_prompt",
             )
             selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected):
-                self.process_option(selected)
+            self.process_option(selected)
 
             if selected.id in ["EXIT", "RETURN"]:
                 break

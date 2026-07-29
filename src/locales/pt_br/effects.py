@@ -112,8 +112,8 @@ BURN = {
 
 CLEANSE = {
     "name": "PURIFICAR",
-    "description": "Remove enfraquecimentos, começando pelo mais antigo.",
-    "description_variable": "Remove até {value_flat} enfraquecimentos, começando pelo mais antigo.",
+    "description": "Remove enfraquecimentos, do mais antigo para o mais novo.",
+    "description_variable": "Remove até {value_flat} {debuffs}, do mais antigo para o mais novo.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -144,8 +144,8 @@ CONFUSE = {
 
 CORRUPT = {
     "name": "CORROMPER",
-    "description": "Remove fortalecimentos, começando pelo mais antigo.",
-    "description_variable": "Remove até {value_flat} fortalecimentos, começando pelo mais antigo.",
+    "description": "Remove fortalecimentos, do mais antigo para o mais novo.",
+    "description_variable": "Remove até {value_flat} {buffs}, do mais antigo para o mais novo.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -560,7 +560,7 @@ REVIVE = {
 
 SACRED_BLOCK = {
     "name": "BLOQUEIO SAGRADO",
-    "description": "Reduz todo o dano direto recebido.",
+    "description": "Reduz todo o dano direto recebido um número de vezes.",
     "description_variable": "Reduz todo o dano direto recebido até {value_flat} vezes.",
     "action": "SAGRADAMENTE BLOQUEADO",
     "activation": "{defended_damage} de dano foi {defensive_action}.",

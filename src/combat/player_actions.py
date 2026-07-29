@@ -197,6 +197,41 @@ class CombatPlayerActionsMenu(Menu):
     # Options
     # =========================================================================
 
+    def select(
+        self,
+        options: List[Option],
+        monster: Monster,
+        message: str = None,
+        validate: bool = True,
+    ) -> Option:
+        """
+        Prompts the user to select an option from a list. If an invalid key is selected,
+        the prompt will repeat.
+
+        :param options: List of selectable options.
+        :type options: List[Option]
+
+        :param monster: Monster being controlled by a player.
+        :type monster: Monster
+
+        :param message: Message to use in the input prompt. Default value is None.
+        :type message: str
+
+        :param validate: If the option will be validated when selected. Default value is True.
+        :type validate: bool
+
+        :return: Option selected by the user.
+        :rtype: Option
+        """
+        while True:
+            selected = self.logger.input(message=message)
+
+            for option in options:
+                if selected == option.key and (
+                    not validate or self.is_option_valid(option, monster)
+                ):
+                    return option
+
     def is_option_valid(self, option: Option, monster: Monster) -> bool:
         """
         Returns if the option can be selected or not.
@@ -250,7 +285,7 @@ class CombatPlayerActionsMenu(Menu):
             return {"turn_taken": False, "wait_for_input": True}
 
         elif option.id == "SHOW_DETAILS":
-            return self.show_details()
+            return self.show_details(monster)
 
         elif option.id == "SKIP_TURN":
             return self.skip_turn(monster)
@@ -484,7 +519,9 @@ class CombatPlayerActionsMenu(Menu):
                 key="select_side_prompt",
             )
 
-            selected_option: Option = self.select(options, message)
+            selected_option: Option = self.select(
+                options, monster, message, validate=False
+            )
             self.logger.log(message="")
 
             # Cancelling action
@@ -617,7 +654,9 @@ class CombatPlayerActionsMenu(Menu):
                         key="select_target_prompt",
                     )
 
-                    selected_option: Option = self.select(options, message)
+                    selected_option: Option = self.select(
+                        options, monster, message, validate=False
+                    )
 
                     if selected_option.id == "CANCEL":
                         cancel = True
@@ -653,7 +692,7 @@ class CombatPlayerActionsMenu(Menu):
 
         return {"turn_taken": True, "wait_for_input": True}
 
-    def show_details(self) -> CombatPlayerActionData:
+    def show_details(self, monster: Monster) -> CombatPlayerActionData:
         """
         The steps of this method is as follows:
         1. All alive monsters in combat are logged.
@@ -722,7 +761,7 @@ class CombatPlayerActionsMenu(Menu):
             key="select_target_prompt",
         )
 
-        selected_option: Option = self.select(options, message)
+        selected_option: Option = self.select(options, monster, message, validate=False)
 
         # Cancelling action
         if selected_option.id == "CANCEL":
@@ -818,10 +857,8 @@ class CombatPlayerActionsMenu(Menu):
                 message_group="BASE",
                 key="select_option_prompt",
             )
-            selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected, monster):
-                data = self.process_option(selected, monster)
+            selected = self.select(self.options, monster, message)
+            data = self.process_option(selected, monster)
 
             if not data["turn_taken"]:
                 self.logger.log_turn_start(monster)

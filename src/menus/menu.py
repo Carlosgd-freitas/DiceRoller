@@ -93,6 +93,7 @@ class Menu(Manager):
         self,
         options: List[Option],
         message: str = None,
+        validate: bool = True,
     ) -> Option:
         """
         Prompts the user to select an option from a list. If an invalid key is selected,
@@ -104,6 +105,9 @@ class Menu(Manager):
         :param message: Message to use in the input prompt. Default value is None.
         :type message: str
 
+        :param validate: If the option will be validated when selected. Default value is True.
+        :type validate: bool
+
         :return: Option selected by the user.
         :rtype: Option
         """
@@ -111,7 +115,9 @@ class Menu(Manager):
             selected = self.logger.input(message=message)
 
             for option in options:
-                if selected == option.key:
+                if selected == option.key and (
+                    not validate or self.is_option_valid(option)
+                ):
                     return option
 
     @abstractmethod
@@ -196,9 +202,7 @@ class Menu(Manager):
                 key="select_option_prompt",
             )
             selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected):
-                self.process_option(selected)
+            self.process_option(selected)
 
             if selected.id in ["EXIT", "RETURN"]:
                 break

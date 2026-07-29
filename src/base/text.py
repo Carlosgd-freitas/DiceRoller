@@ -17,10 +17,12 @@ def numeric_to_string(value: float) -> str:
 
     if isinstance(value, str):
         return value
-    elif value != inf:
-        return f"{value:g}"
-    else:
+    elif value == inf:
         return "∞"
+    elif value == -inf:
+        return "-∞"
+    else:
+        return f"{value:g}"
 
 
 def unaccent(text: str) -> str:

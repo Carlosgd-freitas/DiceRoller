@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from math import ceil, inf
 from typing import TYPE_CHECKING, List
 from uuid import uuid4
 
@@ -358,6 +359,9 @@ class Entity:
                 negative += effective_speed * slow.value.percent
 
         effective_speed += positive - negative
+
+        if (effective_speed != inf) and (effective_speed != -inf):
+            effective_speed = ceil(effective_speed)
 
         return effective_speed
 

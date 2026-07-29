@@ -607,11 +607,8 @@ class Compendium(Menu):
             if selected.id == "EXIT":
                 break
 
-            elif self.is_option_valid(selected):
-                self.process_option(selected)
-
             else:
-                self.logger.log(message="")
+                self.process_option(selected)
 
             # Showing Content
             if self.level == CompendiumLevel.PAGE:

@@ -112,8 +112,8 @@ BURN = {
 
 CLEANSE = {
     "name": "CLEANSE",
-    "description": "Removes debuffs, starting from the oldest.",
-    "description_variable": "Removes up to {value_flat} debuffs, starting from the oldest.",
+    "description": "Removes debuffs, from oldest to newest.",
+    "description_variable": "Removes up to {value_flat} {debuffs}, from oldest to newest.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -144,10 +144,8 @@ CONFUSE = {
 
 CORRUPT = {
     "name": "CORRUPT",
-    "description": "Removes buffs, starting from the oldest.",
-    "description_variable": "Removes up to {value_flat} buffs, starting from the oldest.",
-    "description_percent": None,
-    "description_both": None,
+    "description": "Removes buffs, from oldest to newest.",
+    "description_variable": "Removes up to {value_flat} {buffs}, from oldest to newest.",
     "action": None,
     "activation": None,
     "countdown": None,
@@ -562,10 +560,8 @@ REVIVE = {
 
 SACRED_BLOCK = {
     "name": "SACRED BLOCK",
-    "description": "Reduces all recieved direct damage.",
+    "description": "Reduces all recieved direct damage a number of times.",
     "description_variable": "Reduces all recieved direct damage up to {value_flat} times.",
-    "description_percent": None,
-    "description_both": None,
     "action": "SACRED BLOCKED",
     "activation": "{defended_damage} damage was {defensive_action}.",
     "countdown": None,

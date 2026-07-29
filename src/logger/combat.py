@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, List
 from src.base.color import Color, ColorData, color_string
 from src.base.life_state import LifeState
 from src.base.monster import ControlType, Monster
+from src.base.side import Side
 from src.logger.monster import MonsterLogger
 from src.systems.targeting.filters import filter_monsters
 
@@ -275,6 +276,35 @@ class CombatLogger(MonsterLogger):
         )
 
         self.log(message=message)
+
+        return
+
+    def log_roll_dice(self, monster: Monster, sides: List[Side]):
+        """
+        Logs a monster rolling their dice.
+
+        :param monster: A monster.
+        :type monster: Monster
+
+        :param sides: The sides that were rolled.
+        :type sides: List[Side]
+        """
+        if not self.enabled:
+            return
+
+        name = self.get_monster_name(monster)
+
+        message = self.get_message(
+            namespace="combat",
+            message_group="ACTIONS",
+            key="roll_dice",
+            name=name,
+        )
+        self.log(message=message)
+
+        for side in sides:
+            message = "● " + self.get_side_effects_message(side)
+            self.log(message=message)
 
         return
 

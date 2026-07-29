@@ -369,6 +369,6 @@ class EffectCompendium(Compendium):
         # Description
         self.logger.log_effect_description(
             effect=item,
-            params="name",
+            variation="static",
         )
         self.logger.log(message="")

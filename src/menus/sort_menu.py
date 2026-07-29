@@ -296,9 +296,7 @@ class SortMenu(Menu):
                 key="select_option_prompt",
             )
             selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected):
-                self.process_option(selected)
+            self.process_option(selected)
 
             if selected.id in ["EXIT", "RETURN"]:
                 break

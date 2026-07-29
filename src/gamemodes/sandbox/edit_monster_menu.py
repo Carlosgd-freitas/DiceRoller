@@ -365,9 +365,7 @@ class EditMonsterMenu(Menu):
                 key="select_option_prompt",
             )
             selected = self.select(self.options, message)
-
-            if self.is_option_valid(selected):
-                self.process_option(selected, team)
+            self.process_option(selected, team)
 
             if selected.id in ["EXIT", "RETURN"]:
                 break
