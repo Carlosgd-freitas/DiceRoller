@@ -8,6 +8,8 @@ ATTRIBUTES = {
 }
 
 DETAILS = {
+    "no_members": "This team has no members.",
+    "no_teams": "This combat has no teams.",
     "no_sides": "This dice has no sides.",
     "no_effects": "This side has no effects.",
 }

@@ -2,7 +2,8 @@
 
 from typing import Dict
 
-from src.combat.manager import CombatManager, OrderStrategy
+from src.combat.manager import CombatManager
+from src.combat.order_strategy import OrderStrategy
 from tests.utils import assert_conditions
 
 
@@ -25,7 +26,7 @@ def test_turn_order_faster(combat: Dict):
 def test_turn_order_set(combat: Dict):
     combat_manager: CombatManager = combat["combat_manager"]
 
-    combat_manager.order_strategy = OrderStrategy.SET
+    combat_manager.order_strategy = OrderStrategy.SEQUENTIAL
     combat_manager.start_combat()
 
     conditions = [

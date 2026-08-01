@@ -36,6 +36,8 @@ class FocusEffect(Effect):
             min_value = Stat(percent=0)
         if max_value is None:
             max_value = Stat(percent=inf)
+        if delta is None:
+            delta = Stat(percent=0)
 
         super().__init__(
             keyword=Keyword.FOCUS,

@@ -38,6 +38,8 @@ class BurnEffect(Effect):
             min_value = Stat(flat=0, percent=0)
         if max_value is None:
             max_value = Stat(flat=inf, percent=inf)
+        if delta is None:
+            delta = Stat(flat=0, percent=0)
 
         super().__init__(
             keyword=Keyword.BURN,

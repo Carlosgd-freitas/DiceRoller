@@ -4,19 +4,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, List
 
-from src.base.color import Color, color_string
-from src.base.life_state import LifeState
 from src.base.team import Team
-from src.combat.manager import CombatData, CombatManager
-from src.compendium.effects import get_all_effects
-from src.compendium.monsters import get_all_monsters
-from src.locales.languages import Language
-from src.logger.combat import CombatLogger
-from src.menus.menu import Menu
+from src.combat.manager import CombatData
+from src.gamemodes.sandbox.edit_dice_menu import EditDiceMenu
+from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
-from src.systems.file import FileManager
 from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
@@ -28,7 +22,7 @@ EXTENSION = ".monster.dat"
 # Generate Global ID
 
 
-class EditMonsterMenu(Menu):
+class EditMonsterMenu(EditMenu):
     """
     Edit Monster Menu class.
 
@@ -47,35 +41,20 @@ class EditMonsterMenu(Menu):
         self,
         settings: Settings,
         logging: bool = True,
+        randomizer: Randomizer = None,
     ):
-        # Initialization
-        logger = CombatLogger(enabled=logging, language=settings.language)
-
         super().__init__(
-            logger,
             settings,
+            message_group="EDIT_MONSTER",
+            logging=logging,
+            randomizer=randomizer,
         )
+        self.editing: Team = None
 
-        self.logger: CombatLogger
-
-        # Attributes
-        self.all_effects = get_all_effects()
-        self.all_monsters = get_all_monsters()
-
-        # Managers
-        self.combat_manager = CombatManager(settings)
-        combat_data = self.get_random_combat()
-        self.combat_manager.set_combat_data(combat_data)
-
-        self.file_manager = FileManager()
-        self.randomizer = Randomizer()
-
-    def get_title(self) -> str:
-        """
-        Returns the Menu's title.
-        """
-        return self.logger.get_message(
-            namespace="menus", message_group="SANDBOX", key="title"
+        self.edit_dice_menu = EditDiceMenu(
+            settings,
+            logging=logging,
+            randomizer=randomizer,
         )
 
     def get_options(self) -> List[Option]:
@@ -93,7 +72,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_DESCRIPTION",
+                id="EDIT_HP",
                 key="2",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -102,7 +81,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_HP",
+                id="EDIT_MANA",
                 key="3",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -111,7 +90,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_MANA",
+                id="EDIT_SPEED",
                 key="4",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -120,7 +99,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_SPEED",
+                id="EDIT_CONTROL_TYPE",
                 key="5",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -129,7 +108,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_CONTROL_TYPE",
+                id="EDIT_DIFFICULTY",
                 key="6",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -138,7 +117,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_DIFFICULTY",
+                id="EDIT_DICE",
                 key="7",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -147,7 +126,7 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_DICE",
+                id="EDIT_EQUIPMENT",
                 key="8",
                 message=self.logger.get_message(
                     namespace="menus",
@@ -156,17 +135,8 @@ class EditMonsterMenu(Menu):
                 ),
             ),
             Option(
-                id="EDIT_EQUIPMENT",
-                key="9",
-                message=self.logger.get_message(
-                    namespace="menus",
-                    message_group="SANDBOX",
-                    key="edit_combat",
-                ),
-            ),
-            Option(
                 id="EDIT_SKILLS",
-                key="10",
+                key="9",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="SANDBOX",
@@ -215,40 +185,6 @@ class EditMonsterMenu(Menu):
         ]
 
         return options
-
-    # =========================================================================
-    # Utility
-    # =========================================================================
-
-    def change_language(self, language: Language, _messages: Dict = None):
-        """
-        Changes the Manager language.
-
-        :var language: A Language.
-        :vartype language: Language
-
-        :var _messages: Messages loaded from a locale module.
-        :vartype _messages: Dict
-        """
-        self.logger.change_language(language, _messages)
-        _messages = self.logger._messages
-
-        self.title = self.get_title()
-        self.options = self.get_options()
-
-        self.file_manager.change_language(language, _messages)
-        self.combat_manager.logger.change_language(language, _messages)
-
-    def toggle_logging(self, enabled: bool):
-        """
-        Enables or disables the Manager logging.
-
-        :var enabled: If the Manager logging is enabled or disabled.
-        :vartype enabled: bool
-        """
-        self.logger.enabled = enabled
-        self.file_manager.toggle_logging(enabled)
-        self.combat_manager.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -318,59 +254,13 @@ class EditMonsterMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self):
+    def show_editing_details(self):
         """
-        Shows the Menu's options.
+        Shows the details of the object being edited.
         """
-        self.logger.log_team(self.team, life_state=LifeState.ANY, control_type=True)
+        self.logger.log_monster_details(
+            self.editing,
+            description=False,
+            control_type=True,
+        )
         self.logger.log(message="")
-
-        for option in self.options:
-            message = ""
-
-            if option.isolate_before:
-                message += "\n"
-
-            message += f"[{option.key}] {option.message}"
-
-            if option.isolate_after:
-                message += "\n"
-
-            if not self.is_option_valid(option):
-                message = color_string(message, foreground_color=Color.RED)
-
-            self.logger.log(message=message)
-
-        if not self.options[-1].isolate_after:
-            self.logger.log(message="")
-
-        return
-
-    def open(self, team: Team):
-        """
-        Opens the Menu.
-
-        :param team: Team to be edited
-        :type team: Team
-        """
-        self.team = team
-
-        while True:
-            self.show_title()
-            self.show_options()
-
-            message = self.logger.get_message(
-                namespace="menus",
-                message_group="BASE",
-                key="select_option_prompt",
-            )
-            selected = self.select(self.options, message)
-            self.process_option(selected, team)
-
-            if selected.id in ["EXIT", "RETURN"]:
-                break
-
-            else:
-                self.logger.log(message="")
-
-        return

@@ -10,6 +10,7 @@ from src.base.side import Side
 from src.base.stat import Stat
 from src.base.team import Team
 from src.combat.manager import CombatManager
+from src.combat.order_strategy import OrderStrategy
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.confuse import ConfuseEffect
@@ -178,7 +179,7 @@ combat_manager = CombatManager(
         team_a,
         team_b,
     ],
-    order_strategy="SET",
+    order_strategy=OrderStrategy.SEQUENTIAL,
 )
 
 # ----------------------------

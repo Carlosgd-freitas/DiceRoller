@@ -33,10 +33,14 @@ PLAYER_ACTIONS = {
 }
 
 SANDBOX = {
-    "edit_combat": "Edit Combat",
+    "change_combat_order": "Change Combat Order",
+    "edit_team": "Edit Team",
+    "add_team": "Add Team",
+    "remove_team": "Remove Team",
     "export_combat": "Export Combat",
     "import_combat": "Import Combat",
     "randomize_combat": "Randomize Combat",
+    "select_combat_order_prompt": "Select a combat order",
     "start_combat": "Start Combat",
     "title": "Sandbox Mode",
 }
@@ -85,15 +89,16 @@ EDIT_EFFECT = {
     "title": "Edit Effect",
     "change_keyword": "Change Keyword",
     "edit_value": "Edit Value",
-    "edit_value_prompt": "Type a new value",
-    "edit_value_percent": "Edit Value (%)",
-    "edit_value_percent_prompt": "Type a new value (%)",
+    "edit_min_value": "Edit Min. Value",
+    "edit_max_value": "Edit Max. Value",
     "edit_duration": "Edit Duration",
     "edit_duration_prompt": "Type a new duration",
-    "edit_decay": "Edit Decay",
-    "edit_decay_prompt": "Type a new decay",
+    "edit_delta": "Edit Delta",
     "edit_accuracy": "Edit Accuracy",
     "edit_accuracy_prompt": "Type a new accuracy",
+    "edit_removable": "Edit Removable",
+    "add_target_keyword": "Add Target Keyword",
+    "remove_target_keyword": "Remove Target Keyword",
     "randomize_effect": "Randomize Effect",
 }
 

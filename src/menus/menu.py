@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Dict, List, TypeVar
 
-from src.base.color import Color, color_string
+from src.base.color import Color, ColorData, color_string
 from src.locales.languages import Language
 from src.systems.manager import Manager
 
@@ -157,7 +157,14 @@ class Menu(Manager):
                 size=50,
             )
 
-    def show_options(self, options: List[Option], validate: bool = True):
+    def show_options(
+        self,
+        options: List[Option],
+        validate: bool = True,
+        selected_option: Option = None,
+        selected_color_data: ColorData = None,
+        invalid_color_data: ColorData = None,
+    ):
         """
         Shows options.
 
@@ -166,20 +173,47 @@ class Menu(Manager):
 
         :param validate: If the options will be validated. Default value is True.
         :type validate: bool
+
+        :param selected_option: Currently selected option. Default value is None.
+        :type selected_option: Option
+
+        :param selected_color_data: Data for coloring currently selected option.
+        Default value is green foreground and bright intensity.
+        :type selected_color_data: ColorData
+
+        :param invalid_color_data: Data for coloring invalid optionss. Default value is
+        red foreground.
+        :type invalid_color_data: ColorData
         """
+        # Coloring default values
+        if selected_color_data is None:
+            selected_color_data = {
+                "foreground_color": Color.GREEN,
+                "intensity": "BRIGHT",
+            }
+
+        if invalid_color_data is None:
+            invalid_color_data = {
+                "foreground_color": Color.RED,
+            }
+
+        # Logging options
         for option in options:
-            message = ""
+            message = f"[{option.key}] {option.message}"
 
+            # Coloring message
+            if (validate) and (not self.is_option_valid(option)):
+                message = color_string(message, **invalid_color_data)
+
+            elif option == selected_option:
+                message = color_string(message, **selected_color_data)
+
+            # Isolation formatting
             if option.isolate_before:
-                message += "\n"
-
-            message += f"[{option.key}] {option.message}"
+                message = "\n" + message
 
             if option.isolate_after:
                 message += "\n"
-
-            if (validate) and (not self.is_option_valid(option)):
-                message = color_string(message, foreground_color=Color.RED)
 
             self.logger.log(message=message)
 

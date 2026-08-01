@@ -242,3 +242,4 @@ class EditDiceMenu(EditMenu):
         Shows the details of the object being edited.
         """
         self.logger.log_dice_details(self.editing)
+        self.logger.log(message="")

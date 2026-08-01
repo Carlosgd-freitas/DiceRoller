@@ -150,7 +150,7 @@ class EditEffectMenu(EditMenu):
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="remove_target_keywords",
+                    key="remove_target_keyword",
                 ),
                 isolate_after=True,
             ),
@@ -303,3 +303,4 @@ class EditEffectMenu(EditMenu):
         """
         message = self.logger.get_effect_message(effect=self.editing)
         self.logger.log(message=message)
+        self.logger.log(message="")

@@ -1,34 +1,31 @@
 """Sandbox Menu module."""
 
-## TODO
-
 from __future__ import annotations
 
 from copy import deepcopy
-from random import choice
 from typing import TYPE_CHECKING, Dict, List
 
-from src.base.color import Color, color_string
+from src.base.color import color_string
 from src.base.life_state import LifeState
-from src.base.monster import ControlType
 from src.base.team import Team
 from src.combat.manager import CombatData, CombatManager
+from src.combat.order_strategy import OrderStrategy
 from src.compendium.effects import get_all_effects
 from src.compendium.monsters import get_all_monsters
+from src.gamemodes.sandbox.edit_team_menu import EditTeamMenu
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
-from src.menus.menu import Menu
+from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
-from src.systems.file import FileManager
-from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
+    from src.systems.randomizer import Randomizer
     from src.systems.settings import Settings
 
 EXTENSION = ".combat.dat"
 
 
-class SandboxMenu(Menu):
+class SandboxMenu(EditMenu):
     """
     Sandbox Menu class.
 
@@ -47,13 +44,20 @@ class SandboxMenu(Menu):
         self,
         settings: Settings,
         logging: bool = True,
+        randomizer: Randomizer = None,
     ):
-        # Initialization
-        logger = CombatLogger(enabled=logging, language=settings.language)
-
         super().__init__(
-            logger,
             settings,
+            message_group="SANDBOX",
+            logging=logging,
+            randomizer=randomizer,
+        )
+        self.editing: CombatData = None
+
+        self.edit_team_menu = EditTeamMenu(
+            settings,
+            logging=logging,
+            randomizer=randomizer,
         )
 
         self.logger: CombatLogger
@@ -64,19 +68,6 @@ class SandboxMenu(Menu):
 
         # Managers
         self.combat_manager = CombatManager(settings)
-        combat_data = self.get_random_combat()
-        self.combat_manager.set_combat_data(combat_data)
-
-        self.file_manager = FileManager()
-        self.randomizer = Randomizer()
-
-    def get_title(self) -> str:
-        """
-        Returns the Menu's title.
-        """
-        return self.logger.get_message(
-            namespace="menus", message_group="SANDBOX", key="title"
-        )
 
     def get_options(self) -> List[Option]:
         """
@@ -88,18 +79,47 @@ class SandboxMenu(Menu):
                 key="1",
                 message=self.logger.get_message(
                     namespace="menus",
-                    message_group="SANDBOX",
+                    message_group=self.message_group,
                     key="start_combat",
+                ),
+                isolate_after=True,
+            ),
+            Option(
+                id="CHANGE_COMBAT_ORDER",
+                key="2",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="change_combat_order",
                 ),
             ),
             Option(
                 id="EDIT_TEAM",
-                key="2",
+                key="3",
                 message=self.logger.get_message(
                     namespace="menus",
-                    message_group="SANDBOX",
-                    key="edit_combat",
+                    message_group=self.message_group,
+                    key="edit_team",
                 ),
+            ),
+            Option(
+                id="ADD_TEAM",
+                key="4",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="add_team",
+                ),
+            ),
+            Option(
+                id="REMOVE_TEAM",
+                key="5",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="remove_team",
+                ),
+                isolate_after=True,
             ),
             Option(
                 id="IMPORT_COMBAT",
@@ -109,7 +129,6 @@ class SandboxMenu(Menu):
                     message_group="SANDBOX",
                     key="import_combat",
                 ),
-                isolate_before=True,
             ),
             Option(
                 id="EXPORT_COMBAT",
@@ -180,87 +199,13 @@ class SandboxMenu(Menu):
     # Options
     # =========================================================================
 
-    def get_random_combat(self, n_teams: int = 2, team_size: int = 3) -> CombatData:
-        """
-        Gets a random combat.
-
-        :param n_teams: Number of teams.
-        :type n_teams: int
-
-        :param teams_size: Number of monsters in each team.
-        :type teams_size: int
-        """
-        teams: List[Team] = []
-
-        team_names = [
-            "Alpha",
-            "Beta",
-            "Gamma",
-            "Delta",
-            "Kappa",
-            "Omega",
-            "Red",
-            "Blue",
-            "Green",
-            "Yellow",
-            "Purple",
-            "Orange",
-        ]
-
-        for idx_team in range(n_teams):
-            team_name = choice(team_names)
-            team_names.remove(team_name)
-
-            members = []
-            for _ in range(team_size):
-                member = deepcopy(choice(self.all_monsters))
-                if idx_team == 0:
-                    member.control_type = ControlType.PLAYER
-
-                members.append(member)
-
-            message = self.logger.get_message(
-                namespace="combat", message_group="COMBAT", key="team"
-            )
-
-            team = Team(name=f"{message} {team_name}", members=members)
-
-            teams.append(team)
-
-        return {
-            "teams": teams,
-        }
-
-    def import_combat(self):
-        """
-        Imports combat from a file.
-        """
-        filename = self.file_manager.logger.input_filename(EXTENSION)
-
-        if self.file_manager.exists(filename):
-            combat_data: CombatData = self.file_manager.load_file(filename)
-            self.combat_manager.set_combat_data(combat_data)
-
-        else:
-            self.file_manager.logger.log_file_not_found(filename)
-            self.logger.log("")
-
-        return
-
-    def export_combat(self):
-        """
-        Exports the current combat to a file.
-        """
-        filename = self.file_manager.logger.input_filename(EXTENSION)
-        combat_data = self.combat_manager.get_combat_data()
-        self.file_manager.save_file(filename, combat_data)
-
-        return
-
     def is_option_valid(self, option: Option) -> bool:
         """
         Returns if the option can be selected or not.
         """
+        if option.id in ["EDIT_TEAM", "REMOVE_TEAM"]:
+            return len(self.editing["teams"]) > 0
+
         return True
 
     def process_option(self, option: Option):
@@ -270,22 +215,172 @@ class SandboxMenu(Menu):
         if option.id == "START_COMBAT":
             self.start_combat()
 
+        elif option.id == "CHANGE_COMBAT_ORDER":
+            self.change_combat_order()
+
         elif option.id == "EDIT_TEAM":
-            pass
-            # self.edit_team()
+            self.edit_team()
+
+        elif option.id == "ADD_TEAM":
+            self.add_team()
+
+        elif option.id == "REMOVE_TEAM":
+            self.remove_team()
 
         elif option.id == "IMPORT_COMBAT":
-            self.import_combat()
+            self.import_object("combat", EXTENSION)
 
         elif option.id == "EXPORT_COMBAT":
-            self.export_combat()
+            self.export_object("combat", EXTENSION)
 
         elif option.id == "RANDOMIZE_COMBAT":
-            combat_data = self.get_random_combat()
-            self.combat_manager.set_combat_data(combat_data)
+            randomized_combat = self.randomizer.get_random_combat()
+            self.editing = randomized_combat
 
         elif option.id == "EXIT":
             pass
+
+        return
+
+    def change_combat_order(self):
+        """
+        Changes the order strategy of the Combat being edited.
+        """
+        # Defining options
+        options = []
+        selected_option = None
+
+        for index, order_strategy in enumerate(OrderStrategy):
+            message = self.logger.get_message(
+                namespace="combat",
+                message_group="ORDER",
+                key=order_strategy.value.lower(),
+            )
+
+            option = Option(
+                id=f"ORDER_STRATEGY_{index + 1}",
+                key=str(index + 1),
+                message=message,
+                obj=order_strategy,
+            )
+            options.append(option)
+
+            if order_strategy == self.editing["order_strategy"]:
+                selected_option = option
+
+        options.append(
+            Option(
+                id="CANCEL",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="cancel",
+                ),
+                isolate_before=True,
+                isolate_after=True,
+            )
+        )
+
+        # Showing options
+        self.logger.log(message="")
+        self.show_options(options, validate=False, selected_option=selected_option)
+
+        # Selecting an option
+        message = self.logger.get_message(
+            namespace="menus",
+            message_group="SANDBOX",
+            key="select_combat_order_prompt",
+        )
+
+        selected_option = self.select(options, message, validate=False)
+
+        if selected_option.id != "CANCEL":
+            self.editing["order_strategy"] = selected_option.obj
+
+        return
+
+    def _select_team(self) -> Option:
+        """
+        Shows the teams of the combat being edited and prompts the user to select one of
+        them, returning the corresponding option.
+
+        :return: Option selected by the user.
+        :rtype: Option
+        """
+        options = []
+
+        # Defining options
+        self.logger.log(message="")
+
+        for index, team in enumerate(self.editing["teams"]):
+            option = Option(
+                id=f"TEAM_{index + 1}",
+                key=str(index + 1),
+                message=team.name,
+                obj=team,
+            )
+            options.append(option)
+
+        options.append(
+            Option(
+                id="CANCEL",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="cancel",
+                ),
+                isolate_before=True,
+                isolate_after=True,
+            )
+        )
+
+        # Showing options
+        self.show_options(
+            options,
+            validate=False,
+        )
+
+        # Selecting option
+        selected_option = self.select_attribute_option(options, "team")
+
+        return selected_option
+
+    def edit_team(self):
+        """
+        Edits a Team of the Combat being edited.
+        """
+        selected_option = self._select_team()
+
+        if selected_option.id != "CANCEL":
+            selected_team = selected_option.obj
+            selected_team = self.edit_team_menu.open(selected_team)
+
+        return
+
+    def add_team(self):
+        """
+        Adds a new Team to the Combat being edited, and opens the Edit Team
+        Menu with it.
+        """
+        name = self.randomizer.get_random_team_name()
+        new_team = Team(name=name)
+
+        new_team = self.edit_team_menu.open(new_team)
+        self.editing["teams"].append(new_team)
+
+        return
+
+    def remove_team(self):
+        """
+        Removes a Team of the Combat being edited.
+        """
+        selected_option = self._select_team()
+
+        if selected_option.id != "CANCEL":
+            selected_team = selected_option.obj
+            self.editing["teams"].remove(selected_team)
 
         return
 
@@ -293,7 +388,9 @@ class SandboxMenu(Menu):
         """
         Starts a combat between the current set teams.
         """
-        original_combat_data = deepcopy(self.combat_manager.get_combat_data())
+        original_combat_data = deepcopy(self.editing)
+        self.combat_manager.set_combat_data(self.editing)
+
         self.combat_manager.run()
         self.combat_manager.set_combat_data(original_combat_data)
         return
@@ -302,32 +399,35 @@ class SandboxMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self):
+    def show_editing_details(self):
         """
-        Shows the Menu's options.
+        Shows the details of the object being edited.
         """
-        self.logger.log_teams(
-            self.combat_manager.teams, life_state=LifeState.ANY, control_type=True
+        # Order Strategy
+        message = (
+            self.logger.get_message(
+                namespace="combat",
+                message_group="ORDER",
+                key="order",
+            )
+            + ": "
         )
-        self.logger.log(message="")
+        message = color_string(message, intensity="BRIGHT")
 
-        for option in self.options:
-            message = ""
+        message += (
+            self.logger.get_message(
+                namespace="combat",
+                message_group="ORDER",
+                key=self.editing["order_strategy"].value.lower(),
+            )
+            + "\n"
+        )
 
-            if option.isolate_before:
-                message += "\n"
+        self.logger.log(message=message)
 
-            message += f"[{option.key}] {option.message}"
-
-            if option.isolate_after:
-                message += "\n"
-
-            if not self.is_option_valid(option):
-                message = color_string(message, foreground_color=Color.RED)
-
-            self.logger.log(message=message)
-
-        if not self.options[-1].isolate_after:
-            self.logger.log(message="")
-
-        return
+        # Teams
+        self.logger.log_teams(
+            self.editing["teams"],
+            life_state=LifeState.ANY,
+            control_type=True,
+        )

@@ -36,3 +36,11 @@ FAILS = {
     "target_sleep": "{target} estava {fail_status}.",
     "target_stun": "{target} estava {fail_status}.",
 }
+
+ORDER = {
+    "faster": "MAIS RÁPIDO",
+    "order": "Ordem de Combate",
+    "sequential": "SEQUENCIAL",
+    "shuffle": "EMBARALHADO",
+    "slower": "MAIS LENTO",
+}

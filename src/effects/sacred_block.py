@@ -36,6 +36,8 @@ class SacredBlockEffect(Effect):
             min_value = Stat(flat=0)
         if max_value is None:
             max_value = Stat(flat=inf)
+        if delta is None:
+            delta = Stat(flat=0)
 
         super().__init__(
             keyword=Keyword.SACRED_BLOCK,

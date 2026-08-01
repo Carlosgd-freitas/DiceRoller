@@ -10,7 +10,8 @@ from src.base.monster import Monster
 from src.base.side import Side
 from src.base.team import Team
 from src.combat.effects import EffectManager
-from src.combat.manager import CombatManager, OrderStrategy
+from src.combat.manager import CombatManager
+from src.combat.order_strategy import OrderStrategy
 from src.combat.suffixes import SuffixManager
 from src.combat.team_manager import TeamManager
 from src.compendium.effects import EffectCompendium
@@ -194,7 +195,7 @@ def combat(settings: Settings) -> Dict:
     combat_manager = CombatManager(
         settings=settings,
         teams=teams,
-        order_strategy=OrderStrategy.SET,
+        order_strategy=OrderStrategy.SEQUENTIAL,
         logging=False,
     )
 
@@ -255,7 +256,7 @@ def combat_softlock(settings: Settings) -> Dict:
     combat_manager = CombatManager(
         settings=settings,
         teams=teams,
-        order_strategy=OrderStrategy.SET,
+        order_strategy=OrderStrategy.SEQUENTIAL,
         logging=False,
         softlock_limit=3,
     )

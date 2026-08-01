@@ -8,6 +8,8 @@ ATTRIBUTES = {
 }
 
 DETAILS = {
+    "no_members": "Esse time não possui membros.",
+    "no_teams": "Esse combate não possui times.",
     "no_sides": "Esse dado não possui lados.",
     "no_effects": "Esse lado não possui efeitos.",
 }

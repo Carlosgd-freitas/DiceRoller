@@ -33,10 +33,14 @@ PLAYER_ACTIONS = {
 }
 
 SANDBOX = {
-    "edit_combat": "Editar Combate",
+    "change_combat_order": "Alterar Ordem de Combate",
+    "edit_team": "Editar Time",
+    "add_team": "Adicionar Time",
+    "remove_team": "Remover Time",
     "export_combat": "Exportar Combate",
     "import_combat": "Importar Combate",
     "randomize_combat": "Aleatorizar Combate",
+    "select_combat_order_prompt": "Selecione uma ordem de combate",
     "start_combat": "Começar Combate",
     "title": "Modo Sandbox",
 }
@@ -85,15 +89,16 @@ EDIT_EFFECT = {
     "title": "Editar Efeito",
     "change_keyword": "Alterar Palavra-chave",
     "edit_value": "Editar Valor",
-    "edit_value_prompt": "Digite um novo valor",
-    "edit_value_percent": "Editar Valor (%)",
-    "edit_value_percent_prompt": "Digite um novo valor (%)",
+    "edit_min_value": "Editar Valor Mín.",
+    "edit_max_value": "Editar Valor Máx.",
     "edit_duration": "Editar Duração",
     "edit_duration_prompt": "Digite uma nova duração",
-    "edit_decay": "Editar Decaimento",
-    "edit_decay_prompt": "Digite um novo decaimento",
+    "edit_delta": "Editar Delta",
     "edit_accuracy": "Editar Acurácia",
     "edit_accuracy_prompt": "Digite uma nova acurácia",
+    "edit_removable": "Editar Removível",
+    "add_target_keyword": "Adicionar Palavra-chave Alvo",
+    "remove_target_keyword": "Remover Palavra-chave Alvo",
     "randomize_effect": "Aleatorizar Efeito",
 }
 

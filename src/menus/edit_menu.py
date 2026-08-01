@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from math import inf
 from typing import TYPE_CHECKING, Any, List
 
 from src.base.text import normalize_filename
@@ -99,10 +100,16 @@ class EditMenu(Menu):
         while True:
             try:
                 value = self.logger.input(message=message)
-                value = type_cast(value)
 
-                if type_cast is float:
-                    value = round(value, 2)
+                if value in ["∞", "inf"]:
+                    value = inf
+                elif value in ["-∞", "-inf"]:
+                    value = -inf
+                else:
+                    value = type_cast(value)
+
+                    if type_cast is float:
+                        value = round(value, 2)
 
                 break
             except Exception:
@@ -253,7 +260,6 @@ class EditMenu(Menu):
             self.show_title()
 
             self.show_editing_details()
-            self.logger.log(message="")
 
             self.show_options(self.options)
 

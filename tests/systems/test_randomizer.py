@@ -2,10 +2,42 @@
 
 from __future__ import annotations
 
+from math import inf, isclose
+
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
+from src.combat.manager import OrderStrategy
 from src.systems.randomizer import Randomizer, RandomizerConfig
 from tests.utils import assert_conditions
+
+
+def test_random_int(randomizer: Randomizer):
+    value_0 = randomizer.random_int([1, 6], cap=[-999, 999])
+    value_1 = randomizer.random_int([-inf, 6], cap=[-999, 999])
+    value_2 = randomizer.random_int([1, inf], cap=[-999, 999])
+
+    conditions = [
+        value_0 in range(1, 7),
+        value_1 in range(-999, 7),
+        value_2 in range(1, 999),
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_random_float(randomizer: Randomizer):
+    value_0 = randomizer.random_float([0.1, 1])
+    value_1 = randomizer.random_float([-inf, 1])
+    value_2 = randomizer.random_float([0.1, inf])
+
+    conditions = [
+        value_0 >= 0.1,
+        value_0 <= 1,
+        value_1 == -inf,
+        value_2 == inf,
+    ]
+
+    assert_conditions(conditions)
 
 
 def test_get_random_keyword(randomizer: Randomizer):
@@ -34,67 +66,98 @@ def test_get_random_keyword(randomizer: Randomizer):
     assert_conditions(conditions)
 
 
+def test_get_random_stat(randomizer: Randomizer):
+    config = RandomizerConfig(
+        flat_threshold=(1, 10),
+        percent_threshold=(0.1, 0.2),
+    )
+
+    stat_0 = randomizer.get_random_stat(config)
+
+    conditions = [
+        stat_0.flat in range(1, 20),
+        stat_0.percent >= 0.1,
+        stat_0.percent <= 0.2,
+    ]
+
+    assert_conditions(conditions)
+
+
 def test_get_random_effect(randomizer: Randomizer):
     config = RandomizerConfig(
-        value_threshold=(1, 6),
+        value_flat_threshold=(1, 6),
         value_percent_threshold=(0.01, 0.1),
-        duration_threshold=(2, 4),
         accuracy_threshold=(0.8, 1),
-        effect_type=EffectType.DETERIORATION,
+        effect_type=EffectType.OFFENSIVE,
     )
 
     effect_0 = randomizer.get_random_effect(config)
 
     conditions = [
-        effect_0.value in range(1, 7),
-        effect_0.value_percent >= 0.01,
-        effect_0.value_percent <= 0.1,
-        effect_0.duration in range(2, 5),
+        effect_0.type == EffectType.OFFENSIVE,
+        effect_0.value.flat in range(1, 7),
+        effect_0.value.percent >= 0.01,
+        effect_0.value.percent <= 0.1,
+        effect_0.duration is None,
+        effect_0.delta is None,
         effect_0.accuracy >= 0.8,
         effect_0.accuracy <= 1,
-        effect_0.type == EffectType.DETERIORATION,
     ]
 
     config = RandomizerConfig(
-        duration_threshold=(3, 4),
-        accuracy_threshold=(0.9, 1),
-        target_keywords_threshold=(1, 3),
-        effect_type=EffectType.BUFF,
-        keyword_whitelist=[Keyword.IMMUNITY],
+        value_flat_threshold=(2, 2),
+        value_percent_threshold=(0.02, 0.02),
+        min_value_flat_threshold=(1, 1),
+        min_value_percent_threshold=(0.01, 0.01),
+        max_value_flat_threshold=(3, 3),
+        max_value_percent_threshold=(0.03, 0.03),
+        duration_threshold=(4, 4),
+        delta_flat_threshold=(5, 5),
+        delta_percent_threshold=(0.05, 0.05),
+        accuracy_threshold=(0.6, 0.6),
+        target_keywords_threshold=(7, 7),
+        keyword_whitelist=[Keyword.BURN],
     )
 
     effect_1 = randomizer.get_random_effect(config)
 
     conditions.extend(
         [
-            effect_1.duration in range(3, 5),
-            effect_1.accuracy >= 0.9,
-            effect_1.accuracy <= 1,
-            effect_1.keyword == Keyword.IMMUNITY,
-            len(effect_1.target_keywords) in range(1, 4),
+            effect_1.keyword == Keyword.BURN,
+            effect_1.value.flat == 2,
+            isclose(effect_1.value.percent, 0.02),
+            effect_1.min_value.flat == 1,
+            isclose(effect_1.min_value.percent, 0.01),
+            effect_1.max_value.flat == 3,
+            isclose(effect_1.max_value.percent, 0.03),
+            effect_1.duration == 4,
+            effect_1.delta.flat == 5,
+            isclose(effect_1.delta.percent, 0.05),
+            isclose(effect_1.accuracy, 0.6),
+            effect_1.target_keywords is None,
         ]
     )
 
     config = RandomizerConfig(
-        value_threshold=(1, 1),
-        value_percent_threshold=(0.02, 0.02),
-        duration_threshold=(3, 3),
-        accuracy_threshold=(0.4, 0.4),
-        target_keywords_threshold=(0, 0),
-        effect_type=EffectType.DETERIORATION,
-        keyword_whitelist=[Keyword.EXECUTE],
+        duration_threshold=(3, 4),
+        accuracy_threshold=(0.9, 1),
+        target_keywords_threshold=(1, 3),
+        keyword_whitelist=[Keyword.IMMUNITY],
     )
 
     effect_2 = randomizer.get_random_effect(config)
 
     conditions.extend(
         [
-            effect_2.value == 1,
-            effect_2.value_percent == 0.02,
-            effect_2.duration == 3,
-            effect_2.accuracy == 0.4,
-            effect_2.keyword == Keyword.EXECUTE,
-            len(effect_2.target_keywords) == 0,
+            effect_2.keyword == Keyword.IMMUNITY,
+            effect_2.value is None,
+            effect_2.min_value is None,
+            effect_2.max_value is None,
+            effect_2.duration in range(3, 5),
+            effect_2.delta is None,
+            effect_2.accuracy >= 0.9,
+            effect_2.accuracy <= 1,
+            len(effect_2.target_keywords) in range(1, 4),
         ]
     )
 
@@ -106,45 +169,20 @@ def test_get_random_side(randomizer: Randomizer):
         effect_threshold=(1, 3),
     )
 
-    side_0 = randomizer.get_random_side(config)
+    side = randomizer.get_random_side(config)
 
     same_type = True
-    effect_type = side_0.effects[0].type
+    effect_type = side.effects[0].type
 
-    for effect in side_0.effects:
+    for effect in side.effects:
         if effect.type != effect_type:
             same_type = False
             break
 
     conditions = [
-        len(side_0.effects) in range(1, 4),
+        len(side.effects) in range(1, 4),
         same_type is True,
     ]
-
-    config = RandomizerConfig(
-        effect_threshold=(1, 1),
-        value_threshold=(2, 2),
-        value_percent_threshold=(0.3, 0.3),
-        duration_threshold=(4, 4),
-        accuracy_threshold=(0.05, 0.05),
-        target_keywords_threshold=(0, 0),
-        effect_type=EffectType.OFFENSIVE,
-        keyword_whitelist=[Keyword.ATTACK],
-    )
-
-    side_1 = randomizer.get_random_side(config)
-
-    conditions.extend(
-        [
-            len(side_1.effects) == 1,
-            side_1.effects[0].value == 2,
-            side_1.effects[0].value_percent == 0.3,
-            side_1.effects[0].duration == 4,
-            side_1.effects[0].accuracy == 0.05,
-            len(side_1.effects[0].target_keywords) == 0,
-            side_1.effects[0].keyword == Keyword.ATTACK,
-        ]
-    )
 
     assert_conditions(conditions)
 
@@ -163,12 +201,18 @@ def test_get_random_dice(randomizer: Randomizer):
     config = RandomizerConfig(
         side_threshold=(2, 2),
         effect_threshold=(1, 1),
-        value_threshold=(3, 3),
-        value_percent_threshold=(0.4, 0.4),
-        duration_threshold=(5, 5),
-        accuracy_threshold=(0.06, 0.06),
-        target_keywords_threshold=(0, 0),
-        effect_type=EffectType.OFFENSIVE,
+        value_flat_threshold=(4, 4),
+        value_percent_threshold=(0.04, 0.04),
+        min_value_flat_threshold=(3, 3),
+        min_value_percent_threshold=(0.03, 0.03),
+        max_value_flat_threshold=(5, 5),
+        max_value_percent_threshold=(0.05, 0.05),
+        duration_threshold=(6, 6),
+        delta_flat_threshold=(7, 7),
+        delta_percent_threshold=(0.07, 0.07),
+        accuracy_threshold=(0.8, 0.8),
+        target_keywords_threshold=(9, 9),
+        keyword_whitelist=[Keyword.BURN],
     )
 
     dice_1 = randomizer.get_random_dice(config)
@@ -178,45 +222,101 @@ def test_get_random_dice(randomizer: Randomizer):
             len(dice_1.sides) == 2,
             all([len(side.effects) == 1 for side in dice_1.sides]),
             all(
-                [effect.value == 3 for side in dice_1.sides for effect in side.effects]
-            ),
-            all(
                 [
-                    effect.value_percent == 0.4
+                    effect.keyword == Keyword.BURN
                     for side in dice_1.sides
                     for effect in side.effects
                 ]
             ),
             all(
                 [
-                    effect.duration == 5
+                    effect.value.flat == 4
                     for side in dice_1.sides
                     for effect in side.effects
                 ]
             ),
             all(
                 [
-                    effect.accuracy == 0.06
+                    isclose(effect.value.percent, 0.04)
                     for side in dice_1.sides
                     for effect in side.effects
                 ]
             ),
             all(
                 [
-                    len(effect.target_keywords) == 0
+                    effect.min_value.flat == 3
                     for side in dice_1.sides
                     for effect in side.effects
                 ]
             ),
             all(
                 [
-                    effect.type == EffectType.OFFENSIVE
+                    isclose(effect.min_value.percent, 0.03)
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.max_value.flat == 5
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.max_value.percent, 0.05)
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.duration == 6
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.delta.flat == 7
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.delta.percent, 0.07)
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.accuracy, 0.8)
+                    for side in dice_1.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.target_keywords is None
                     for side in dice_1.sides
                     for effect in side.effects
                 ]
             ),
         ]
     )
+
+    assert_conditions(conditions)
+
+
+def test_get_random_monster_name(randomizer: Randomizer):
+    name = randomizer.get_random_monster_name()
+
+    conditions = [
+        isinstance(name, str),
+    ]
 
     assert_conditions(conditions)
 
@@ -232,6 +332,7 @@ def test_get_random_monster(randomizer: Randomizer):
     monster_0 = randomizer.get_random_monster(config)
 
     conditions = [
+        isinstance(monster_0.name, str),
         monster_0.hp in range(80, 101),
         monster_0.max_hp == monster_0.hp,
         monster_0.mana in range(20, 31),
@@ -240,28 +341,34 @@ def test_get_random_monster(randomizer: Randomizer):
     ]
 
     config = RandomizerConfig(
-        hp_threshold=(10, 10),
-        mana_threshold=(9, 9),
-        speed_threshold=(8, 8),
+        hp_threshold=(11, 11),
+        mana_threshold=(12, 12),
+        speed_threshold=(13, 13),
         dice_threshold=(2, 2),
         side_threshold=(1, 1),
         effect_threshold=(3, 3),
-        value_threshold=(4, 4),
-        value_percent_threshold=(0.5, 0.5),
-        duration_threshold=(6, 6),
-        accuracy_threshold=(0.07, 0.07),
-        target_keywords_threshold=(0, 0),
         effect_type=EffectType.DEBUFF,
+        value_flat_threshold=(5, 5),
+        value_percent_threshold=(0.05, 0.05),
+        min_value_flat_threshold=(4, 4),
+        min_value_percent_threshold=(0.04, 0.04),
+        max_value_flat_threshold=(6, 6),
+        max_value_percent_threshold=(0.06, 0.06),
+        duration_threshold=(7, 7),
+        delta_flat_threshold=(8, 8),
+        delta_percent_threshold=(0.08, 0.08),
+        accuracy_threshold=(0.9, 0.9),
+        target_keywords_threshold=(10, 10),
     )
 
     monster_1 = randomizer.get_random_monster(config)
 
     conditions.extend(
         [
-            monster_1.hp == 10,
+            monster_1.hp == 11,
             monster_1.max_hp == monster_1.hp,
-            monster_1.mana == 9,
-            monster_1.speed == 8,
+            monster_1.mana == 12,
+            monster_1.speed == 13,
             len(monster_1.dice) == 2,
             all([len(dice.sides) == 1 for dice in monster_1.dice]),
             all(
@@ -273,47 +380,130 @@ def test_get_random_monster(randomizer: Randomizer):
             ),
             all(
                 [
-                    effect.value == 4
-                    for dice in monster_1.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.value_percent == 0.5
-                    for dice in monster_1.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.duration == 6
-                    for dice in monster_1.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.accuracy == 0.07
-                    for dice in monster_1.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    len(effect.target_keywords) == 0
-                    for dice in monster_1.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
                     effect.type == EffectType.DEBUFF
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.flat is None
+                        or effect.value.flat == 5
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.percent is None
+                        or isclose(effect.value.percent, 0.05)
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.flat is None
+                        or effect.min_value.flat == 4
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.percent is None
+                        or isclose(effect.min_value.percent, 0.04)
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.flat is None
+                        or effect.max_value.flat == 6
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.percent is None
+                        or isclose(effect.max_value.percent, 0.06)
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.duration == 7
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.flat is None
+                        or effect.delta.flat == 8
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.percent is None
+                        or isclose(effect.delta.percent, 0.08)
+                    )
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.accuracy, 0.9)
+                    for dice in monster_1.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.target_keywords is None
+                        or len(effect.target_keywords) <= 10
+                    )
                     for dice in monster_1.dice
                     for side in dice.sides
                     for effect in side.effects
@@ -321,6 +511,16 @@ def test_get_random_monster(randomizer: Randomizer):
             ),
         ]
     )
+
+    assert_conditions(conditions)
+
+
+def test_get_random_team_name(randomizer: Randomizer):
+    name = randomizer.get_random_team_name()
+
+    conditions = [
+        isinstance(name, str),
+    ]
 
     assert_conditions(conditions)
 
@@ -338,18 +538,24 @@ def test_get_random_team(randomizer: Randomizer):
 
     config = RandomizerConfig(
         member_threshold=(2, 2),
-        hp_threshold=(11, 11),
-        mana_threshold=(10, 10),
-        speed_threshold=(9, 9),
+        hp_threshold=(12, 12),
+        mana_threshold=(13, 13),
+        speed_threshold=(14, 14),
         dice_threshold=(1, 1),
         side_threshold=(3, 3),
         effect_threshold=(4, 4),
-        value_threshold=(5, 5),
-        value_percent_threshold=(0.6, 0.6),
-        duration_threshold=(7, 7),
-        accuracy_threshold=(0.08, 0.08),
-        target_keywords_threshold=(0, 0),
         effect_type=EffectType.BUFF,
+        value_flat_threshold=(6, 6),
+        value_percent_threshold=(0.06, 0.06),
+        min_value_flat_threshold=(5, 5),
+        min_value_percent_threshold=(0.05, 0.05),
+        max_value_flat_threshold=(7, 7),
+        max_value_percent_threshold=(0.07, 0.07),
+        duration_threshold=(8, 8),
+        delta_flat_threshold=(9, 9),
+        delta_percent_threshold=(0.09, 0.09),
+        accuracy_threshold=(0.1, 0.1),
+        target_keywords_threshold=(11, 11),
     )
 
     team_1 = randomizer.get_random_team(config)
@@ -357,10 +563,10 @@ def test_get_random_team(randomizer: Randomizer):
     conditions.extend(
         [
             len(team_1.members) == 2,
-            all([monster.hp == 11 for monster in team_1.members]),
+            all([monster.hp == 12 for monster in team_1.members]),
             all([monster.max_hp == monster.hp for monster in team_1.members]),
-            all([monster.mana == 10 for monster in team_1.members]),
-            all([monster.speed == 9 for monster in team_1.members]),
+            all([monster.mana == 13 for monster in team_1.members]),
+            all([monster.speed == 14 for monster in team_1.members]),
             all([len(monster.dice) == 1 for monster in team_1.members]),
             all(
                 [
@@ -379,52 +585,141 @@ def test_get_random_team(randomizer: Randomizer):
             ),
             all(
                 [
-                    effect.value == 5
-                    for monster in team_1.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.value_percent == 0.6
-                    for monster in team_1.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.duration == 7
-                    for monster in team_1.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.accuracy == 0.08
-                    for monster in team_1.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    len(effect.target_keywords) == 0
-                    for monster in team_1.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
                     effect.type == EffectType.BUFF
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.flat is None
+                        or effect.value.flat == 6
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.percent is None
+                        or isclose(effect.value.percent, 0.06)
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.flat is None
+                        or effect.min_value.flat == 5
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.percent is None
+                        or isclose(effect.min_value.percent, 0.05)
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.flat is None
+                        or effect.max_value.flat == 7
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.percent is None
+                        or isclose(effect.max_value.percent, 0.07)
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.duration == 8
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.flat is None
+                        or effect.delta.flat == 9
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.percent is None
+                        or isclose(effect.delta.percent, 0.09)
+                    )
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.accuracy, 0.1)
+                    for monster in team_1.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.target_keywords is None
+                        or len(effect.target_keywords) <= 11
+                    )
                     for monster in team_1.members
                     for dice in monster.dice
                     for side in dice.sides
@@ -445,24 +740,31 @@ def test_get_random_combat(randomizer: Randomizer):
     combat_0 = randomizer.get_random_combat(config)
 
     conditions = [
+        isinstance(combat_0["order_strategy"], OrderStrategy),
         len(combat_0["teams"]) in range(2, 4),
     ]
 
     config = RandomizerConfig(
         team_threshold=(3, 3),
         member_threshold=(1, 1),
-        hp_threshold=(12, 12),
-        mana_threshold=(11, 11),
-        speed_threshold=(10, 10),
+        hp_threshold=(13, 13),
+        mana_threshold=(14, 14),
+        speed_threshold=(15, 15),
         dice_threshold=(2, 2),
         side_threshold=(4, 4),
         effect_threshold=(5, 5),
-        value_threshold=(6, 6),
-        value_percent_threshold=(0.7, 0.7),
-        duration_threshold=(8, 8),
-        accuracy_threshold=(0.09, 0.09),
-        target_keywords_threshold=(0, 0),
         effect_type=EffectType.BUFF,
+        value_flat_threshold=(7, 7),
+        value_percent_threshold=(0.07, 0.07),
+        min_value_flat_threshold=(6, 6),
+        min_value_percent_threshold=(0.06, 0.06),
+        max_value_flat_threshold=(8, 8),
+        max_value_percent_threshold=(0.08, 0.08),
+        duration_threshold=(9, 9),
+        delta_flat_threshold=(10, 10),
+        delta_percent_threshold=(0.1, 0.1),
+        accuracy_threshold=(0.11, 0.11),
+        target_keywords_threshold=(12, 12),
     )
 
     combat_1 = randomizer.get_random_combat(config)
@@ -473,7 +775,7 @@ def test_get_random_combat(randomizer: Randomizer):
             all([len(team.members) == 1 for team in combat_1["teams"]]),
             all(
                 [
-                    monster.hp == 12
+                    monster.hp == 13
                     for team in combat_1["teams"]
                     for monster in team.members
                 ]
@@ -487,14 +789,14 @@ def test_get_random_combat(randomizer: Randomizer):
             ),
             all(
                 [
-                    monster.mana == 11
+                    monster.mana == 14
                     for team in combat_1["teams"]
                     for monster in team.members
                 ]
             ),
             all(
                 [
-                    monster.speed == 10
+                    monster.speed == 15
                     for team in combat_1["teams"]
                     for monster in team.members
                 ]
@@ -525,57 +827,152 @@ def test_get_random_combat(randomizer: Randomizer):
             ),
             all(
                 [
-                    effect.value == 6
-                    for team in combat_1["teams"]
-                    for monster in team.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.value_percent == 0.7
-                    for team in combat_1["teams"]
-                    for monster in team.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.duration == 8
-                    for team in combat_1["teams"]
-                    for monster in team.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    effect.accuracy == 0.09
-                    for team in combat_1["teams"]
-                    for monster in team.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
-                    len(effect.target_keywords) == 0
-                    for team in combat_1["teams"]
-                    for monster in team.members
-                    for dice in monster.dice
-                    for side in dice.sides
-                    for effect in side.effects
-                ]
-            ),
-            all(
-                [
                     effect.type == EffectType.BUFF
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.flat is None
+                        or effect.value.flat == 7
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.value is None
+                        or effect.value.percent is None
+                        or isclose(effect.value.percent, 0.07)
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.flat is None
+                        or effect.min_value.flat == 6
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.min_value is None
+                        or effect.min_value.percent is None
+                        or isclose(effect.min_value.percent, 0.06)
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.flat is None
+                        or effect.max_value.flat == 8
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.max_value is None
+                        or effect.max_value.percent is None
+                        or isclose(effect.max_value.percent, 0.08)
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    effect.duration == 9
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.flat is None
+                        or effect.delta.flat == 10
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.delta is None
+                        or effect.delta.percent is None
+                        or isclose(effect.delta.percent, 0.1)
+                    )
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    isclose(effect.accuracy, 0.11)
+                    for team in combat_1["teams"]
+                    for monster in team.members
+                    for dice in monster.dice
+                    for side in dice.sides
+                    for effect in side.effects
+                ]
+            ),
+            all(
+                [
+                    (
+                        effect.target_keywords is None
+                        or len(effect.target_keywords) <= 12
+                    )
                     for team in combat_1["teams"]
                     for monster in team.members
                     for dice in monster.dice

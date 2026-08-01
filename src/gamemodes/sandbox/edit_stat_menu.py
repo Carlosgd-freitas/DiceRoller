@@ -130,7 +130,12 @@ class EditStatMenu(EditMenu):
 
         elif option.id == "RANDOMIZE_STAT":
             randomized_stat = self.randomizer.get_random_stat()
-            self.editing = randomized_stat
+
+            if self.editing.flat is not None:
+                self.editing.flat = randomized_stat.flat
+
+            if self.editing.percent is not None:
+                self.editing.percent = randomized_stat.percent
 
         elif option.id == "RETURN":
             pass
@@ -146,3 +151,4 @@ class EditStatMenu(EditMenu):
         Shows the details of the object being edited.
         """
         self.logger.log_stat_details(self.editing)
+        self.logger.log(message="")

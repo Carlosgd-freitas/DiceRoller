@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, TypeVar
+from typing import TYPE_CHECKING, List
 
 from src.base.life_state import LifeState
 from src.base.monster import Monster
@@ -15,7 +15,6 @@ from src.systems.randomizer import Randomizer
 if TYPE_CHECKING:
     from src.systems.settings import Settings
 
-T = TypeVar("T")
 EXTENSION = ".team.dat"
 
 
@@ -113,7 +112,6 @@ class EditTeamMenu(EditMenu):
                     message_group=self.message_group,
                     key="import_team",
                 ),
-                isolate_before=True,
             ),
             Option(
                 id="EXPORT_TEAM",
@@ -171,7 +169,7 @@ class EditTeamMenu(EditMenu):
         if option.id == "EDIT_NAME":
             self.edit_attribute("name", str)
 
-        if option.id == "EDIT_MONSTER":
+        elif option.id == "EDIT_MONSTER":
             self.edit_monster()
 
         elif option.id == "ADD_MONSTER":
@@ -198,7 +196,7 @@ class EditTeamMenu(EditMenu):
     def _select_monster(self) -> Option:
         """
         Shows the monsters of the team being edited and prompts the user to select one of
-        them, returning the option that corresponds to them.
+        them, returning the corresponding option.
 
         :return: Option selected by the user.
         :rtype: Option
@@ -287,3 +285,4 @@ class EditTeamMenu(EditMenu):
             life_state=LifeState.ANY,
             control_type=True,
         )
+        self.logger.log(message="")

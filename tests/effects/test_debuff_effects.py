@@ -9,7 +9,8 @@ from src.base.dice import Dice
 from src.base.keywords import Keyword
 from src.base.side import Side
 from src.base.stat import Stat
-from src.combat.manager import CombatManager, OrderStrategy
+from src.combat.manager import CombatManager
+from src.combat.order_strategy import OrderStrategy
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect

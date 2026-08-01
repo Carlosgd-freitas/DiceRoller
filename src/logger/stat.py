@@ -65,6 +65,6 @@ class StatLogger(AttributeLogger):
 
         else:
             message += numeric_to_string(stat.percent)
-            message += f"({numeric_to_string(stat.percent * 100)}%)"
+            message += f" ({numeric_to_string(stat.percent * 100)}%)"
 
         self.log(message=message)

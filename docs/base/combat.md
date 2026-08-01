@@ -5,12 +5,12 @@ A **combat** is composed of [`Teams`](/docs/base/team.md) facing each other, eac
 * **Turn**: equivalent to **one monster** currently in combat. Dead monsters are not considered in combat, and can't take their turn.
 * **Round**: equivalent to **all monsters** currently in combat taking **one turn**. This equivalency changes when monsters are added or removed from combat.
 
-## Turn Order
+## Order Strategy
 In what order the monsters still alive and in combat takes their turns:
-* **Faster**: monsters with **higher speed** take their turn before those with lower speed.
-* **Slower**: monsters with **lower speed** take their turn before those with higher speed.
-* **Set**: monsters take their turn in the same order as they are in the `CombatManager` **teams** attribute.
-* **Shuffle**: monsters take their turn **randomly**.
+* **FASTER**: monsters with **higher speed** take their turn before those with lower speed.
+* **SLOWER**: monsters with **lower speed** take their turn before those with higher speed.
+* **SEQUENTIAL**: monsters take their turn in the same order as they are in the `CombatManager` **teams** attribute.
+* **SHUFFLE**: monsters take their turn **randomly**.
 
 ## Steps
 1. Combat starts

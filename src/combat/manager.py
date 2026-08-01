@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from enum import Enum
 from math import inf
 from random import shuffle
 from typing import TYPE_CHECKING, Callable, Dict, List, Literal, TypedDict
@@ -13,6 +12,7 @@ from src.base.keywords import Keyword
 from src.base.monster import ControlType, Monster
 from src.base.triggers import Trigger
 from src.combat.effects import EffectManager
+from src.combat.order_strategy import OrderStrategy
 from src.combat.player_actions import CombatPlayerActionsMenu
 from src.combat.suffixes import SuffixManager
 from src.combat.team_manager import TeamManager
@@ -26,25 +26,12 @@ if TYPE_CHECKING:
     from src.systems.settings import Settings
 
 
-class OrderStrategy(Enum):
-    """
-    Strategy when definining monsters turn order in combat.
-
-    * ``FASTER``: monsters act from highest to lowest speed
-    * ``SET``: monsters act in the order they are provided
-    * ``SHUFFLE``: monsters act in random order
-    * ``SLOWER``: monsters act from lowest to highest speed
-    """
-
-    FASTER = "FASTER"
-    SET = "SET"
-    SHUFFLE = "SHUFFLE"
-    SLOWER = "SLOWER"
-
-
 class CombatData(TypedDict):
     """
     Combat Data.
+
+    :var order_strategy: Strategy when definining monsters turn order in combat.
+    :vartype order_strategy: OrderStrategy
 
     :var round: combat round number.
     :vartype round: int
@@ -56,6 +43,7 @@ class CombatData(TypedDict):
     :vartype turn: int
     """
 
+    order_strategy: OrderStrategy
     round: int
     teams: List[Team]
     turn: int
@@ -79,12 +67,15 @@ def are_combat_data_equivalent(
     return (
         isinstance(combat_data_1, dict)
         and isinstance(combat_data_2, dict)
-        and len(combat_data_1["teams"]) == len(combat_data_2["teams"])
+        and combat_data_1.get("order_strategy") == combat_data_2.get("order_strategy")
+        and len(combat_data_1.get("teams", [])) == len(combat_data_2.get("teams", []))
         and all(
             [
                 team_1.is_equivalent(team_2)
                 for team_1, team_2 in zip(
-                    combat_data_1["teams"], combat_data_2["teams"], strict=True
+                    combat_data_1.get("teams", []),
+                    combat_data_2.get("teams", []),
+                    strict=True,
                 )
             ]
         )
@@ -265,6 +256,7 @@ class CombatManager(Manager):
         :rtype: CombatData
         """
         return {
+            "order_strategy": self.order_strategy,
             "round": self.round,
             "teams": deepcopy(self.teams),
             "turn": self.turn,

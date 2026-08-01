@@ -191,7 +191,8 @@ class MainMenu(Menu):
             pass
 
         elif option.id == "SANDBOX_MODE":
-            self.sandbox_menu.open()
+            random_combat = self.sandbox_menu.randomizer.get_random_combat()
+            self.sandbox_menu.open(random_combat)
 
         elif option.id == "COMPENDIUM":
             self.compendium_menu.open()

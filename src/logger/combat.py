@@ -311,8 +311,8 @@ class CombatLogger(MonsterLogger):
     def log_team(
         self,
         team: Team,
-        whitelist: List[Monster],
         index: int = None,
+        filtered: List[Monster] = None,
         life_state: LifeState = LifeState.ALIVE,
         control_type: bool = False,
         monster_index: int = None,
@@ -323,8 +323,9 @@ class CombatLogger(MonsterLogger):
         :param team: Team of monsters.
         :type team: Team
 
-        :param whitelist: Only monters that are in this list will be considered.
-        :type whitelist: List[Monster]
+        :param filtered: An optional list of already filtered monsters. If passed, only
+        monters in this list will be logged.
+        :type filtered: List[Monster]
 
         :param index: Team index.
         :type index: int
@@ -344,8 +345,9 @@ class CombatLogger(MonsterLogger):
         if not self.enabled:
             return
 
-        whitelist = [] if whitelist is None else whitelist
+        filtered = [] if filtered is None else filtered
 
+        # Header + Team name
         message = self.get_message(
             namespace="combat", message_group="COMBAT", key="team"
         )
@@ -360,25 +362,22 @@ class CombatLogger(MonsterLogger):
 
         self.log(message=message)
 
-        for monster in team.members:
-            if (not whitelist) or (whitelist and monster in whitelist):
-                pass
-            else:
-                continue
+        # Filter monsters
+        if not filtered:
+            filtered = filter_monsters(
+                team.members,
+                k=inf,
+                life_state=life_state,
+                method="FIRST",
+            )
 
-            will_log = False
+        if filtered:
+            for monster in filtered:
+                if monster.is_alive():
+                    color_data = {"foreground_color": None}
+                else:
+                    color_data = {"foreground_color": Color.GRAY}
 
-            if monster.is_alive():
-                color_data = {"foreground_color": None}
-            else:
-                color_data = {"foreground_color": Color.GRAY}
-
-            if life_state == LifeState.ANY or life_state == monster.get_life_state():
-                will_log = True
-            else:
-                will_log = False
-
-            if will_log:
                 self.log_monster(
                     monster,
                     control_type=control_type,
@@ -388,6 +387,14 @@ class CombatLogger(MonsterLogger):
 
                 if isinstance(monster_index, int):
                     monster_index += 1
+
+        else:
+            message = self.get_message(
+                namespace="base",
+                message_group="DETAILS",
+                key="no_members",
+            )
+            self.log(message=message)
 
         return {
             "monster_index": monster_index,
@@ -425,27 +432,35 @@ class CombatLogger(MonsterLogger):
         if not self.enabled:
             return
 
-        for index, team in enumerate(teams):
-            filtered = filter_monsters(
-                team.members,
-                k=inf,
-                whitelist=whitelist,
-                life_state=life_state,
-                method="FIRST",
+        if teams:
+            for index, team in enumerate(teams):
+                filtered = filter_monsters(
+                    team.members,
+                    k=inf,
+                    whitelist=whitelist,
+                    life_state=life_state,
+                    method="FIRST",
+                )
+
+                if not filtered:
+                    continue
+
+                data = self.log_team(
+                    team=team,
+                    index=index + 1,
+                    filtered=filtered,
+                    control_type=control_type,
+                    monster_index=monster_index,
+                )
+
+                monster_index = data["monster_index"]
+
+                self.log(message="")
+
+        else:
+            message = self.get_message(
+                namespace="base",
+                message_group="DETAILS",
+                key="no_teams",
             )
-
-            if not filtered:
-                continue
-
-            data = self.log_team(
-                team=team,
-                whitelist=filtered,
-                index=index + 1,
-                life_state=life_state,
-                control_type=control_type,
-                monster_index=monster_index,
-            )
-
-            monster_index = data["monster_index"]
-
-            self.log(message="")
+            self.log(message=message)
