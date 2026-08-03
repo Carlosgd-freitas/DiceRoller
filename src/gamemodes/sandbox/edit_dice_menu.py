@@ -156,7 +156,7 @@ class EditDiceMenu(EditMenu):
 
     def _select_side(self) -> Option:
         """
-        Shows the sides of the dice being edited and prompts the user to select one of
+        Shows the sides of the Dice being edited and prompts the user to select one of
         them, returning the option that corresponds to them.
 
         :return: Option selected by the user.
@@ -191,7 +191,10 @@ class EditDiceMenu(EditMenu):
         )
 
         # Showing options
-        self.show_options(options, validate=True)
+        self.show_options(
+            options,
+            validate=False,
+        )
 
         # Selecting option
         selected_option = self.select_attribute_option(options, "side")
@@ -205,8 +208,12 @@ class EditDiceMenu(EditMenu):
         selected_option = self._select_side()
 
         if selected_option.id != "CANCEL":
-            selected_side = selected_option.obj
-            selected_side = self.edit_side_menu.open(selected_side)
+            selected_side: Side = selected_option.obj
+            index = self.editing.sides.index(selected_side)
+
+            edited_side: Side = self.edit_side_menu.open(selected_side)
+
+            self.editing.sides[index] = edited_side
 
         return
 
@@ -228,7 +235,7 @@ class EditDiceMenu(EditMenu):
         selected_option = self._select_side()
 
         if selected_option.id != "CANCEL":
-            selected_side = selected_option.obj
+            selected_side: Side = selected_option.obj
             self.editing.sides.remove(selected_side)
 
         return

@@ -33,16 +33,21 @@ PLAYER_ACTIONS = {
 }
 
 SANDBOX = {
+    "title": "Modo Sandbox",
+    "start_combat": "Começar Combate",
     "change_combat_order": "Alterar Ordem de Combate",
     "edit_team": "Editar Time",
     "add_team": "Adicionar Time",
     "remove_team": "Remover Time",
-    "export_combat": "Exportar Combate",
     "import_combat": "Importar Combate",
+    "import_combat_success": "Combate foi importado com sucesso.",
+    "import_combat_fail": "Combate não pôde ser importado.",
+    "export_combat": "Exportar Combate",
+    "export_combat_success": "Combate foi exportado com sucesso.",
+    "export_combat_fail": "Combate não pôde ser exportado.",
     "randomize_combat": "Aleatorizar Combate",
     "select_combat_order_prompt": "Selecione uma ordem de combate",
-    "start_combat": "Começar Combate",
-    "title": "Modo Sandbox",
+    "select_team_prompt": "Selecione um time",
 }
 
 EDIT_TEAM = {
@@ -59,10 +64,32 @@ EDIT_TEAM = {
     "export_team_success": "Time foi exportado com sucesso.",
     "export_team_fail": "Time não pôde ser exportado.",
     "randomize_team": "Aleatorizar Time",
+    "select_monster_prompt": "Selecione um monstro",
 }
 
 EDIT_MONSTER = {
     "title": "Editar Monstro",
+    "edit_name": "Editar Nome",
+    "edit_name_prompt": "Digite um novo nome",
+    "edit_hp": "Editar HP",
+    "edit_hp_prompt": "Digite o novo HP",
+    "edit_mana": "Editar Mana",
+    "edit_mana_prompt": "Digite a nova mana",
+    "edit_speed": "Editar Velocidade",
+    "edit_speed_prompt": "Digite uma nova velocidade",
+    "edit_control_type": "Editar Tipo de Controle",
+    "edit_difficulty": "Editar Dificuldade",
+    "edit_dice": "Editar Dado",
+    "add_dice": "Adicionar Dado",
+    "remove_dice": "Remover Dado",
+    "import_monster": "Importar Monstro",
+    "import_monster_success": "Monstro foi importado com sucesso.",
+    "import_monster_fail": "Monstro não pôde ser importado.",
+    "export_monster": "Exportar Monstro",
+    "export_monster_success": "Monstro foi exportado com sucesso.",
+    "export_monster_fail": "Monstro não pôde ser exportado.",
+    "randomize_monster": "Aleatorizar Monstro",
+    "select_dice_prompt": "Selecione um dado",
 }
 
 EDIT_DICE = {

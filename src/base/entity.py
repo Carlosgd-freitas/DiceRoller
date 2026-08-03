@@ -58,7 +58,7 @@ class Entity:
 
     def __init__(
         self,
-        global_id: str = None,
+        global_id: str = str(uuid4()),
         local_id: str = str(uuid4()),
         name: str = None,
         description: str = None,

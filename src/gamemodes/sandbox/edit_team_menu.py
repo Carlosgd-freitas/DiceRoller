@@ -195,7 +195,7 @@ class EditTeamMenu(EditMenu):
 
     def _select_monster(self) -> Option:
         """
-        Shows the monsters of the team being edited and prompts the user to select one of
+        Shows the monsters of the Team being edited and prompts the user to select one of
         them, returning the corresponding option.
 
         :return: Option selected by the user.
@@ -230,7 +230,10 @@ class EditTeamMenu(EditMenu):
         )
 
         # Showing options
-        self.show_options(options, validate=True)
+        self.show_options(
+            options,
+            validate=False,
+        )
 
         # Selecting option
         selected_option = self.select_attribute_option(options, "monster")
@@ -244,8 +247,12 @@ class EditTeamMenu(EditMenu):
         selected_option = self._select_monster()
 
         if selected_option.id != "CANCEL":
-            selected_monster = selected_option.obj
-            selected_monster = self.edit_monster_menu.open(selected_monster)
+            selected_monster: Monster = selected_option.obj
+            index = self.editing.members.index(selected_monster)
+
+            edited_monster: Monster = self.edit_monster_menu.open(selected_monster)
+
+            self.editing.members[index] = edited_monster
 
         return
 
@@ -254,7 +261,9 @@ class EditTeamMenu(EditMenu):
         Adds a new Monster to the Team being edited, and opens the Edit Monster
         Menu with it.
         """
-        new_monster = Monster()
+        name = self.randomizer.get_random_monster_name()
+        new_monster = Monster(name=name)
+
         new_monster = self.edit_monster_menu.open(new_monster)
         self.editing.members.append(new_monster)
 
@@ -267,7 +276,7 @@ class EditTeamMenu(EditMenu):
         selected_option = self._select_monster()
 
         if selected_option.id != "CANCEL":
-            selected_monster = selected_option.obj
+            selected_monster: Monster = selected_option.obj
             self.editing.members.remove(selected_monster)
 
         return

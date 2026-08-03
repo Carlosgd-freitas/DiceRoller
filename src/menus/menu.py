@@ -115,7 +115,7 @@ class Menu(Manager):
             selected = self.logger.input(message=message)
 
             for option in options:
-                if selected == option.key and (
+                if (option.key.lower() == selected.lower()) and (
                     not validate or self.is_option_valid(option)
                 ):
                     return option

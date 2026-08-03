@@ -354,8 +354,12 @@ class SandboxMenu(EditMenu):
         selected_option = self._select_team()
 
         if selected_option.id != "CANCEL":
-            selected_team = selected_option.obj
-            selected_team = self.edit_team_menu.open(selected_team)
+            selected_team: Team = selected_option.obj
+            index = self.editing["teams"].index(selected_team)
+
+            edited_team: Team = self.edit_team_menu.open(selected_team)
+
+            self.editing["teams"][index] = edited_team
 
         return
 
@@ -379,7 +383,7 @@ class SandboxMenu(EditMenu):
         selected_option = self._select_team()
 
         if selected_option.id != "CANCEL":
-            selected_team = selected_option.obj
+            selected_team: Team = selected_option.obj
             self.editing["teams"].remove(selected_team)
 
         return

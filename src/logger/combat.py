@@ -138,25 +138,19 @@ class CombatLogger(MonsterLogger):
 
         # Control Type
         if control_type:
-            if monster.control_type == ControlType.AI:
-                message = self.get_message(
-                    namespace="combat",
-                    message_group="COMBAT",
-                    key=monster.control_type.name.lower(),
-                )
+            message = self.get_message(
+                namespace="combat",
+                message_group="COMBAT",
+                key=monster.control_type.name.lower(),
+            )
 
+            if monster.control_type == ControlType.AI:
                 foreground_color = Color.RED
 
                 # IA Level
                 message += f" ({monster.difficulty.name})"
 
             elif monster.control_type == ControlType.PLAYER:
-                message = self.get_message(
-                    namespace="combat",
-                    message_group="COMBAT",
-                    key=monster.control_type.name.lower(),
-                )
-
                 foreground_color = Color.BLUE
 
             message = (

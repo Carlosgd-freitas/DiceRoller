@@ -117,16 +117,7 @@ class Compendium(Menu):
         # Sort Attributes
         self.column_index = 1
         self.reverse = False
-
-        sort_menu_title = (
-            self.title
-            + ": "
-            + self.logger.get_message(
-                namespace="compendium",
-                message_group="BASE",
-                key="sort",
-            ).title()
-        )
+        sort_menu_title = self.get_sort_menu_title()
 
         self.sort_menu = SortMenu(
             title=sort_menu_title,
@@ -251,6 +242,25 @@ class Compendium(Menu):
         """
         raise NotImplementedError
 
+    def get_sort_menu_title(self) -> str:
+        """
+        Returns the Sort Menu title.
+
+        :return: Sort Menu title.
+        :rtype: str
+        """
+        title = (
+            self.get_title()
+            + ": "
+            + self.logger.get_message(
+                namespace="compendium",
+                message_group="BASE",
+                key="sort",
+            ).title()
+        )
+
+        return title
+
     # =========================================================================
     # Utility
     # =========================================================================
@@ -266,12 +276,18 @@ class Compendium(Menu):
         :type _messages: Dict
         """
         self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
 
         self.title = self.get_title()
         self.columns = self.get_columns()
         self.options = self.get_options()
         self.messages = self.get_messages()
         self.pages_data = self.get_pages_data(self.items)
+
+        # Menus
+        self.sort_menu.columns = self.columns
+        self.sort_menu.change_language(language, _messages)
+        self.sort_menu.title = self.get_sort_menu_title()
 
     # =========================================================================
     # Data access

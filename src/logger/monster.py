@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from tabulate import tabulate
 
 from src.base.color import Color, color_string
 from src.base.keywords import Keyword
+from src.base.monster import ControlType, Monster
 from src.base.text import numeric_to_string
 from src.logger.dice import DiceLogger
-
-if TYPE_CHECKING:
-    from src.base.monster import Monster
 
 
 class MonsterLogger(DiceLogger):
@@ -58,6 +54,7 @@ class MonsterLogger(DiceLogger):
         monster: Monster,
         description: bool = False,
         current_hp: bool = True,
+        control_type: bool = False,
     ):
         """
         Logs a Monster details.
@@ -72,6 +69,10 @@ class MonsterLogger(DiceLogger):
         :param current_hp: If True, "hp/max_hp" will be logged, and "max_hp" only
         otherwise. Default value is True.
         :type current_hp: bool
+
+        :param control_type: If the monster control type will be logged. Default
+        value is False.
+        :type control_type: bool
         """
         if not self.enabled:
             return
@@ -148,6 +149,54 @@ class MonsterLogger(DiceLogger):
         row.append(message)
 
         attributes.append(row)
+
+        # Control Type
+        if control_type:
+            # Blank line
+            attributes.append(["", ""])
+
+            row = []
+
+            message = self.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="control",
+            ).title()
+
+            message = (
+                color_string(
+                    message,
+                    intensity="BRIGHT",
+                )
+                + ": "
+            )
+
+            row.append(message)
+
+            message = self.get_message(
+                namespace="combat",
+                message_group="COMBAT",
+                key=monster.control_type.name.lower(),
+            )
+
+            if monster.control_type == ControlType.AI:
+                foreground_color = Color.RED
+
+                # IA Level
+                message += f" ({monster.difficulty.name})"
+
+            elif monster.control_type == ControlType.PLAYER:
+                foreground_color = Color.BLUE
+
+            message = color_string(
+                message,
+                foreground_color=foreground_color,
+                intensity="BRIGHT",
+            )
+
+            row.append(message)
+
+            attributes.append(row)
 
         # Logging attributes
         table = tabulate(

@@ -269,7 +269,15 @@ class CombatManager(Manager):
         :var combat_data: Combat data.
         :vartype combat_data: CombatData
         """
-        self.__dict__.update(combat_data)
+        for attribute in [
+            "order_strategy",
+            "round",
+            "turn",
+            "teams",
+        ]:
+            if combat_data.get(attribute) is not None:
+                setattr(self, attribute, deepcopy(combat_data[attribute]))
+
         self.update_teams()
 
     def check_softlock(self) -> bool:

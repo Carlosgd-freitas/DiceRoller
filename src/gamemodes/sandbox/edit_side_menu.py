@@ -12,6 +12,7 @@ from src.menus.option import Option
 from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
+    from src.base.effect import Effect
     from src.systems.settings import Settings
 
 
@@ -196,7 +197,7 @@ class EditSideMenu(EditMenu):
 
     def _select_effect(self) -> Option:
         """
-        Shows the effects of the side being edited and prompts the user to select one of
+        Shows the effects of the Side being edited and prompts the user to select one of
         them, returning the option that corresponds to them.
 
         :return: Option selected by the user.
@@ -231,7 +232,10 @@ class EditSideMenu(EditMenu):
         )
 
         # Showing options
-        self.show_options(options, validate=True)
+        self.show_options(
+            options,
+            validate=False,
+        )
 
         # Selecting option
         selected_option = self.select_attribute_option(options, "effect")
@@ -245,8 +249,12 @@ class EditSideMenu(EditMenu):
         selected_option = self._select_effect()
 
         if selected_option.id != "CANCEL":
-            selected_effect = selected_option.obj
-            selected_effect = self.edit_effect_menu.open(selected_effect)
+            selected_effect: Effect = selected_option.obj
+            index = self.editing.effects.index(selected_effect)
+
+            edited_effect: Effect = self.edit_effect_menu.open(selected_effect)
+
+            self.editing.effects[index] = edited_effect
 
         return
 
@@ -268,7 +276,7 @@ class EditSideMenu(EditMenu):
         selected_option = self._select_effect()
 
         if selected_option.id != "CANCEL":
-            selected_effect = selected_option.obj
+            selected_effect: Effect = selected_option.obj
             self.editing.effects.remove(selected_effect)
 
         return

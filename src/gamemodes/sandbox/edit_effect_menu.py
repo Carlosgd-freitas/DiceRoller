@@ -276,7 +276,7 @@ class EditEffectMenu(EditMenu):
             self.edit_attribute("accuracy", float)
 
         elif option.id == "EDIT_REMOVABLE":
-            pass
+            pass  # switch
 
         elif option.id == "ADD_TARGET_KEYWORD":
             pass

@@ -33,16 +33,21 @@ PLAYER_ACTIONS = {
 }
 
 SANDBOX = {
+    "title": "Sandbox Mode",
+    "start_combat": "Start Combat",
     "change_combat_order": "Change Combat Order",
     "edit_team": "Edit Team",
     "add_team": "Add Team",
     "remove_team": "Remove Team",
-    "export_combat": "Export Combat",
     "import_combat": "Import Combat",
+    "import_combat_success": "Combat was imported successfully.",
+    "import_combat_fail": "Combat could not be imported.",
+    "export_combat": "Export Combat",
+    "export_combat_success": "Combat was exported successfully.",
+    "export_combat_fail": "Combat could not be exported.",
     "randomize_combat": "Randomize Combat",
     "select_combat_order_prompt": "Select a combat order",
-    "start_combat": "Start Combat",
-    "title": "Sandbox Mode",
+    "select_team_prompt": "Select a team",
 }
 
 EDIT_TEAM = {
@@ -59,10 +64,32 @@ EDIT_TEAM = {
     "export_team_success": "Team was exported successfully.",
     "export_team_fail": "Team could not be exported.",
     "randomize_team": "Randomize Team",
+    "select_monster_prompt": "Select a monster",
 }
 
 EDIT_MONSTER = {
     "title": "Edit Monster",
+    "edit_name": "Edit Name",
+    "edit_name_prompt": "Type a new name",
+    "edit_hp": "Edit HP",
+    "edit_hp_prompt": "Type the new HP",
+    "edit_mana": "Edit Mana",
+    "edit_mana_prompt": "Type the new mana",
+    "edit_speed": "Edit Speed",
+    "edit_speed_prompt": "Type a new speed",
+    "edit_control_type": "Edit Control Type",
+    "edit_difficulty": "Edit Difficulty",
+    "edit_dice": "Edit Dice",
+    "add_dice": "Add Dice",
+    "remove_dice": "Remove Dice",
+    "import_monster": "Import Monster",
+    "import_monster_success": "Monster was imported successfully.",
+    "import_monster_fail": "Monster could not be imported.",
+    "export_monster": "Export Monster",
+    "export_monster_success": "Monster was exported successfully.",
+    "export_monster_fail": "Monster could not be exported.",
+    "randomize_monster": "Randomize Monster",
+    "select_dice_prompt": "Selecione a dice",
 }
 
 EDIT_DICE = {

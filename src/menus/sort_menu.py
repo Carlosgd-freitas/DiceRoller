@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, List, TypedDict
 
-from src.base.color import Color, color_string
+from src.base.color import color_string
 from src.base.text import unaccent
 from src.logger.logger import Logger
 from src.menus.menu import Menu
@@ -85,6 +85,8 @@ class SortMenu(Menu):
         self.reverse = reverse
         self.get_sort_key = get_sort_key
 
+        self.selected_option: Option = None
+
         logger = Logger(enabled=logging, language=settings.language)
 
         super().__init__(
@@ -111,6 +113,7 @@ class SortMenu(Menu):
         options = []
         index = 1
 
+        # Sort by column options
         for column in self.columns:
             if column == "#":
                 continue
@@ -121,19 +124,48 @@ class SortMenu(Menu):
                 message=column,
             )
 
+            if index == self.column_index:
+                self.selected_option = option
+
             options.append(option)
 
             index += 1
 
+        # Normal/Reverse order option
+        message = (
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="order",
+            ).title()
+            + ": "
+        )
+
+        if not self.reverse:
+            message += color_string(
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="normal",
+                ).upper(),
+                intensity="BRIGHT",
+            )
+
+        else:
+            message += color_string(
+                self.logger.get_message(
+                    namespace="menus",
+                    message_group="SORT",
+                    key="reverse",
+                ).upper(),
+                intensity="BRIGHT",
+            )
+
         options.append(
             Option(
                 id="ORDER",
-                key=str(len(options) + 1),
-                message=self.logger.get_message(
-                    namespace="base",
-                    message_group="LEXICON",
-                    key="order",
-                ).upper(),
+                key="O",
+                message=message,
                 isolate_before=True,
             )
         )
@@ -215,70 +247,6 @@ class SortMenu(Menu):
     # Rendering
     # =========================================================================
 
-    def show_options(self, options: List[Option]):
-        """
-        Shows options.
-
-        :param options: Options to be showed.
-        :type options: List[Option]
-        """
-        message = color_string(
-            self.logger.get_message(
-                namespace="base", message_group="LEXICON", key="columns"
-            ).title()
-            + ":",
-            intensity="BRIGHT",
-        )
-
-        self.logger.log(message=message)
-
-        for option in options:
-            message = ""
-
-            if option.isolate_before:
-                message += "\n"
-
-            message += f"[{option.key}] {option.message}"
-
-            # Order option
-            if option.id == "ORDER":
-                message += ": "
-
-                if not self.reverse:
-                    message += color_string(
-                        self.logger.get_message(
-                            namespace="base",
-                            message_group="LEXICON",
-                            key="normal",
-                        ).upper(),
-                        intensity="BRIGHT",
-                    )
-
-                else:
-                    message += color_string(
-                        self.logger.get_message(
-                            namespace="menus",
-                            message_group="SORT",
-                            key="reverse",
-                        ).upper(),
-                        intensity="BRIGHT",
-                    )
-
-            # Column options
-            elif int(option.key) == self.column_index:
-                message = color_string(
-                    message,
-                    foreground_color=Color.GREEN,
-                    intensity="BRIGHT",
-                )
-
-            if option.isolate_after:
-                message += "\n"
-
-            self.logger.log(message=message)
-
-        return
-
     def open(self) -> SortData:
         """
         Opens the Menu.
@@ -288,7 +256,19 @@ class SortMenu(Menu):
         """
         while True:
             self.show_title()
-            self.show_options(self.options)
+
+            message = color_string(
+                self.logger.get_message(
+                    namespace="base", message_group="LEXICON", key="columns"
+                ).title()
+                + ":",
+                intensity="BRIGHT",
+            )
+            self.logger.log(message=message)
+
+            self.show_options(
+                self.options, validate=False, selected_option=self.selected_option
+            )
 
             message = self.logger.get_message(
                 namespace="menus",
@@ -297,6 +277,8 @@ class SortMenu(Menu):
             )
             selected = self.select(self.options, message)
             self.process_option(selected)
+
+            self.options = self.get_options()
 
             if selected.id in ["EXIT", "RETURN"]:
                 break

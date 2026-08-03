@@ -24,6 +24,7 @@ LEXICON = {
     "buffs": "buffs",
     "column": "column",
     "columns": "columns",
+    "control": "control",
     "consumable": "consumable",
     "consumables": "consumables",
     "debuff": "debuff",

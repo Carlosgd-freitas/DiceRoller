@@ -24,6 +24,7 @@ LEXICON = {
     "buffs": "fortalecimentos",
     "column": "coluna",
     "columns": "colunas",
+    "control": "controle",
     "consumable": "consumable",
     "consumables": "consumables",
     "debuff": "enfraquecimento",

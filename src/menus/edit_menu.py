@@ -155,7 +155,7 @@ class EditMenu(Menu):
 
         loaded = self.file_manager.load_file(filename)
 
-        if loaded:
+        if loaded and type(self.editing) is type(loaded):
             message = self.logger.get_message(
                 namespace="menus",
                 message_group=self.message_group,
@@ -170,7 +170,8 @@ class EditMenu(Menu):
                 key=f"import_{name}_fail",
             )
 
-        self.logger.log(message=message)
+        self.logger.log(message=message, end="")
+        self.logger.input(message="")
 
         return
 
@@ -208,7 +209,8 @@ class EditMenu(Menu):
                 key=f"export_{name}_fail",
             )
 
-        self.logger.log(message=message)
+        self.logger.log(message=message, end="")
+        self.logger.input(message="")
 
         return saved
 
