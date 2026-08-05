@@ -14,6 +14,15 @@ DETAILS = {
     "no_effects": "Esse lado não possui efeitos.",
 }
 
+DIFFICULTIES = {
+    "easy": "fácil",
+    "normal": "normal",
+    "hard": "difícil",
+    "expert": "perito",
+    "master": "mestre",
+    "nightmare": "pesadelo",
+}
+
 LEXICON = {
     "accuracy": "precisão",
     "area": "área",
@@ -58,11 +67,14 @@ LEXICON = {
     "order": "ordem",
     "on": "ligado",
     "percent": "porcentagem",
+    "removable": "removível",
     "side": "lado",
     "sides": "lados",
     "skill": "habilidade",
     "skills": "habilidades",
     "target": "alvo",
+    "target_keyword": "palavra-chave alvo",
+    "target_keywords": "palavras-chave alvo",
     "targets": "alvos",
     "true": "verdadeiro",
     "turn": "turno",

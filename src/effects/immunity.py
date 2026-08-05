@@ -37,6 +37,45 @@ class ImmunityEffect(Effect):
             target_keywords=target_keywords,
         )
 
+    def get_valid_target_keywords(self) -> List[Keyword]:
+        """
+        Returns a list containing the valid targt keywords for the Effect.
+
+        :return: Valid targt keywords for the Effect.
+        :rtype: List[Keyword]
+        """
+        return [
+            Keyword.ALL,
+            Keyword.ABSORB,
+            Keyword.BLIND,
+            Keyword.BLOCK,
+            Keyword.BLEED,
+            Keyword.BURN,
+            Keyword.CONFUSE,
+            Keyword.DOOM,
+            Keyword.FOCUS,
+            Keyword.FORTIFY,
+            Keyword.FRAGILE,
+            Keyword.FREEZE,
+            Keyword.FROSTBURN,
+            Keyword.HASTE,
+            Keyword.INVISIBLE,
+            Keyword.INVULNERABLE,
+            Keyword.MANA_REGEN,
+            Keyword.OIL,
+            Keyword.POISON,
+            Keyword.REGEN,
+            Keyword.REPEL,
+            Keyword.SACRED_BLOCK,
+            Keyword.SLEEP,
+            Keyword.SLOW,
+            Keyword.STRENGTH,
+            Keyword.STUN,
+            Keyword.TAUNT,
+            Keyword.THORNS,
+            Keyword.WEAK,
+        ]
+
     def get_description_variable_key(self) -> str:
         """
         Returns a message key for the Effect description that takes the parameters into

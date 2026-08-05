@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
+from src.base.data import next_value
 from src.base.dice import Dice
-from src.base.monster import Monster
+from src.base.monster import AILevel, ControlType, Monster
 from src.gamemodes.sandbox.edit_dice_menu import EditDiceMenu
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
@@ -94,21 +95,21 @@ class EditMonsterMenu(EditMenu):
                 ),
             ),
             Option(
-                id="EDIT_CONTROL_TYPE",
+                id="CHANGE_CONTROL_TYPE",
                 key="5",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_control_type",
+                    key="change_control_type",
                 ),
             ),
             Option(
-                id="EDIT_DIFFICULTY",
+                id="CHANGE_AI_LEVEL",
                 key="6",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_difficulty",
+                    key="change_ai_level",
                 ),
             ),
             Option(
@@ -210,11 +211,13 @@ class EditMonsterMenu(EditMenu):
         elif option.id == "EDIT_SPEED":
             self.edit_attribute("speed", int)
 
-        elif option.id == "EDIT_CONTROL_TYPE":
-            pass  # switch
+        elif option.id == "CHANGE_CONTROL_TYPE":
+            self.editing.control_type = next_value(
+                [ControlType.AI, ControlType.PLAYER], self.editing.control_type
+            )
 
-        elif option.id == "EDIT_DIFFICULTY":
-            pass  # menu
+        elif option.id == "CHANGE_AI_LEVEL":
+            self.change_ai_level()
 
         elif option.id == "EDIT_DICE":
             self.edit_dice()
@@ -240,29 +243,33 @@ class EditMonsterMenu(EditMenu):
 
         return
 
-    def _select_dice(self) -> Option:
+    def change_ai_level(self):
         """
-        Shows the dice of the Monster being edited and prompts the user to select one of
-        them, returning the option that corresponds to them.
-
-        :return: Option selected by the user.
-        :rtype: Option
+        Changes the AI Level of the Monster being edited.
         """
         options = []
+        selected_option: Option = None
 
         # Defining options
         self.logger.log(message="")
 
-        for index, single_dice in enumerate(self.editing.dice):
+        for index, ai_level in enumerate(list(AILevel)):
+            message = self.logger.get_message(
+                namespace="base",
+                message_group="DIFFICULTIES",
+                key=ai_level.name.lower(),
+            ).title()
+
             option = Option(
-                id=f"DICE_{index + 1}",
+                id=f"AI_LEVEL_{index + 1}",
                 key=str(index + 1),
-                message=self.logger.log_dice_details(
-                    single_dice
-                ),  ## TODO: Change logging
-                obj=single_dice,
+                message=message,
+                obj=ai_level,
             )
             options.append(option)
+
+            if self.editing.ai_level == ai_level:
+                selected_option = option
 
         options.append(
             Option(
@@ -282,7 +289,67 @@ class EditMonsterMenu(EditMenu):
         self.show_options(
             options,
             validate=False,
+            selected_option=selected_option,
         )
+
+        # Selecting option
+        selected_option = self.select_attribute_option(options, "ai_level")
+        self.editing.ai_level = selected_option.obj
+
+        return
+
+    def _select_dice(self) -> Option:
+        """
+        Shows the dice of the Monster being edited and prompts the user to select one
+        of them, returning the corresponding option.
+
+        :return: Option selected by the user.
+        :rtype: Option
+        """
+        options = []
+
+        # Defining + showing options
+        self.logger.log(message="")
+
+        for index, single_dice in enumerate(self.editing.dice):
+            header = (
+                f"[{index+1}] "
+                + self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="dice",
+                ).title()
+                + f" #{index+1}"
+            )
+
+            self.logger.log_dice_details(
+                single_dice,
+                header=header,
+            )
+
+            option = Option(
+                id=f"DICE_{index + 1}",
+                key=str(index + 1),
+                message=f"DICE_{index + 1}",
+                obj=single_dice,
+            )
+            options.append(option)
+
+        options.append(
+            Option(
+                id="CANCEL",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="cancel",
+                ),
+                isolate_before=True,
+                isolate_after=True,
+            )
+        )
+
+        self.logger.log(message="")
 
         # Selecting option
         selected_option = self.select_attribute_option(options, "dice")
@@ -336,7 +403,6 @@ class EditMonsterMenu(EditMenu):
         """
         Shows the details of the object being edited.
         """
-        ## TODO: FIX
         self.logger.log_monster_details(
             self.editing,
             description=False,

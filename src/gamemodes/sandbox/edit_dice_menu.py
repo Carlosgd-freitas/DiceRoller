@@ -157,7 +157,7 @@ class EditDiceMenu(EditMenu):
     def _select_side(self) -> Option:
         """
         Shows the sides of the Dice being edited and prompts the user to select one of
-        them, returning the option that corresponds to them.
+        them, returning the corresponding option.
 
         :return: Option selected by the user.
         :rtype: Option

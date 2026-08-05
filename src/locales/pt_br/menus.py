@@ -77,8 +77,9 @@ EDIT_MONSTER = {
     "edit_mana_prompt": "Digite a nova mana",
     "edit_speed": "Editar Velocidade",
     "edit_speed_prompt": "Digite uma nova velocidade",
-    "edit_control_type": "Editar Tipo de Controle",
-    "edit_difficulty": "Editar Dificuldade",
+    "change_control_type": "Alterar Tipo de Controle",
+    "change_ai_level": "Alterar Nível da IA",
+    "select_ai_level_prompt": "Selecione um nível de IA",
     "edit_dice": "Editar Dado",
     "add_dice": "Adicionar Dado",
     "remove_dice": "Remover Dado",
@@ -123,9 +124,10 @@ EDIT_EFFECT = {
     "edit_delta": "Editar Delta",
     "edit_accuracy": "Editar Acurácia",
     "edit_accuracy_prompt": "Digite uma nova acurácia",
-    "edit_removable": "Editar Removível",
+    "change_removable": "Alterar Removível",
     "add_target_keyword": "Adicionar Palavra-chave Alvo",
     "remove_target_keyword": "Remover Palavra-chave Alvo",
+    "select_target_keyword_prompt": "Selecione uma palavra-chave alvo",
     "randomize_effect": "Aleatorizar Efeito",
 }
 

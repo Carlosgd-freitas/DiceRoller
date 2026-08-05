@@ -476,7 +476,7 @@ class CombatManager(Manager):
                 allies=allies,
                 enemies=enemies,
                 k=1,
-                difficulty=monster.difficulty,
+                ai_level=monster.ai_level,
             )
 
             for target in targets:

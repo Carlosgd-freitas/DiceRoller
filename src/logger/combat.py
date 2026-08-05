@@ -148,7 +148,15 @@ class CombatLogger(MonsterLogger):
                 foreground_color = Color.RED
 
                 # IA Level
-                message += f" ({monster.difficulty.name})"
+                message += (
+                    " ("
+                    + self.get_message(
+                        namespace="base",
+                        message_group="DIFFICULTIES",
+                        key=monster.ai_level.name.lower(),
+                    ).title()
+                    + ")"
+                )
 
             elif monster.control_type == ControlType.PLAYER:
                 foreground_color = Color.BLUE

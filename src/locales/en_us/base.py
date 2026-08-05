@@ -14,6 +14,15 @@ DETAILS = {
     "no_effects": "This side has no effects.",
 }
 
+DIFFICULTIES = {
+    "easy": "easy",
+    "normal": "normal",
+    "hard": "hard",
+    "expert": "expert",
+    "master": "master",
+    "nightmare": "nightmare",
+}
+
 LEXICON = {
     "accuracy": "accuracy",
     "area": "area",
@@ -58,11 +67,14 @@ LEXICON = {
     "order": "order",
     "on": "on",
     "percent": "percent",
+    "removable": "removable",
     "side": "side",
     "sides": "sides",
     "skill": "skill",
     "skills": "skills",
     "target": "target",
+    "target_keyword": "target keyword",
+    "target_keywords": "target keywords",
     "targets": "targets",
     "true": "true",
     "turn": "turn",

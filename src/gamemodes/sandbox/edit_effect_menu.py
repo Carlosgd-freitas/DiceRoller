@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
+from src.base.color import Color, color_string
 from src.base.effect import Effect
+from src.base.keywords import Keyword
+from src.base.text import numeric_to_string
 from src.gamemodes.sandbox.edit_stat_menu import EditStatMenu
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
@@ -127,12 +130,12 @@ class EditEffectMenu(EditMenu):
                 ),
             ),
             Option(
-                id="EDIT_REMOVABLE",
+                id="CHANGE_REMOVABLE",
                 key="8",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_removable",
+                    key="change_removable",
                 ),
             ),
             Option(
@@ -233,7 +236,7 @@ class EditEffectMenu(EditMenu):
         elif option.id == "EDIT_ACCURACY":
             return self.editing.accuracy is not None
 
-        elif option.id == "EDIT_REMOVABLE":
+        elif option.id == "CHANGE_REMOVABLE":
             return self.editing.removable is not None
 
         elif option.id == "ADD_TARGET_KEYWORD":
@@ -275,14 +278,14 @@ class EditEffectMenu(EditMenu):
         elif option.id == "EDIT_ACCURACY":
             self.edit_attribute("accuracy", float)
 
-        elif option.id == "EDIT_REMOVABLE":
-            pass  # switch
+        elif option.id == "CHANGE_REMOVABLE":
+            self.editing.removable = not self.editing.removable
 
         elif option.id == "ADD_TARGET_KEYWORD":
             pass
 
         elif option.id == "REMOVE_TARGET_KEYWORD":
-            pass
+            self.remove_target_keyword()
 
         elif option.id == "RANDOMIZE_EFFECT":
             randomized_effect = self.randomizer.get_random_effect()
@@ -290,6 +293,65 @@ class EditEffectMenu(EditMenu):
 
         elif option.id == "RETURN":
             pass
+
+        return
+
+    def _select_target_keyword(self) -> Option:
+        """
+        Shows the target keywords of the Effect being edited and prompts the user to
+        select one of them, returning the corresponding option.
+
+        :return: Option selected by the user.
+        :rtype: Option
+        """
+        options = []
+
+        # Defining options
+        self.logger.log(message="")
+
+        for index, target_keyword in enumerate(self.editing.target_keywords):
+            option = Option(
+                id=f"TARGET_KEYWORD_{index + 1}",
+                key=str(index + 1),
+                message=self.logger.get_effect_message(keyword=target_keyword),
+                obj=target_keyword,
+            )
+            options.append(option)
+
+        options.append(
+            Option(
+                id="CANCEL",
+                key="0",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group="BASE",
+                    key="cancel",
+                ),
+                isolate_before=True,
+                isolate_after=True,
+            )
+        )
+
+        # Showing options
+        self.show_options(
+            options,
+            validate=False,
+        )
+
+        # Selecting option
+        selected_option = self.select_attribute_option(options, "target_keyword")
+
+        return selected_option
+
+    def remove_target_keyword(self):
+        """
+        Removes a target keyword from the Effect being edited.
+        """
+        selected_option = self._select_target_keyword()
+
+        if selected_option.id != "CANCEL":
+            selected_target_keyword: Keyword = selected_option.obj
+            self.editing.target_keywords.remove(selected_target_keyword)
 
         return
 
@@ -301,6 +363,222 @@ class EditEffectMenu(EditMenu):
         """
         Shows the details of the object being edited.
         """
-        message = self.logger.get_effect_message(effect=self.editing)
+        # Name
+        message = self.logger.get_effect_message(
+            keyword=self.editing.keyword,
+            associated=False,
+        )
+        self.logger.log(message=message + "\n")
+
+        # Description
+        self.logger.log_effect_description(
+            effect=self.editing,
+            variation="variable",
+        )
+        self.logger.log(message="")
+
+        # Type
+        message = (
+            self.logger.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="type",
+            ).title()
+            + ": "
+        )
+        message = color_string(message, intensity="BRIGHT")
+        self.logger.log(message=message, end="")
+
+        message = self.logger.get_message(
+            namespace="effect_types",
+            message_group=self.editing.type.name,
+            key="name",
+        ).title()
+
         self.logger.log(message=message)
+
+        # Value
+        if self.editing.value is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="value",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            values = []
+            if self.editing.value.flat is not None:
+                values.append(numeric_to_string(self.editing.value.flat))
+            if self.editing.value.percent is not None:
+                values.append(numeric_to_string(self.editing.value.percent * 100) + "%")
+
+            message = " + ".join(values)
+            self.logger.log(message=message)
+
+        # Min Value
+        if self.editing.min_value is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="min_value",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            values = []
+            if self.editing.min_value.flat is not None:
+                values.append(numeric_to_string(self.editing.min_value.flat))
+            if self.editing.min_value.percent is not None:
+                values.append(
+                    numeric_to_string(self.editing.min_value.percent * 100) + "%"
+                )
+
+            message = " + ".join(values)
+            self.logger.log(message=message)
+
+        # Max Value
+        if self.editing.max_value is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="max_value",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            values = []
+            if self.editing.max_value.flat is not None:
+                values.append(numeric_to_string(self.editing.max_value.flat))
+            if self.editing.max_value.percent is not None:
+                values.append(
+                    numeric_to_string(self.editing.max_value.percent * 100) + "%"
+                )
+
+            message = " + ".join(values)
+            self.logger.log(message=message)
+
+        # Duration
+        if self.editing.duration is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="duration",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            message = numeric_to_string(self.editing.duration)
+            message += (
+                " "
+                + self.logger.pluralize(
+                    self.editing.duration,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="turn",
+                ).title()
+            )
+            self.logger.log(message=message)
+
+        # Delta
+        if self.editing.delta is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="delta",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            values = []
+            if self.editing.delta.flat is not None:
+                values.append(numeric_to_string(self.editing.delta.flat))
+            if self.editing.delta.percent is not None:
+                values.append(numeric_to_string(self.editing.delta.percent * 100) + "%")
+
+            message = " + ".join(values)
+            self.logger.log(message=message)
+
+        # Accuracy
+        if self.editing.accuracy is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="accuracy",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            message = numeric_to_string(self.editing.accuracy * 100) + "%"
+            self.logger.log(message=message)
+
+        # Removable
+        if self.editing.removable is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="removable",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            if self.editing.removable is True:
+                message = self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="yes",
+                ).title()
+
+            else:
+                message = self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="no",
+                ).title()
+
+            self.logger.log_boolean(message=message, value=self.editing.removable)
+
+        # Target Keywords
+        if self.editing.target_keywords is not None:
+            message = (
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="target_keywords",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.logger.log(message=message, end="")
+
+            if len(self.editing.target_keywords) > 0:
+                message = self.logger.get_multiple_effects_message(
+                    keywords=self.editing.target_keywords
+                )
+            else:
+                message = color_string("-", foreground_color=Color.RED)
+
+            self.logger.log(message=message)
+
         self.logger.log(message="")

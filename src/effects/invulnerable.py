@@ -37,6 +37,28 @@ class InvulnerableEffect(Effect):
             target_keywords=target_keywords,
         )
 
+    def get_valid_target_keywords(self) -> List[Keyword]:
+        """
+        Returns a list containing the valid targt keywords for the Effect.
+
+        :return: Valid targt keywords for the Effect.
+        :rtype: List[Keyword]
+        """
+        return [
+            Keyword.ALL,
+            Keyword.ATTACK,
+            Keyword.BLEED,
+            Keyword.BURN,
+            Keyword.DOOM,
+            Keyword.EXECUTE,
+            Keyword.FROSTBURN,
+            Keyword.DRAIN,
+            Keyword.PAIN,
+            Keyword.PIERCE,
+            Keyword.POISON,
+            Keyword.THORNS,
+        ]
+
     def get_description_variable_key(self) -> str:
         """
         Returns a message key for the Effect description that takes the parameters into

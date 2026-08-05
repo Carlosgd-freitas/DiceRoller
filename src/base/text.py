@@ -1,3 +1,5 @@
+"""Text utility functions."""
+
 import unicodedata
 from math import inf
 

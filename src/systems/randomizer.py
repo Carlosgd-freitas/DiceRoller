@@ -695,7 +695,7 @@ class Randomizer:
         if effect.target_keywords is not None:
             target_keywords: List[Keyword] = []
 
-            config.keyword_whitelist = []
+            config.keyword_whitelist = effect.get_valid_target_keywords()
             config.keyword_blacklist = [effect.keyword]
 
             for index in range(config.target_keywords_threshold[1]):

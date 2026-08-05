@@ -5,7 +5,6 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, List
 
-from src.base.difficulties import Difficulty
 from src.base.entity import Entity
 
 if TYPE_CHECKING:
@@ -19,6 +18,14 @@ class ControlType(Enum):
     PLAYER = "PLAYER"
 
 
+class AILevel(Enum):
+    """Monter IA level."""
+
+    EASY = 0
+    NORMAL = 1
+    HARD = 2
+
+
 class Monster(Entity):
     """
     Monster class.
@@ -30,9 +37,9 @@ class Monster(Entity):
     is ControlType.AI.
     :vartype control_type: ControlType
 
-    :var difficulty: Monster's difficulty level, which dictates how the AI will choose
-    it's actions. Default is NORMAL.
-    :vartype difficulty: Difficulty
+    :var ai_level: Monster AI level, which dictates AI behavior. Higher levels means
+    smarter actions. Default is AILevel.NORMAL.
+    :vartype ai_level: AILevel
 
     :var in_combat: If the monster is in combat. Default value is True.
     :vartype in_combat: bool
@@ -48,7 +55,7 @@ class Monster(Entity):
         self,
         skills: List[Skill] = None,
         control_type: ControlType = ControlType.AI,
-        difficulty: Difficulty = Difficulty.NORMAL,
+        ai_level: AILevel = AILevel.NORMAL,
         in_combat: bool = True,
         turn_taken: bool = False,
         suffix: str = None,
@@ -57,7 +64,7 @@ class Monster(Entity):
         super().__init__(**kwargs)
         self.skills = [] if skills is None else skills
         self.control_type = control_type
-        self.difficulty = difficulty
+        self.ai_level = ai_level
         self.in_combat = in_combat
         self.turn_taken = turn_taken
         self.suffix = suffix
@@ -72,7 +79,7 @@ class Monster(Entity):
         _str += f" | Mana: {self.mana}"
 
         _str += f"\n Control Type: {self.control_type.name}"
-        _str += f" | Difficulty: {self.difficulty.name}"
+        _str += f" | AI Level: {self.ai_level.name}"
 
         _str += f"\n>>> Dice ({len(self.dice)}):"
         for one_dice in self.dice:

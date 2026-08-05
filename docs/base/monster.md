@@ -10,7 +10,7 @@ Only `Entity` attributes whose meaning depends on the child class will be covere
 * **mana**: a resource used by `Skills`.
 * **skills**: a list of `Skills` that can be used by the monster.
 * **control_type**: what controls the monster actions (IA or a player).
-* **difficulty**: changes `Items`, `Skills`, other attributes and the IA behavior.
+* **ai_level**: changes IA behavior.  Higher levels means smarter strategies.
 * **in_combat**: if the monster is participating in combat.
 * **turn_taken**: if the monster has taken its turn in the current combat round.
 * **suffix**: a suffix to differentiate monsters that have the same name.

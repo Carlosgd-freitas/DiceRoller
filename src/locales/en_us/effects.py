@@ -420,8 +420,8 @@ MANA = {
 
 NOTHING = {
     "name": "NOTHING",
-    "description_combat": "Does nothing.",
-    "description_compendium": "Does nothing.",
+    "description_static": "Does nothing.",
+    "description_variable": "Does nothing.",
     "action": None,
     "activation": None,
     "countdown": None,

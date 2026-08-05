@@ -1,6 +1,6 @@
 """Settings module."""
 
-from typing import List, Literal
+from typing import Literal
 
 from src.locales.languages import Language
 
@@ -29,12 +29,3 @@ class Settings:
     ):
         self.language = language
         self.monster_end_turn = monster_end_turn
-
-    def switch_setting(self, setting_name: str, values: List):
-        """
-        Switches a setting for next possible value in a setting of values.
-        """
-        setting_value = getattr(self, setting_name)
-        index = values.index(setting_value)
-        new_value = values[(index + 1) % len(values)]
-        setattr(self, setting_name, new_value)

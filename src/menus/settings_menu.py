@@ -6,6 +6,7 @@ from enum import Enum
 from typing import List
 
 from src.base.color import color_string
+from src.base.data import next_value
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.menu import Menu
@@ -121,16 +122,14 @@ class SettingsMenu(Menu):
         :type option: Option
         """
         if option.id == "LANGUAGE":
-            self.settings.switch_setting(
-                "language",
-                [Language.EN_US, Language.PT_BR],
+            self.settings.language = next_value(
+                [Language.EN_US, Language.PT_BR], self.settings.language
             )
             self.change_language(self.settings.language)
 
         elif option.id == "MONSTER_END_TURN":
-            self.settings.switch_setting(
-                "monster_end_turn",
-                ["AUTO", "MANUAL"],
+            self.settings.monster_end_turn = next_value(
+                ["AUTO", "MANUAL"], self.settings.monster_end_turn
             )
 
         elif option.id == "EXIT":

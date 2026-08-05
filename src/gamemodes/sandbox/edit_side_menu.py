@@ -197,8 +197,8 @@ class EditSideMenu(EditMenu):
 
     def _select_effect(self) -> Option:
         """
-        Shows the effects of the Side being edited and prompts the user to select one of
-        them, returning the option that corresponds to them.
+        Shows the effects of the Side being edited and prompts the user to select one
+        of them, returning the corresponding option.
 
         :return: Option selected by the user.
         :rtype: Option
@@ -290,3 +290,4 @@ class EditSideMenu(EditMenu):
         Shows the details of the object being edited.
         """
         self.logger.log_side_details(self.editing, weight=True)
+        self.logger.log(message="")

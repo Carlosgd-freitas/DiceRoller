@@ -4,8 +4,11 @@ from enum import Enum
 
 
 class Difficulty(Enum):
-    """Difficulty level."""
+    """Game difficulty level."""
 
-    EASY = 1
-    NORMAL = 2
-    HARD = 3
+    EASY = 0
+    NORMAL = 1
+    HARD = 2
+    EXPERT = 3
+    MASTER = 4
+    NIGHTMARE = 5

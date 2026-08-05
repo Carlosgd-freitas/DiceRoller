@@ -145,17 +145,16 @@ class Effect(ABC):
 
     def __str__(self) -> str:
         """String representation of Effect."""
-        type = self.type.value if self.type else None
         trigger = self.trigger.value if self.trigger else None
         on_execute = "Persistent" if self.persistent else "Instant"
         target_keywords = (
             ", ".join([str(keyword) for keyword in self.target_keywords])
             if self.target_keywords
-            else None
+            else "-"
         )
 
         _str = f"{self.keyword}"
-        _str += f" | Type: {type}"
+        _str += f" | Type: {self.type.value}"
         _str += f" | Value: {str(self.value)}"
         _str += f" | Min Value: {str(self.min_value)}"
         _str += f" | Max Value: {str(self.max_value)}"
@@ -225,6 +224,15 @@ class Effect(ABC):
             effective_value = self.max_value.flat
 
         return effective_value
+
+    def get_valid_target_keywords(self) -> List[Keyword]:
+        """
+        Returns a list containing the valid targt keywords for the Effect.
+
+        :return: Valid targt keywords for the Effect.
+        :rtype: List[Keyword]
+        """
+        return None
 
     def get_description_variable_key(self) -> str:
         """

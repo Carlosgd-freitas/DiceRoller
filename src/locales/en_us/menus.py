@@ -77,8 +77,9 @@ EDIT_MONSTER = {
     "edit_mana_prompt": "Type the new mana",
     "edit_speed": "Edit Speed",
     "edit_speed_prompt": "Type a new speed",
-    "edit_control_type": "Edit Control Type",
-    "edit_difficulty": "Edit Difficulty",
+    "change_control_type": "Change Control Type",
+    "change_ai_level": "Change AI Level",
+    "select_ai_level_prompt": "Select an AI level",
     "edit_dice": "Edit Dice",
     "add_dice": "Add Dice",
     "remove_dice": "Remove Dice",
@@ -89,7 +90,7 @@ EDIT_MONSTER = {
     "export_monster_success": "Monster was exported successfully.",
     "export_monster_fail": "Monster could not be exported.",
     "randomize_monster": "Randomize Monster",
-    "select_dice_prompt": "Selecione a dice",
+    "select_dice_prompt": "Select a dice",
 }
 
 EDIT_DICE = {
@@ -123,9 +124,10 @@ EDIT_EFFECT = {
     "edit_delta": "Edit Delta",
     "edit_accuracy": "Edit Accuracy",
     "edit_accuracy_prompt": "Type a new accuracy",
-    "edit_removable": "Edit Removable",
+    "change_removable": "Change Removable",
     "add_target_keyword": "Add Target Keyword",
     "remove_target_keyword": "Remove Target Keyword",
+    "select_target_keyword_prompt": "Select a target keyword",
     "randomize_effect": "Randomize Effect",
 }
 

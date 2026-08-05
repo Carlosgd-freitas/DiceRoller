@@ -126,7 +126,7 @@ class ExecuteEffect(Effect):
 
         threshold = self.get_effective_value(source=source, target=target)
 
-        if target.hp <= threshold:
+        if target.hp <= threshold and not target.has_effect(Keyword.INVULNERABLE):
             target.hp = 0
         else:
             fail = "default"

@@ -862,16 +862,12 @@ class EffectLogger(StatLogger):
     def log_effect_details(
         self,
         effect: Effect,
-        source: Monster,
     ):
         """
         Logs an Effect details.
 
         :param effect: An effect.
         :type effect: Effect
-
-        :param source: The Monster which has the effect.
-        :type source: Monster
         """
         if not self.enabled:
             return
@@ -898,27 +894,28 @@ class EffectLogger(StatLogger):
         )
 
         # Duration
-        message = (
-            self.get_message(
-                namespace="base",
-                message_group="LEXICON",
-                key="duration",
-            ).title()
-            + ": "
-        )
+        if effect.duration is not None:
+            message = (
+                self.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="duration",
+                ).title()
+                + ": "
+            )
+            message = color_string(message, intensity="BRIGHT")
+            self.log(message=message, end="")
 
-        self.log(message=message, end="")
-
-        message = numeric_to_string(effect.duration)
-        message += (
-            " "
-            + self.pluralize(
-                effect.duration,
-                namespace="base",
-                message_group="LEXICON",
-                key="turn",
-            ).title()
-        )
+            message = numeric_to_string(effect.duration)
+            message += (
+                " "
+                + self.pluralize(
+                    effect.duration,
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="turn",
+                ).title()
+            )
 
         self.log(message=message)
 

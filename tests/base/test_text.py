@@ -1,4 +1,4 @@
-"""Tests for text module methods."""
+"""Tests for text utility module methods."""
 
 from math import inf
 

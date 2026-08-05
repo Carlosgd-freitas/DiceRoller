@@ -5,9 +5,9 @@ from __future__ import annotations
 from random import random
 from typing import TYPE_CHECKING, List
 
-from src.base.difficulties import Difficulty
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
+from src.base.monster import AILevel
 from src.systems.targeting.selectors.buff_selector import BuffSelector
 from src.systems.targeting.selectors.cleanse_selector import CleanseSelector
 from src.systems.targeting.selectors.corrupt_selector import CorruptSelector
@@ -36,7 +36,7 @@ class SelectorManager:
         allies: List[Monster] = None,
         enemies: List[Monster] = None,
         k: int = 1,
-        difficulty: Difficulty = Difficulty.NORMAL,
+        ai_level: AILevel = AILevel.NORMAL,
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on Side's effects.
@@ -56,9 +56,9 @@ class SelectorManager:
         :param k: The number of monsters which will be returned.
         :type k: int
 
-        :param difficulty: What kind of strategy will be used to determine the targets.
-        Harder difficulties means more smart strategies. Default value is Difficulty.NORMAL.
-        :type difficulty: Difficulty
+        :param ai_level: What kind of strategy will be used to determine the targets.
+        Higher levels means smarter strategies. Default value is AILevel.NORMAL.
+        :type ai_level: AILevel
 
         :return: A list of target monsters.
         :rtype: List[Monster]
@@ -121,7 +121,7 @@ class SelectorManager:
                 selector = RandomSelector()
 
         # Using get targets strategy
-        if difficulty == Difficulty.EASY:
+        if ai_level == AILevel.EASY:
             targets = selector.get_targets_easy(
                 source=source,
                 allies=allies,
@@ -130,7 +130,7 @@ class SelectorManager:
                 main_keyword=main_keyword,
             )
 
-        elif difficulty == Difficulty.NORMAL:
+        elif ai_level == AILevel.NORMAL:
             targets = selector.get_targets_normal(
                 source=source,
                 allies=allies,

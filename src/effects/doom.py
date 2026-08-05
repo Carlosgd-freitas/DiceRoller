@@ -82,7 +82,7 @@ class DoomEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
-        if self.duration == 0:
+        if self.duration == 0 and not target.has_effect(Keyword.INVULNERABLE):
             target.hp = 0
 
         return {}

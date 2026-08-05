@@ -33,7 +33,7 @@ class Stat:
         if self.percent is not None:
             values.append(str(self.percent * 100) + "%")
 
-        _str = "; ".join(values)
+        _str = " + ".join(values)
 
         return _str
 

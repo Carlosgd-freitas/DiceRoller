@@ -39,7 +39,7 @@ for effect in all_effects:
         effect.duration = choice(durations)
 
     if effect.target_keywords is not None:
-        effect.target_keywords = [deepcopy(choice(all_effects).keyword)]
+        effect.target_keywords = [deepcopy(choice(effect.get_valid_target_keywords()))]
 
 buffs = [effect for effect in all_effects if effect.type == EffectType.BUFF]
 debuffs = [effect for effect in all_effects if effect.type == EffectType.DEBUFF]
