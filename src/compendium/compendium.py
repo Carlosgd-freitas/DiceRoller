@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Tuple, TypedDict, TypeVa
 
 from tabulate import tabulate
 
-from src.base.color import Color, color_string
+from src.base.color import Color, ColorData, color_string
 from src.base.text import normalize
 from src.locales.languages import Language
 from src.menus.menu import Menu
@@ -65,6 +65,9 @@ class Compendium(Menu):
     :var items: Compendium's main content.
     :vartype items: List[T]
 
+    :param selected_item: Currently selected item. Default value is None.
+    :type selected_item: T
+
     :var columns: Names of the Compendium's columns (Headers).
     :vartype columns: List[str]
 
@@ -88,6 +91,7 @@ class Compendium(Menu):
         logger: Logger,
         settings: Settings,
         items: List[T],
+        selected_item: T = None,
         alignments: Tuple[str] = None,
         page_number: int = 1,
         page_size: int = 15,
@@ -98,6 +102,7 @@ class Compendium(Menu):
             settings,
         )
         self.items = items
+        self.selected_item = selected_item
 
         # Page Attributes
         self.page_number = page_number
@@ -282,7 +287,10 @@ class Compendium(Menu):
         self.columns = self.get_columns()
         self.options = self.get_options()
         self.messages = self.get_messages()
-        self.pages_data = self.get_pages_data(self.items)
+        self.pages_data = self.get_pages_data(
+            self.items,
+            selected_item=self.selected_item,
+        )
 
         # Menus
         self.sort_menu.columns = self.columns
@@ -294,12 +302,24 @@ class Compendium(Menu):
     # =========================================================================
 
     @abstractmethod
-    def get_pages_data(self, items: List[T]) -> List[List]:
+    def get_pages_data(
+        self,
+        items: List[T],
+        selected_item: T = None,
+        selected_color_data: ColorData = None,
+    ) -> List[List]:
         """
         Returns all the tabulated data that will be used on the Compendium.
 
         :param items: Compendium items.
         :type items: List[T]
+
+        :param selected_item: Currently selected item. Default value is None.
+        :type selected_item: T
+
+        :param selected_color_data: Data for coloring currently selected option.
+        Default value is green foreground and bright intensity.
+        :type selected_color_data: ColorData
 
         :return: Compendium items structured as tabulated data.
         :rtype: List[List]
@@ -424,6 +444,10 @@ class Compendium(Menu):
         elif option.id == "SHOW_DETAILS":
             self.show_details()
 
+        elif option.id == "SELECT":
+            item: T = self.items[self.item_number - 1]
+            return item
+
         elif option.id == "RETURN":
             self.level = CompendiumLevel.PAGE
 
@@ -519,7 +543,10 @@ class Compendium(Menu):
         self.items = sort_data["items"]
         self.reverse = sort_data["reverse"]
 
-        self.pages_data = self.get_pages_data(self.items)
+        self.pages_data = self.get_pages_data(
+            self.items,
+            selected_item=self.selected_item,
+        )
 
         return
 
@@ -601,9 +628,12 @@ class Compendium(Menu):
         """
         Opens the Compendium on current page.
         """
-        # Default sorting
+        self.level = CompendiumLevel.PAGE
         self.items = self.sort_menu.sort(self.column_index, self.reverse)
-        self.pages_data = self.get_pages_data(self.items)
+        self.pages_data = self.get_pages_data(
+            self.items,
+            selected_item=self.selected_item,
+        )
 
         # Current page showing
         self.show_page()
@@ -622,6 +652,10 @@ class Compendium(Menu):
             # Option processing
             if selected.id == "EXIT":
                 break
+
+            elif selected.id == "SELECT":
+                selected_item: T = self.process_option(selected)
+                return selected_item
 
             else:
                 self.process_option(selected)

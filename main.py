@@ -12,15 +12,14 @@ from src.systems.settings import Settings
 # Colorama
 init()
 
+file_manager = FileManager()
 settings = Settings()
 
-# Player settings
 try:
-    file_manager = FileManager()
+    loaded_settings = file_manager.load_file(SETTINGS_FILENAME)
 
-    if file_manager.exists(SETTINGS_FILENAME):
-        settings_data = file_manager.load_file(SETTINGS_FILENAME)
-        settings.__dict__.update(settings_data.__dict__)
+    if loaded_settings and isinstance(loaded_settings, Settings):
+        settings = loaded_settings
 
     # Main Menu
     menu = MainMenu(settings=settings)

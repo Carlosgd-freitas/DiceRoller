@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.side import Side
 from src.effects.nothing import NothingEffect
 from src.gamemodes.sandbox.edit_effect_menu import EditEffectMenu
+from src.locales.languages import Language
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
 from src.systems.randomizer import Randomizer
@@ -126,33 +127,38 @@ class EditSideMenu(EditMenu):
 
         return options
 
-    def _effects_as_options(self) -> List[Option]:
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
         """
-        Returns the effects of the Side being edited as Options.
+        Changes the Manager language.
 
-        :return: Side effects as options.
-        :rtype: List[Option]
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        options = [
-            Option(
-                id=f"EFFECT_{idx+1}",
-                key=str(idx + 1),
-                message=self.logger.get_effect_message(effect=effect),
-                obj=effect,
-            )
-            for idx, effect in enumerate(self.editing.effects)
-        ]
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
 
-        options.append(
-            Option(
-                id="CANCEL",
-                key="0",
-                message=None,
-                isolate_before=True,
-            )
-        )
+        self.title = self.get_title()
+        self.options = self.get_options()
 
-        return options
+        self.edit_effect_menu.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+
+        self.edit_effect_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options

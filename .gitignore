@@ -4,6 +4,8 @@ __pycache__
 .vscode
 *.csv
 *.dat
+*.spec
 playground.py
 todo.txt
-sandbox/*
+build/
+dist/

@@ -125,6 +125,7 @@ EDIT_EFFECT = {
     "edit_accuracy": "Edit Accuracy",
     "edit_accuracy_prompt": "Type a new accuracy",
     "change_removable": "Change Removable",
+    "edit_target_keyword": "Edit Target Keyword",
     "add_target_keyword": "Add Target Keyword",
     "remove_target_keyword": "Remove Target Keyword",
     "select_target_keyword_prompt": "Select a target keyword",

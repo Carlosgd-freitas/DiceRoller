@@ -5,6 +5,7 @@ BASE = {
     "page": "Page",
     "previous_page": "Previous Page",
     "search": "Search",
+    "select": "Select",
     "sort": "Sort",
     "show_details": "Show Details",
     "title": "Compendium",

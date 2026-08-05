@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Callable, List
 
-from src.base.color import color_string
+from src.base.color import Color, ColorData, color_string
 from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
@@ -252,16 +252,35 @@ class EffectCompendium(Compendium):
     # Data access
     # =========================================================================
 
-    def get_pages_data(self, items: List[Effect]) -> List[List]:
+    def get_pages_data(
+        self,
+        items: List[Effect],
+        selected_item: Effect = None,
+        selected_color_data: ColorData = None,
+    ) -> List[List]:
         """
         Returns all the tabulated data that will be used on the Compendium.
 
         :param items: Compendium items.
-        :type items: List
+        :type items: List[Effect]
+
+        :param selected_item: Currently selected item. Default value is None.
+        :type selected_item: Effect
+
+        :param selected_color_data: Data for coloring currently selected option.
+        Default value is green foreground and bright intensity.
+        :type selected_color_data: ColorData
 
         :return: Compendium items structured as tabulated data.
         :rtype: List[List]
         """
+        # Coloring default values
+        if selected_color_data is None:
+            selected_color_data = {
+                "foreground_color": Color.GREEN,
+                "intensity": "BRIGHT",
+            }
+
         pages_data = []
 
         for idx, item in enumerate(items):
@@ -274,13 +293,18 @@ class EffectCompendium(Compendium):
                 namespace="effect_types", message_group=item.type.name, key="name"
             )
 
-            pages_data.append(
-                [
-                    f"[{idx+1}]",
-                    effect_keyword,
-                    effect_type,
+            row_data = [
+                f"[{idx+1}]",
+                effect_keyword,
+                effect_type,
+            ]
+
+            if selected_item is not None and item.keyword == selected_item.keyword:
+                row_data = [
+                    color_string(cell, **selected_color_data) for cell in row_data
                 ]
-            )
+
+            pages_data.append(row_data)
 
         return pages_data
 

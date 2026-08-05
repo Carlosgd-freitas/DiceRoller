@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.data import next_value
 from src.base.dice import Dice
 from src.base.monster import AILevel, ControlType, Monster
 from src.gamemodes.sandbox.edit_dice_menu import EditDiceMenu
+from src.locales.languages import Language
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
 from src.systems.randomizer import Randomizer
@@ -181,6 +182,39 @@ class EditMonsterMenu(EditMenu):
         ]
 
         return options
+
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
+        """
+        Changes the Manager language.
+
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
+        """
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
+        self.title = self.get_title()
+        self.options = self.get_options()
+
+        self.edit_dice_menu.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+
+        self.edit_dice_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options

@@ -183,7 +183,8 @@ class SandboxMenu(EditMenu):
         self.title = self.get_title()
         self.options = self.get_options()
 
-        self.combat_manager.logger.change_language(language, _messages)
+        self.combat_manager.change_language(language, _messages)
+        self.edit_team_menu.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
         """
@@ -193,7 +194,9 @@ class SandboxMenu(EditMenu):
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
+
         self.combat_manager.toggle_logging(enabled)
+        self.edit_team_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options

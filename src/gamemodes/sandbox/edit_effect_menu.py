@@ -2,18 +2,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import Color, color_string
 from src.base.effect import Effect
 from src.base.keywords import Keyword
 from src.base.text import numeric_to_string
+from src.compendium.effects import EffectCompendium
 from src.gamemodes.sandbox.edit_stat_menu import EditStatMenu
+from src.locales.languages import Language
 from src.menus.edit_menu import EditMenu
 from src.menus.option import Option
 from src.systems.randomizer import Randomizer
 
 if TYPE_CHECKING:
+    from src.base.stat import Stat
     from src.systems.settings import Settings
 
 
@@ -57,6 +60,30 @@ class EditEffectMenu(EditMenu):
             logging=logging,
             randomizer=randomizer,
         )
+
+        self.effect_compendium = EffectCompendium(
+            settings,
+            logging=logging,
+        )
+        self.modify_effect_compendium()
+
+    def modify_effect_compendium(self):
+        """
+        Modifies the Menu Effect Compendium, adding extended functionality to it.
+        """
+        select_option = Option(
+            id="SELECT",
+            key="4",
+            message=self.logger.get_message(
+                namespace="compendium",
+                message_group="BASE",
+                key="select",
+            ),
+        )
+
+        self.effect_compendium.options["ITEM"].insert(-1, select_option)
+
+        return
 
     def get_options(self) -> List[Option]:
         """
@@ -139,8 +166,17 @@ class EditEffectMenu(EditMenu):
                 ),
             ),
             Option(
-                id="ADD_TARGET_KEYWORD",
+                id="EDIT_TARGET_KEYWORD",
                 key="9",
+                message=self.logger.get_message(
+                    namespace="menus",
+                    message_group=self.message_group,
+                    key="edit_target_keyword",
+                ),
+            ),
+            Option(
+                id="ADD_TARGET_KEYWORD",
+                key="10",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -149,7 +185,7 @@ class EditEffectMenu(EditMenu):
             ),
             Option(
                 id="REMOVE_TARGET_KEYWORD",
-                key="10",
+                key="11",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
@@ -181,34 +217,41 @@ class EditEffectMenu(EditMenu):
 
         return options
 
-    def _target_keywords_as_options(self) -> List[Option]:
+    # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
         """
-        Returns the target keywords of the Effect being edited as Options.
+        Changes the Manager language.
 
-        :return: Effect target keywords as options.
-        :rtype: List[Option]
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
         """
-        options = [
-            Option(
-                id=f"TARGET_KEYWORD_{idx+1}",
-                key=str(idx + 1),
-                message=self.logger.get_effect_message(
-                    keyword=keyword, associated=False
-                ),
-                obj=keyword,
-            )
-            for idx, keyword in enumerate(self.editing.target_keywords)
-        ]
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
 
-        options.append(
-            Option(
-                id="CANCEL",
-                key="0",
-                message=None,
-            )
-        )
+        self.title = self.get_title()
+        self.options = self.get_options()
 
-        return options
+        self.effect_compendium.change_language(language, _messages)
+        self.modify_effect_compendium()
+        self.edit_stat_menu.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Manager logging.
+
+        :var enabled: If the Manager logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+
+        self.effect_compendium.toggle_logging(enabled)
+        self.edit_stat_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -239,14 +282,14 @@ class EditEffectMenu(EditMenu):
         elif option.id == "CHANGE_REMOVABLE":
             return self.editing.removable is not None
 
-        elif option.id == "ADD_TARGET_KEYWORD":
-            return self.editing.target_keywords is not None
-
-        elif option.id == "REMOVE_TARGET_KEYWORD":
+        elif option.id in ["EDIT_TARGET_KEYWORD", "REMOVE_TARGET_KEYWORD"]:
             return (
                 self.editing.target_keywords is not None
                 and len(self.editing.target_keywords) > 0
             )
+
+        elif option.id == "ADD_TARGET_KEYWORD":
+            return self.editing.target_keywords is not None
 
         return True
 
@@ -258,7 +301,7 @@ class EditEffectMenu(EditMenu):
         :type side: Side
         """
         if option.id == "CHANGE_KEYWORD":
-            pass
+            self.change_keyword()
 
         elif option.id == "EDIT_VALUE":
             self.edit_stat_menu.open(self.editing.value)
@@ -281,8 +324,11 @@ class EditEffectMenu(EditMenu):
         elif option.id == "CHANGE_REMOVABLE":
             self.editing.removable = not self.editing.removable
 
+        elif option.id == "EDIT_TARGET_KEYWORD":
+            self.edit_target_keyword()
+
         elif option.id == "ADD_TARGET_KEYWORD":
-            pass
+            self.add_target_keyword()
 
         elif option.id == "REMOVE_TARGET_KEYWORD":
             self.remove_target_keyword()
@@ -293,6 +339,56 @@ class EditEffectMenu(EditMenu):
 
         elif option.id == "RETURN":
             pass
+
+        return
+
+    def change_keyword(self):
+        """
+        Changes the Keyword from the Effect being edited and its attributes accodingly.
+        """
+        # Selecting an effect from Effect Compendium
+        self.effect_compendium.selected_item = self.editing
+        selected_effect: Effect = self.effect_compendium.open()
+
+        if selected_effect is not None:
+            # Changing Keyword
+            for attribute in [
+                "value",
+                "min_value",
+                "max_value",
+                "delta",
+            ]:
+                editing_stat: Stat = getattr(self.editing, attribute)
+                selected_effect_stat: Stat = getattr(selected_effect, attribute)
+
+                if editing_stat is not None and selected_effect_stat is not None:
+                    if (
+                        editing_stat.flat is not None
+                        and selected_effect_stat.flat is not None
+                    ):
+                        selected_effect_stat.flat = editing_stat.flat
+
+                    if (
+                        editing_stat.percent is not None
+                        and selected_effect_stat.percent is not None
+                    ):
+                        selected_effect_stat.percent = editing_stat.percent
+
+            for attribute in [
+                "duration",
+                "accuracy",
+                "removable",
+                "target_keywords",
+            ]:
+                editing_value = getattr(self.editing, attribute)
+                selected_effect_value = getattr(selected_effect, attribute)
+
+                if editing_value is not None and selected_effect_value is not None:
+                    setattr(selected_effect, attribute, selected_effect_value)
+
+            self.editing = selected_effect
+
+        self.effect_compendium.selected_item = None
 
         return
 
@@ -342,6 +438,37 @@ class EditEffectMenu(EditMenu):
         selected_option = self.select_attribute_option(options, "target_keyword")
 
         return selected_option
+
+    def edit_target_keyword(self):
+        """
+        Edits a target keyword of the Effect being edited.
+        """
+        selected_option = self._select_target_keyword()
+
+        if selected_option.id != "CANCEL":
+            selected_target_keyword: Keyword = selected_option.obj
+            index = self.editing.target_keywords.index(selected_target_keyword)
+
+            selected_effect: Effect = self.effect_compendium.open()
+
+            if selected_effect is not None:
+                self.editing.target_keywords[index] = selected_effect.keyword
+
+        return
+
+    def add_target_keyword(self):
+        """
+        Adds a target keyword to the Effect being edited.
+        """
+        # Selecting an effect from Effect Compendium
+        selected_effect: Effect = self.effect_compendium.open()
+
+        if selected_effect is not None:
+
+            if selected_effect.keyword not in self.editing.target_keywords:
+                self.editing.target_keywords.append(selected_effect.keyword)
+
+        return
 
     def remove_target_keyword(self):
         """
@@ -393,7 +520,7 @@ class EditEffectMenu(EditMenu):
             namespace="effect_types",
             message_group=self.editing.type.name,
             key="name",
-        ).title()
+        ).upper()
 
         self.logger.log(message=message)
 
