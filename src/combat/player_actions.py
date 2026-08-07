@@ -178,6 +178,8 @@ class CombatPlayerActionsMenu(Menu):
         self.logger.change_language(language, _messages)
         _messages = self.logger._messages
 
+        self.options = self.get_options()
+
         # Managers
         self.effect_manager.change_language(language, _messages)
 
