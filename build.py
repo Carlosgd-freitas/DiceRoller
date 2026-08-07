@@ -2,14 +2,7 @@
 
 import subprocess
 
-from src.base.constants import VERSION
-
 subprocess.run(
-    [
-        "pyinstaller",
-        "--onedir",
-        "--name",
-        f"DiceRoller_{VERSION}",
-        "main.py",
-    ]
+    ["pyinstaller", "DiceRoller.spec"],
+    check=True,
 )

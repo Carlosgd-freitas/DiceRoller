@@ -4,7 +4,10 @@ __pycache__
 .vscode
 *.csv
 *.dat
-*.spec
+*.log
+*.pyc
+*.tar.gz
+*.zip
 playground.py
 todo.txt
 build/
