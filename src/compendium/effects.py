@@ -9,6 +9,7 @@ from src.base.color import Color, ColorData, color_string
 from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
 from src.effects.absorb import AbsorbEffect
+from src.effects.all import AllEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
 from src.effects.blind import BlindEffect
@@ -57,6 +58,7 @@ if TYPE_CHECKING:
 
 ALL_EFFECTS = [
     AbsorbEffect(),
+    AllEffect(),
     AttackEffect(),
     BleedEffect(),
     BlindEffect(),

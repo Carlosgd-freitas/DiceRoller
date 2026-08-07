@@ -60,6 +60,9 @@ class Logger:
             _messages[namespace] = {}
 
             for name, value in vars(module).items():
+                if name.startswith("__"):
+                    continue
+
                 if isinstance(value, dict):
                     _messages[namespace][name] = value
 
@@ -79,6 +82,21 @@ class Logger:
 
         self._messages = _messages
 
+    def get_namespace(self, namespace: Namespace) -> Dict:
+        """
+        Gets a namespace from a locale.
+
+        :param namespace: Namespace name.
+        :type namespace: Namespace
+
+        :return: A Namespace, where each item is a message group.
+        :rtype: Dict
+        """
+        namespace: Dict = self._messages.get(namespace)
+
+        if namespace:
+            return namespace
+
     def get_message_group(
         self,
         namespace: Namespace,
@@ -88,17 +106,14 @@ class Logger:
         """
         Gets a message group from a locale's namespace.
 
-        :param namespace: The namespace.
+        :param namespace: Namespace name.
         :type namespace: Namespace
 
-        :param message_group: The message group.
+        :param message_group: Message group name.
         :type message_group: str
 
-        :param key: The message key.
-        :type key: str
-
-        :return: A message.
-        :rtype: str
+        :return: A Message group, where each item is a message.
+        :rtype: Dict
         """
         namespace: Dict = self._messages.get(namespace)
 
@@ -120,13 +135,13 @@ class Logger:
         """
         Gets a message from a locale's namespace and message group.
 
-        :param namespace: The namespace.
+        :param namespace: Namespace name.
         :type namespace: Namespace
 
-        :param message_group: The message group.
+        :param message_group: Message group name.
         :type message_group: str
 
-        :param key: The message key.
+        :param key: Message key.
         :type key: str
 
         :return: A message.

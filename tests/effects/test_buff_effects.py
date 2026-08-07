@@ -1,4 +1,4 @@
-"""Tests for buff effects processing."""
+"""Tests for effect with 'BUFF' type."""
 
 from __future__ import annotations
 

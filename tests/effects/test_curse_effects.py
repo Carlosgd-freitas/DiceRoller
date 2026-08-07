@@ -1,4 +1,4 @@
-"""Tests for curse effects processing."""
+"""Tests for effect with 'CURSE' type."""
 
 from __future__ import annotations
 

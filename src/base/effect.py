@@ -61,6 +61,7 @@ class EffectRequirements(TypedDict):
 class EffectType(Enum):
     """Type of Effect."""
 
+    ALL = "ALL"
     BUFF = "BUFF"
     CURSE = "CURSE"
     DEBUFF = "DEBUFF"
@@ -147,11 +148,13 @@ class Effect(ABC):
         """String representation of Effect."""
         trigger = self.trigger.value if self.trigger else None
         on_execute = "Persistent" if self.persistent else "Instant"
-        target_keywords = (
-            ", ".join([str(keyword) for keyword in self.target_keywords])
-            if self.target_keywords
-            else "-"
-        )
+
+        if isinstance(self.target_keywords, list) and len(self.target_keywords) > 0:
+            target_keywords = ", ".join(
+                [str(keyword) for keyword in self.target_keywords]
+            )
+        else:
+            target_keywords = str(self.target_keywords)
 
         _str = f"{self.keyword}"
         _str += f" | Type: {self.type.value}"

@@ -1,4 +1,4 @@
-"""Tests for offensive effects processing."""
+"""Tests for effect with 'OFFENSIVE' type."""
 
 from __future__ import annotations
 

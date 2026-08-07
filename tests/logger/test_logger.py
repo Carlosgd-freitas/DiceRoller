@@ -25,6 +25,20 @@ def test_logger_change_language(loggers: Dict):
     assert_conditions(conditions)
 
 
+def test_logger_get_namespace(loggers: Dict):
+    logger: Logger = loggers["logger"]
+
+    namespace = logger.get_namespace(namespace="base")
+
+    conditions = [
+        isinstance(namespace, Dict),
+        len(namespace.keys()) > 0,
+        all([isinstance(value, dict) for _, value in namespace.items()]),
+    ]
+
+    assert_conditions(conditions)
+
+
 def test_logger_get_message_group(loggers: Dict):
     logger: Logger = loggers["logger"]
 
@@ -35,6 +49,7 @@ def test_logger_get_message_group(loggers: Dict):
     conditions = [
         isinstance(message_group, Dict),
         len(message_group.keys()) > 0,
+        all([isinstance(value, str) for _, value in message_group.items()]),
     ]
 
     assert_conditions(conditions)

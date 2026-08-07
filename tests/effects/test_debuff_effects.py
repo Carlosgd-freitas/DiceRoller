@@ -1,4 +1,4 @@
-"""Tests for debuff effects processing."""
+"""Tests for effect with 'DEBUFF' type."""
 
 from __future__ import annotations
 

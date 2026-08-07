@@ -1,4 +1,4 @@
-"""Tests for restoration effects processing."""
+"""Tests for effect with 'RESTORATION' type."""
 
 from __future__ import annotations
 

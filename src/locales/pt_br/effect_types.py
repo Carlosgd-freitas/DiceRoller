@@ -1,5 +1,13 @@
 """PT-BR localization por effect types module."""
 
+ALL = {
+    "name": "TODOS",
+    "execution": "{source} fez tudo.",
+    "execution_self": "{source} fez tudo.",
+    "execution_fail": "{source} tentou fazer tudo, mas",
+    "execution_fail_self": "{source} tentou fazer tudo, mas",
+}
+
 BUFF = {
     "name": "FORTALECIMENTO",
     "execution": "{source} fortaleceu {target} com {keyword} por {duration} {turns}.",

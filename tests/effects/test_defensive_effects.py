@@ -1,4 +1,4 @@
-"""Tests for defensive effects processing."""
+"""Tests for effect with 'DEFENSIVE' type."""
 
 from __future__ import annotations
 

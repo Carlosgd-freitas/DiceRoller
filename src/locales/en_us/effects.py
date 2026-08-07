@@ -1,9 +1,5 @@
 """EN-US localization for effects module."""
 
-ALL = {
-    "name": "ALL",
-}
-
 ABSORB = {
     "name": "ABSORB",
     "description": "Reduces recieved direct damage. Any blocked damage restores {hp}.",
@@ -20,6 +16,22 @@ ABSORB = {
     "fail": None,
     "removal": None,
     "status": "ABSORBING",
+}
+
+ALL = {
+    "name": "ALL",
+    "description": "Considered as every other effect, but does nothing.",
+    "description_variable": "Considered as every other effect, but does nothing.",
+    "action": None,
+    "activation": None,
+    "countdown": None,
+    "execution": "Everything happened.",
+    "execution_self": "Everything happened.",
+    "execution_fail": "Everything would happen, but {source}",
+    "execution_fail_self": "Everything would happen, but {source}",
+    "fail": None,
+    "removal": None,
+    "status": None,
 }
 
 ATTACK = {
@@ -420,7 +432,7 @@ MANA = {
 
 NOTHING = {
     "name": "NOTHING",
-    "description_static": "Does nothing.",
+    "description": "Does nothing.",
     "description_variable": "Does nothing.",
     "action": None,
     "activation": None,

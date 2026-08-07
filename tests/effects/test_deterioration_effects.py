@@ -1,4 +1,4 @@
-"""Tests for deterioration effects processing."""
+"""Tests for effect with 'DETERIORATION' type."""
 
 from __future__ import annotations
 

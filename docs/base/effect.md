@@ -18,12 +18,13 @@ Each **effect** has its own behavior, and are to be used by "bigger" components,
 * **target_keywords**: other keywords that the effect can use in it's behavior.
 
 ## Effect types
+* **ALL**: exclusive to the "All" effect.
 * **BUFF**: a persistent effect that benefits the target.
 * **CURSE**: an instant or persistent effect that harms self and allies.
 * **DEBUFF**: a persistent effect that harms the target.
 * **DEFENSIVE**: a persistent effect that reduces direct damage that the target would recieve.
 * **DETERIORATION**: an instant effect that harms the target.
-* **NOTHING**: does nothing.
+* **NOTHING**: exclusive to the "Nothing" effect.
 * **OFFENSIVE**: an instant effct directly damages the target.
 * **RESTORATION**: an instant effect that benefits the target.
 
