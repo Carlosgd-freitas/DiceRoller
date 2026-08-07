@@ -35,7 +35,10 @@ class EffectManager(Manager):
         logging: bool = True,
     ):
         # Initialization
-        logger = EffectLogger(enabled=logging)
+        logger = EffectLogger(
+            enabled=logging,
+            language=settings.language,
+        )
 
         super().__init__(
             logger,

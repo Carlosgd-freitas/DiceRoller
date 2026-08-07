@@ -74,7 +74,7 @@ def compendiums(settings: Settings) -> Dict:
 
 @fixture()
 def managers(settings: Settings) -> Dict:
-    logger = Logger(enabled=False)
+    logger = Logger(enabled=False, language=Language.EN_US)
 
     manager = Manager(logger=logger, settings=settings)
 

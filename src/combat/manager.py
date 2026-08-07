@@ -141,7 +141,10 @@ class CombatManager(Manager):
         softlock_limit: int = 3,
     ):
         # Initialization
-        logger = CombatLogger(enabled=logging)
+        logger = CombatLogger(
+            enabled=logging,
+            language=settings.language,
+        )
 
         super().__init__(
             logger,
