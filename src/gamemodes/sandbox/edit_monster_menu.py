@@ -238,6 +238,7 @@ class EditMonsterMenu(EditMenu):
 
         elif option.id == "EDIT_HP":
             self.edit_attribute("hp", int)
+            self.editing.max_hp = self.editing.hp
 
         elif option.id == "EDIT_MANA":
             self.edit_attribute("mana", int)
@@ -328,7 +329,9 @@ class EditMonsterMenu(EditMenu):
 
         # Selecting option
         selected_option = self.select_attribute_option(options, "ai_level")
-        self.editing.ai_level = selected_option.obj
+
+        if selected_option.id != "CANCEL":
+            self.editing.ai_level = selected_option.obj
 
         return
 

@@ -36,8 +36,10 @@ You can download the latest pre-built versions from the [Releases](../../release
 **Note:** If needed, use `chmod +x` to give executable permission to the game file.
 
 ## Planned Updates
-* **v0.3.0:** Roguelike Mode, Playable Classes, Items, Shops
-* **v0.4.0:** Skills, Events
+* **v0.3.0:** Roguelike Mode, Playable Classes
+* **v0.4.0:** Items (Consumables & Equipment), Shops
+* **v0.5.0:** Skills, Events
+* **v0.6.0:** Save System, Achievements, Unlocks
 
 ## Modding: Getting Started
 This project uses **Python 3.14.4**, be sure to use this or another compatible version.

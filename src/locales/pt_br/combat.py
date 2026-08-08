@@ -22,7 +22,7 @@ FAILS = {
     "default": "falhou.",
     "non-persistable": "foi ineficaz.",
     "source_alive": "estava vivo.",
-    "source_dead": "estava morto.",
+    "source_dead": "morreu antes de poder fazer isso.",
     "source_freeze": "estava {fail_status}.",
     "source_immunity": "era {fail_status}.",
     "source_miss": "se errou.",

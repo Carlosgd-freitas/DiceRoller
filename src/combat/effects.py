@@ -105,6 +105,19 @@ class EffectManager(Manager):
                     **effect_data,
                 )
 
+            # Reverting target and source monsters to original
+            if trigger in [
+                Trigger.BEING_BUFFED,
+                Trigger.BEING_DEBUFFED,
+                Trigger.BEING_DEFENDED,
+                Trigger.BEING_DETERIORATED,
+                Trigger.BEING_ATTACKED,
+                Trigger.BEING_RESTORED,
+            ]:
+                aux = target
+                target = source
+                source = aux
+
         return
 
     def execute_effect(

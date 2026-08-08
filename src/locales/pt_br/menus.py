@@ -54,9 +54,9 @@ EDIT_TEAM = {
     "title": "Editar Time",
     "edit_name": "Editar Nome",
     "edit_name_prompt": "Digite um novo nome",
-    "edit_monster": "Editar Monstro",
-    "add_monster": "Adicionar Monstro",
-    "remove_monster": "Remover Monstro",
+    "edit_member": "Editar Membro",
+    "add_member": "Adicionar Membro",
+    "remove_member": "Remover Membro",
     "import_team": "Importar Time",
     "import_team_success": "Time foi importado com sucesso.",
     "import_team_fail": "Time não pôde ser importado.",
@@ -68,7 +68,7 @@ EDIT_TEAM = {
 }
 
 EDIT_MONSTER = {
-    "title": "Editar Monstro",
+    "title": "Editar Membro",
     "edit_name": "Editar Nome",
     "edit_name_prompt": "Digite um novo nome",
     "edit_hp": "Editar HP",

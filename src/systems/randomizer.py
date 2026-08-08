@@ -122,6 +122,7 @@ class RandomizerConfig:
     :type keyword_whitelist: List[Keyword]
 
     :param keyword_blacklist: Generated Effects won't have any keywords in this list.
+    By default, All and Nothing effects aren't generated.
     :type keyword_blacklist: List[Keyword]
     """
 
@@ -156,7 +157,9 @@ class RandomizerConfig:
     percent_threshold: Tuple[float, float] = (0.01, 1)
     # Keyword attributes
     keyword_whitelist: list[Keyword] = field(default_factory=list)
-    keyword_blacklist: list[Keyword] = field(default_factory=list)
+    keyword_blacklist: list[Keyword] = field(
+        default_factory=lambda: [Keyword.ALL, Keyword.NOTHING]
+    )
 
     def __str__(self) -> str:
         """String representation of RandomizerConfig."""

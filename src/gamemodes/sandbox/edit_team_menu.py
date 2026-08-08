@@ -78,30 +78,30 @@ class EditTeamMenu(EditMenu):
                 ),
             ),
             Option(
-                id="EDIT_MONSTER",
+                id="EDIT_MEMBER",
                 key="2",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="edit_monster",
+                    key="edit_member",
                 ),
             ),
             Option(
-                id="ADD_MONSTER",
+                id="ADD_MEMBER",
                 key="3",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="add_monster",
+                    key="add_member",
                 ),
             ),
             Option(
-                id="REMOVE_MONSTER",
+                id="REMOVE_MEMBER",
                 key="4",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group=self.message_group,
-                    key="remove_monster",
+                    key="remove_member",
                 ),
                 isolate_after=True,
             ),
@@ -188,7 +188,7 @@ class EditTeamMenu(EditMenu):
         """
         Returns if the option can be selected or not.
         """
-        if option.id in ["EDIT_MONSTER", "REMOVE_MONSTER"]:
+        if option.id in ["EDIT_MEMBER", "REMOVE_MEMBER"]:
             return len(self.editing.members) > 0
 
         return True
@@ -203,13 +203,13 @@ class EditTeamMenu(EditMenu):
         if option.id == "EDIT_NAME":
             self.edit_attribute("name", str)
 
-        elif option.id == "EDIT_MONSTER":
+        elif option.id == "EDIT_MEMBER":
             self.edit_monster()
 
-        elif option.id == "ADD_MONSTER":
+        elif option.id == "ADD_MEMBER":
             self.add_monster()
 
-        elif option.id == "REMOVE_MONSTER":
+        elif option.id == "REMOVE_MEMBER":
             self.remove_monster()
 
         elif option.id == "IMPORT_TEAM":

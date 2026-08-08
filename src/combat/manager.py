@@ -577,11 +577,20 @@ class CombatManager(Manager):
             if effect.duration != inf:
                 effect.duration -= 1
 
-                # Procesing effects on duration decay
-                self.effect_manager.process_trigger(
-                    Trigger.DURATION_DECAY,
-                    target=self.current_monster,
-                )
+                # Processing only duration trigger effects
+                if effect.trigger == Trigger.DURATION_DECAY:
+                    effect_data = effect.activate(
+                        source=None,
+                        target=self.current_monster,
+                    )
+
+                    # Logging triggered effect
+                    self.logger.log_effect_activation(
+                        effect=effect,
+                        source=None,
+                        target=self.current_monster,
+                        **effect_data,
+                    )
 
             if effect.delta:
                 if effect.delta.flat:
