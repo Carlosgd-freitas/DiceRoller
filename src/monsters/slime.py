@@ -1,6 +1,9 @@
 """Slime module."""
 
+from typing import List
+
 from src.base.dice import Dice
+from src.base.difficulties import Difficulty
 from src.base.monster import Monster
 from src.base.side import Side
 from src.base.stat import Stat
@@ -14,33 +17,55 @@ class Slime(Monster):
     """
 
     def __init__(self, **kwargs):
-        dice_0 = Dice(
-            sides=[
-                Side([AttackEffect(Stat(flat=1, percent=0))]),
-                Side([AttackEffect(Stat(flat=2, percent=0))]),
-                Side([AttackEffect(Stat(flat=3, percent=0))]),
-                Side([AttackEffect(Stat(flat=4, percent=0))]),
-            ]
-        )
+        super().__init__(global_id="SLIME", hp=6, max_hp=6, speed=1, mana=0, **kwargs)
 
-        dice_1 = Dice(
-            sides=[
-                Side([BlockEffect(Stat(flat=1, percent=0))]),
-                Side([BlockEffect(Stat(flat=2, percent=0))]),
-                Side([BlockEffect(Stat(flat=3, percent=0))]),
-                Side([BlockEffect(Stat(flat=4, percent=0))]),
-            ]
-        )
+    def get_dice(self, difficulty: Difficulty) -> List[Dice]:
+        """
+        Returns the Dice that will be used by the Monster.
 
-        super().__init__(
-            global_id="SLIME",
-            dice=[
-                dice_0,
-                dice_1,
-            ],
-            hp=6,
-            max_hp=6,
-            speed=1,
-            mana=0,
-            **kwargs
-        )
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Dice that will be used by the Monster.
+        :rtype: List[Dice]
+        """
+        dice: List[Dice] = []
+
+        if difficulty.value < 3:
+            dice_0 = Dice(
+                sides=[
+                    Side([AttackEffect(Stat(flat=1, percent=0))]),
+                    Side([AttackEffect(Stat(flat=2, percent=0))]),
+                    Side([AttackEffect(Stat(flat=3, percent=0))]),
+                    Side([AttackEffect(Stat(flat=4, percent=0))]),
+                    Side([BlockEffect(Stat(flat=1, percent=0))]),
+                    Side([BlockEffect(Stat(flat=2, percent=0))]),
+                    Side([BlockEffect(Stat(flat=3, percent=0))]),
+                    Side([BlockEffect(Stat(flat=4, percent=0))]),
+                ]
+            )
+
+            dice = [dice_0]
+
+        else:
+            dice_0 = Dice(
+                sides=[
+                    Side([AttackEffect(Stat(flat=1, percent=0))]),
+                    Side([AttackEffect(Stat(flat=2, percent=0))]),
+                    Side([AttackEffect(Stat(flat=3, percent=0))]),
+                    Side([AttackEffect(Stat(flat=4, percent=0))]),
+                ]
+            )
+
+            dice_1 = Dice(
+                sides=[
+                    Side([BlockEffect(Stat(flat=1, percent=0))]),
+                    Side([BlockEffect(Stat(flat=2, percent=0))]),
+                    Side([BlockEffect(Stat(flat=3, percent=0))]),
+                    Side([BlockEffect(Stat(flat=4, percent=0))]),
+                ]
+            )
+
+            dice = [dice_0, dice_1]
+
+        return dice

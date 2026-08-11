@@ -19,6 +19,15 @@ MAIN = {
     "title": "Main Menu",
 }
 
+ROGUELIKE = {
+    "title": "Roguelike Mode",
+    "new_run": "New Run",
+    "select_class": "Select Class",
+    "select_class_prompt": "Select a class",
+    "select_difficulty": "Select Difficulty",
+    "select_difficulty_prompt": "Selecione a difficulty",
+}
+
 PLAYER_ACTIONS = {
     "consumables": "Consumables",
     "equipment": "Equipment",

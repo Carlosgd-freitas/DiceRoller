@@ -528,8 +528,8 @@ class Randomizer:
             max_hp=hp,
             speed=speed,
             mana=mana,
-            dice=dice,
         )
+        monster.dice = dice
 
         return monster
 

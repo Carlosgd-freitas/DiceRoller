@@ -5,9 +5,11 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, List
 
+from src.base.difficulties import Difficulty
 from src.base.entity import Entity
 
 if TYPE_CHECKING:
+    from src.base.dice import Dice
     from src.base.skill import Skill
 
 
@@ -30,12 +32,12 @@ class Monster(Entity):
     """
     Monster class.
 
-    :var skills: Monster's skills.
-    :vartype skills: List[Skill]
-
     :var control_type: If the Monster is controller by AI or the player. Default value
     is ControlType.AI.
     :vartype control_type: ControlType
+
+    :var difficulty: Game difficulty.
+    :vartype difficulty: Difficulty
 
     :var ai_level: Monster AI level, which dictates AI behavior. Higher levels means
     smarter actions. Default is AILevel.NORMAL.
@@ -53,21 +55,26 @@ class Monster(Entity):
 
     def __init__(
         self,
-        skills: List[Skill] = None,
         control_type: ControlType = ControlType.AI,
-        ai_level: AILevel = AILevel.NORMAL,
+        difficulty: Difficulty = Difficulty.NORMAL,
         in_combat: bool = True,
         turn_taken: bool = False,
         suffix: str = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.skills = [] if skills is None else skills
+
         self.control_type = control_type
-        self.ai_level = ai_level
         self.in_combat = in_combat
         self.turn_taken = turn_taken
         self.suffix = suffix
+
+        # Difficulty-based attributes
+        self.scale_attributes(difficulty)
+
+        self.ai_level = self.get_ai_level(difficulty)
+        self.dice = self.get_dice(difficulty)
+        self.skills = self.get_skills(difficulty)
 
     def __str__(self) -> str:
         """String representation of Monster."""
@@ -119,3 +126,71 @@ class Monster(Entity):
                 ]
             )
         )
+
+    def scale_attributes(self, difficulty: Difficulty):
+        """
+        Scales the Monster attributes according to the game difficulty.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+        """
+        if difficulty == Difficulty.EASY:
+            hp_scaling = 0.5
+        elif difficulty == Difficulty.NORMAL:
+            hp_scaling = 1
+        elif difficulty == Difficulty.HARD:
+            hp_scaling = 1.25
+        elif difficulty == Difficulty.EXPERT:
+            hp_scaling = 1.5
+        elif difficulty == Difficulty.MASTER:
+            hp_scaling = 1.75
+        elif difficulty == Difficulty.NIGHTMARE:
+            hp_scaling = 2
+
+        if self.max_hp is not None:
+            self.max_hp *= hp_scaling
+        if self.hp is not None:
+            self.hp *= hp_scaling
+
+        return
+
+    def get_ai_level(self, difficulty: Difficulty) -> AILevel:
+        """
+        Returns the level of AI that will be used by the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: AI Level that will be used by the Monster.
+        :rtype: AILevel
+        """
+        if difficulty == Difficulty.EASY:
+            return AILevel.EASY
+        elif difficulty == Difficulty.NORMAL:
+            return AILevel.NORMAL
+        else:
+            return AILevel.HARD
+
+    def get_dice(self, difficulty: Difficulty) -> List[Dice]:
+        """
+        Returns the Dice that will be used by the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Dice that will be used by the Monster.
+        :rtype: List[Dice]
+        """
+        return []
+
+    def get_skills(self, difficulty: Difficulty) -> List[Skill]:
+        """
+        Returns the skills that will be used by the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Skills that will be used by the Monster.
+        :rtype: List[Skill]
+        """
+        return []

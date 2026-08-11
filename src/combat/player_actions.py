@@ -229,10 +229,15 @@ class CombatPlayerActionsMenu(Menu):
             selected = self.logger.input(message=message)
 
             for option in options:
-                if selected == option.key and (
-                    not validate or self.is_option_valid(option, monster)
-                ):
-                    return option
+                if option.key.lower() == selected.lower():
+
+                    if validate and not self.is_option_valid(option, monster):
+                        if option.message_invalid is not None:
+                            self.logger.log(message=option.message_invalid)
+                        pass
+
+                    else:
+                        return option
 
     def is_option_valid(self, option: Option, monster: Monster) -> bool:
         """

@@ -115,10 +115,15 @@ class Menu(Manager):
             selected = self.logger.input(message=message)
 
             for option in options:
-                if (option.key.lower() == selected.lower()) and (
-                    not validate or self.is_option_valid(option)
-                ):
-                    return option
+                if option.key.lower() == selected.lower():
+
+                    if validate and not self.is_option_valid(option):
+                        if option.message_invalid is not None:
+                            self.logger.log(message=option.message_invalid)
+                        pass
+
+                    else:
+                        return option
 
     @abstractmethod
     def is_option_valid(self, option: Option) -> bool:

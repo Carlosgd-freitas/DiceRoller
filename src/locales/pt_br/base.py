@@ -7,6 +7,14 @@ ATTRIBUTES = {
     "speed": "VEL",
 }
 
+CLASSES = {
+    "mage": "mago",
+    "random": "aleatório",
+    "ranger": "patrulheiro",
+    "rogue": "ladino",
+    "warrior": "guerreiro",
+}
+
 DETAILS = {
     "no_members": "Esse time não possui membros.",
     "no_teams": "Esse combate não possui times.",

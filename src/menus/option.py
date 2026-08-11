@@ -16,6 +16,10 @@ class Option:
     :var message: Message that will be logged when displaying the Option.
     :vartype message: str
 
+    :var message_invalid: A message that will be logged if the Option was selected and
+    it was invalid. Default value is None.
+    :vartype message_invalid: str
+
     :var obj: Optional bject to be associated to the option.
     :vartype obj: Any
 
@@ -33,6 +37,7 @@ class Option:
         id: str,
         key: str,
         message: str,
+        message_invalid: str = None,
         obj: Any = None,
         isolate_before: bool = None,
         isolate_after: bool = None,
@@ -40,6 +45,7 @@ class Option:
         self.id = id
         self.key = key
         self.message = message
+        self.message_invalid = message_invalid
         self.obj = obj
         self.isolate_before = isolate_before
         self.isolate_after = isolate_after
