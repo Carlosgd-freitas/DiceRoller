@@ -40,6 +40,7 @@ from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.repel import RepelEffect
+from src.effects.resistance import ResistanceEffect
 from src.effects.revive import ReviveEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
@@ -89,6 +90,7 @@ ALL_EFFECTS = [
     PoisonEffect(),
     RegenEffect(),
     RepelEffect(),
+    ResistanceEffect(),
     ReviveEffect(),
     SacredBlockEffect(),
     SleepEffect(),

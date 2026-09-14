@@ -40,6 +40,7 @@ from src.effects.pierce import PierceEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.repel import RepelEffect
+from src.effects.resistance import ResistanceEffect
 from src.effects.sacred_block import SacredBlockEffect
 from src.effects.sleep import SleepEffect
 from src.effects.slow import SlowEffect
@@ -309,6 +310,35 @@ for i in [0, 1, 5, 6, 10]:
 
     combat_manager.effect_manager.execute_effect(
         effect=immunity_effect,
+        source=monster_b,
+        target=monster_b,
+    )
+
+combat_manager.effect_manager.execute_effect(
+    effect=BurnEffect(),
+    source=monster_a,
+    target=monster_b,
+)
+
+monster_b.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: RESISTANCE =====")
+
+keywords = []
+for i in range(11):
+    if i % 2 == 0:
+        keyword = Keyword.BURN
+    else:
+        keyword = Keyword.POISON
+    keywords.append(keyword)
+
+for i in [0, 1, 5, 6, 10]:
+    resistance_effect = ResistanceEffect(Stat(percent=1), target_keywords=keywords[:i])
+
+    combat_manager.effect_manager.execute_effect(
+        effect=resistance_effect,
         source=monster_b,
         target=monster_b,
     )

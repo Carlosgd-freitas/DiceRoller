@@ -129,6 +129,7 @@ class EffectManager(Manager):
         check_target_life_state: bool = True,
         check_can_act: bool = True,
         check_immunity: bool = True,
+        check_resistance: bool = True,
         check_accuracy: bool = True,
         check_persistable: bool = True,
     ) -> bool:
@@ -160,6 +161,10 @@ class EffectManager(Manager):
         :param check_immunity: If True, checks if the target is immune to the Effect.
         Default value is True.
         :type check_immunity: bool
+
+        :param check_resistance: If True, checks if the target is resistent to the Effect.
+        Default value is True.
+        :type check_resistance: bool
 
         :param check_accuracy: If True, checks if the Effect will hit the target with
         accuracy calculations. Default value is True.
@@ -200,6 +205,23 @@ class EffectManager(Manager):
                     fail = "source_immunity"
                 else:
                     fail = "target_immunity"
+
+        # Check target resistance
+        if fail is None and check_resistance:
+            resistance = target.get_effect(Keyword.RESISTANCE)
+
+            if (
+                resistance
+                and (
+                    Keyword.ALL in resistance.target_keywords
+                    or effect.keyword in resistance.target_keywords
+                )
+                and (random() < resistance.get_effective_value())
+            ):
+                if source == target:
+                    fail = "source_resistance"
+                else:
+                    fail = "target_resistance"
 
         # Check target life state
         if (

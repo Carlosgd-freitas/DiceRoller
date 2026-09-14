@@ -23,6 +23,7 @@ from src.effects.mana_regen import ManaRegenEffect
 from src.effects.poison import PoisonEffect
 from src.effects.regen import RegenEffect
 from src.effects.repel import RepelEffect
+from src.effects.resistance import ResistanceEffect
 from src.effects.slow import SlowEffect
 from src.effects.strength import StrengthEffect
 from src.effects.taunt import TauntEffect
@@ -760,6 +761,153 @@ def test_repel_effect(combat: Dict):
             targets_ids == {"MONSTER_1", "MONSTER_2"},
         ]
     )
+
+    assert_conditions(conditions)
+
+
+def test_resistance_effect(combat: Dict):
+    combat_manager: CombatManager = combat["combat_manager"]
+    monster_1: Monster = combat["monsters"][1]
+    monster_2: Monster = combat["monsters"][2]
+
+    combat_manager.current_monster = monster_2
+
+    effect_burn = BurnEffect(Stat(flat=1), duration=1)
+    effect_poison = PoisonEffect(Stat(flat=1), duration=1)
+    effect_resistance = ResistanceEffect(
+        Stat(percent=1), target_keywords=[Keyword.ALL], duration=1
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_resistance,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions = [
+        monster_1.local_id == "MONSTER_1",
+        len(monster_1.effects) == 0,
+        monster_2.local_id == "MONSTER_2",
+        len(monster_2.effects) == 1,
+        monster_2.get_effect(Keyword.RESISTANCE).keyword == Keyword.RESISTANCE,
+        monster_2.get_effect(Keyword.RESISTANCE).duration == 1,
+    ]
+
+    combat_manager.end_turn()
+
+    combat_manager.current_monster = monster_2
+
+    effect_resistance = ResistanceEffect(
+        Stat(percent=1), target_keywords=[Keyword.BURN], duration=1
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_resistance,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            len(monster_2.effects) == 2,
+            monster_2.has_effect(Keyword.RESISTANCE),
+            monster_2.has_effect(Keyword.POISON),
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.current_monster = monster_2
+
+    effect_resistance = ResistanceEffect(
+        Stat(percent=1e-09), target_keywords=[Keyword.BURN], duration=1
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_resistance,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            len(monster_2.effects) == 3,
+            monster_2.has_effect(Keyword.RESISTANCE),
+            monster_2.has_effect(Keyword.BURN),
+            monster_2.has_effect(Keyword.POISON),
+        ]
+    )
+
+    combat_manager.end_turn()
+
+    combat_manager.current_monster = monster_2
+
+    effect_resistance = ResistanceEffect(Stat(percent=1e-09), duration=1)
+
+    combat_manager.effect_manager.execute_effect(
+        effect_resistance,
+        source=monster_2,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_burn,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    combat_manager.effect_manager.execute_effect(
+        effect_poison,
+        source=monster_1,
+        target=monster_2,
+    )
+
+    conditions.extend(
+        [
+            len(monster_2.effects) == 3,
+            monster_2.has_effect(Keyword.RESISTANCE),
+            monster_2.has_effect(Keyword.BURN),
+            monster_2.has_effect(Keyword.POISON),
+        ]
+    )
+
+    combat_manager.end_turn()
 
     assert_conditions(conditions)
 

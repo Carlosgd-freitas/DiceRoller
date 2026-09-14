@@ -12,7 +12,6 @@ from src.base.text import numeric_to_string
 from src.logger.stat import StatLogger
 
 if TYPE_CHECKING:
-    from src.effects.immunity import ImmunityEffect
     from src.processors.damage import DefendedDamage
 
 
@@ -508,17 +507,18 @@ class EffectLogger(StatLogger):
 
         return
 
-    def _log_immunity_effect(
+    def _log_effect_target_keywords(
         self,
-        effect: ImmunityEffect,
+        effect: Effect,
         limit: int = 5,
         **kwargs,
     ) -> None:
         """
-        Logs a message for the Immunity effect execution.
+        Logs a message for an effect execution which behavior involves target keywords
+        (e.g. Immunity, Resistance).
         """
-        immune_to: List[Keyword] = effect.target_keywords
-        count = len(immune_to)
+        target_keywords: List[Keyword] = effect.target_keywords
+        count = len(target_keywords)
         kwargs["count"] = color_string(
             str(count),
             intensity="BRIGHT",
@@ -534,14 +534,14 @@ class EffectLogger(StatLogger):
             **kwargs,
         )
 
-        # Immune to no effects
+        # No target keywords
         if count == 0:
             self.log(message=".")
             return
 
-        # Immune to multiple effects
+        # Multiple target keywords
         message = self.get_multiple_effects_message(
-            keywords=immune_to, associated=False, limit=limit
+            keywords=target_keywords, associated=False, limit=limit
         )
         self.log(message=": " + message, end="")
 
@@ -554,15 +554,14 @@ class EffectLogger(StatLogger):
 
         return
 
-    def _log_multiple_effect_removal(
+    def _log_effect_remover(
         self,
         effect: Effect,
         limit: int = 5,
         **kwargs,
     ) -> None:
         """
-        Logs a message for effects that removes multiple effects at once (e.g.
-        Cleanse an Corrupt).
+        Logs a message for effects that removes effects (e.g. Cleanse, Corrupt).
         """
         removed_effects: List[Effect] = kwargs["removed_effects"]
         count = len(removed_effects)
@@ -686,13 +685,13 @@ class EffectLogger(StatLogger):
 
         # Specific effect logging
         if effect.keyword in [Keyword.CLEANSE, Keyword.CORRUPT]:
-            return self._log_multiple_effect_removal(
+            return self._log_effect_remover(
                 effect,
                 **kwargs,
             )
 
-        elif effect.keyword in [Keyword.IMMUNITY]:
-            return self._log_immunity_effect(
+        elif effect.keyword in [Keyword.IMMUNITY, Keyword.RESISTANCE]:
+            return self._log_effect_target_keywords(
                 effect,
                 **kwargs,
             )
@@ -764,12 +763,16 @@ class EffectLogger(StatLogger):
 
         for keyword in Keyword:
             if possible_fail_keyword == keyword.name.lower():
-                kwargs["fail_status"] = self.get_colored_message(
-                    keyword=keyword,
-                    namespace="effects",
-                    message_group=keyword.name,
-                    key="status",
-                )
+                for fail_key, key in [
+                    ("fail_action", "action"),
+                    ("fail_status", "status"),
+                ]:
+                    kwargs[fail_key] = self.get_colored_message(
+                        keyword=keyword,
+                        namespace="effects",
+                        message_group=keyword.name,
+                        key=key,
+                    )
                 break
 
         message = self.get_message(

@@ -40,6 +40,7 @@ class Keyword(Enum):
     POISON = "POISON"
     REGEN = "REGEN"
     REPEL = "REPEL"
+    RESISTANCE = "RESISTANCE"
     REVIVE = "REVIVE"
     SACRED_BLOCK = "SACRED_BLOCK"
     SLEEP = "SLEEP"
@@ -131,7 +132,13 @@ def get_keyword_color(keyword: Keyword) -> ColorData:
         foreground_color = Color.TOMATO
     elif keyword in [Keyword.PAIN]:
         foreground_color = Color.VIOLET
-    elif keyword in [Keyword.ALL, Keyword.IMMUNITY, Keyword.NOTHING, Keyword.STUN]:
+    elif keyword in [
+        Keyword.ALL,
+        Keyword.IMMUNITY,
+        Keyword.NOTHING,
+        Keyword.RESISTANCE,
+        Keyword.STUN,
+    ]:
         foreground_color = Color.WHITE
 
     return {

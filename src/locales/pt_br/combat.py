@@ -26,6 +26,7 @@ FAILS = {
     "source_freeze": "estava {fail_status}.",
     "source_immunity": "era {fail_status}.",
     "source_miss": "se errou.",
+    "source_resistance": "{fail_action}.",
     "source_sleep": "estava {fail_status}.",
     "source_stun": "estava {fail_status}.",
     "target_alive": "{target} estava vivo.",
@@ -33,6 +34,7 @@ FAILS = {
     "target_freeze": "{target} estava {fail_status}.",
     "target_immunity": "{target} era {fail_status}",
     "target_miss": "errou o alvo.",
+    "target_resistance": "{target} {fail_action}.",
     "target_sleep": "{target} estava {fail_status}.",
     "target_stun": "{target} estava {fail_status}.",
 }

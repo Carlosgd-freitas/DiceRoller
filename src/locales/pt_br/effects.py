@@ -521,6 +521,22 @@ REPEL = {
     "status": "REPELINDO",
 }
 
+RESISTANCE = {
+    "name": "RESISTÊNCIA",
+    "description": "O alvo tem uma chance de que efeitos não sejam aplicados à ele.",
+    "description_all": "O alvo tem uma chance de que nenhum efeito seja aplicado à ele.",
+    "description_specific": "O alvo tem {value_percent}% de chance de que esses efeitos não sejam aplicados à ele: {target_keywords}.",
+    "action": "RESISTIU",
+    "activation": None,
+    "execution": "{source} tornou {target} {value_percent}% {status} a {count} efeitos",
+    "execution_self": "{source} se tornou {value_percent}% {status} a {count} efeitos",
+    "execution_fail": "{source} tentou tornar {target} {status}, mas",
+    "execution_fail_self": "{source} tentou se tornar {status}, mas",
+    "fail": "{target} {status}.",
+    "removal": None,
+    "status": "RESISTENTE",
+}
+
 REVIVE = {
     "name": "REVIVER",
     "description": "Se o alvo estiver morto, restaura o {hp}.",
