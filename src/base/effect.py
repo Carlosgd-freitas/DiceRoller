@@ -70,6 +70,7 @@ class EffectType(Enum):
     NOTHING = "NOTHING"
     OFFENSIVE = "OFFENSIVE"
     RESTORATION = "RESTORATION"
+    UTILITY = "UTILITY"
 
 
 class Effect(ABC):

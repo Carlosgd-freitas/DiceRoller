@@ -18,6 +18,7 @@ from src.effects.burn import BurnEffect
 from src.effects.cleanse import CleanseEffect
 from src.effects.confuse import ConfuseEffect
 from src.effects.corrupt import CorruptEffect
+from src.effects.delay import DelayEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
@@ -68,6 +69,7 @@ ALL_EFFECTS = [
     CleanseEffect(),
     ConfuseEffect(),
     CorruptEffect(),
+    DelayEffect(),
     DoomEffect(),
     DrainEffect(),
     ExecuteEffect(),

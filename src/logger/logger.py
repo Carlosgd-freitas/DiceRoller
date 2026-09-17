@@ -130,6 +130,7 @@ class Logger:
         namespace: Namespace,
         message_group: str,
         key: str,
+        format: bool = True,
         **kwargs,
     ) -> str | None:
         """
@@ -144,6 +145,9 @@ class Logger:
         :param key: Message key.
         :type key: str
 
+        :param format: If the message will be formated or not. Default value is True.
+        :type format: bool
+
         :return: A message.
         :rtype: str
         """
@@ -156,7 +160,8 @@ class Logger:
                 message: str = message_group.get(key)
 
                 if message:
-                    message = message.format(**kwargs)
+                    if format:
+                        message = message.format(**kwargs)
                     return message
 
         return

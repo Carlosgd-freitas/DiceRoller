@@ -27,6 +27,7 @@ Each **effect** has its own behavior, and are to be used by "bigger" components,
 * **NOTHING**: exclusive to the "Nothing" effect.
 * **OFFENSIVE**: an instant effct directly damages the target.
 * **RESTORATION**: an instant effect that benefits the target.
+* **UTILITY**: general purpose effects.
 
 ## Main methods
 * `.get_requirements()`: returns the requirements for executing the effect.

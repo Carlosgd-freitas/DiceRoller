@@ -71,3 +71,11 @@ RESTORATION = {
     "execution_fail": "{source} tentou restaurar {target} com {keyword}, mas",
     "execution_fail_self": "{source} tentou se restaurar com {keyword}, mas",
 }
+
+UTILITY = {
+    "name": "UTILIDADE",
+    "execution": "{source} foi útil para {target} com {keyword}.",
+    "execution_self": "{source} foi útil para si com {keyword}.",
+    "execution_fail": "{source} tentou ser útil com {target} com {keyword}, mas",
+    "execution_fail_self": "{source} tentou ser útil para si com {keyword}, mas",
+}

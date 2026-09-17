@@ -18,6 +18,7 @@ class Keyword(Enum):
     CLEANSE = "CLEANSE"
     CONFUSE = "CONFUSE"
     CORRUPT = "CORRUPT"
+    DELAY = "DELAY"
     DOOM = "DOOM"
     DRAIN = "DRAIN"
     EXECUTE = "EXECUTE"
@@ -91,7 +92,7 @@ def get_keyword_color(keyword: Keyword) -> ColorData:
         foreground_color = Color.AERO
     elif keyword in [Keyword.BLOCK]:
         foreground_color = Color.BLUE
-    elif keyword in [Keyword.SLEEP]:
+    elif keyword in [Keyword.DELAY, Keyword.SLEEP]:
         foreground_color = Color.DARK_NAVY
         intensity = "DIM"
     elif keyword in [Keyword.POISON]:

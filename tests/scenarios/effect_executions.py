@@ -24,6 +24,7 @@ from src.effects.block import BlockEffect
 from src.effects.burn import BurnEffect
 from src.effects.cleanse import CleanseEffect
 from src.effects.corrupt import CorruptEffect
+from src.effects.delay import DelayEffect
 from src.effects.doom import DoomEffect
 from src.effects.drain import DrainEffect
 from src.effects.execute import ExecuteEffect
@@ -70,6 +71,9 @@ for effect in all_effects:
 
     if effect.duration is not None:
         effect.duration = 2
+
+    if effect.target_keywords is not None:
+        effect.target_keywords = [choice(all_effects).keyword]
 
 # ----------------------------
 
@@ -295,28 +299,89 @@ monster_b.hp = 150
 
 # ----------------------------
 
-print("\n===== Effect Execution: IMMUNITY =====")
+print("\n===== Effect Execution: DELAY =====")
 
-keywords = []
-for i in range(11):
-    if i % 2 == 0:
-        keyword = Keyword.BURN
-    else:
-        keyword = Keyword.POISON
-    keywords.append(keyword)
-
-for i in [0, 1, 5, 6, 10]:
-    immunity_effect = ImmunityEffect(target_keywords=keywords[:i])
-
-    combat_manager.effect_manager.execute_effect(
-        effect=immunity_effect,
-        source=monster_b,
-        target=monster_b,
-    )
+poison_effect = PoisonEffect(Stat(flat=1))
 
 combat_manager.effect_manager.execute_effect(
-    effect=BurnEffect(),
-    source=monster_a,
+    effect=poison_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+delay_effect = DelayEffect(Stat(flat=3, percent=0.5), target_keywords=[Keyword.POISON])
+
+combat_manager.effect_manager.execute_effect(
+    effect=delay_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+delay_effect = DelayEffect(Stat(flat=1), target_keywords=[Keyword.BURN])
+
+combat_manager.effect_manager.execute_effect(
+    effect=delay_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+monster_b.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: IMMUNITY =====")
+
+burn_effect = BurnEffect(Stat(flat=1))
+
+poison_effect = PoisonEffect(Stat(flat=1))
+
+immunity_effect = ImmunityEffect(target_keywords=[Keyword.POISON])
+
+combat_manager.effect_manager.execute_effect(
+    effect=immunity_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=poison_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=burn_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+monster_b.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: INVULNERABLE =====")
+
+attack_effect = AttackEffect(Stat(flat=1))
+
+pierce_effect = PierceEffect(Stat(flat=1))
+
+invulnerable_effect = InvulnerableEffect(target_keywords=[Keyword.ATTACK])
+
+combat_manager.effect_manager.execute_effect(
+    effect=invulnerable_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=attack_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=pierce_effect,
+    source=monster_b,
     target=monster_b,
 )
 
@@ -326,26 +391,27 @@ monster_b.effects = []
 
 print("\n===== Effect Execution: RESISTANCE =====")
 
-keywords = []
-for i in range(11):
-    if i % 2 == 0:
-        keyword = Keyword.BURN
-    else:
-        keyword = Keyword.POISON
-    keywords.append(keyword)
+burn_effect = BurnEffect(Stat(flat=1))
 
-for i in [0, 1, 5, 6, 10]:
-    resistance_effect = ResistanceEffect(Stat(percent=1), target_keywords=keywords[:i])
+poison_effect = PoisonEffect(Stat(flat=1))
 
-    combat_manager.effect_manager.execute_effect(
-        effect=resistance_effect,
-        source=monster_b,
-        target=monster_b,
-    )
+resistance_effect = ResistanceEffect(Stat(percent=1), target_keywords=[Keyword.POISON])
 
 combat_manager.effect_manager.execute_effect(
-    effect=BurnEffect(),
-    source=monster_a,
+    effect=resistance_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=poison_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=burn_effect,
+    source=monster_b,
     target=monster_b,
 )
 
@@ -357,32 +423,32 @@ print("\n===== Effect Removal =====")
 
 removal_sets = [
     (
-        BlindEffect(),
-        [FocusEffect()],
+        BlindEffect(Stat(percent=1)),
+        [FocusEffect(Stat(percent=1))],
     ),
     (
-        BurnEffect(),
+        BurnEffect(Stat(percent=1)),
         [FreezeEffect()],
     ),
     (
-        FocusEffect(),
-        [BlindEffect()],
+        FocusEffect(Stat(percent=1)),
+        [BlindEffect(Stat(percent=1))],
     ),
     (
-        FortifyEffect(),
-        [FragileEffect()],
+        FortifyEffect(Stat(percent=1)),
+        [FragileEffect(Stat(percent=1))],
     ),
     (
-        FragileEffect(),
-        [FortifyEffect()],
+        FragileEffect(Stat(percent=1)),
+        [FortifyEffect(Stat(percent=1))],
     ),
     (
         FreezeEffect(),
-        [BurnEffect()],
+        [BurnEffect(Stat(percent=1))],
     ),
     (
-        HasteEffect(),
-        [SlowEffect()],
+        HasteEffect(Stat(percent=1)),
+        [SlowEffect(Stat(percent=1))],
     ),
     (
         RepelEffect(),
@@ -397,20 +463,20 @@ removal_sets = [
         ],
     ),
     (
-        SlowEffect(),
-        [HasteEffect()],
+        SlowEffect(Stat(percent=1)),
+        [HasteEffect(Stat(percent=1))],
     ),
     (
-        StrengthEffect(),
-        [WeakEffect()],
+        StrengthEffect(Stat(percent=1)),
+        [WeakEffect(Stat(percent=1))],
     ),
     (
         TauntEffect(),
         [RepelEffect()],
     ),
     (
-        WeakEffect(),
-        [StrengthEffect()],
+        WeakEffect(Stat(percent=1)),
+        [StrengthEffect(Stat(percent=1))],
     ),
 ]
 
@@ -424,11 +490,13 @@ for removed, removers in removal_sets:
             target=monster_b,
         )
 
+    print()
+
 monster_b.effects = []
 
 # ----------------------------
 
-print("\n===== Effect Activation: Act Disabling =====")
+print("===== Effect Activation: Act Disabling =====")
 
 combat_manager.current_monster = monster_a
 

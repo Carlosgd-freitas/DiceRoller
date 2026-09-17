@@ -99,6 +99,7 @@ class EffectLogger(StatLogger):
                 )
 
         # Value
+        value = None
         value_flat = None
         value_percent = None
 
@@ -126,18 +127,37 @@ class EffectLogger(StatLogger):
             if effect.value.percent is not None:
                 value_percent = numeric_to_string(effect.value.percent * 100)
 
+            if (not effect.value.flat) and (not effect.value.percent):
+                value = "0"
+            elif (effect.value.flat) and (not effect.value.percent):
+                value = value_flat
+            elif (not effect.value.flat) and (effect.value.percent):
+                value = value_percent
+            else:
+                value = f"({value_flat} + {value_percent}%)"
+
         # Min Value
+        min_value = None
         min_value_flat = None
         min_value_percent = None
 
         if effect.min_value is not None:
             if effect.min_value.flat is not None:
                 min_value_flat = numeric_to_string(effect.min_value.flat)
-
             if effect.min_value.percent is not None:
                 min_value_percent = numeric_to_string(effect.min_value.percent * 100)
 
+            if (not effect.min_value.flat) and (not effect.min_value.percent):
+                min_value = "0"
+            elif (effect.min_value.flat) and (not effect.min_value.percent):
+                min_value = min_value_flat
+            elif (not effect.min_value.flat) and (effect.min_value.percent):
+                min_value = min_value_percent
+            else:
+                min_value = f"({min_value_flat} + {min_value_percent}%)"
+
         # Max Value
+        max_value = None
         max_value_flat = None
         max_value_percent = None
 
@@ -148,12 +168,22 @@ class EffectLogger(StatLogger):
             if effect.max_value.percent is not None:
                 max_value_percent = numeric_to_string(effect.max_value.percent * 100)
 
+            if (not effect.max_value.flat) and (not effect.max_value.percent):
+                max_value = "0"
+            elif (effect.max_value.flat) and (not effect.max_value.percent):
+                max_value = max_value_flat
+            elif (not effect.max_value.flat) and (effect.max_value.percent):
+                max_value = max_value_percent
+            else:
+                max_value = f"({max_value_flat} + {max_value_percent}%)"
+
         # Effective value
         effective_value = effect.get_effective_value(source=source, target=target)
         if effective_value is not None:
             effective_value = numeric_to_string(effective_value)
 
         # Delta
+        delta = None
         delta_flat = None
         delta_percent = None
 
@@ -163,6 +193,15 @@ class EffectLogger(StatLogger):
 
             if effect.delta.percent is not None:
                 delta_percent = numeric_to_string(effect.delta.percent * 100)
+
+            if (not effect.delta.flat) and (not effect.delta.percent):
+                delta = "0"
+            elif (effect.delta.flat) and (not effect.delta.percent):
+                delta = delta_flat
+            elif (not effect.delta.flat) and (effect.delta.percent):
+                delta = delta_percent
+            else:
+                delta = f"({delta_flat} + {delta_percent}%)"
 
         # Duration
         duration = None
@@ -195,19 +234,23 @@ class EffectLogger(StatLogger):
         params.update(
             {
                 "accuracy": color_string(accuracy, intensity="BRIGHT"),
+                "delta": color_string(delta, intensity="BRIGHT"),
                 "delta_flat": color_string(delta_flat, intensity="BRIGHT"),
                 "delta_percent": color_string(delta_percent, intensity="BRIGHT"),
                 "duration": color_string(duration, intensity="BRIGHT"),
                 "effective_value": color_string(effective_value, intensity="BRIGHT"),
+                "max_value": color_string(max_value, intensity="BRIGHT"),
                 "max_value_flat": color_string(max_value_flat, intensity="BRIGHT"),
                 "max_value_percent": color_string(
                     max_value_percent, intensity="BRIGHT"
                 ),
+                "min_value": color_string(min_value, intensity="BRIGHT"),
                 "min_value_flat": color_string(min_value_flat, intensity="BRIGHT"),
                 "min_value_percent": color_string(
                     min_value_percent, intensity="BRIGHT"
                 ),
                 "target_keywords": target_keywords,
+                "value": color_string(value, intensity="BRIGHT"),
                 "value_flat": color_string(value_flat, intensity="BRIGHT"),
                 "value_percent": color_string(value_percent, intensity="BRIGHT"),
             }
@@ -507,53 +550,6 @@ class EffectLogger(StatLogger):
 
         return
 
-    def _log_effect_target_keywords(
-        self,
-        effect: Effect,
-        limit: int = 5,
-        **kwargs,
-    ) -> None:
-        """
-        Logs a message for an effect execution which behavior involves target keywords
-        (e.g. Immunity, Resistance).
-        """
-        target_keywords: List[Keyword] = effect.target_keywords
-        count = len(target_keywords)
-        kwargs["count"] = color_string(
-            str(count),
-            intensity="BRIGHT",
-        )
-
-        # Base message
-        key = "execution_self" if kwargs["targeting_self"] else "execution"
-        self.log(
-            namespace="effects",
-            message_group=effect.keyword.name,
-            key=key,
-            end="",
-            **kwargs,
-        )
-
-        # No target keywords
-        if count == 0:
-            self.log(message=".")
-            return
-
-        # Multiple target keywords
-        message = self.get_multiple_effects_message(
-            keywords=target_keywords, associated=False, limit=limit
-        )
-        self.log(message=": " + message, end="")
-
-        # Message ending
-        if count > limit:
-            self.log(message="")
-
-        else:
-            self.log(message=".")
-
-        return
-
     def _log_effect_remover(
         self,
         effect: Effect,
@@ -601,6 +597,66 @@ class EffectLogger(StatLogger):
             self.log(message=".")
 
         return
+
+    def get_effect_execution_message(
+        self,
+        base_key: Literal["execution", "execution_fail"],
+        effect: Effect,
+        source: Monster = None,
+        target: Monster = None,
+        fail: str = None,
+        **kwargs,
+    ) -> str:
+        """
+        Returns the proper effect execution message.
+
+        :param effect: An Effect.
+        :type effect: Effect
+
+        :param source: The Monster which executed the effect.
+        :type source: Monster
+
+        :param target: The Monster targeted by the effect execution.
+        :type target: Monster
+
+        :return: Effect execution message.
+        :rtype: str
+        """
+        key = base_key
+
+        if fail is not None:
+            key += "_fail"
+
+        elif effect.target_keywords is not None:
+            if Keyword.ALL in effect.target_keywords:
+                key += "_all"
+            else:
+                key += "_specific"
+
+        if source == target:
+            key += "_self"
+
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
+
+        # Effect message
+        message = self.get_message(
+            namespace="effects",
+            message_group=effect.keyword.name,
+            key=key,
+            **kwargs,
+        )
+
+        # Generic effect type message
+        if message is None:
+            if message is None:
+                message = self.get_message(
+                    namespace="effect_types",
+                    message_group=effect.type.name,
+                    key=key,
+                    **kwargs,
+                )
+
+        return message
 
     def log_effect_activation(
         self,
@@ -674,10 +730,9 @@ class EffectLogger(StatLogger):
         if not self.enabled:
             return
 
-        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
-
         # Logging offensive type effect execution
         if effect.type == EffectType.OFFENSIVE:
+            kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
             return self._log_damage_calculation(
                 effect,
                 **kwargs,
@@ -685,34 +740,15 @@ class EffectLogger(StatLogger):
 
         # Specific effect logging
         if effect.keyword in [Keyword.CLEANSE, Keyword.CORRUPT]:
+            kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
             return self._log_effect_remover(
                 effect,
                 **kwargs,
             )
 
-        elif effect.keyword in [Keyword.IMMUNITY, Keyword.RESISTANCE]:
-            return self._log_effect_target_keywords(
-                effect,
-                **kwargs,
-            )
-
-        # Logging effect execution
-        key = "execution_self" if kwargs["targeting_self"] else "execution"
-
-        # Specific message
-        message = self.get_message(
-            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
+        message = self.get_effect_execution_message(
+            "execution", effect, source, target, **kwargs
         )
-
-        # Generic message
-        if message is None:
-            message = self.get_message(
-                namespace="effect_types",
-                message_group=effect.type.name,
-                key=key,
-                **kwargs,
-            )
-
         return self.log(message=message)
 
     def log_effect_execution_fail(
@@ -737,23 +773,11 @@ class EffectLogger(StatLogger):
         if not self.enabled:
             return
 
-        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
-
-        key = "execution_fail_self" if kwargs["targeting_self"] else "execution_fail"
-
-        # Specific message
-        message = self.get_message(
-            namespace="effects", message_group=effect.keyword.name, key=key, **kwargs
+        # Base message
+        message = self.get_effect_execution_message(
+            "execution", effect, source, target, **kwargs
         )
-
-        # Generic message
-        if message is None:
-            message = self.get_message(
-                namespace="effect_types",
-                message_group=effect.type.name,
-                key=key,
-                **kwargs,
-            )
+        kwargs.update(self._get_effect_params(effect, source, target, **kwargs))
 
         self.log(message=message, end=" ")
 

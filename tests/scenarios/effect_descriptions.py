@@ -35,10 +35,10 @@ for effect in all_effects:
 
     for key, _value in message_group.items():
         if key.startswith("description"):
-            if key == "description_all":
+            if "_all" in key:
                 effect.target_keywords = [Keyword.ALL]
 
-            elif key == "description_specific":
+            elif "_specific" in key:
                 effect.target_keywords = [
                     randomizer.get_random_keyword(),
                     randomizer.get_random_keyword(),

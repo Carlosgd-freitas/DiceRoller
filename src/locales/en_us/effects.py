@@ -160,6 +160,28 @@ CORRUPT = {
     "status": None,
 }
 
+DELAY = {
+    "name": "DELAY",
+    "description": "Extends the duration of effects on target.",
+    "description_all_flat": "Extends the duration of all effects on target by {value_flat}.",
+    "description_all_percent": "Extends the duration of all effects on target by {value_percent}%.",
+    "description_all_both": "Extends the duration of all effects on target by {value_flat} + {value_percent}%.",
+    "description_specific_flat": "Extends the duration of the following effects on target by {value_flat}: {target_keywords}.",
+    "description_specific_percent": "Extends the duration of the following effects on target by {value_percent}%: {target_keywords}.",
+    "description_specific_both": "Extends the duration of the following effects on target by {value_flat} + {value_percent}%: {target_keywords}.",
+    "action": "DELAYED",
+    "activation": None,
+    "execution_all": "{source} {action} the duration of all effects on {target} by {value}.",
+    "execution_all_self": "{source} {action} the duration of all effects on themselves by {value}.",
+    "execution_specific": "{source} {action} the duration of {target_keywords} on {target} by {value}.",
+    "execution_specific_self": "{source} {action} the duration of {target_keywords} on themselves by {value}.",
+    "execution_fail": "{source} tried to {keyword} the duration of effects on {target}, but",
+    "execution_fail_self": "{source} tried to {keyword} the duration of effects on themselves, but",
+    "fail": None,
+    "removal": None,
+    "status": None,
+}
+
 DOOM = {
     "name": "DOOM",
     "description": "Kills the target when effect expires.",
@@ -332,9 +354,11 @@ IMMUNITY = {
     "description_specific": "The target can't have these effects applied to it: {target_keywords}.",
     "action": None,
     "activation": None,
-    "execution": "{source} granted {keyword} of {count} effects to {target}",
-    "execution_self": "{source} granted {keyword} of {count} effects to themselves",
-    "execution_fail": "{source} tried to turn {target} {status}, but",
+    "execution_all": "{source} granted {keyword} to all effects to {target}.",
+    "execution_all_self": "{source} became {status} to all effects.",
+    "execution_specific": "{source} granted {keyword} to {target_keywords} to {target}.",
+    "execution_specific_self": "{source} became {status} to {target_keywords}.",
+    "execution_fail": "{source} tried to grant {keyword} to {target}, but",
     "execution_fail_self": "{source} tried to turn themselves {status}, but",
     "fail": "{target} was {status}.",
     "removal": None,
@@ -363,8 +387,10 @@ INVULNERABLE = {
     "description_specific": "Negates damage that would be done to the target by {target_keywords}.",
     "action": None,
     "activation": "{defended_damage} damage was negated because {target} was {defensive_status}.",
-    "execution": "{source} turned {target} {keyword} for {duration} {turns}.",
-    "execution_self": "{source} turned themselves {keyword} for {duration} {turns}.",
+    "execution_all": "{source} turned {target} {keyword} against everything for {duration} {turns}.",
+    "execution_all_self": "{source} turned themselves {keyword} against everything for {duration} {turns}.",
+    "execution_specific": "{source} turned {target} {keyword} against {target_keywords} for {duration} {turns}.",
+    "execution_specific_self": "{source} turned themselves {keyword} against {target_keywords} for {duration} {turns}.",
     "execution_fail": "{source} tried to turn {target} {keyword}, but",
     "execution_fail_self": "{source} tried to turn themselves {keyword}, but",
     "fail": None,
@@ -528,13 +554,15 @@ RESISTANCE = {
     "description_specific": "The target has {value_percent}% chance for these effects to not be applied to it: {target_keywords}.",
     "action": "RESISTED",
     "activation": None,
-    "execution": "{source} made {target} {value_percent}% {status} of {count} effects",
-    "execution_self": "{source} became {value_percent}% {status} of {count} effects",
+    "execution_all": "{source} made {target} {value_percent}% {status} to all effects.",
+    "execution_all_self": "{source} became {value_percent}% {status} to all effects.",
+    "execution_specific": "{source} made {target} {value_percent}% {status} to {target_keywords}.",
+    "execution_specific_self": "{source} became {value_percent}% {status} to {target_keywords}.",
     "execution_fail": "{source} tried to make {target} {status}, but",
     "execution_fail_self": "{source} tried to become {status}, but",
     "fail": "{target} {status}.",
     "removal": None,
-    "status": "RESISTENT",
+    "status": "RESISTANT",
 }
 
 REVIVE = {
@@ -615,7 +643,7 @@ STRENGTH = {
     "execution_fail_self": None,
     "fail": None,
     "removal": "{target} is not {removed_status} anymore by the effect of {keyword}.",
-    "status": "STRONG",
+    "status": "STRENGTHENED",
 }
 
 STUN = {
