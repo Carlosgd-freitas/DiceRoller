@@ -6,11 +6,11 @@ from random import random
 from typing import TYPE_CHECKING, List
 
 from src.base.effect import EffectType
-from src.base.keywords import Keyword
 from src.systems.targeting.filters import preprocess_enemies
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
+    from src.base.effect import Effect
     from src.base.monster import Monster
 
 
@@ -25,7 +25,7 @@ class CorruptSelector(Selector):
         allies: List[Monster],
         enemies: List[Monster],
         k: int,
-        main_keyword: Keyword,
+        main_effect: Effect,
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
@@ -44,8 +44,8 @@ class CorruptSelector(Selector):
         :param k: The number of monsters which will be returned.
         :type k: int
 
-        :param main_keyword: The main keyword of an Effect.
-        :type main_keyword: Keyword
+        :param main_effect: The main effect.
+        :type main_effect: Effect
 
         :return: A list of target monsters.
         :rtype: List[Monster]
@@ -64,7 +64,7 @@ class CorruptSelector(Selector):
         allies: List[Monster],
         enemies: List[Monster],
         k: int,
-        main_keyword: Keyword,
+        main_effect: Effect,
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
@@ -84,8 +84,8 @@ class CorruptSelector(Selector):
         :param k: The number of monsters which will be returned.
         :type k: int
 
-        :param main_keyword: The main keyword of an Effect.
-        :type main_keyword: Keyword
+        :param main_effect: The main effect.
+        :type main_effect: Effect
 
         :return: A list of target monsters.
         :rtype: List[Monster]
@@ -113,7 +113,7 @@ class CorruptSelector(Selector):
         allies: List[Monster],
         enemies: List[Monster],
         k: int,
-        main_keyword: Keyword,
+        main_effect: Effect,
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
@@ -132,8 +132,8 @@ class CorruptSelector(Selector):
         :param k: The number of monsters which will be returned.
         :type k: int
 
-        :param main_keyword: The main keyword of an Effect.
-        :type main_keyword: Keyword
+        :param main_effect: The main effect.
+        :type main_effect: Effect
 
         :return: A list of target monsters.
         :rtype: List[Monster]

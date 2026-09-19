@@ -21,6 +21,8 @@ class AbsorbEffect(Effect):
     damage reduced.
     """
 
+    keyword = Keyword.ABSORB
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -41,7 +43,7 @@ class AbsorbEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.ABSORB,
+            keyword=self.keyword,
             type=EffectType.DEFENSIVE,
             value=value,
             min_value=min_value,

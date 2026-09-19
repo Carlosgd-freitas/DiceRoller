@@ -19,6 +19,8 @@ class DoomEffect(Effect):
     Kills the target at turn end if expiring.
     """
 
+    keyword = Keyword.DOOM
+
     def __init__(
         self,
         duration: int = 2,
@@ -26,7 +28,7 @@ class DoomEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.DOOM,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             duration=duration,
             accuracy=accuracy,

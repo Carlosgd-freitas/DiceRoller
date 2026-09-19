@@ -20,6 +20,8 @@ class ResistanceEffect(Effect):
     Makes the target have a chance for effects to not be applied to it.
     """
 
+    keyword = Keyword.RESISTANCE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -43,7 +45,7 @@ class ResistanceEffect(Effect):
         target_keywords = [] if target_keywords is None else target_keywords
 
         super().__init__(
-            keyword=Keyword.RESISTANCE,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

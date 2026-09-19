@@ -22,6 +22,8 @@ class RegenEffect(Effect):
     Increases the target HP at turn start.
     """
 
+    keyword = Keyword.REGEN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -42,7 +44,7 @@ class RegenEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.REGEN,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

@@ -8,12 +8,14 @@ from typing import TYPE_CHECKING, List
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.monster import AILevel
+from src.systems.targeting.filters import filter_effect_types
 from src.systems.targeting.selectors.buff_selector import BuffSelector
 from src.systems.targeting.selectors.cleanse_selector import CleanseSelector
 from src.systems.targeting.selectors.corrupt_selector import CorruptSelector
 from src.systems.targeting.selectors.curse_selector import CurseSelector
 from src.systems.targeting.selectors.debuff_selector import DebuffSelector
 from src.systems.targeting.selectors.defensive_selector import DefensiveSelector
+from src.systems.targeting.selectors.delay_selector import DelaySelector
 from src.systems.targeting.selectors.offensive_selector import OffensiveSelector
 from src.systems.targeting.selectors.random_selector import RandomSelector
 from src.systems.targeting.selectors.revive_selector import ReviveSelector
@@ -65,9 +67,20 @@ class SelectorManager:
         """
         selector: Selector = None
 
+        # ToDo: get main effect once; infer effect type and keyword from it
         # Determining the main properties
-        main_effect_type = side.get_main_effect_type()
+        main_effect_type = filter_effect_types(
+            effect_types=[effect.type for effect in side.effects],
+            k=1,
+            frequency_order="MOST",
+        )[0]
+
         main_keyword = side.get_main_keyword()
+
+        for effect in side.effects:
+            if effect.keyword == main_keyword:
+                main_effect = effect
+                break
 
         # Confuse check
         confused = source.get_effect(Keyword.CONFUSE)
@@ -79,24 +92,22 @@ class SelectorManager:
         ):
             selector = RandomSelector()
 
-        # Specific Keywords
-        for effect in side.effects:
-            if effect.keyword == Keyword.CLEANSE:
+        else:
+            # High priority: Determining selector by effect keyword
+            if main_keyword == Keyword.CLEANSE:
                 selector = CleanseSelector()
-                break
 
-            elif effect.keyword == Keyword.CORRUPT:
+            elif main_keyword == Keyword.CORRUPT:
                 selector = CorruptSelector()
-                break
 
-            elif effect.keyword == Keyword.REVIVE:
+            elif main_keyword == Keyword.DELAY:
+                selector = DelaySelector()
+
+            elif main_keyword == Keyword.REVIVE:
                 selector = ReviveSelector()
-                break
 
-        if not selector:
-
-            # Determining Selector
-            if main_effect_type in [
+            # Low priority: Determining selector by effect type
+            elif main_effect_type in [
                 EffectType.DETERIORATION,
                 EffectType.OFFENSIVE,
             ]:
@@ -127,7 +138,7 @@ class SelectorManager:
                 allies=allies,
                 enemies=enemies,
                 k=k,
-                main_keyword=main_keyword,
+                main_effect=main_effect,
             )
 
         elif ai_level == AILevel.NORMAL:
@@ -136,7 +147,7 @@ class SelectorManager:
                 allies=allies,
                 enemies=enemies,
                 k=k,
-                main_keyword=main_keyword,
+                main_effect=main_effect,
             )
 
         else:
@@ -145,7 +156,7 @@ class SelectorManager:
                 allies=allies,
                 enemies=enemies,
                 k=k,
-                main_keyword=main_keyword,
+                main_effect=main_effect,
             )
 
         return targets

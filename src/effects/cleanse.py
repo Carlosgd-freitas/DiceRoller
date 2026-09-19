@@ -20,6 +20,8 @@ class CleanseEffect(Effect):
     Removes debuffs from the target, starting from the oldest.
     """
 
+    keyword = Keyword.CLEANSE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -35,7 +37,7 @@ class CleanseEffect(Effect):
             max_value = Stat(flat=inf)
 
         super().__init__(
-            keyword=Keyword.CLEANSE,
+            keyword=self.keyword,
             type=EffectType.RESTORATION,
             value=value,
             min_value=min_value,

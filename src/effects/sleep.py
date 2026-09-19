@@ -18,6 +18,8 @@ class SleepEffect(Effect):
     Makes the target unable to act.
     """
 
+    keyword = Keyword.SLEEP
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class SleepEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.SLEEP,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             duration=duration,
             accuracy=accuracy,

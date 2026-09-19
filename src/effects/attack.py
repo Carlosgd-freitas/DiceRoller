@@ -21,6 +21,8 @@ class AttackEffect(Effect):
     Reduces the target HP and removes Sleep.
     """
 
+    keyword = Keyword.ATTACK
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -36,7 +38,7 @@ class AttackEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.ATTACK,
+            keyword=self.keyword,
             type=EffectType.OFFENSIVE,
             value=value,
             min_value=min_value,

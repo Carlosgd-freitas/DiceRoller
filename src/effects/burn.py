@@ -22,6 +22,8 @@ class BurnEffect(Effect):
     Reduces the target HP each turn start and removes Freeze.
     """
 
+    keyword = Keyword.BURN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -42,7 +44,7 @@ class BurnEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.BURN,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

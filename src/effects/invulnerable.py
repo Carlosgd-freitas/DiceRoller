@@ -18,6 +18,8 @@ class InvulnerableEffect(Effect):
     Negates any damage done to the target.
     """
 
+    keyword = Keyword.INVULNERABLE
+
     def __init__(
         self,
         duration: int = 2,
@@ -28,7 +30,7 @@ class InvulnerableEffect(Effect):
         target_keywords = [] if target_keywords is None else target_keywords
 
         super().__init__(
-            keyword=Keyword.INVULNERABLE,
+            keyword=self.keyword,
             type=EffectType.DEFENSIVE,
             duration=duration,
             accuracy=accuracy,

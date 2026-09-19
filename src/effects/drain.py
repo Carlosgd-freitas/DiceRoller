@@ -21,6 +21,8 @@ class DrainEffect(Effect):
     Reduces the target HP and removes Sleep. Increases the source HP by the damage done.
     """
 
+    keyword = Keyword.DRAIN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -36,7 +38,7 @@ class DrainEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.DRAIN,
+            keyword=self.keyword,
             type=EffectType.OFFENSIVE,
             value=value,
             min_value=min_value,

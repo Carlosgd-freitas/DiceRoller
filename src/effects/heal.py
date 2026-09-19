@@ -21,6 +21,8 @@ class HealEffect(Effect):
     Increases the target HP.
     """
 
+    keyword = Keyword.HEAL
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -36,7 +38,7 @@ class HealEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.HEAL,
+            keyword=self.keyword,
             type=EffectType.RESTORATION,
             value=value,
             min_value=min_value,

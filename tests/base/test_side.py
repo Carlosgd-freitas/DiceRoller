@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 
-from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.side import Side
 from src.base.stat import Stat
@@ -33,71 +32,6 @@ def test_side_get_effect():
     conditions.extend(
         [
             effect is None,
-        ]
-    )
-
-    assert_conditions(conditions)
-
-
-def test_side_get_effect_summary():
-    side = Side(
-        effects=[
-            AttackEffect(Stat(flat=1)),
-            BlockEffect(Stat(flat=2)),
-            AbsorbEffect(Stat(flat=3)),
-        ]
-    )
-
-    effect_summary = side.get_effect_summary()
-
-    conditions = [
-        len(effect_summary) == 2,
-        "OFFENSIVE" in effect_summary.keys(),
-        effect_summary["OFFENSIVE"] == [Keyword.ATTACK],
-        "DEFENSIVE" in effect_summary.keys(),
-        effect_summary["DEFENSIVE"] == [Keyword.BLOCK, Keyword.ABSORB],
-    ]
-
-    assert_conditions(conditions)
-
-
-def test_side_get_main_effect_type():
-    side = Side(
-        effects=[
-            AttackEffect(Stat(flat=1)),
-            BlockEffect(Stat(flat=2)),
-            AbsorbEffect(Stat(flat=3)),
-        ]
-    )
-
-    main_effect_type = side.get_main_effect_type()
-
-    conditions = [
-        main_effect_type == EffectType.DEFENSIVE,
-    ]
-
-    side = Side(
-        effects=[
-            AttackEffect(Stat(flat=1)),
-            BlockEffect(Stat(flat=2)),
-        ]
-    )
-
-    main_effect_type = side.get_main_effect_type()
-
-    conditions.extend(
-        [
-            main_effect_type == EffectType.OFFENSIVE,
-        ]
-    )
-
-    side = Side(effects=[])
-
-    main_effect_type = side.get_main_effect_type()
-
-    conditions.extend(
-        [
-            main_effect_type is None,
         ]
     )
 

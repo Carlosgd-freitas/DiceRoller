@@ -18,6 +18,8 @@ class ImmunityEffect(Effect):
     Makes the target immune to other effects.
     """
 
+    keyword = Keyword.IMMUNITY
+
     def __init__(
         self,
         duration: int = 2,
@@ -28,7 +30,7 @@ class ImmunityEffect(Effect):
         target_keywords = [] if target_keywords is None else target_keywords
 
         super().__init__(
-            keyword=Keyword.IMMUNITY,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             duration=duration,
             accuracy=accuracy,

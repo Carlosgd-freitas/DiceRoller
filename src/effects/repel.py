@@ -18,6 +18,8 @@ class RepelEffect(Effect):
     Decreases the pririority of the target for enemies.
     """
 
+    keyword = Keyword.REPEL
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class RepelEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.REPEL,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             duration=duration,
             accuracy=accuracy,

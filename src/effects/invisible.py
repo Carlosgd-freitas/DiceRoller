@@ -18,6 +18,8 @@ class InvisibleEffect(Effect):
     Makes the target untargetable by enemies.
     """
 
+    keyword = Keyword.INVISIBLE
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class InvisibleEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.INVISIBLE,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             duration=duration,
             accuracy=accuracy,

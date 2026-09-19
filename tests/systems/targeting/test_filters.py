@@ -2,6 +2,7 @@
 
 from typing import Dict, List
 
+from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
 from src.base.monster import Monster
@@ -10,11 +11,59 @@ from src.effects.immunity import ImmunityEffect
 from src.effects.repel import RepelEffect
 from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
-from src.systems.targeting.filters import filter_monsters
+from src.systems.targeting.filters import (
+    filter_effect_types,
+    filter_monsters,
+)
 from tests.utils import assert_conditions
 
 
-def test_filter_method_first(combat: Dict):
+def test_filter_effect_types_frequency_order_least():
+    effect_types = [
+        EffectType.BUFF,
+        EffectType.DEBUFF,
+        EffectType.BUFF,
+        EffectType.OFFENSIVE,
+    ]
+
+    filtered = filter_effect_types(
+        effect_types,
+        k=2,
+        frequency_order="LEAST",
+    )
+
+    conditions = [
+        len(filtered) == 2,
+        filtered[0] == EffectType.DEBUFF,
+        filtered[1] == EffectType.OFFENSIVE,
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_filter_effect_types_frequency_order_most():
+    effect_types = [
+        EffectType.BUFF,
+        EffectType.DEBUFF,
+        EffectType.BUFF,
+        EffectType.OFFENSIVE,
+    ]
+
+    filtered = filter_effect_types(
+        effect_types,
+        k=1,
+        frequency_order="MOST",
+    )
+
+    conditions = [
+        len(filtered) == 1,
+        filtered[0] == EffectType.BUFF,
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_filter_monsters_method_first(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -32,7 +81,7 @@ def test_filter_method_first(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_method_last(combat: Dict):
+def test_filter_monsters_method_last(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -52,7 +101,7 @@ def test_filter_method_last(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_life_state_alive(combat: Dict):
+def test_filter_monsters_life_state_alive(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -73,7 +122,7 @@ def test_filter_life_state_alive(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_life_state_dead(combat: Dict):
+def test_filter_monsters_life_state_dead(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -92,7 +141,7 @@ def test_filter_life_state_dead(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_hurt(combat: Dict):
+def test_filter_monsters_hurt(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -114,7 +163,7 @@ def test_filter_hurt(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_sort_functions_single(combat: Dict):
+def test_filter_monsters_sort_functions_single(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     filtered = filter_monsters(
@@ -134,7 +183,7 @@ def test_filter_sort_functions_single(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_sort_functions_multiple(combat: Dict):
+def test_filter_monsters_sort_functions_multiple(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     for monster in monsters:
@@ -158,7 +207,7 @@ def test_filter_sort_functions_multiple(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_whitelist(combat: Dict):
+def test_filter_monsters_whitelist(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     whitelist = monsters[:2]
@@ -180,7 +229,7 @@ def test_filter_whitelist(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_blacklist(combat: Dict):
+def test_filter_monsters_blacklist(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     blacklist = monsters[:2]
@@ -203,7 +252,7 @@ def test_filter_blacklist(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_keyword_whitelist(combat: Dict):
+def test_filter_monsters_keyword_whitelist(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     effect_burn = BurnEffect()
@@ -228,7 +277,7 @@ def test_filter_keyword_whitelist(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_keyword_blacklist(combat: Dict):
+def test_filter_monsters_keyword_blacklist(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     effect_burn = BurnEffect()
@@ -256,7 +305,7 @@ def test_filter_keyword_blacklist(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_ignore_immune_to(combat: Dict):
+def test_filter_monsters_ignore_immune_to(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     effect_immunity = ImmunityEffect(target_keywords=[Keyword.BURN])
@@ -282,7 +331,7 @@ def test_filter_ignore_immune_to(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_consider_repel(combat: Dict):
+def test_filter_monsters_consider_repel(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     monsters[0].apply_effect(RepelEffect())
@@ -306,7 +355,7 @@ def test_filter_consider_repel(combat: Dict):
     assert_conditions(conditions)
 
 
-def test_filter_consider_taunt(combat: Dict):
+def test_filter_monsters_consider_taunt(combat: Dict):
     monsters: List[Monster] = combat["monsters"]
 
     monsters[3].apply_effect(TauntEffect())

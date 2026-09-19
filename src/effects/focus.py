@@ -20,6 +20,8 @@ class FocusEffect(Effect):
     Increases the target's accuracies. Removes Blind.
     """
 
+    keyword = Keyword.FOCUS
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class FocusEffect(Effect):
             delta = Stat(percent=0)
 
         super().__init__(
-            keyword=Keyword.FOCUS,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

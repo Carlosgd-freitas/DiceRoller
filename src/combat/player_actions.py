@@ -8,6 +8,7 @@ from random import random
 from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict, TypeVar
 
 from src.base.color import Color, color_string
+from src.base.effect import get_effect_summary
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
 from src.base.monster import Monster
@@ -329,7 +330,7 @@ class CombatPlayerActionsMenu(Menu):
         targets = []
         blacklist = [] if blacklist is None else deepcopy(blacklist)
 
-        effect_summary = side.get_effect_summary()
+        effect_summary = get_effect_summary(side.effects)
 
         # Determining life state
         add_alive = False
@@ -447,7 +448,7 @@ class CombatPlayerActionsMenu(Menu):
         :return: If the side needs to be used automatically.
         :rtype: bool
         """
-        effect_summary = side.get_effect_summary()
+        effect_summary = get_effect_summary(side.effects)
 
         used = all(
             [

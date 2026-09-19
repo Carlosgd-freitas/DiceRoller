@@ -309,7 +309,17 @@ combat_manager.effect_manager.execute_effect(
     target=monster_b,
 )
 
-delay_effect = DelayEffect(Stat(flat=3, percent=0.5), target_keywords=[Keyword.POISON])
+delay_effect = DelayEffect(
+    Stat(flat=3, percent=0.5),
+    target_keywords=[
+        Keyword.FROSTBURN,
+        Keyword.MANA_REGEN,
+        Keyword.POISON,
+        Keyword.REGEN,
+        Keyword.STRENGTH,
+        Keyword.WEAK,
+    ],
+)
 
 combat_manager.effect_manager.execute_effect(
     effect=delay_effect,
@@ -335,7 +345,16 @@ burn_effect = BurnEffect(Stat(flat=1))
 
 poison_effect = PoisonEffect(Stat(flat=1))
 
-immunity_effect = ImmunityEffect(target_keywords=[Keyword.POISON])
+immunity_effect = ImmunityEffect(
+    target_keywords=[
+        Keyword.FROSTBURN,
+        Keyword.MANA_REGEN,
+        Keyword.POISON,
+        Keyword.REGEN,
+        Keyword.STRENGTH,
+        Keyword.WEAK,
+    ]
+)
 
 combat_manager.effect_manager.execute_effect(
     effect=immunity_effect,
@@ -365,7 +384,16 @@ attack_effect = AttackEffect(Stat(flat=1))
 
 pierce_effect = PierceEffect(Stat(flat=1))
 
-invulnerable_effect = InvulnerableEffect(target_keywords=[Keyword.ATTACK])
+invulnerable_effect = InvulnerableEffect(
+    target_keywords=[
+        Keyword.ATTACK,
+        Keyword.DRAIN,
+        Keyword.FROSTBURN,
+        Keyword.EXECUTE,
+        Keyword.PAIN,
+        Keyword.THORNS,
+    ]
+)
 
 combat_manager.effect_manager.execute_effect(
     effect=invulnerable_effect,
@@ -395,7 +423,17 @@ burn_effect = BurnEffect(Stat(flat=1))
 
 poison_effect = PoisonEffect(Stat(flat=1))
 
-resistance_effect = ResistanceEffect(Stat(percent=1), target_keywords=[Keyword.POISON])
+resistance_effect = ResistanceEffect(
+    Stat(percent=1),
+    target_keywords=[
+        Keyword.FROSTBURN,
+        Keyword.MANA_REGEN,
+        Keyword.POISON,
+        Keyword.REGEN,
+        Keyword.STRENGTH,
+        Keyword.WEAK,
+    ],
+)
 
 combat_manager.effect_manager.execute_effect(
     effect=resistance_effect,

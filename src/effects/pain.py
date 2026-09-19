@@ -21,6 +21,8 @@ class PainEffect(Effect):
     Damages the target by its value.
     """
 
+    keyword = Keyword.PAIN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -37,7 +39,7 @@ class PainEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.PAIN,
+            keyword=self.keyword,
             type=EffectType.CURSE,
             value=value,
             min_value=min_value,

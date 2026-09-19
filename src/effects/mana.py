@@ -20,6 +20,8 @@ class ManaEffect(Effect):
     Increases the target mana.
     """
 
+    keyword = Keyword.MANA
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -35,7 +37,7 @@ class ManaEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.MANA,
+            keyword=self.keyword,
             type=EffectType.RESTORATION,
             value=value,
             min_value=min_value,

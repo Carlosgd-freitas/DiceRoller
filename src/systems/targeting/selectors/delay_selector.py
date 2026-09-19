@@ -1,20 +1,20 @@
-"""Random Selector module."""
+"""Delay Selector module."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
-from src.systems.targeting.filters import preprocess_enemies
+from src.base.effect import Effect, EffectType
+from src.factories.effect import EffectFactory
 from src.systems.targeting.selectors.selector import Selector
 
 if TYPE_CHECKING:
-    from src.base.effect import Effect
     from src.base.monster import Monster
 
 
-class RandomSelector(Selector):
+class DelaySelector(Selector):
     """
-    Selects monster targets randomly.
+    Selects monster targets for the delay effect.
     """
 
     def get_targets_easy(
@@ -27,8 +27,8 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on EASY difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        the delay effect:
+        * 100% -> k random alive monsters, among source, allies and enemies
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -54,12 +54,12 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
-            enemies = preprocess_enemies(enemies)
             monsters.extend(enemies)
 
         return self._get_targets_random(
-            monsters=monsters,
+            monsters,
             k=k,
+            consider=[],
         )
 
     def get_targets_normal(
@@ -72,8 +72,9 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on NORMAL difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        the delay effect:
+        * 100% -> k monsters with effects that can have their duration extended
+        by the delay effect
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -99,13 +100,25 @@ class RandomSelector(Selector):
         if allies:
             monsters.extend(allies)
         if enemies:
-            enemies = preprocess_enemies(enemies)
             monsters.extend(enemies)
 
-        return self._get_targets_random(
-            monsters=monsters,
+        targets = self._get_targets_highest_hp(
+            monsters,
             k=k,
+            keyword_whitelist=main_effect.target_keywords,
+            consider=[],
         )
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    monsters,
+                    k=k,
+                    consider=[],
+                )
+            )
+
+        return targets
 
     def get_targets_hard(
         self,
@@ -117,8 +130,10 @@ class RandomSelector(Selector):
     ) -> List[Monster]:
         """
         Returns a list of target monsters based on HARD difficulty criteria for
-        Offensive type effects:
-        * 100% -> random alive monters, among source, allies and enemies
+        the delay effect:
+        * 100% -> k monsters with the effects that can have their duration extended
+        by the delay effect, prioritizing self and allies if the the later are
+        benefitial or enemies otherwise
 
         :param source: The source monster which is targeting others.
         :type source: Monster
@@ -138,16 +153,59 @@ class RandomSelector(Selector):
         :return: A list of target monsters.
         :rtype: List[Monster]
         """
-        monsters = []
-        if source:
-            monsters.append(source)
-        if allies:
-            monsters.extend(allies)
-        if enemies:
-            enemies = preprocess_enemies(enemies)
-            monsters.extend(enemies)
+        target_effects = [
+            EffectFactory.create_effect(keyword)
+            for keyword in main_effect.target_keywords
+        ]
 
-        return self._get_targets_random(
-            monsters=monsters,
+        effect_type = self._get_most_frequent_effect_types(
+            target_effects,
             k=k,
+        )[0]
+
+        monsters = []
+
+        if effect_type in [
+            EffectType.BUFF,
+            EffectType.CURSE,
+            EffectType.DEFENSIVE,
+            EffectType.RESTORATION,
+        ]:
+            if source:
+                monsters.append(source)
+            if allies:
+                monsters.extend(allies)
+
+        elif effect_type in [
+            EffectType.DEBUFF,
+            EffectType.DETERIORATION,
+            EffectType.OFFENSIVE,
+        ]:
+            if enemies:
+                monsters.extend(enemies)
+
+        else:
+            if source:
+                monsters.append(source)
+            if allies:
+                monsters.extend(allies)
+            if enemies:
+                monsters.extend(enemies)
+
+        targets = self._get_targets_highest_hp(
+            monsters,
+            k=k,
+            keyword_whitelist=main_effect.target_keywords,
+            consider=[],
         )
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    monsters,
+                    k=k,
+                    consider=[],
+                )
+            )
+
+        return targets

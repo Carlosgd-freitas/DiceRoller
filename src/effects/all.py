@@ -18,9 +18,11 @@ class AllEffect(Effect):
     Considered as every other effect, but does nothing.
     """
 
+    keyword = Keyword.ALL
+
     def __init__(self):
         super().__init__(
-            keyword=Keyword.ALL,
+            keyword=self.keyword,
             type=EffectType.ALL,
             persistent=False,
         )

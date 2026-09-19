@@ -18,9 +18,11 @@ class NothingEffect(Effect):
     Does nothing.
     """
 
+    keyword = Keyword.NOTHING
+
     def __init__(self):
         super().__init__(
-            keyword=Keyword.NOTHING,
+            keyword=self.keyword,
             type=EffectType.NOTHING,
             persistent=False,
         )

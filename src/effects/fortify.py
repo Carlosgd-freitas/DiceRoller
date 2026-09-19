@@ -20,6 +20,8 @@ class FortifyEffect(Effect):
     Increases block recieved by defensive effects.
     """
 
+    keyword = Keyword.FORTIFY
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class FortifyEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.FORTIFY,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

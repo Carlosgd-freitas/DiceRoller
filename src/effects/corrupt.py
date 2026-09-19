@@ -20,6 +20,8 @@ class CorruptEffect(Effect):
     Removes buffs from the target, starting from the oldest.
     """
 
+    keyword = Keyword.CORRUPT
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -35,7 +37,7 @@ class CorruptEffect(Effect):
             max_value = Stat(flat=inf)
 
         super().__init__(
-            keyword=Keyword.CORRUPT,
+            keyword=self.keyword,
             type=EffectType.DETERIORATION,
             value=value,
             min_value=min_value,

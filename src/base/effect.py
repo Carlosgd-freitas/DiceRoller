@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, List, TypedDict
+from typing import TYPE_CHECKING, Dict, List, TypedDict
 
+from src.base.effect_registry import register_effect
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
 from src.base.triggers import Trigger
@@ -116,6 +117,12 @@ class Effect(ABC):
     var target_keywords: What others keywords the Effect targets on its execution.
     :vartype target_keywords: List[Keyword] | None
     """
+
+    keyword: Keyword
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        register_effect(cls)
 
     def __init__(
         self,
@@ -373,3 +380,22 @@ class Effect(ABC):
             and self.removable == effect.removable
             and self.target_keywords == effect.target_keywords
         )
+
+
+def get_effect_summary(effects: List[Effect]) -> Dict:
+    """
+    Gets a summary of a list of effects based on their types.
+
+    :return: A dictionary where the keys are effect types and the values are lists
+    containing the keywords of the effects.
+    :rtype: Dict
+    """
+    types = {}
+
+    for effect in effects:
+        if effect.type.value not in types:
+            types[effect.type.value] = [effect.keyword]
+        else:
+            types[effect.type.value].append(effect.keyword)
+
+    return types

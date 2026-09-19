@@ -22,6 +22,8 @@ class FrostburnEffect(Effect):
     Reduces the target HP each turn start.
     """
 
+    keyword = Keyword.FROSTBURN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -42,7 +44,7 @@ class FrostburnEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.FROSTBURN,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

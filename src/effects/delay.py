@@ -20,6 +20,8 @@ class DelayEffect(Effect):
     Extends the duration of effects on target.
     """
 
+    keyword = Keyword.DELAY
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -38,7 +40,7 @@ class DelayEffect(Effect):
         target_keywords = [] if target_keywords is None else target_keywords
 
         super().__init__(
-            keyword=Keyword.DELAY,
+            keyword=self.keyword,
             type=EffectType.UTILITY,
             value=value,
             min_value=min_value,

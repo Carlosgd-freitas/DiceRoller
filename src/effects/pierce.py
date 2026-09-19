@@ -22,6 +22,8 @@ class PierceEffect(Effect):
     on the target.
     """
 
+    keyword = Keyword.PIERCE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -37,7 +39,7 @@ class PierceEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.PIERCE,
+            keyword=self.keyword,
             type=EffectType.OFFENSIVE,
             value=value,
             min_value=min_value,

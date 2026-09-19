@@ -18,6 +18,8 @@ class TauntEffect(Effect):
     Increases the pririority of the target for enemies.
     """
 
+    keyword = Keyword.TAUNT
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class TauntEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.TAUNT,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             duration=duration,
             accuracy=accuracy,

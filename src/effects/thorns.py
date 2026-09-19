@@ -22,6 +22,8 @@ class ThornsEffect(Effect):
     When the target is attacked, the monster who attacked it will have their HP reduced.
     """
 
+    keyword = Keyword.THORNS
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -42,7 +44,7 @@ class ThornsEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.THORNS,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

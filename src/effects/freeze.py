@@ -18,6 +18,8 @@ class FreezeEffect(Effect):
     Makes the target unable to act. Removes Burn.
     """
 
+    keyword = Keyword.FREEZE
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class FreezeEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.FREEZE,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             duration=duration,
             accuracy=accuracy,

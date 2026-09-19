@@ -20,6 +20,8 @@ class BlockEffect(Effect):
     Reduces direct damage done to the target by its value.
     """
 
+    keyword = Keyword.BLOCK
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class BlockEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.BLOCK,
+            keyword=self.keyword,
             type=EffectType.DEFENSIVE,
             value=value,
             min_value=min_value,

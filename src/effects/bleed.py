@@ -22,6 +22,8 @@ class BleedEffect(Effect):
     Reduces the target HP each time they roll a dice.
     """
 
+    keyword = Keyword.BLEED
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -42,7 +44,7 @@ class BleedEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.BLEED,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

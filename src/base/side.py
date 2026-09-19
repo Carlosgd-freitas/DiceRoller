@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import Dict, List
+from typing import List
 
-from src.base.effect import Effect, EffectType
+from src.base.effect import Effect
 from src.base.keywords import Keyword
 
 
@@ -49,38 +49,6 @@ class Side:
             if effect.keyword == keyword:
                 return effect
         return None
-
-    def get_effect_summary(self) -> Dict:
-        """
-        Gets a summary of the Side's effects based on their types.
-
-        :return: A dictionary where the keys are effect types and the values are lists
-        containing the keywords of the effects.
-        :rtype: Dict
-        """
-        types = {}
-
-        for effect in self.effects:
-            if effect.type.value not in types:
-                types[effect.type.value] = [effect.keyword]
-            else:
-                types[effect.type.value].append(effect.keyword)
-
-        return types
-
-    def get_main_effect_type(self) -> EffectType:
-        """
-        Gets the Side main effect type.
-
-        :return: The main effect type of the Side.
-        :rtype: EffectType
-        """
-        effect_types = [effect.type for effect in self.effects]
-        counter = Counter(effect_types)
-
-        most_frequent = counter.most_common(1)
-        if most_frequent:
-            return most_frequent[0][0]
 
     def get_main_keyword(self) -> Keyword:
         """

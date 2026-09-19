@@ -18,6 +18,8 @@ class StunEffect(Effect):
     Makes the target unable to act.
     """
 
+    keyword = Keyword.STUN
+
     def __init__(
         self,
         duration: int = 2,
@@ -25,7 +27,7 @@ class StunEffect(Effect):
         removable: bool = True,
     ):
         super().__init__(
-            keyword=Keyword.STUN,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             duration=duration,
             accuracy=accuracy,

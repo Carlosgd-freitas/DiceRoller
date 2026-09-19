@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from math import inf
 from random import sample, shuffle
-from typing import Callable, List, Literal
+from typing import TYPE_CHECKING, Callable, List, Literal
 
+from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
-from src.base.monster import Monster
+
+if TYPE_CHECKING:
+    from src.base.monster import Monster
 
 
 def preprocess_enemies(monsters: List[Monster]) -> List[Monster]:
@@ -28,6 +32,50 @@ def preprocess_enemies(monsters: List[Monster]) -> List[Monster]:
     return monsters
 
 
+def filter_effect_types(
+    effect_types: List[EffectType],
+    k: int = 1,
+    frequency_order: Literal["LEAST", "MOST"] = "MOST",
+) -> List[EffectType]:
+    """
+    Filters a list of effect types which meet the criteria.
+
+    :param effect_types: A list of effects types.
+    :type effect_types: List[EffectType]
+
+    :param k: The number of effects which will be returned.
+    :type k: int
+
+    :param frequency_order: The frequency order in which the effect types will be
+    sort. Default value is "MOST".
+    :type frequency_order: Literal["LEAST", "MOST"]
+
+    :return: A list of effects which meets the criteria.
+    :rtype: List[Effect]
+    """
+    counter = Counter(effect_types)
+
+    filtered = []
+
+    if k <= 0 or not counter:
+        return filtered
+
+    if frequency_order == "MOST":
+        filtered = [effect_type for effect_type, _ in counter.most_common(k)]
+
+    elif frequency_order == "LEAST":
+        filtered = [
+            effect_type
+            for effect_type, _ in sorted(
+                counter.items(),
+                key=lambda item: item[1],
+            )
+        ][:k]
+
+    return filtered
+
+
+# TODO: Consider Keyword.ALL on filtering
 def filter_monsters(
     monsters: List[Monster],
     k: int = 1,

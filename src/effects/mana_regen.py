@@ -21,6 +21,8 @@ class ManaRegenEffect(Effect):
     Increases the target mana at turn start.
     """
 
+    keyword = Keyword.MANA_REGEN
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -41,7 +43,7 @@ class ManaRegenEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.MANA_REGEN,
+            keyword=self.keyword,
             type=EffectType.BUFF,
             value=value,
             min_value=min_value,

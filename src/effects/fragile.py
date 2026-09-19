@@ -20,6 +20,8 @@ class FragileEffect(Effect):
     Reduces block recieved by defensive effects.
     """
 
+    keyword = Keyword.FRAGILE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class FragileEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.FRAGILE,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

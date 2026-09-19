@@ -21,6 +21,8 @@ class BlindEffect(Effect):
     Removes Focus.
     """
 
+    keyword = Keyword.BLIND
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -41,7 +43,7 @@ class BlindEffect(Effect):
             delta = Stat(percent=0)
 
         super().__init__(
-            keyword=Keyword.BLIND,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

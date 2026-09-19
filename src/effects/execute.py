@@ -20,6 +20,8 @@ class ExecuteEffect(Effect):
     Kills the target if it has HP less than a threshold.
     """
 
+    keyword = Keyword.EXECUTE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -35,7 +37,7 @@ class ExecuteEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.EXECUTE,
+            keyword=self.keyword,
             type=EffectType.DETERIORATION,
             value=value,
             min_value=min_value,

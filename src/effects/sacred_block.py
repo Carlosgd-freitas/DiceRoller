@@ -20,6 +20,8 @@ class SacredBlockEffect(Effect):
     Negates direct damage done to the target a number of times equal to its value.
     """
 
+    keyword = Keyword.SACRED_BLOCK
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class SacredBlockEffect(Effect):
             delta = Stat(flat=0)
 
         super().__init__(
-            keyword=Keyword.SACRED_BLOCK,
+            keyword=self.keyword,
             type=EffectType.DEFENSIVE,
             value=value,
             min_value=min_value,

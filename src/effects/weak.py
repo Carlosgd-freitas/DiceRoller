@@ -20,6 +20,8 @@ class WeakEffect(Effect):
     Reduces damage dealt by offensive effects.
     """
 
+    keyword = Keyword.WEAK
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -40,7 +42,7 @@ class WeakEffect(Effect):
             delta = Stat(flat=0, percent=0)
 
         super().__init__(
-            keyword=Keyword.WEAK,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

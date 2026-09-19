@@ -20,6 +20,8 @@ class ConfuseEffect(Effect):
     Makes the target select targets randomly.
     """
 
+    keyword = Keyword.CONFUSE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -37,7 +39,7 @@ class ConfuseEffect(Effect):
             max_value = Stat(percent=inf)
 
         super().__init__(
-            keyword=Keyword.CONFUSE,
+            keyword=self.keyword,
             type=EffectType.DEBUFF,
             value=value,
             min_value=min_value,

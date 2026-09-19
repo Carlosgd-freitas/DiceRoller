@@ -22,6 +22,8 @@ class ReviveEffect(Effect):
     If the target is dead, returns it to combat and increases its HP.
     """
 
+    keyword = Keyword.REVIVE
+
     def __init__(
         self,
         value: Stat | None = None,
@@ -37,7 +39,7 @@ class ReviveEffect(Effect):
             max_value = Stat(flat=inf, percent=inf)
 
         super().__init__(
-            keyword=Keyword.REVIVE,
+            keyword=self.keyword,
             type=EffectType.RESTORATION,
             value=value,
             min_value=min_value,
