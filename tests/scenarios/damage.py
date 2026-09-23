@@ -69,12 +69,13 @@ monster = Monster(
     name="Monster",
     hp=15,
     max_hp=30,
-    dice=[
-        dice_0,
-        dice_1,
-        dice_2,
-    ],
 )
+
+monster.dice = [
+    dice_0,
+    dice_1,
+    dice_2,
+]
 
 # ----------------------------
 

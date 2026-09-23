@@ -75,7 +75,6 @@ def filter_effect_types(
     return filtered
 
 
-# TODO: Consider Keyword.ALL on filtering
 def filter_monsters(
     monsters: List[Monster],
     k: int = 1,

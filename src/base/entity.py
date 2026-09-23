@@ -218,7 +218,7 @@ class Entity:
 
     def get_effect(self, keyword: Keyword) -> Effect | None:
         """
-        Returns an effect from the entity.
+        Returns an effect from the Entity.
 
         :param keyword: A keyword.
         :type keyword: Keyword

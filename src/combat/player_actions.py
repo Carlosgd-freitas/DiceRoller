@@ -546,7 +546,7 @@ class CombatPlayerActionsMenu(Menu):
             automatic = self._is_automatic(selected_side)
             confused = monster.get_effect(Keyword.CONFUSE)
 
-            main_keyword = selected_side.get_main_keyword()
+            main_effect = selected_side.get_main_effect()
 
             # Automatic target selecting
             if automatic:
@@ -571,7 +571,7 @@ class CombatPlayerActionsMenu(Menu):
                     allies=allies,
                     enemies=enemies,
                     k=K,
-                    main_keyword=main_keyword,
+                    main_effect=main_effect,
                 )
 
             # Manual target selecting

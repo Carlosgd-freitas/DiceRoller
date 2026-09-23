@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectType
+from src.base.keywords import Keyword
 from src.factories.effect import EffectFactory
 from src.systems.targeting.selectors.selector import Selector
 
@@ -102,10 +103,14 @@ class DelaySelector(Selector):
         if enemies:
             monsters.extend(enemies)
 
+        keyword_whitelist = None
+        if Keyword.ALL not in main_effect.target_keywords:
+            keyword_whitelist = main_effect.target_keywords
+
         targets = self._get_targets_highest_hp(
             monsters,
             k=k,
-            keyword_whitelist=main_effect.target_keywords,
+            keyword_whitelist=keyword_whitelist,
             consider=[],
         )
 
@@ -192,10 +197,14 @@ class DelaySelector(Selector):
             if enemies:
                 monsters.extend(enemies)
 
+        keyword_whitelist = None
+        if Keyword.ALL not in main_effect.target_keywords:
+            keyword_whitelist = main_effect.target_keywords
+
         targets = self._get_targets_highest_hp(
             monsters,
             k=k,
-            keyword_whitelist=main_effect.target_keywords,
+            keyword_whitelist=keyword_whitelist,
             consider=[],
         )
 

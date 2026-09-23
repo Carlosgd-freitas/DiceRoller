@@ -37,7 +37,7 @@ class Side:
 
     def get_effect(self, keyword: Keyword) -> Effect | None:
         """
-        Returns an effect from the entity.
+        Returns the first corresponding effect from the Side.
 
         :param keyword: A keyword.
         :type keyword: Keyword
@@ -50,23 +50,28 @@ class Side:
                 return effect
         return None
 
-    def get_main_keyword(self) -> Keyword:
+    def get_main_effect(self) -> Effect | None:
         """
-        Gets the Side main keyword.
+        Returns the Side main Effect.
 
-        :return: The main keyword of the Side.
-        :rtype: Keyword
+        :return: The main Effect of the Side.
+        :rtype: Effect
         """
         keywords = [effect.keyword for effect in self.effects]
         counter = Counter(keywords)
 
         most_frequent = counter.most_common(1)
         if most_frequent:
-            return most_frequent[0][0]
+            main_effect = next(
+                effect
+                for effect in self.effects
+                if effect.keyword == most_frequent[0][0]
+            )
+            return main_effect
 
     def has_effect(self, keyword: Keyword) -> bool:
         """
-        Returns if the entity is currently under the effect.
+        Returns if the Side has an effect.
 
         :param keyword: A keyword.
         :type keyword: Keyword

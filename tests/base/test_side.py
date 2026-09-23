@@ -38,7 +38,7 @@ def test_side_get_effect():
     assert_conditions(conditions)
 
 
-def test_side_get_main_keyword():
+def test_side_get_main_effect():
     side = Side(
         effects=[
             AttackEffect(Stat(flat=1)),
@@ -47,10 +47,10 @@ def test_side_get_main_keyword():
         ]
     )
 
-    main_keyword = side.get_main_keyword()
+    main_effect = side.get_main_effect()
 
     conditions = [
-        main_keyword == Keyword.ATTACK,
+        main_effect.keyword == Keyword.ATTACK,
     ]
 
     side = Side(
@@ -61,21 +61,21 @@ def test_side_get_main_keyword():
         ]
     )
 
-    main_keyword = side.get_main_keyword()
+    main_effect = side.get_main_effect()
 
     conditions.extend(
         [
-            main_keyword == Keyword.ABSORB,
+            main_effect.keyword == Keyword.ABSORB,
         ]
     )
 
     side = Side(effects=[])
 
-    main_keyword = side.get_main_keyword()
+    main_effect = side.get_main_effect()
 
     conditions.extend(
         [
-            main_keyword is None,
+            main_effect is None,
         ]
     )
 

@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, List
 from src.base.effect import EffectType
 from src.base.keywords import Keyword
 from src.base.monster import AILevel
-from src.systems.targeting.filters import filter_effect_types
 from src.systems.targeting.selectors.buff_selector import BuffSelector
 from src.systems.targeting.selectors.cleanse_selector import CleanseSelector
 from src.systems.targeting.selectors.corrupt_selector import CorruptSelector
@@ -66,21 +65,7 @@ class SelectorManager:
         :rtype: List[Monster]
         """
         selector: Selector = None
-
-        # ToDo: get main effect once; infer effect type and keyword from it
-        # Determining the main properties
-        main_effect_type = filter_effect_types(
-            effect_types=[effect.type for effect in side.effects],
-            k=1,
-            frequency_order="MOST",
-        )[0]
-
-        main_keyword = side.get_main_keyword()
-
-        for effect in side.effects:
-            if effect.keyword == main_keyword:
-                main_effect = effect
-                break
+        main_effect = side.get_main_effect()
 
         # Confuse check
         confused = source.get_effect(Keyword.CONFUSE)
@@ -94,38 +79,38 @@ class SelectorManager:
 
         else:
             # High priority: Determining selector by effect keyword
-            if main_keyword == Keyword.CLEANSE:
+            if main_effect.keyword == Keyword.CLEANSE:
                 selector = CleanseSelector()
 
-            elif main_keyword == Keyword.CORRUPT:
+            elif main_effect.keyword == Keyword.CORRUPT:
                 selector = CorruptSelector()
 
-            elif main_keyword == Keyword.DELAY:
+            elif main_effect.keyword == Keyword.DELAY:
                 selector = DelaySelector()
 
-            elif main_keyword == Keyword.REVIVE:
+            elif main_effect.keyword == Keyword.REVIVE:
                 selector = ReviveSelector()
 
             # Low priority: Determining selector by effect type
-            elif main_effect_type in [
+            elif main_effect.type in [
                 EffectType.DETERIORATION,
                 EffectType.OFFENSIVE,
             ]:
                 selector = OffensiveSelector()
 
-            elif main_effect_type in [
+            elif main_effect.type in [
                 EffectType.DEFENSIVE,
                 EffectType.RESTORATION,
             ]:
                 selector = DefensiveSelector()
 
-            elif main_effect_type == EffectType.BUFF:
+            elif main_effect.type == EffectType.BUFF:
                 selector = BuffSelector()
 
-            elif main_effect_type == EffectType.CURSE:
+            elif main_effect.type == EffectType.CURSE:
                 selector = CurseSelector()
 
-            elif main_effect_type == EffectType.DEBUFF:
+            elif main_effect.type == EffectType.DEBUFF:
                 selector = DebuffSelector()
 
             else:

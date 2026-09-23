@@ -73,8 +73,8 @@ class Monster(Entity):
         self.scale_attributes(difficulty)
 
         self.ai_level = self.get_ai_level(difficulty)
-        self.dice = self.get_dice(difficulty)
-        self.skills = self.get_skills(difficulty)
+        self.dice = self.get_dice(difficulty) or kwargs.get("dice", [])
+        self.skills = self.get_skills(difficulty) or kwargs.get("skills", [])
 
     def __str__(self) -> str:
         """String representation of Monster."""
