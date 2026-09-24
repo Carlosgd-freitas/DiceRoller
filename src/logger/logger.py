@@ -11,6 +11,7 @@ Namespace = Literal[
     "base",
     "combat",
     "compendium",
+    "difficulties",
     "effect_types",
     "effects",
     "menus",

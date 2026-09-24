@@ -186,9 +186,9 @@ class MonsterLogger(DiceLogger):
                 message += (
                     " ("
                     + self.get_message(
-                        namespace="base",
-                        message_group="DIFFICULTIES",
-                        key=monster.ai_level.name.lower(),
+                        namespace="difficulties",
+                        message_group=monster.ai_level.name,
+                        key="name",
                     ).title()
                     + ")"
                 )

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
-from src.base.difficulties import Difficulty
+from src.base.color import color_string
+from src.base.difficulties import get_difficulty_color
 from src.classes.base_class import BaseClass
 from src.classes.ranger import Ranger
 from src.classes.rogue import Rogue
 from src.classes.warrior import Warrior
+from src.gamemodes.roguelike.select_difficulty_menu import SelectDifficultyMenu
+from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.edit_menu import Menu
 from src.menus.option import Option
@@ -48,7 +51,13 @@ class RoguelikeMenu(Menu):
         self.logger: CombatLogger
 
         self.player_class: BaseClass = None
-        self.difficulty = Difficulty.NORMAL
+
+        # Difficulty
+        self.difficulty = settings.last_difficulty
+        self.select_difficulty_menu = SelectDifficultyMenu(
+            settings,
+            logging=logging,
+        )
 
     def get_title(self) -> str:
         """
@@ -110,6 +119,39 @@ class RoguelikeMenu(Menu):
         return options
 
     # =========================================================================
+    # Utility
+    # =========================================================================
+
+    def change_language(self, language: Language, _messages: Dict = None):
+        """
+        Changes the Menu language.
+
+        :var language: A Language.
+        :vartype language: Language
+
+        :var _messages: Messages loaded from a locale module.
+        :vartype _messages: Dict
+        """
+        self.logger.change_language(language, _messages)
+        _messages = self.logger._messages
+
+        self.title = self.get_title()
+        self.options = self.get_options()
+
+        self.select_difficulty_menu.change_language(language, _messages)
+
+    def toggle_logging(self, enabled: bool):
+        """
+        Enables or disables the Menu logging.
+
+        :var enabled: If the Menu logging is enabled or disabled.
+        :vartype enabled: bool
+        """
+        self.logger.enabled = enabled
+
+        self.select_difficulty_menu.toggle_logging(enabled)
+
+    # =========================================================================
     # Options
     # =========================================================================
 
@@ -133,7 +175,10 @@ class RoguelikeMenu(Menu):
             self.select_class()
 
         elif option.id == "SELECT_DIFFICULTY":
-            self.select_difficulty()
+            self.select_difficulty_menu.difficulty = self.difficulty
+            self.select_difficulty_menu.open()
+            self.difficulty = self.select_difficulty_menu.difficulty
+            self.settings.last_difficulty = self.difficulty
 
         elif option.id == "EXIT":
             pass
@@ -229,60 +274,60 @@ class RoguelikeMenu(Menu):
 
         return selected_option
 
-    def select_difficulty(self) -> Option:
+    # =========================================================================
+    # Rendering
+    # =========================================================================
+
+    def open(self):
         """
-        Shows the available game difficulties and prompts the user to select one of
-        them, returning the corresponding option.
-
-        :return: Option selected by the user.
-        :rtype: Option
+        Opens the Menu.
         """
-        # Defining options
-        self.logger.log(message="")
+        while True:
+            self.show_title()
 
-        options = []
-
-        for index, difficulty in enumerate(list(Difficulty)):
-            options.append(
-                Option(
-                    id=f"DIFFICULTY_{index}",
-                    key=str(index),
-                    message=self.logger.get_message(
-                        namespace="base",
-                        message_group="DIFFICULTIES",
-                        key=difficulty.name.lower(),
-                    ),
-                    obj=difficulty,
-                )
+            # Logging selected difficulty
+            message = color_string(
+                self.logger.get_message(
+                    namespace="base",
+                    message_group="LEXICON",
+                    key="difficulty",
+                ).title()
+                + ": ",
+                intensity="BRIGHT",
             )
 
-        options.append(
-            Option(
-                id="CANCEL",
-                key="0",
-                message=self.logger.get_message(
-                    namespace="menus",
-                    message_group="BASE",
-                    key="cancel",
-                ),
-                isolate_before=True,
-                isolate_after=True,
+            self.logger.log(
+                message=message,
+                end="",
             )
-        )
 
-        # Showing options
-        self.show_options(
-            options,
-            validate=False,
-        )
+            message = self.logger.get_message(
+                namespace="difficulties",
+                message_group=self.difficulty.name,
+                key="name",
+            )
 
-        # Selecting option
-        message = self.logger.get_message(
-            namespace="menus",
-            message_group="ROGUELIKE",
-            key="select_difficulty_prompt",
-        )
+            color_data = get_difficulty_color(self.difficulty)
 
-        selected_option = self.select(options, message, validate=False)
+            self.logger.log(message=color_string(message, **color_data))
 
-        return selected_option
+            self.logger.log(message="")
+
+            # Logging options
+            self.show_options(self.options)
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options, message)
+            self.process_option(selected)
+
+            if selected.id in ["EXIT", "RETURN"]:
+                break
+
+            else:
+                self.logger.log(message="")
+
+        return

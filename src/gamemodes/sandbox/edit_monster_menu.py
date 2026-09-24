@@ -189,7 +189,7 @@ class EditMonsterMenu(EditMenu):
 
     def change_language(self, language: Language, _messages: Dict = None):
         """
-        Changes the Manager language.
+        Changes the Menu language.
 
         :var language: A Language.
         :vartype language: Language
@@ -207,9 +207,9 @@ class EditMonsterMenu(EditMenu):
 
     def toggle_logging(self, enabled: bool):
         """
-        Enables or disables the Manager logging.
+        Enables or disables the Menu logging.
 
-        :var enabled: If the Manager logging is enabled or disabled.
+        :var enabled: If the Menu logging is enabled or disabled.
         :vartype enabled: bool
         """
         self.logger.enabled = enabled
@@ -290,9 +290,9 @@ class EditMonsterMenu(EditMenu):
 
         for index, ai_level in enumerate(list(AILevel)):
             message = self.logger.get_message(
-                namespace="base",
-                message_group="DIFFICULTIES",
-                key=ai_level.name.lower(),
+                namespace="difficulties",
+                message_group=ai_level.name,
+                key="name",
             ).title()
 
             option = Option(

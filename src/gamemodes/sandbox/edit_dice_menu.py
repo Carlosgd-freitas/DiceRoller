@@ -123,7 +123,7 @@ class EditDiceMenu(EditMenu):
 
     def change_language(self, language: Language, _messages: Dict = None):
         """
-        Changes the Manager language.
+        Changes the Menu language.
 
         :var language: A Language.
         :vartype language: Language
@@ -141,9 +141,9 @@ class EditDiceMenu(EditMenu):
 
     def toggle_logging(self, enabled: bool):
         """
-        Enables or disables the Manager logging.
+        Enables or disables the Menu logging.
 
-        :var enabled: If the Manager logging is enabled or disabled.
+        :var enabled: If the Menu logging is enabled or disabled.
         :vartype enabled: bool
         """
         self.logger.enabled = enabled

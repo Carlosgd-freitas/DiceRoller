@@ -9,7 +9,10 @@ BASE = {
     "file_not_found": "não foi encontrado!",
     "file_save": "foi salvo com sucesso!",
     "filename_prompt": "Digite o nome do arquivo",
+    "next": "Próximo",
+    "previous": "Anterior",
     "return": "Retornar",
+    "select": "Selecionar",
     "select_option_prompt": "Selecione uma opção",
 }
 
@@ -25,7 +28,12 @@ ROGUELIKE = {
     "select_class": "Selecionar Classe",
     "select_class_prompt": "Selecione uma classe",
     "select_difficulty": "Selecionar Dificuldade",
+}
+
+SELECT_DIFFICULTY = {
+    "title": "Selecionar Dificuldade",
     "select_difficulty_prompt": "Selecione uma dificuldade",
+    "selected_difficulty": "Dificuldade Selecionada",
 }
 
 PLAYER_ACTIONS = {

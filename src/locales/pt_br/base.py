@@ -22,15 +22,6 @@ DETAILS = {
     "no_effects": "Esse lado não possui efeitos.",
 }
 
-DIFFICULTIES = {
-    "easy": "fácil",
-    "normal": "normal",
-    "hard": "difícil",
-    "expert": "perito",
-    "master": "mestre",
-    "nightmare": "pesadelo",
-}
-
 LEXICON = {
     "accuracy": "precisão",
     "area": "área",
@@ -52,6 +43,7 @@ LEXICON = {
     "delta_percent": "delta (%)",
     "dice": "dado",
     "dices": "dados",
+    "difficulty": "dificuldade",
     "duration": "duração",
     "effect": "efeito",
     "effects": "efeitos",

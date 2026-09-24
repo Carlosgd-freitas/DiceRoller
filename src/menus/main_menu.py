@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.constants import VERSION
+from src.gamemodes.roguelike.roguelike_menu import RoguelikeMenu
 from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.logger import Logger
@@ -13,6 +14,7 @@ from src.menus.menu import Menu
 from src.menus.option import Option
 from src.menus.settings_menu import SettingsMenu
 from src.systems.file import FileManager
+from src.systems.settings import FILENAME as SETTINGS_FILENAME
 
 if TYPE_CHECKING:
     from src.systems.settings import Settings
@@ -50,8 +52,9 @@ class MainMenu(Menu):
         self.file_manager = FileManager()
 
         # Menus
-        self.compendium_menu = CompendiumMenu(self.settings, self.logger.enabled)
+        self.roguelike_menu = RoguelikeMenu(self.settings, self.logger.enabled)
         self.sandbox_menu = SandboxMenu(self.settings, self.logger.enabled)
+        self.compendium_menu = CompendiumMenu(self.settings, self.logger.enabled)
         self.settings_menu = SettingsMenu(self.settings, self.logger.enabled)
 
     def get_title(self) -> str:
@@ -143,8 +146,9 @@ class MainMenu(Menu):
         self.options = self.get_options()
 
         # Menus
-        self.compendium_menu.change_language(language, _messages)
+        self.roguelike_menu.change_language(language, _messages)
         self.sandbox_menu.change_language(language, _messages)
+        self.compendium_menu.change_language(language, _messages)
         self.settings_menu.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
@@ -157,8 +161,9 @@ class MainMenu(Menu):
         self.logger.enabled = enabled
 
         # Menus
-        self.compendium_menu.toggle_logging(enabled)
+        self.roguelike_menu.toggle_logging(enabled)
         self.sandbox_menu.toggle_logging(enabled)
+        self.compendium_menu.toggle_logging(enabled)
         self.settings_menu.toggle_logging(enabled)
 
     # =========================================================================
@@ -175,9 +180,6 @@ class MainMenu(Menu):
         :return: If the option can be selected.
         :rtype: bool
         """
-        if option.id in ["NEW_GAME"]:
-            return False
-
         return True
 
     def process_option(self, option: Option):
@@ -188,7 +190,7 @@ class MainMenu(Menu):
         :type option: Option
         """
         if option.id == "NEW_GAME":
-            pass
+            self.roguelike_menu.open()
 
         elif option.id == "SANDBOX_MODE":
             random_combat = self.sandbox_menu.randomizer.get_random_combat()
@@ -202,6 +204,6 @@ class MainMenu(Menu):
             self.change_language(self.settings.language)
 
         elif option.id == "EXIT":
-            pass
+            self.file_manager.save_file(SETTINGS_FILENAME, self.settings)
 
         return

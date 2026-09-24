@@ -26,6 +26,26 @@ class EffectLogger(StatLogger):
     ):
         super().__init__(**kwargs)
 
+    def _get_keyword_params(self) -> Dict:
+        """
+        Returns common keyword parameters for logging.
+
+        :return: Parameters for logging.
+        :rtype: Dict
+        """
+        params = {}
+
+        # All keywords
+        for keyword in Keyword:
+            params[keyword.name.lower()] = self.get_colored_message(
+                keyword=keyword,
+                namespace="effects",
+                message_group=keyword.name,
+                key="name",
+            )
+
+        return params
+
     def _get_effect_params(
         self,
         effect: Effect = None,
@@ -59,15 +79,6 @@ class EffectLogger(StatLogger):
 
             if target.suffix:
                 params["target"] += " " + target.suffix
-
-        # All keywords
-        for keyword in Keyword:
-            params[keyword.name.lower()] = self.get_colored_message(
-                keyword=keyword,
-                namespace="effects",
-                message_group=keyword.name,
-                key="name",
-            )
 
         # Effect keyword and variations
         for params_key, key in [
@@ -264,6 +275,9 @@ class EffectLogger(StatLogger):
                 "turns": turns,
             }
         )
+
+        # Keyword params
+        params.update(self._get_keyword_params())
 
         # Attribute params
         params.update(self._get_attribute_params())

@@ -22,15 +22,6 @@ DETAILS = {
     "no_effects": "This side has no effects.",
 }
 
-DIFFICULTIES = {
-    "easy": "easy",
-    "normal": "normal",
-    "hard": "hard",
-    "expert": "expert",
-    "master": "master",
-    "nightmare": "nightmare",
-}
-
 LEXICON = {
     "accuracy": "accuracy",
     "area": "area",
@@ -52,6 +43,7 @@ LEXICON = {
     "delta_percent": "delta (%)",
     "dice": "dice",
     "dices": "dice",
+    "difficulty": "difficulty",
     "duration": "duration",
     "effect": "effect",
     "effects": "effects",
