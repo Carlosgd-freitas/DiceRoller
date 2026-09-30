@@ -7,14 +7,6 @@ ATTRIBUTES = {
     "speed": "SPD",
 }
 
-CLASSES = {
-    "mage": "mage",
-    "random": "random",
-    "ranger": "ranger",
-    "rogue": "rogue",
-    "warrior": "warrior",
-}
-
 DETAILS = {
     "no_members": "This team has no members.",
     "no_teams": "This combat has no teams.",
@@ -30,6 +22,7 @@ LEXICON = {
     "armors": "armors",
     "buff": "buff",
     "buffs": "buffs",
+    "class": "class",
     "column": "column",
     "columns": "columns",
     "control": "control",

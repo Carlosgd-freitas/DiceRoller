@@ -143,7 +143,7 @@ class Menu(Manager):
         """
         Processes an option.
 
-        :param option: Menu's option.
+        :param option: Menu option.
         :type option: Option
         """
         raise NotImplementedError

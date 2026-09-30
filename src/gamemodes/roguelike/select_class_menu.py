@@ -1,4 +1,4 @@
-"""Select Difficulty Menu module."""
+"""Select Class Menu module."""
 
 from __future__ import annotations
 
@@ -9,19 +9,23 @@ from src.base.data import (
     next_value,
     previous_value,
 )
-from src.base.difficulties import Difficulty, get_difficulty_color
+from src.classes.mage import Mage
+from src.classes.ranger import Ranger
+from src.classes.rogue import Rogue
+from src.classes.warrior import Warrior
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
 
 if TYPE_CHECKING:
+    from src.classes.base_class import BaseClass
     from src.systems.settings import Settings
 
 
-class SelectDifficultyMenu(Menu):
+class SelectClassMenu(Menu):
     """
-    Select Difficulty Menu class.
+    Select Class Menu class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -48,9 +52,14 @@ class SelectDifficultyMenu(Menu):
         # Initialization
         logger = CombatLogger(enabled=logging, language=settings.language)
 
-        self.difficulty = settings.last_difficulty
-        self.difficulties = list(Difficulty)
-        self.showing_difficulty: Difficulty = None
+        self.class_ = settings.last_class
+        self.classes: List[BaseClass] = [
+            Warrior(),
+            Mage(),
+            Ranger(),
+            Rogue(),
+        ]
+        self.showing_class: BaseClass = None
 
         super().__init__(
             logger,
@@ -69,7 +78,7 @@ class SelectDifficultyMenu(Menu):
         :rtype: str
         """
         return self.logger.get_message(
-            namespace="menus", message_group="SELECT_DIFFICULTY", key="title"
+            namespace="menus", message_group="SELECT_CLASS", key="title"
         )
 
     def get_options(self) -> List[Option]:
@@ -81,24 +90,24 @@ class SelectDifficultyMenu(Menu):
         """
         options = []
 
-        for index, difficulty in enumerate(self.difficulties, start=1):
+        for index, class_ in enumerate(self.classes, start=1):
             message = self.logger.get_message(
-                namespace="difficulties",
-                message_group=difficulty.name,
+                namespace="classes",
+                message_group=class_.global_id,
                 key="name",
             )
 
-            color_data = get_difficulty_color(difficulty)
+            color_data = class_.get_color()
 
             options.append(
                 Option(
-                    id=f"DIFFICULTY_{index}",
+                    id=f"CLASS_{index}",
                     key=str(index),
                     message=color_string(
                         message,
                         **color_data,
                     ),
-                    obj=difficulty,
+                    obj=class_,
                 )
             )
 
@@ -195,12 +204,12 @@ class SelectDifficultyMenu(Menu):
         Returns if the option can be selected or not.
         """
         if (option.id == "PREVIOUS") and (
-            self.showing_difficulty == self.difficulties[0]
+            self.showing_class.global_id == self.classes[0].global_id
         ):
             return False
 
         elif (option.id == "NEXT") and (
-            self.showing_difficulty == self.difficulties[-1]
+            self.showing_class.global_id == self.classes[-1].global_id
         ):
             return False
 
@@ -213,9 +222,9 @@ class SelectDifficultyMenu(Menu):
         :param option: Menu option.
         :type option: Option
         """
-        if "DIFFICULTY" in option.id:
-            self.showing_difficulty = option.obj
-            self.show_difficulty(self.showing_difficulty)
+        if "CLASS" in option.id:
+            self.showing_class = option.obj
+            self.show_class(self.showing_class)
 
             # Showing submenu options
             self.show_options(self.submenu_options)
@@ -232,7 +241,7 @@ class SelectDifficultyMenu(Menu):
                 self.process_option(selected_option)
 
         elif option.id == "PREVIOUS":
-            difficulty = previous_value(self.difficulties, self.showing_difficulty)
+            difficulty = previous_value(self.classes, self.showing_class)
 
             for option in self.options:
                 if option.obj == difficulty:
@@ -241,7 +250,7 @@ class SelectDifficultyMenu(Menu):
             self.process_option(option)
 
         elif option.id == "NEXT":
-            difficulty = next_value(self.difficulties, self.showing_difficulty)
+            difficulty = next_value(self.classes, self.showing_class)
 
             for option in self.options:
                 if option.obj == difficulty:
@@ -250,72 +259,46 @@ class SelectDifficultyMenu(Menu):
             self.process_option(option)
 
         elif option.id == "SELECT":
-            self.difficulty = self.showing_difficulty
+            self.class_ = self.showing_class
 
         elif option.id == "RETURN":
             pass
 
         return
 
-    def show_difficulty(self, difficulty: Difficulty, **kwargs):
+    def show_class(self, class_: BaseClass, **kwargs):
         """
-        Shows the difficulty details.
+        Shows the class details.
         """
         # Updating logging params
         kwargs.update(self.logger._get_attribute_params())
         kwargs.update(self.logger._get_keyword_params())
 
-        # Name
         self.logger.log(message="")
 
-        message = self.logger.get_message(
-            namespace="difficulties",
-            message_group=difficulty.name,
+        # Name
+        name = self.logger.get_message(
+            namespace="classes",
+            message_group=class_.global_id,
             key="name",
         )
+        class_.name = name
 
-        color_data = get_difficulty_color(difficulty)
+        color_data = class_.get_color()
 
-        self.logger.log(message=color_string(message, **color_data) + "\n")
+        self.logger.log(message=color_string(name, **color_data) + "\n")
 
-        # Modifiers
-        modifiers = [
-            "after_battles",
-            "after_boss_battles",
-            "enemy_attribute_scaling",
-            "enemy_dice_items",
-            "enemy_skills",
-            "enemy_ai",
-            "shop_pricing",
-        ]
+        # Description
+        message = self.logger.get_message(
+            namespace="classes",
+            message_group=class_.global_id,
+            key="description",
+        )
 
-        for modifier in modifiers:
-            self.logger.log(
-                message="● ",
-                end="",
-            )
+        self.logger.log(message=color_string(message, italic=True) + "\n")
 
-            message = color_string(
-                self.logger.get_message(
-                    namespace="difficulties",
-                    message_group="MODIFIERS",
-                    key=modifier,
-                )
-                + ": ",
-                intensity="BRIGHT",
-            )
-
-            self.logger.log(
-                message=message,
-                end="",
-            )
-
-            self.logger.log(
-                namespace="difficulties",
-                message_group=difficulty.name,
-                key=modifier,
-                **kwargs,
-            )
+        # Dice
+        self.logger.log_monster_details(class_)
 
         self.logger.log(message="")
 
@@ -332,12 +315,12 @@ class SelectDifficultyMenu(Menu):
         while True:
             self.show_title()
 
-            # Logging selected difficulty
+            # Logging selected class
             message = color_string(
                 self.logger.get_message(
                     namespace="menus",
-                    message_group="SELECT_DIFFICULTY",
-                    key="selected_difficulty",
+                    message_group="SELECT_CLASS",
+                    key="selected_class",
                 )
                 + ": ",
                 intensity="BRIGHT",
@@ -349,12 +332,12 @@ class SelectDifficultyMenu(Menu):
             )
 
             message = self.logger.get_message(
-                namespace="difficulties",
-                message_group=self.difficulty.name,
+                namespace="classes",
+                message_group=self.class_.global_id,
                 key="name",
             )
 
-            color_data = get_difficulty_color(self.difficulty)
+            color_data = self.class_.get_color()
 
             self.logger.log(message=color_string(message, **color_data))
 
@@ -365,8 +348,8 @@ class SelectDifficultyMenu(Menu):
 
             message = self.logger.get_message(
                 namespace="menus",
-                message_group="SELECT_DIFFICULTY",
-                key="select_difficulty_prompt",
+                message_group="SELECT_CLASS",
+                key="select_class_prompt",
             )
             selected = self.select(self.options, message)
             self.process_option(selected)

@@ -2,6 +2,7 @@
 
 from typing import List
 
+from src.base.color import Color, ColorData
 from src.base.dice import Dice
 from src.base.side import Side
 from src.base.stat import Stat
@@ -52,3 +53,13 @@ class Warrior(BaseClass):
         dice = [dice_0, dice_1]
 
         return dice
+
+    def get_color(self) -> ColorData:
+        """
+        Returns the Class color data.
+        """
+        return {
+            "background_color": None,
+            "foreground_color": Color.RED,
+            "intensity": "BRIGHT",
+        }

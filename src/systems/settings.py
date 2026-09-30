@@ -3,6 +3,8 @@
 from typing import Literal
 
 from src.base.difficulties import Difficulty
+from src.classes.base_class import BaseClass
+from src.classes.warrior import Warrior
 from src.locales.languages import Language
 
 BASENAME = "settings"
@@ -31,6 +33,7 @@ class Settings:
         self,
         language: Language = Language.EN_US,
         monster_end_turn: Literal["AUTO", "MANUAL"] = "MANUAL",
+        last_class: BaseClass = None,
         last_difficulty: Difficulty = Difficulty.NORMAL,
     ):
         # Changeable on settings menu
@@ -38,4 +41,8 @@ class Settings:
         self.monster_end_turn = monster_end_turn
 
         # Changeable by other means
+        if last_class is None:
+            last_class = Warrior()
+        self.last_class = last_class
+
         self.last_difficulty = last_difficulty

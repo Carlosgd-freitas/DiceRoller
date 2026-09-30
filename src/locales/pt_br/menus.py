@@ -36,6 +36,12 @@ SELECT_DIFFICULTY = {
     "selected_difficulty": "Dificuldade Selecionada",
 }
 
+SELECT_CLASS = {
+    "title": "Selecionar Classe",
+    "select_class_prompt": "Selecione uma classe",
+    "selected_class": "Classe Selecionada",
+}
+
 PLAYER_ACTIONS = {
     "consumables": "Consumíveis",
     "equipment": "Equipamento",

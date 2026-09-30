@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, List
 
+from src.base.color import Color, ColorData
 from src.base.monster import Monster
 
 if TYPE_CHECKING:
@@ -29,3 +30,13 @@ class BaseClass(Monster):
         :rtype: List[Dice]
         """
         raise NotImplementedError
+
+    def get_color(self) -> ColorData:
+        """
+        Returns the Class color data.
+        """
+        return {
+            "background_color": None,
+            "foreground_color": Color.WHITE,
+            "intensity": "BRIGHT",
+        }
