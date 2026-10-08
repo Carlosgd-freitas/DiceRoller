@@ -8,10 +8,14 @@ ATTRIBUTES = {
 }
 
 DETAILS = {
-    "no_members": "Esse time não possui membros.",
-    "no_teams": "Esse combate não possui times.",
-    "no_sides": "Esse dado não possui lados.",
+    "no_dice": "Não há dados presentes.",
     "no_effects": "Esse lado não possui efeitos.",
+    "no_equipment": "Esse monstro não possui equipamento.",
+    "no_items": "Não há itens presentes.",
+    "no_members": "Esse time não possui membros.",
+    "no_sides": "Esse dado não possui lados.",
+    "no_skills": "Esse monstro não possui habilidades.",
+    "no_teams": "Esse combate não possui times.",
 }
 
 LEXICON = {

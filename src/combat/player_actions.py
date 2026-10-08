@@ -110,6 +110,12 @@ class CombatPlayerActionsMenu(Menu):
                     message_group="PLAYER_ACTIONS",
                     key="roll_dice",
                 ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_roll_dice",
+                    format=False,
+                ),
             ),
             Option(
                 id="SKILLS",
@@ -118,6 +124,12 @@ class CombatPlayerActionsMenu(Menu):
                     namespace="menus",
                     message_group="PLAYER_ACTIONS",
                     key="skills",
+                ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_skills",
+                    format=False,
                 ),
             ),
             Option(
@@ -128,6 +140,12 @@ class CombatPlayerActionsMenu(Menu):
                     message_group="PLAYER_ACTIONS",
                     key="consumables",
                 ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_consumables",
+                    format=False,
+                ),
             ),
             Option(
                 id="EQUIPMENT",
@@ -136,6 +154,12 @@ class CombatPlayerActionsMenu(Menu):
                     namespace="menus",
                     message_group="PLAYER_ACTIONS",
                     key="equipment",
+                ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_equipment",
+                    format=False,
                 ),
             ),
             Option(
@@ -146,6 +170,12 @@ class CombatPlayerActionsMenu(Menu):
                     message_group="PLAYER_ACTIONS",
                     key="show_details",
                 ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_show_details",
+                    format=False,
+                ),
             ),
             Option(
                 id="SKIP_TURN",
@@ -154,6 +184,12 @@ class CombatPlayerActionsMenu(Menu):
                     namespace="menus",
                     message_group="PLAYER_ACTIONS",
                     key="skip_turn",
+                ),
+                message_invalid=self.logger.get_message(
+                    namespace="combat",
+                    message_group="ACTIONS",
+                    key="no_skip_turn",
+                    format=False,
                 ),
                 isolate_before=True,
                 isolate_after=True,
@@ -234,7 +270,10 @@ class CombatPlayerActionsMenu(Menu):
 
                     if validate and not self.is_option_valid(option, monster):
                         if option.message_invalid is not None:
-                            self.logger.log(message=option.message_invalid)
+                            message_invalid = option.message_invalid.format(
+                                name=monster.name
+                            )
+                            self.logger.log(message=message_invalid)
                         pass
 
                     else:

@@ -5,7 +5,7 @@ from copy import deepcopy
 from colorama import init
 
 from src.base.dice import Dice
-from src.base.monster import Monster
+from src.base.monster import ControlType, Monster
 from src.base.side import Side
 from src.base.stat import Stat
 from src.base.team import Team
@@ -66,9 +66,10 @@ dice_2 = Dice(sides=sides)
 # ----------------------------
 
 monster = Monster(
-    name="Monster",
+    name="James",
     hp=15,
     max_hp=30,
+    control_type=ControlType.AI,
 )
 
 monster.dice = [
@@ -99,7 +100,7 @@ team_b = Team(
 
 combat_manager = CombatManager(
     settings=Settings(
-        monster_end_turn="AUTO",
+        monster_end_turn="MANUAL",
     ),
     teams=[
         team_a,

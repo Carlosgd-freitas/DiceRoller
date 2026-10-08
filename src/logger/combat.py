@@ -296,10 +296,15 @@ class CombatLogger(MonsterLogger):
 
         name = self.get_monster_name(monster)
 
+        if sides:
+            key = "roll_dice"
+        else:
+            key = "no_roll_dice"
+
         message = self.get_message(
             namespace="combat",
             message_group="ACTIONS",
-            key="roll_dice",
+            key=key,
             name=name,
         )
         self.log(message=message)
@@ -465,4 +470,4 @@ class CombatLogger(MonsterLogger):
                 message_group="DETAILS",
                 key="no_teams",
             )
-            self.log(message=message)
+            self.log(message=message + "\n")

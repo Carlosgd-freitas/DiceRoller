@@ -11,6 +11,7 @@ from src.monsters.mana_spirit import ManaSpirit
 from src.monsters.slime import Slime
 from src.monsters.tortuga import Tortuga
 from src.monsters.training_dummy import TrainingDummy
+from src.monsters.troll import Troll
 from src.monsters.venenobra import Venenobra
 from src.monsters.weeke import Weeke
 
@@ -25,6 +26,7 @@ ALL_MONSTERS = [
     ManaSpirit(),
     Venenobra(),
     Weeke(),
+    Troll(),
 ]
 
 

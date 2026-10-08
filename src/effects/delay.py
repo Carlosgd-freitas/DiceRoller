@@ -128,6 +128,8 @@ class DelayEffect(Effect):
         target: Entity,
         source: Entity | None = None,
     ) -> EffectData:
+        affected_effects = []
+
         for effect in target.effects:
             if (
                 (self.value is not None)
@@ -138,6 +140,8 @@ class DelayEffect(Effect):
                 )
                 and (effect.duration is not None)
             ):
+                affected_effects.append(effect)
+
                 effective_value = 0
 
                 if self.value.flat is not None:
@@ -147,4 +151,9 @@ class DelayEffect(Effect):
 
                 effect.duration += effective_value
 
-        return {}
+        fail = None if len(affected_effects) > 0 else "delay"
+
+        return {
+            "affected_effects": affected_effects,
+            "fail": fail,
+        }

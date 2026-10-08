@@ -213,29 +213,26 @@ class MonsterLogger(DiceLogger):
             tablefmt="plain",
         )
 
-        self.log(message=table)
+        self.log(message=table + "\n")
 
         # Dice
+        message = (
+            self.get_message(
+                namespace="base",
+                message_group="LEXICON",
+                key="dices",
+            ).title()
+            + ":"
+        )
+
+        message = color_string(
+            message,
+            intensity="BRIGHT",
+        )
+        self.log(message=message)
+
         if len(monster.dice) > 0:
             for idx, dice in enumerate(monster.dice):
-                self.log(message="")
-
-                if idx == 0:
-                    message = (
-                        self.get_message(
-                            namespace="base",
-                            message_group="LEXICON",
-                            key="dices",
-                        ).title()
-                        + ":"
-                    )
-
-                    message = color_string(
-                        message,
-                        intensity="BRIGHT",
-                    )
-                    self.log(message=message)
-
                 header = (
                     self.get_message(
                         namespace="base",
@@ -246,6 +243,15 @@ class MonsterLogger(DiceLogger):
                 )
 
                 self.log_dice_details(dice, header=header)
+
+        else:
+            message = self.get_message(
+                namespace="base",
+                message_group="DETAILS",
+                key="no_dice",
+            )
+
+            self.log(message=message)
 
         # Effects
         if len(monster.effects) > 0:

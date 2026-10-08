@@ -8,10 +8,14 @@ ATTRIBUTES = {
 }
 
 DETAILS = {
-    "no_members": "This team has no members.",
-    "no_teams": "This combat has no teams.",
-    "no_sides": "This dice has no sides.",
+    "no_dice": "No dice are present.",
     "no_effects": "This side has no effects.",
+    "no_equipment": "This monster has no equipment.",
+    "no_items": "No items are present.",
+    "no_members": "This team has no members.",
+    "no_sides": "This dice has no sides.",
+    "no_skills": "This monster has no skills.",
+    "no_teams": "This combat has no teams.",
 }
 
 LEXICON = {

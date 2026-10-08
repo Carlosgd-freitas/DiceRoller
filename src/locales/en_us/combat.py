@@ -2,7 +2,15 @@
 
 ACTIONS = {
     "roll_dice": "{name} rolled their dice and got:",
+    "skill": "{monster_name} used {skill_name} and got:",
+    "consumable": "{monster_name} used {consumable_name} and got:",
     "skip_turn": "{name} decided to do nothing.",
+    "no_roll_dice": "{name} don't have dice to roll.",
+    "no_skills": "{name} can't use any skills.",
+    "no_consumables": "There are no consumables for {name} to use.",
+    "no_equipment": "There are no equipment for {name}.",
+    "no_show_details": "{name} can't see the details of anything!",
+    "no_skip_turn": "{name} must do something!",
 }
 
 COMBAT = {
@@ -20,6 +28,7 @@ COMBAT = {
 FAILS = {
     "act_disabled": "they could not act.",
     "default": "failed.",
+    "delay": "no effects could be extended.",
     "non-persistable": "it was ineffective.",
     "source_alive": "they were alive.",
     "source_dead": "died before they could do that.",

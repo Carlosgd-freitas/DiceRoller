@@ -33,6 +33,9 @@ class EffectData(TypedDict):
     :var healed: Healing done to a Monster.
     :vartype healed: int
 
+    :var affected_effects: A list of effects that were affected.
+    :vartype affected_effects: List[Effect]
+
     :var removed_effects: A list of effects that were removed.
     :vartype removed_effects: List[Effect]
     """
@@ -41,6 +44,7 @@ class EffectData(TypedDict):
     defended_damage: DefendedDamage
     fail: str
     healed: int
+    affected_effects: List[Effect]
     removed_effects: List[Effect]
 
 

@@ -241,10 +241,22 @@ class EffectLogger(StatLogger):
                 keywords=effect.target_keywords
             )
 
+        # Affected Keywords
+        affected_keywords = None
+
+        if kwargs.get("affected_effects"):
+            affected_effects: List[Effect] = kwargs["affected_effects"]
+
+            affected_keywords = self.get_multiple_effects_message(
+                effects=affected_effects,
+                associated=False,
+            )
+
         # Effect params
         params.update(
             {
                 "accuracy": color_string(accuracy, intensity="BRIGHT"),
+                "affected_keywords": affected_keywords,
                 "delta": color_string(delta, intensity="BRIGHT"),
                 "delta_flat": color_string(delta_flat, intensity="BRIGHT"),
                 "delta_percent": color_string(delta_percent, intensity="BRIGHT"),

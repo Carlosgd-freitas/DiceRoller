@@ -2,7 +2,15 @@
 
 ACTIONS = {
     "roll_dice": "{name} rolou seus dados e tirou:",
+    "skill": "{monster_name} usou {skill_name} e tirou:",
+    "consumable": "{monster_name} usou {consumable_name} e tirou:",
     "skip_turn": "{name} decidiu não fazer nada.",
+    "no_roll_dice": "{name} não tem dados pra rolar.",
+    "no_skills": "{name} não pode usar nenhuma habilidade.",
+    "no_consumables": "Não há consumíveis que {name} possa usar.",
+    "no_equipment": "Não há equipamentos para {name}.",
+    "no_show_details": "{name} não consegue ver os detalhes de nada!",
+    "no_skip_turn": "{name} tem que fazer alguma coisa!",
 }
 
 COMBAT = {
@@ -20,6 +28,7 @@ COMBAT = {
 FAILS = {
     "act_disabled": "não pôde agir.",
     "default": "falhou.",
+    "delay": "nenhum efeito pôde ser extendido.",
     "non-persistable": "foi ineficaz.",
     "source_alive": "estava vivo.",
     "source_dead": "morreu antes de poder fazer isso.",
