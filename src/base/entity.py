@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from math import ceil, inf
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, TypedDict
 from uuid import uuid4
 
 from src.base.color import Color, ColorData
@@ -17,6 +17,29 @@ if TYPE_CHECKING:
     from src.base.effect import Effect, EffectData
     from src.base.entity import Entity
     from src.base.side import Side
+
+
+class AttributeData(TypedDict):
+    """
+    Attribute data for an Entity.
+
+    :var hp: Entity's current health points.
+    :vartype hp: int
+
+    :var max_hp: Entity's maximum health points.
+    :vartype max_hp: int
+
+    :var speed: Entity's speed.
+    :vartype speed: int
+
+    :var mana: Entity's mana points.
+    :vartype mana: int
+    """
+
+    hp: int
+    max_hp: int
+    speed: int
+    mana: int
 
 
 class Entity:
@@ -56,6 +79,8 @@ class Entity:
     :vartype effects: List[Effect]
     """
 
+    global_id: str
+
     def __init__(
         self,
         global_id: str = str(uuid4()),
@@ -90,7 +115,7 @@ class Entity:
     def __str__(self) -> str:
         """String representation of Entity."""
         _str = f"({self.global_id} | {self.local_id})"
-        _str = f" {self.name} {self.suffix}"
+        _str += f" {self.name}"
         _str += f" | HP: {self.hp}/{self.max_hp}"
         _str += f" | Speed: {self.speed}"
         _str += f" | Mana: {self.mana}"

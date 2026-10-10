@@ -4,6 +4,7 @@ from typing import List
 
 from src.base.dice import Dice
 from src.base.difficulties import Difficulty
+from src.base.entity import AttributeData
 from src.base.monster import Monster
 from src.base.side import Side
 from src.effects.nothing import NothingEffect
@@ -14,22 +15,27 @@ class TrainingDummy(Monster):
     Training Dummy class.
     """
 
-    def __init__(self, **kwargs):
-        dice = Dice(
-            sides=[
-                Side([NothingEffect()]),
-            ]
-        )
+    global_id = "TRAINING_DUMMY"
 
-        super().__init__(
-            global_id="TRAINING_DUMMY",
-            dice=[dice],
-            hp=6,
-            max_hp=6,
-            speed=0,
-            mana=0,
-            **kwargs
-        )
+    def __init__(self, **kwargs):
+        super().__init__(global_id=self.global_id, **kwargs)
+
+    def get_attributes(self, difficulty: Difficulty) -> AttributeData:
+        """
+        Returns the attributes of the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Attributes of the the Monster.
+        :rtype: AttributeData
+        """
+        return {
+            "hp": 6,
+            "max_hp": 6,
+            "speed": 0,
+            "mana": 0,
+        }
 
     def get_dice(self, difficulty: Difficulty) -> List[Dice]:
         """

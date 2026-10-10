@@ -4,6 +4,7 @@ from typing import List
 
 from src.base.dice import Dice
 from src.base.difficulties import Difficulty
+from src.base.entity import AttributeData
 from src.base.monster import Monster
 from src.base.side import Side
 from src.base.stat import Stat
@@ -17,10 +18,37 @@ class Venenobra(Monster):
     Venenobra class.
     """
 
+    global_id = "VENENOBRA"
+
     def __init__(self, **kwargs):
-        super().__init__(
-            global_id="VENENOBRA", hp=6, max_hp=6, speed=2, mana=0, **kwargs
-        )
+        super().__init__(global_id=self.global_id, **kwargs)
+
+    def get_attributes(self, difficulty: Difficulty) -> AttributeData:
+        """
+        Returns the attributes of the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Attributes of the the Monster.
+        :rtype: AttributeData
+        """
+        if difficulty.value < 3:
+            mana = 0
+        else:
+            mana = 2
+
+        if difficulty.value < 4:
+            speed = 1
+        else:
+            speed = 2
+
+        return {
+            "hp": 6,
+            "max_hp": 6,
+            "speed": speed,
+            "mana": mana,
+        }
 
     def get_dice(self, difficulty: Difficulty) -> List[Dice]:
         """

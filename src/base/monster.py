@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from enum import Enum
+from math import ceil
 from typing import TYPE_CHECKING, List
 
 from src.base.difficulties import Difficulty
-from src.base.entity import Entity
+from src.base.entity import AttributeData, Entity
+from src.base.monster_registry import register_monster
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
@@ -53,6 +55,12 @@ class Monster(Entity):
     :vartype suffix: str
     """
 
+    global_id: str
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        register_monster(cls)
+
     def __init__(
         self,
         control_type: ControlType = ControlType.AI,
@@ -62,15 +70,22 @@ class Monster(Entity):
         suffix: str = None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
-
         self.control_type = control_type
         self.in_combat = in_combat
         self.turn_taken = turn_taken
         self.suffix = suffix
 
         # Difficulty-based attributes
-        self.scale_attributes(difficulty)
+        attributes = self.get_attributes(difficulty)
+
+        for attribute in ["hp", "max_hp", "speed", "mana"]:
+            if attributes.get(attribute):
+                kwargs[attribute] = attributes[attribute]
+
+        for attribute in ["hp", "max_hp"]:
+            attributes[attribute] = self.scale_hp(attributes[attribute], difficulty)
+
+        super().__init__(**kwargs)
 
         self.ai_level = self.get_ai_level(difficulty)
         self.dice = self.get_dice(difficulty) or kwargs.get("dice", [])
@@ -79,13 +94,13 @@ class Monster(Entity):
     def __str__(self) -> str:
         """String representation of Monster."""
         _str = f"({self.global_id} | {self.local_id})"
-        _str = f" {self.name} {self.suffix}"
+        _str += f" {self.name} {self.suffix}"
 
         _str += f"\nHP: {self.hp}/{self.max_hp}"
         _str += f" | Speed: {self.speed}"
         _str += f" | Mana: {self.mana}"
 
-        _str += f"\n Control Type: {self.control_type.name}"
+        _str += f"\nControl Type: {self.control_type.name}"
         _str += f" | AI Level: {self.ai_level.name}"
 
         _str += f"\n>>> Dice ({len(self.dice)}):"
@@ -127,17 +142,40 @@ class Monster(Entity):
             )
         )
 
-    def scale_attributes(self, difficulty: Difficulty):
+    def get_attributes(self, difficulty: Difficulty) -> AttributeData:
         """
-        Scales the Monster attributes according to the game difficulty.
+        Returns the attributes of the Monster.
 
         :var difficulty: Game difficulty.
         :vartype difficulty: Difficulty
+
+        :return: Attributes of the the Monster.
+        :rtype: AttributeData
         """
+        return {
+            "hp": None,
+            "max_hp": None,
+            "speed": None,
+            "mana": None,
+        }
+
+    def scale_hp(self, hp: int, difficulty: Difficulty) -> int:
+        """
+        Scales the Monster HP according to the game difficulty.
+
+        :var hp: Initial Monster HP.
+        :vartype hp: int
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Scaled Monster HP.
+        :rtype: int
+        """
+        hp_scaling = 1
+
         if difficulty == Difficulty.EASY:
             hp_scaling = 0.5
-        elif difficulty == Difficulty.NORMAL:
-            hp_scaling = 1
         elif difficulty == Difficulty.HARD:
             hp_scaling = 1.25
         elif difficulty == Difficulty.EXPERT:
@@ -147,12 +185,10 @@ class Monster(Entity):
         elif difficulty == Difficulty.NIGHTMARE:
             hp_scaling = 2
 
-        if self.max_hp is not None:
-            self.max_hp *= hp_scaling
-        if self.hp is not None:
-            self.hp *= hp_scaling
-
-        return
+        if hp is not None:
+            return ceil(hp * hp_scaling)
+        else:
+            return 0
 
     def get_ai_level(self, difficulty: Difficulty) -> AILevel:
         """

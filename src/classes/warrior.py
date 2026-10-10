@@ -4,6 +4,8 @@ from typing import List
 
 from src.base.color import Color, ColorData
 from src.base.dice import Dice
+from src.base.difficulties import Difficulty
+from src.base.entity import AttributeData
 from src.base.side import Side
 from src.base.stat import Stat
 from src.classes.base_class import BaseClass
@@ -16,10 +18,27 @@ class Warrior(BaseClass):
     Warrior class.
     """
 
+    global_id = "WARRIOR"
+
     def __init__(self, **kwargs):
-        super().__init__(
-            global_id="WARRIOR", hp=15, max_hp=15, speed=1, mana=0, **kwargs
-        )
+        super().__init__(global_id=self.global_id, **kwargs)
+
+    def get_attributes(self, difficulty: Difficulty) -> AttributeData:
+        """
+        Returns the attributes of the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Attributes of the the Monster.
+        :rtype: AttributeData
+        """
+        return {
+            "hp": 15,
+            "max_hp": 15,
+            "speed": 1,
+            "mana": 0,
+        }
 
     def get_starting_dice(self) -> List[Dice]:
         """

@@ -4,6 +4,7 @@ from typing import List
 
 from src.base.dice import Dice
 from src.base.difficulties import Difficulty
+from src.base.entity import AttributeData
 from src.base.monster import Monster
 from src.base.side import Side
 from src.base.stat import Stat
@@ -18,10 +19,32 @@ class ManaSpirit(Monster):
     Mana Spirit class.
     """
 
+    global_id = "MANA_SPIRIT"
+
     def __init__(self, **kwargs):
-        super().__init__(
-            global_id="MANA_SPIRIT", hp=6, max_hp=6, speed=1, mana=0, **kwargs
-        )
+        super().__init__(global_id=self.global_id, **kwargs)
+
+    def get_attributes(self, difficulty: Difficulty) -> AttributeData:
+        """
+        Returns the attributes of the Monster.
+
+        :var difficulty: Game difficulty.
+        :vartype difficulty: Difficulty
+
+        :return: Attributes of the the Monster.
+        :rtype: AttributeData
+        """
+        if difficulty.value < 3:
+            mana = 0
+        else:
+            mana = 5
+
+        return {
+            "hp": 6,
+            "max_hp": 6,
+            "speed": 1,
+            "mana": mana,
+        }
 
     def get_dice(self, difficulty: Difficulty) -> List[Dice]:
         """

@@ -17,6 +17,11 @@ class BaseClass(Monster):
     BaseClass class.
     """
 
+    global_id: str
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dice = self.get_starting_dice()
