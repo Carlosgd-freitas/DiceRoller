@@ -9,7 +9,7 @@ from src.locales.languages import Language
 
 Namespace = Literal[
     "base",
-    "classes",
+    "characters",
     "combat",
     "compendium",
     "difficulties",

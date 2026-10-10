@@ -1,24 +1,25 @@
-"""Warrior module."""
+"""Mage module."""
 
 from typing import List
 
+from src.base.character import Character
 from src.base.color import Color, ColorData
 from src.base.dice import Dice
 from src.base.difficulties import Difficulty
 from src.base.entity import AttributeData
 from src.base.side import Side
 from src.base.stat import Stat
-from src.classes.base_class import BaseClass
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
+from src.effects.mana import ManaEffect
 
 
-class Warrior(BaseClass):
+class Mage(Character):
     """
-    Warrior class.
+    Mage class.
     """
 
-    global_id = "WARRIOR"
+    global_id = "MAGE"
 
     def __init__(self, **kwargs):
         super().__init__(global_id=self.global_id, **kwargs)
@@ -34,8 +35,8 @@ class Warrior(BaseClass):
         :rtype: AttributeData
         """
         return {
-            "hp": 15,
-            "max_hp": 15,
+            "hp": 12,
+            "max_hp": 12,
             "speed": 1,
             "mana": 0,
         }
@@ -49,23 +50,39 @@ class Warrior(BaseClass):
         """
         dice_0 = Dice(
             sides=[
-                Side([AttackEffect(Stat(flat=1, percent=0))]),
-                Side([AttackEffect(Stat(flat=2, percent=0))]),
+                Side(
+                    [
+                        AttackEffect(Stat(flat=1, percent=0)),
+                        ManaEffect(Stat(flat=2, percent=0)),
+                    ]
+                ),
+                Side(
+                    [
+                        AttackEffect(Stat(flat=2, percent=0)),
+                        ManaEffect(Stat(flat=1, percent=0)),
+                    ]
+                ),
                 Side([AttackEffect(Stat(flat=3, percent=0))]),
                 Side([AttackEffect(Stat(flat=4, percent=0))]),
-                Side([AttackEffect(Stat(flat=5, percent=0))]),
-                Side([AttackEffect(Stat(flat=6, percent=0))]),
             ]
         )
 
         dice_1 = Dice(
             sides=[
-                Side([BlockEffect(Stat(flat=1, percent=0))]),
-                Side([BlockEffect(Stat(flat=2, percent=0))]),
+                Side(
+                    [
+                        BlockEffect(Stat(flat=1, percent=0)),
+                        ManaEffect(Stat(flat=2, percent=0)),
+                    ]
+                ),
+                Side(
+                    [
+                        BlockEffect(Stat(flat=2, percent=0)),
+                        ManaEffect(Stat(flat=1, percent=0)),
+                    ]
+                ),
                 Side([BlockEffect(Stat(flat=3, percent=0))]),
                 Side([BlockEffect(Stat(flat=4, percent=0))]),
-                Side([BlockEffect(Stat(flat=5, percent=0))]),
-                Side([BlockEffect(Stat(flat=6, percent=0))]),
             ]
         )
 
@@ -79,6 +96,6 @@ class Warrior(BaseClass):
         """
         return {
             "background_color": None,
-            "foreground_color": Color.RED,
+            "foreground_color": Color.INDIGO,
             "intensity": "BRIGHT",
         }

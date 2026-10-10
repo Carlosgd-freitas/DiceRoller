@@ -26,6 +26,7 @@ LEXICON = {
     "armors": "armaduras",
     "buff": "fortalecimento",
     "buffs": "fortalecimentos",
+    "character": "personagem",
     "class": "classe",
     "column": "coluna",
     "columns": "colunas",

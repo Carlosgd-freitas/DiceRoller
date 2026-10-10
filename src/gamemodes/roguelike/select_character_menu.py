@@ -1,4 +1,4 @@
-"""Select Class Menu module."""
+"""Select Character Menu module."""
 
 from __future__ import annotations
 
@@ -9,23 +9,23 @@ from src.base.data import (
     next_value,
     previous_value,
 )
-from src.classes.mage import Mage
-from src.classes.ranger import Ranger
-from src.classes.rogue import Rogue
-from src.classes.warrior import Warrior
+from src.characters.mage import Mage
+from src.characters.ranger import Ranger
+from src.characters.rogue import Rogue
+from src.characters.warrior import Warrior
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
 from src.menus.menu import Menu
 from src.menus.option import Option
 
 if TYPE_CHECKING:
-    from src.classes.base_class import BaseClass
+    from src.base.character import Character
     from src.systems.settings import Settings
 
 
-class SelectClassMenu(Menu):
+class SelectCharacterMenu(Menu):
     """
-    Select Class Menu class.
+    Select Character Menu class.
 
     :var settings: Game settings.
     :vartype settings: Settings
@@ -52,14 +52,14 @@ class SelectClassMenu(Menu):
         # Initialization
         logger = CombatLogger(enabled=logging, language=settings.language)
 
-        self.class_ = settings.last_class
-        self.classes: List[BaseClass] = [
+        self.character = settings.last_character
+        self.characters: List[Character] = [
             Warrior(),
             Mage(),
             Ranger(),
             Rogue(),
         ]
-        self.showing_class: BaseClass = None
+        self.showing_character: Character = None
 
         super().__init__(
             logger,
@@ -78,7 +78,7 @@ class SelectClassMenu(Menu):
         :rtype: str
         """
         return self.logger.get_message(
-            namespace="menus", message_group="SELECT_CLASS", key="title"
+            namespace="menus", message_group="SELECT_CHARACTER", key="title"
         )
 
     def get_options(self) -> List[Option]:
@@ -90,24 +90,24 @@ class SelectClassMenu(Menu):
         """
         options = []
 
-        for index, class_ in enumerate(self.classes, start=1):
+        for index, character in enumerate(self.characters, start=1):
             message = self.logger.get_message(
-                namespace="classes",
-                message_group=class_.global_id,
+                namespace="characters",
+                message_group=character.global_id,
                 key="name",
             )
 
-            color_data = class_.get_color()
+            color_data = character.get_color()
 
             options.append(
                 Option(
-                    id=f"CLASS_{index}",
+                    id=f"CHARACTER_{index}",
                     key=str(index),
                     message=color_string(
                         message,
                         **color_data,
                     ),
-                    obj=class_,
+                    obj=character,
                 )
             )
 
@@ -204,12 +204,12 @@ class SelectClassMenu(Menu):
         Returns if the option can be selected or not.
         """
         if (option.id == "PREVIOUS") and (
-            self.showing_class.global_id == self.classes[0].global_id
+            self.showing_character.global_id == self.characters[0].global_id
         ):
             return False
 
         elif (option.id == "NEXT") and (
-            self.showing_class.global_id == self.classes[-1].global_id
+            self.showing_character.global_id == self.characters[-1].global_id
         ):
             return False
 
@@ -222,9 +222,9 @@ class SelectClassMenu(Menu):
         :param option: Menu option.
         :type option: Option
         """
-        if "CLASS" in option.id:
-            self.showing_class = option.obj
-            self.show_class(self.showing_class)
+        if "CHARACTER_" in option.id:
+            self.showing_character = option.obj
+            self.show_character(self.showing_character)
 
             # Showing submenu options
             self.show_options(self.submenu_options)
@@ -241,7 +241,7 @@ class SelectClassMenu(Menu):
                 self.process_option(selected_option)
 
         elif option.id == "PREVIOUS":
-            difficulty = previous_value(self.classes, self.showing_class)
+            difficulty = previous_value(self.characters, self.showing_character)
 
             for option in self.options:
                 if option.obj == difficulty:
@@ -250,7 +250,7 @@ class SelectClassMenu(Menu):
             self.process_option(option)
 
         elif option.id == "NEXT":
-            difficulty = next_value(self.classes, self.showing_class)
+            difficulty = next_value(self.characters, self.showing_character)
 
             for option in self.options:
                 if option.obj == difficulty:
@@ -259,16 +259,16 @@ class SelectClassMenu(Menu):
             self.process_option(option)
 
         elif option.id == "SELECT":
-            self.class_ = self.showing_class
+            self.character = self.showing_character
 
         elif option.id == "RETURN":
             pass
 
         return
 
-    def show_class(self, class_: BaseClass, **kwargs):
+    def show_character(self, character: Character, **kwargs):
         """
-        Shows the class details.
+        Shows the character details.
         """
         # Updating logging params
         kwargs.update(self.logger._get_attribute_params())
@@ -278,27 +278,27 @@ class SelectClassMenu(Menu):
 
         # Name
         name = self.logger.get_message(
-            namespace="classes",
-            message_group=class_.global_id,
+            namespace="characters",
+            message_group=character.global_id,
             key="name",
         )
-        class_.name = name
+        character.name = name
 
-        color_data = class_.get_color()
+        color_data = character.get_color()
 
         self.logger.log(message=color_string(name, **color_data) + "\n")
 
         # Description
         message = self.logger.get_message(
-            namespace="classes",
-            message_group=class_.global_id,
+            namespace="characters",
+            message_group=character.global_id,
             key="description",
         )
 
         self.logger.log(message=color_string(message, italic=True) + "\n")
 
         # Dice
-        self.logger.log_monster_details(class_)
+        self.logger.log_monster_details(character)
 
         self.logger.log(message="")
 
@@ -315,12 +315,12 @@ class SelectClassMenu(Menu):
         while True:
             self.show_title()
 
-            # Logging selected class
+            # Logging selected character
             message = color_string(
                 self.logger.get_message(
                     namespace="menus",
-                    message_group="SELECT_CLASS",
-                    key="selected_class",
+                    message_group="SELECT_CHARACTER",
+                    key="selected_character",
                 )
                 + ": ",
                 intensity="BRIGHT",
@@ -332,12 +332,12 @@ class SelectClassMenu(Menu):
             )
 
             message = self.logger.get_message(
-                namespace="classes",
-                message_group=self.class_.global_id,
+                namespace="characters",
+                message_group=self.character.global_id,
                 key="name",
             )
 
-            color_data = self.class_.get_color()
+            color_data = self.character.get_color()
 
             self.logger.log(message=color_string(message, **color_data))
 
@@ -348,8 +348,8 @@ class SelectClassMenu(Menu):
 
             message = self.logger.get_message(
                 namespace="menus",
-                message_group="SELECT_CLASS",
-                key="select_class_prompt",
+                message_group="SELECT_CHARACTER",
+                key="select_character_prompt",
             )
             selected = self.select(self.options, message)
             self.process_option(selected)

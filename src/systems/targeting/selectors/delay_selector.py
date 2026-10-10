@@ -159,8 +159,7 @@ class DelaySelector(Selector):
         :rtype: List[Monster]
         """
         target_effects = [
-            EffectFactory.create_effect(keyword)
-            for keyword in main_effect.target_keywords
+            EffectFactory.create(keyword) for keyword in main_effect.target_keywords
         ]
 
         effect_type = self._get_most_frequent_effect_types(

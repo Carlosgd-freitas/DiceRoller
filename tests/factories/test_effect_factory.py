@@ -12,8 +12,8 @@ from src.factories.effect import EffectFactory
 from tests.utils import assert_conditions
 
 
-def test_create_effect_simple():
-    effect = EffectFactory.create_effect(Keyword.NOTHING)
+def test_effect_factory_create_simple():
+    effect = EffectFactory.create(Keyword.NOTHING)
 
     conditions = [
         isinstance(effect, NothingEffect),
@@ -23,8 +23,8 @@ def test_create_effect_simple():
     assert_conditions(conditions)
 
 
-def test_create_effect_args():
-    effect = EffectFactory.create_effect(
+def test_effect_factory_create_args():
+    effect = EffectFactory.create(
         Keyword.BLOCK,
         value=Stat(flat=2, percent=0.2),
         min_value=Stat(flat=1, percent=0.1),

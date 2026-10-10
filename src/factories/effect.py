@@ -4,22 +4,36 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.base.effect_registry import EFFECT_CLASSES, load_effects
 from src.base.keywords import Keyword
+from src.registries.effect import REGISTRIES, EffectRegistry
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
 
-load_effects()
+EffectRegistry.load()
 
 
 class EffectFactory:
+    """
+    EffectFactory class.
+    """
+
     @staticmethod
-    def create_effect(
+    def create(
         keyword: Keyword,
         **kwargs,
     ) -> Effect:
-        effect_class = EFFECT_CLASSES.get(keyword)
+        """
+        Instantiates an Effect from a register by its keyword.
+
+        :param keyword: Effect keyword.
+        :type keyword: Keyword
+
+        :return: Instantiated Effect.
+        :rtype: Effect
+        """
+
+        effect_class = REGISTRIES.get(keyword)
 
         if effect_class is None:
             raise ValueError(f"No effect registered for keyword: {keyword}")

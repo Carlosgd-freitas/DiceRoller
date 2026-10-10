@@ -26,6 +26,7 @@ LEXICON = {
     "armors": "armors",
     "buff": "buff",
     "buffs": "buffs",
+    "character": "character",
     "class": "class",
     "column": "column",
     "columns": "columns",

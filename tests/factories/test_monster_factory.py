@@ -7,8 +7,8 @@ from src.monsters.slime import Slime
 from tests.utils import assert_conditions
 
 
-def test_create_monster_simple():
-    monster = MonsterFactory.create_monster("SLIME")
+def test_monster_factory_create_simple():
+    monster = MonsterFactory.create("SLIME")
 
     conditions = [
         isinstance(monster, Slime),
@@ -18,8 +18,8 @@ def test_create_monster_simple():
     assert_conditions(conditions)
 
 
-def test_create_monster_args():
-    monster = MonsterFactory.create_monster(
+def test_monster_factory_create_args():
+    monster = MonsterFactory.create(
         "SLIME",
         local_id="SLIME_0",
     )

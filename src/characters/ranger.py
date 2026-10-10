@@ -1,26 +1,25 @@
-"""Rogue module."""
+"""Ranger module."""
 
-from copy import deepcopy
 from typing import List
 
+from src.base.character import Character
 from src.base.color import Color, ColorData
 from src.base.dice import Dice
 from src.base.difficulties import Difficulty
 from src.base.entity import AttributeData
 from src.base.side import Side
 from src.base.stat import Stat
-from src.classes.base_class import BaseClass
 from src.effects.attack import AttackEffect
 from src.effects.block import BlockEffect
 from src.effects.invisible import InvisibleEffect
 
 
-class Rogue(BaseClass):
+class Ranger(Character):
     """
-    Rogue class.
+    Ranger class.
     """
 
-    global_id = "ROGUE"
+    global_id = "RANGER"
 
     def __init__(self, **kwargs):
         super().__init__(global_id=self.global_id, **kwargs)
@@ -55,6 +54,10 @@ class Rogue(BaseClass):
                 Side([AttackEffect(Stat(flat=2, percent=0))]),
                 Side([AttackEffect(Stat(flat=3, percent=0))]),
                 Side([AttackEffect(Stat(flat=4, percent=0))]),
+                Side([AttackEffect(Stat(flat=5, percent=0))]),
+                Side([AttackEffect(Stat(flat=6, percent=0))]),
+                Side([AttackEffect(Stat(flat=7, percent=0))]),
+                Side([AttackEffect(Stat(flat=8, percent=0))]),
             ]
         )
 
@@ -69,7 +72,7 @@ class Rogue(BaseClass):
             ]
         )
 
-        dice = [dice_0, deepcopy(dice_0), dice_1]
+        dice = [dice_0, dice_1]
 
         return dice
 
@@ -79,6 +82,6 @@ class Rogue(BaseClass):
         """
         return {
             "background_color": None,
-            "foreground_color": Color.GRAY,
+            "foreground_color": Color.GREEN,
             "intensity": "BRIGHT",
         }

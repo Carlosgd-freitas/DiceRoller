@@ -25,8 +25,8 @@ MAIN = {
 ROGUELIKE = {
     "title": "Roguelike Mode",
     "new_run": "New Run",
-    "select_class": "Select Class",
-    "select_class_prompt": "Select a class",
+    "select_character": "Select character",
+    "select_character_prompt": "Select a character",
     "select_difficulty": "Select Difficulty",
 }
 
@@ -36,10 +36,10 @@ SELECT_DIFFICULTY = {
     "selected_difficulty": "Selected Difficulty",
 }
 
-SELECT_CLASS = {
-    "title": "Select Class",
-    "select_class_prompt": "Select a class",
-    "selected_class": "Selected Class",
+SELECT_CHARACTER = {
+    "title": "Select Character",
+    "select_character_prompt": "Select a character",
+    "selected_character": "Selected Character",
 }
 
 PLAYER_ACTIONS = {

@@ -6,10 +6,10 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, TypedDict
 
-from src.base.effect_registry import register_effect
 from src.base.keywords import Keyword
 from src.base.life_state import LifeState
 from src.base.triggers import Trigger
+from src.registries.effect import EffectRegistry
 
 if TYPE_CHECKING:
     from src.base.damage import DefendedDamage
@@ -126,7 +126,7 @@ class Effect(ABC):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        register_effect(cls)
+        EffectRegistry.register(cls)
 
     def __init__(
         self,

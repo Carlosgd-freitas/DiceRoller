@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, List
 
 from src.base.difficulties import Difficulty
 from src.base.entity import AttributeData, Entity
-from src.base.monster_registry import register_monster
+from src.registries.monster import MonsterRegistry
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
@@ -59,7 +59,7 @@ class Monster(Entity):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        register_monster(cls)
+        MonsterRegistry.register(cls)
 
     def __init__(
         self,

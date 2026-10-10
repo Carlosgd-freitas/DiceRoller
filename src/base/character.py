@@ -1,4 +1,4 @@
-"""Base class module."""
+"""Character module."""
 
 from __future__ import annotations
 
@@ -7,20 +7,22 @@ from typing import TYPE_CHECKING, List
 
 from src.base.color import Color, ColorData
 from src.base.monster import Monster
+from src.registries.character import CharacterRegistry
 
 if TYPE_CHECKING:
     from src.base.dice import Dice
 
 
-class BaseClass(Monster):
+class Character(Monster):
     """
-    BaseClass class.
+    Character class.
     """
 
     global_id: str
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+        CharacterRegistry.register(cls)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

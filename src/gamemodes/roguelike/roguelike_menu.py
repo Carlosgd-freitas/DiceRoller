@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import color_string
 from src.base.difficulties import get_difficulty_color
-from src.gamemodes.roguelike.select_class_menu import SelectClassMenu
+from src.gamemodes.roguelike.select_character_menu import SelectCharacterMenu
 from src.gamemodes.roguelike.select_difficulty_menu import SelectDifficultyMenu
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
@@ -47,9 +47,9 @@ class RoguelikeMenu(Menu):
 
         self.logger: CombatLogger
 
-        # Class
-        self.class_ = settings.last_class
-        self.select_class_menu = SelectClassMenu(
+        # Character
+        self.character = settings.last_character
+        self.select_character_menu = SelectCharacterMenu(
             settings,
             logging=logging,
         )
@@ -88,12 +88,12 @@ class RoguelikeMenu(Menu):
                 isolate_after=True,
             ),
             Option(
-                id="SELECT_CLASS",
+                id="SELECT_CHARACTER",
                 key="2",
                 message=self.logger.get_message(
                     namespace="menus",
                     message_group="ROGUELIKE",
-                    key="select_class",
+                    key="select_character",
                 ),
             ),
             Option(
@@ -140,7 +140,7 @@ class RoguelikeMenu(Menu):
         self.title = self.get_title()
         self.options = self.get_options()
 
-        self.select_class_menu.change_language(language, _messages)
+        self.select_character_menu.change_language(language, _messages)
         self.select_difficulty_menu.change_language(language, _messages)
 
     def toggle_logging(self, enabled: bool):
@@ -152,7 +152,7 @@ class RoguelikeMenu(Menu):
         """
         self.logger.enabled = enabled
 
-        self.select_class_menu.toggle_logging(enabled)
+        self.select_character_menu.toggle_logging(enabled)
         self.select_difficulty_menu.toggle_logging(enabled)
 
     # =========================================================================
@@ -172,11 +172,11 @@ class RoguelikeMenu(Menu):
         if option.id == "NEW_RUN":
             self.new_run()
 
-        elif option.id == "SELECT_CLASS":
-            self.select_class_menu.class_ = self.class_
-            self.select_class_menu.open()
-            self.class_ = self.select_class_menu.class_
-            self.settings.last_class = self.class_
+        elif option.id == "SELECT_CHARACTER":
+            self.select_character_menu.character = self.character
+            self.select_character_menu.open()
+            self.character = self.select_character_menu.character
+            self.settings.last_character = self.character
 
         elif option.id == "SELECT_DIFFICULTY":
             self.select_difficulty_menu.difficulty = self.difficulty
@@ -206,12 +206,12 @@ class RoguelikeMenu(Menu):
         while True:
             self.show_title()
 
-            # Logging selected class
+            # Logging selected character
             message = color_string(
                 self.logger.get_message(
                     namespace="base",
                     message_group="LEXICON",
-                    key="class",
+                    key="character",
                 ).title()
                 + ": ",
                 intensity="BRIGHT",
@@ -223,12 +223,12 @@ class RoguelikeMenu(Menu):
             )
 
             message = self.logger.get_message(
-                namespace="classes",
-                message_group=self.class_.global_id,
+                namespace="characters",
+                message_group=self.character.global_id,
                 key="name",
             )
 
-            color_data = self.class_.get_color()
+            color_data = self.character.get_color()
 
             self.logger.log(message=color_string(message, **color_data))
 
