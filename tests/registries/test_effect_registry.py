@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from src.base.keywords import Keyword
-from src.registries.effect import REGISTRIES, EffectRegistry
+from src.registries.effect import EffectRegistry
 from tests.utils import assert_conditions
 
 
 def test_effect_registry_integrity():
-    EffectRegistry.load()
+    REGISTRIES = EffectRegistry.load()
 
     conditions = [
         len(REGISTRIES.keys()) > 0,

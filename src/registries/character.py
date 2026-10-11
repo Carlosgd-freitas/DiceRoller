@@ -5,14 +5,14 @@ from __future__ import annotations
 from importlib import import_module
 from pathlib import Path
 from pkgutil import iter_modules
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from src.registries.registry import Registry
 
 if TYPE_CHECKING:
     from src.base.character import Character
 
-REGISTRIES: dict[str, type[Character]] = {}
+REGISTRIES: Dict[str, type[Character]] = {}
 
 
 class CharacterRegistry(Registry):
@@ -38,9 +38,13 @@ class CharacterRegistry(Registry):
         REGISTRIES[global_id] = registry
 
     @staticmethod
-    def load() -> None:
+    def load() -> Dict[str, type[Character]]:
         """
         Import registries modules.
+
+        :return: A dictionary where each key is a global ID and each value is a
+        Character class.
+        :rtype: Dict[str, type[Character]]
         """
         characters_dir = Path(__file__).parents[1] / "characters"
 
@@ -49,3 +53,5 @@ class CharacterRegistry(Registry):
                 continue
 
             import_module(f"src.characters.{module.name}")
+
+        return REGISTRIES

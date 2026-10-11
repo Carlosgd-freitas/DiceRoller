@@ -1,7 +1,7 @@
 """Registry module."""
 
 from abc import abstractmethod
-from typing import TypeVar
+from typing import Dict, TypeVar
 
 T = TypeVar("T")
 
@@ -24,8 +24,12 @@ class Registry:
 
     @staticmethod
     @abstractmethod
-    def load() -> None:
+    def load() -> Dict[str, type[T]]:
         """
         Import registries modules.
+
+        :return: A dictionary where each key is an identifier and each value is a
+        class.
+        :rtype: Dict[str, type[T]]
         """
         raise NotImplementedError

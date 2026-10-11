@@ -10,8 +10,6 @@ from src.base.life_state import LifeState
 from src.base.team import Team
 from src.combat.manager import CombatData, CombatManager
 from src.combat.order_strategy import OrderStrategy
-from src.compendium.effects import get_all_effects
-from src.compendium.monsters import get_all_monsters
 from src.gamemodes.sandbox.edit_team_menu import EditTeamMenu
 from src.locales.languages import Language
 from src.logger.combat import CombatLogger
@@ -61,10 +59,6 @@ class SandboxMenu(EditMenu):
         )
 
         self.logger: CombatLogger
-
-        # Attributes
-        self.all_effects = get_all_effects()
-        self.all_monsters = get_all_monsters()
 
         # Managers
         self.combat_manager = CombatManager(settings)

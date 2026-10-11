@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
-from src.registries.character import REGISTRIES, CharacterRegistry
+from src.factories.factory import Factory
+from src.registries.character import CharacterRegistry
 
 if TYPE_CHECKING:
     from src.base.character import Character
 
-CharacterRegistry.load()
+REGISTRIES = CharacterRegistry.load()
 
 
-class CharacterFactory:
+class CharacterFactory(Factory):
     """
     CharacterFactory class.
     """
@@ -38,3 +39,19 @@ class CharacterFactory:
             raise ValueError(f"No character registered for global ID: {global_id}")
 
         return character_class(**kwargs)
+
+    @staticmethod
+    def get_all_objects() -> List[Character]:
+        """
+        Gets all Characters instantiable by the factory.
+
+        :return: A list of all characters.
+        :rtype: List[Character]
+        """
+        objs = []
+
+        for key in REGISTRIES.keys():
+            obj = CharacterFactory.create(key)
+            objs.append(obj)
+
+        return objs

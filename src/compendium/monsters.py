@@ -2,37 +2,45 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from src.compendium.compendium import Compendium
-from src.monsters.giant_slime import GiantSlime
-from src.monsters.mana_spirit import ManaSpirit
-from src.monsters.slime import Slime
-from src.monsters.tortuga import Tortuga
-from src.monsters.training_dummy import TrainingDummy
-from src.monsters.troll import Troll
-from src.monsters.venenobra import Venenobra
-from src.monsters.weeke import Weeke
+from src.factories.monster import MonsterFactory
+from src.logger.effects import EffectLogger
 
 if TYPE_CHECKING:
-    from src.base.monster import Monster
-
-ALL_MONSTERS = [
-    GiantSlime(),
-    Slime(),
-    Tortuga(),
-    TrainingDummy(),
-    ManaSpirit(),
-    Venenobra(),
-    Weeke(),
-    Troll(),
-]
-
-
-def get_all_monsters() -> List[Monster]:
-    return deepcopy(ALL_MONSTERS)
+    from src.systems.settings import Settings
 
 
 class MonsterCompendium(Compendium):
-    pass
+    """
+    Monster Compendium class.
+
+    :var settings: Game settings.
+    :vartype settings: Settings
+
+    :var logging: If logging is enabled. Default value is True.
+    :vartype logging: bool
+    """
+
+    # =========================================================================
+    # Initialization
+    # =========================================================================
+
+    def __init__(
+        self,
+        settings: Settings,
+        logging: bool = True,
+    ):
+        items = MonsterFactory.get_all_objects()
+
+        logger = EffectLogger(enabled=logging, language=settings.language)
+
+        super().__init__(
+            logger=logger,
+            settings=settings,
+            items=items,
+            alignments=("right", "left", "left"),
+        )
+
+        self.logger: EffectLogger

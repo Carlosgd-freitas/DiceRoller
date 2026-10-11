@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from src.registries.character import REGISTRIES, CharacterRegistry
+from src.registries.character import CharacterRegistry
 from tests.utils import assert_conditions
 
 
 def test_character_registry_integrity():
-    CharacterRegistry.load()
+    REGISTRIES = CharacterRegistry.load()
 
     conditions = [
         len(REGISTRIES.keys()) > 0,

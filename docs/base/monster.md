@@ -1,6 +1,11 @@
 # Monster
 A **Monster** is a child class that inherits from [`Entity`](/docs/base/entity.md) and can participate in [**combat**](/docs/base/combat.md).
 
+In-game, monsters:
+* are mainly controlled by AI.
+* are present as enemies or allies of the player.
+* scale with the game difficulty, if they are enemies.
+
 ## Attributes
 Only `Entity` attributes whose meaning depends on the child class will be covered here.
 

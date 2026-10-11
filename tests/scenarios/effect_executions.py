@@ -15,7 +15,6 @@ from src.base.stat import Stat
 from src.base.team import Team
 from src.combat.manager import CombatManager
 from src.combat.order_strategy import OrderStrategy
-from src.compendium.effects import get_all_effects
 from src.effects.absorb import AbsorbEffect
 from src.effects.attack import AttackEffect
 from src.effects.bleed import BleedEffect
@@ -50,13 +49,14 @@ from src.effects.stun import StunEffect
 from src.effects.taunt import TauntEffect
 from src.effects.thorns import ThornsEffect
 from src.effects.weak import WeakEffect
+from src.factories.effect import EffectFactory
 from src.systems.settings import Settings
 
 init()
 
 # ----------------------------
 
-all_effects = get_all_effects()
+all_effects = EffectFactory.get_all_objects()
 
 for effect in all_effects:
     if effect.value is not None:

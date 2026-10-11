@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from math import isclose
 
+from src.base.effect import Effect
 from src.base.keywords import Keyword
 from src.base.stat import Stat
 from src.effects.block import BlockEffect
@@ -45,6 +46,18 @@ def test_effect_factory_create_args():
         effect.delta == Stat(flat=5, percent=0.5),
         isclose(effect.accuracy, 0.6),
         effect.removable is False,
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_effect_factory_get_all_objects():
+    all_effects = EffectFactory.get_all_objects()
+
+    conditions = [
+        isinstance(all_effects, list),
+        len(all_effects) > 0,
+        all([isinstance(effect, Effect) for effect in all_effects]),
     ]
 
     assert_conditions(conditions)

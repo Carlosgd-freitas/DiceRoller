@@ -18,8 +18,8 @@ from src.base.stat import Stat
 from src.base.team import Team
 from src.combat.manager import CombatData
 from src.combat.order_strategy import OrderStrategy
-from src.compendium.effects import get_all_effects
-from src.compendium.monsters import get_all_monsters
+from src.factories.effect import EffectFactory
+from src.factories.monster import MonsterFactory
 
 CHANCE_CALCULATION_METHOD = Literal[
     "LINEAR_DECAY", "QUADRATIC_DECAY", "EXPONENTIAL_INTERPOLATION"
@@ -205,8 +205,8 @@ class Randomizer:
     """
 
     def __init__(self):
-        self.all_effects = get_all_effects()
-        self.all_monsters = get_all_monsters()
+        self.all_effects = EffectFactory.get_all_objects()
+        self.all_monsters = MonsterFactory.get_all_objects()
 
         self.monster_names = [
             "Alpha",

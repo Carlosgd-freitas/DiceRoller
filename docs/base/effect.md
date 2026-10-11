@@ -43,4 +43,3 @@ Each **effect** has its own behavior, and are to be used by "bigger" components,
 - [ ] Functional test on `tests/effects`
 - [ ] Localized logging messages on each `src/locales` module
 - [ ] Additional logging functionality on `src/logger` files
-- [ ] Added to `ALL_EFFECTS` variable in `src/compendium/effects.py`

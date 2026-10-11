@@ -2,111 +2,18 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import TYPE_CHECKING, Callable, List
 
 from src.base.color import Color, ColorData, color_string
 from src.base.text import normalize
 from src.compendium.compendium import Compendium, CompendiumMessages
-from src.effects.absorb import AbsorbEffect
-from src.effects.all import AllEffect
-from src.effects.attack import AttackEffect
-from src.effects.bleed import BleedEffect
-from src.effects.blind import BlindEffect
-from src.effects.block import BlockEffect
-from src.effects.burn import BurnEffect
-from src.effects.cleanse import CleanseEffect
-from src.effects.confuse import ConfuseEffect
-from src.effects.corrupt import CorruptEffect
-from src.effects.delay import DelayEffect
-from src.effects.doom import DoomEffect
-from src.effects.drain import DrainEffect
-from src.effects.execute import ExecuteEffect
-from src.effects.focus import FocusEffect
-from src.effects.fortify import FortifyEffect
-from src.effects.fragile import FragileEffect
-from src.effects.freeze import FreezeEffect
-from src.effects.frostburn import FrostburnEffect
-from src.effects.haste import HasteEffect
-from src.effects.heal import HealEffect
-from src.effects.immunity import ImmunityEffect
-from src.effects.invisible import InvisibleEffect
-from src.effects.invulnerable import InvulnerableEffect
-from src.effects.mana import ManaEffect
-from src.effects.mana_regen import ManaRegenEffect
-from src.effects.nothing import NothingEffect
-from src.effects.oil import OilEffect
-from src.effects.pain import PainEffect
-from src.effects.pierce import PierceEffect
-from src.effects.poison import PoisonEffect
-from src.effects.regen import RegenEffect
-from src.effects.repel import RepelEffect
-from src.effects.resistance import ResistanceEffect
-from src.effects.revive import ReviveEffect
-from src.effects.sacred_block import SacredBlockEffect
-from src.effects.sleep import SleepEffect
-from src.effects.slow import SlowEffect
-from src.effects.strength import StrengthEffect
-from src.effects.stun import StunEffect
-from src.effects.taunt import TauntEffect
-from src.effects.thorns import ThornsEffect
-from src.effects.weak import WeakEffect
+from src.factories.effect import EffectFactory
 from src.logger.effects import EffectLogger
 from src.menus.option import Option
 
 if TYPE_CHECKING:
     from src.base.effect import Effect
     from src.systems.settings import Settings
-
-ALL_EFFECTS = [
-    AbsorbEffect(),
-    AllEffect(),
-    AttackEffect(),
-    BleedEffect(),
-    BlindEffect(),
-    BlockEffect(),
-    BurnEffect(),
-    CleanseEffect(),
-    ConfuseEffect(),
-    CorruptEffect(),
-    DelayEffect(),
-    DoomEffect(),
-    DrainEffect(),
-    ExecuteEffect(),
-    FocusEffect(),
-    FortifyEffect(),
-    FragileEffect(),
-    FreezeEffect(),
-    FrostburnEffect(),
-    HasteEffect(),
-    HealEffect(),
-    ImmunityEffect(),
-    InvisibleEffect(),
-    InvulnerableEffect(),
-    ManaEffect(),
-    ManaRegenEffect(),
-    NothingEffect(),
-    OilEffect(),
-    PainEffect(),
-    PierceEffect(),
-    PoisonEffect(),
-    RegenEffect(),
-    RepelEffect(),
-    ResistanceEffect(),
-    ReviveEffect(),
-    SacredBlockEffect(),
-    SleepEffect(),
-    SlowEffect(),
-    StrengthEffect(),
-    StunEffect(),
-    TauntEffect(),
-    ThornsEffect(),
-    WeakEffect(),
-]
-
-
-def get_all_effects() -> List[Effect]:
-    return deepcopy(ALL_EFFECTS)
 
 
 class EffectCompendium(Compendium):
@@ -129,7 +36,7 @@ class EffectCompendium(Compendium):
         settings: Settings,
         logging: bool = True,
     ):
-        items = get_all_effects()
+        items = EffectFactory.get_all_objects()
 
         logger = EffectLogger(enabled=logging, language=settings.language)
 

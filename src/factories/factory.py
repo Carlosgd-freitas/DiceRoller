@@ -1,7 +1,7 @@
 """Factory module."""
 
 from abc import abstractmethod
-from typing import TypeVar
+from typing import List, TypeVar
 
 T = TypeVar("T")
 
@@ -22,5 +22,16 @@ class Factory:
 
         :return: Instantiated object.
         :rtype: T
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def get_all_objects() -> List[T]:
+        """
+        Gets all objects instantiable by the factory.
+
+        :return: A list of all objects.
+        :rtype: List[T]
         """
         raise NotImplementedError

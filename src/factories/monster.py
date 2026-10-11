@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
-from src.registries.monster import REGISTRIES, MonsterRegistry
+from src.factories.factory import Factory
+from src.registries.monster import MonsterRegistry
 
 if TYPE_CHECKING:
     from src.base.monster import Monster
 
-MonsterRegistry.load()
+REGISTRIES = MonsterRegistry.load()
 
 
-class MonsterFactory:
+class MonsterFactory(Factory):
     """
     MonsterFactory class.
     """
@@ -38,3 +39,19 @@ class MonsterFactory:
             raise ValueError(f"No monster registered for global ID: {global_id}")
 
         return monster_class(**kwargs)
+
+    @staticmethod
+    def get_all_objects() -> List[Monster]:
+        """
+        Gets all Monsters instantiable by the factory.
+
+        :return: A list of all monsters.
+        :rtype: List[Monster]
+        """
+        objs = []
+
+        for key in REGISTRIES.keys():
+            obj = MonsterFactory.create(key)
+            objs.append(obj)
+
+        return objs

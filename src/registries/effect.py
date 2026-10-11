@@ -5,7 +5,7 @@ from __future__ import annotations
 from importlib import import_module
 from pathlib import Path
 from pkgutil import iter_modules
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from src.base.keywords import Keyword
 from src.registries.registry import Registry
@@ -13,7 +13,7 @@ from src.registries.registry import Registry
 if TYPE_CHECKING:
     from src.base.effect import Effect
 
-REGISTRIES: dict[Keyword, type[Effect]] = {}
+REGISTRIES: Dict[Keyword, type[Effect]] = {}
 
 
 class EffectRegistry(Registry):
@@ -39,9 +39,13 @@ class EffectRegistry(Registry):
         REGISTRIES[keyword] = registry
 
     @staticmethod
-    def load() -> None:
+    def load() -> Dict[Keyword, type[Effect]]:
         """
         Import registries modules.
+
+        :return: A dictionary where each key is a Keyword and each value is an Effect
+        class.
+        :rtype: Dict[Keyword, type[Effect]]
         """
         effects_dir = Path(__file__).parents[1] / "effects"
 
@@ -50,3 +54,5 @@ class EffectRegistry(Registry):
                 continue
 
             import_module(f"src.effects.{module.name}")
+
+        return REGISTRIES

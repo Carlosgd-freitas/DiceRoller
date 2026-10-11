@@ -9,7 +9,7 @@ from colorama import init
 from src.base.dice import Dice
 from src.base.effect import EffectType
 from src.base.side import Side
-from src.compendium.effects import get_all_effects
+from src.factories.effect import EffectFactory
 from src.logger.combat import CombatLogger
 from src.monsters.weeke import Weeke
 
@@ -25,7 +25,7 @@ value_flats = [1, 2, 5, 10, inf]
 value_percents = [0.01, 0.05, 0.25, 1, inf]
 durations = [1, 2, 5, inf]
 
-all_effects = get_all_effects()
+all_effects = EffectFactory.get_all_objects()
 
 for effect in all_effects:
     if effect.value is not None:

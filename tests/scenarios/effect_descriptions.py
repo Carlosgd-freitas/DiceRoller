@@ -4,7 +4,7 @@ from colorama import init
 
 from src.base.keywords import Keyword
 from src.base.stat import Stat
-from src.compendium.effects import get_all_effects
+from src.factories.effect import EffectFactory
 from src.logger.effects import EffectLogger
 from src.systems.randomizer import Randomizer
 from src.systems.settings import Settings
@@ -18,7 +18,7 @@ randomizer = Randomizer()
 
 logger = EffectLogger()
 
-all_effects = get_all_effects()
+all_effects = EffectFactory.get_all_objects()
 
 # ----------------------------
 
