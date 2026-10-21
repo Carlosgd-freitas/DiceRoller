@@ -9,7 +9,7 @@ You can download the latest pre-built versions from the [Releases](../../release
 
 1. Download the Windows archive:
 
-   `DiceRoller_0.2.0_windows.zip`
+       DiceRoller_0.2.0_windows.zip
 
 2. Extract the ZIP file.
 
@@ -23,7 +23,7 @@ You can download the latest pre-built versions from the [Releases](../../release
 
 1. Download the Linux archive:
    
-   `DiceRoller_0.2.0_linux.tar.gz`
+       DiceRoller_0.2.0_linux.tar.gz
 
 2. Extract it:
 

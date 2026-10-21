@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List
 
 from src.base.color import color_string
-from src.base.difficulties import get_difficulty_color
+from src.base.difficulties import Difficulty, get_difficulty_color
 from src.gamemodes.roguelike.select_character_menu import SelectCharacterMenu
 from src.gamemodes.roguelike.select_difficulty_menu import SelectDifficultyMenu
 from src.locales.languages import Language
@@ -14,6 +14,7 @@ from src.menus.edit_menu import Menu
 from src.menus.option import Option
 
 if TYPE_CHECKING:
+    from src.base.character import Character
     from src.systems.settings import Settings
 
 
@@ -48,14 +49,14 @@ class RoguelikeMenu(Menu):
         self.logger: CombatLogger
 
         # Character
-        self.character = settings.last_character
+        self.character: Character = settings.last_character
         self.select_character_menu = SelectCharacterMenu(
             settings,
             logging=logging,
         )
 
         # Difficulty
-        self.difficulty = settings.last_difficulty
+        self.difficulty: Difficulty = settings.last_difficulty
         self.select_difficulty_menu = SelectDifficultyMenu(
             settings,
             logging=logging,

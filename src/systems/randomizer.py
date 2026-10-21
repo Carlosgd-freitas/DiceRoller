@@ -156,8 +156,8 @@ class RandomizerConfig:
     flat_threshold: Tuple[float, float] = (1, 20)
     percent_threshold: Tuple[float, float] = (0.01, 1)
     # Keyword attributes
-    keyword_whitelist: list[Keyword] = field(default_factory=list)
-    keyword_blacklist: list[Keyword] = field(
+    keyword_whitelist: List[Keyword] = field(default_factory=list)
+    keyword_blacklist: List[Keyword] = field(
         default_factory=lambda: [Keyword.ALL, Keyword.NOTHING]
     )
 

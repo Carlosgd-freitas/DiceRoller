@@ -22,7 +22,7 @@ class ManaSpirit(Monster):
     global_id = "MANA_SPIRIT"
 
     def __init__(self, **kwargs):
-        super().__init__(global_id=self.global_id, **kwargs)
+        super().__init__(global_id=self.global_id, role="SUPPORT", **kwargs)
 
     def get_attributes(self, difficulty: Difficulty) -> AttributeData:
         """

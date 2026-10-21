@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 from math import ceil
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Literal
 
 from src.base.difficulties import Difficulty
 from src.base.entity import AttributeData, Entity
@@ -68,12 +68,14 @@ class Monster(Entity):
         in_combat: bool = True,
         turn_taken: bool = False,
         suffix: str = None,
+        role: Literal["DAMAGE", "SUPPORT"] = "DAMAGE",
         **kwargs,
     ):
         self.control_type = control_type
         self.in_combat = in_combat
         self.turn_taken = turn_taken
         self.suffix = suffix
+        self.role = role
 
         # Difficulty-based attributes
         attributes = self.get_attributes(difficulty)
