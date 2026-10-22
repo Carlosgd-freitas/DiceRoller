@@ -17,14 +17,14 @@ class BossBattleNode(Node):
 
     def __init__(
         self,
-        label: str,
-        path_level: int,
+        label: str = "A",
+        path_level: int = 1,
         previous_nodes: List[Node] = None,
         next_nodes: List[Node] = None,
     ):
         super().__init__(
-            label=label,
             type=self.type,
+            label=label,
             path_level=path_level,
             previous_nodes=previous_nodes,
             next_nodes=next_nodes,

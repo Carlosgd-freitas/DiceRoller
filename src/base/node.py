@@ -6,6 +6,8 @@ from abc import abstractmethod
 from enum import Enum
 from typing import Any, List
 
+from src.registries.node import NodeRegistry
+
 
 class NodeType(Enum):
     """Type of Node."""
@@ -18,13 +20,14 @@ class Node:
     """
     Node class.
 
-    :var label: Node label.
-    :vartype label: str
-
     :var type: Node type.
     :vartype type: NodeType
 
-    :var path_level: At which Graph level (depth) the Node is found, starting from 1.
+    :var label: Node label. Default value is "A".
+    :vartype label: str
+
+    :var path_level: At which Graph level (depth) the Node is found, starting from the
+    start nodes. Default value is 1.
     :vartype path_level: int
 
     :var previous_nodes: Previous nodes in an Area path.
@@ -34,17 +37,23 @@ class Node:
     :vartype next_nodes: List[Node]
     """
 
+    type: NodeType
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        NodeRegistry.register(cls)
+
     def __init__(
         self,
-        label: str,
         type: NodeType,
-        path_level: int,
+        label: str = "A",
+        path_level: int = 1,
         previous_nodes: List[Node] = None,
         next_nodes: List[Node] = None,
         **kwargs,
     ):
-        self.label = label
         self.type = type
+        self.label = label
         self.path_level = path_level
         self.previous_nodes = [] if previous_nodes is None else previous_nodes
         self.next_nodes = [] if next_nodes is None else next_nodes

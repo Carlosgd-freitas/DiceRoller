@@ -1,19 +1,17 @@
 """Factory module."""
 
-from abc import abstractmethod
-from typing import List, TypeVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 T = TypeVar("T")
 
 
-class Factory:
-    """
-    Factory class.
-    """
+class Factory(Generic[T]):
+    """Base factory for registered objects."""
 
-    @staticmethod
-    @abstractmethod
-    def create(id: str) -> T:
+    registries: ClassVar[dict[str, type[T]]]
+
+    @classmethod
+    def create(cls, id: str, **kwargs: Any) -> T:
         """
         Instantiates a class from a register by its identifier.
 
@@ -23,15 +21,19 @@ class Factory:
         :return: Instantiated object.
         :rtype: T
         """
-        raise NotImplementedError
+        registry_class = cls.registries.get(id)
 
-    @staticmethod
-    @abstractmethod
-    def get_all_objects() -> List[T]:
+        if registry_class is None:
+            raise ValueError(f"No object registered for identifier: {id}")
+
+        return registry_class(**kwargs)
+
+    @classmethod
+    def get_all_objects(cls) -> list[T]:
         """
         Gets all objects instantiable by the factory.
 
         :return: A list of all objects.
         :rtype: List[T]
         """
-        raise NotImplementedError
+        return [cls.create(id) for id in cls.registries]

@@ -6,8 +6,7 @@ from typing import Dict, List, Tuple
 
 from src.base.node import Node, NodeType
 from src.combat.suffixes import SuffixManager
-from src.nodes.battle_node import BattleNode
-from src.nodes.boss_battle_node import BossBattleNode
+from src.factories.node import NodeFactory
 
 
 @dataclass
@@ -23,9 +22,17 @@ class GraphConfig:
     closed interval. Default value is [1, 1].
     :type end_nodes: Tuple[int, int]
 
-    :param node_types: Possible node types. By default, battles are boss batles are
-    considered.
-    :type node_types: List[NodeType]
+    :param start_node_types: Possible node types when generating start nodes. By
+    default, battles are considered.
+    :type start_node_types: List[NodeType]
+
+    :param intermediary_node_types: Possible node types when generating intermediary
+    nodes. By default, battles are considered.
+    :type intermediary_node_types: List[NodeType]
+
+    :param end_node_types: Possible node types when generating end nodes. By default,
+    boss batles are considered.
+    :type end_node_types: List[NodeType]
 
     :param max_length: Maximum path length that can be transversed by the player.
     Default value is 5.
@@ -38,9 +45,18 @@ class GraphConfig:
 
     start_nodes: Tuple[int, int] = (1, 3)
     end_nodes: Tuple[int, int] = (1, 1)
-    node_types: List[NodeType] = field(
+    start_node_types: List[NodeType] = field(
         default_factory=lambda: [
             NodeType.BATTLE,
+        ]
+    )
+    intermediary_node_types: List[NodeType] = field(
+        default_factory=lambda: [
+            NodeType.BATTLE,
+        ]
+    )
+    end_node_types: List[NodeType] = field(
+        default_factory=lambda: [
             NodeType.BOSS_BATTLE,
         ]
     )
@@ -84,21 +100,6 @@ class Graph:
     ):
         self.nodes = {} if nodes is None else nodes
         self.suffix_manager = suffix_manager or SuffixManager()
-
-    def create_node(self, node_type: NodeType, **kwargs) -> Node:
-        """
-        Instantiates a Node from a register by its type.
-
-        :param node_type: Node type.
-        :type node_type: NodeType
-
-        :return: Instantiated Node.
-        :rtype: Node
-        """
-        if node_type == NodeType.BATTLE:
-            return BattleNode(**kwargs)
-        elif node_type == NodeType.BOSS_BATTLE:
-            return BossBattleNode(**kwargs)
 
     def get_nodes(self, path_level: int = None) -> List[Node]:
         """
@@ -161,11 +162,12 @@ class Graph:
                     next_node = choice(nodes)
 
                 else:
-                    next_node = self.create_node(
-                        NodeType.BATTLE,
+                    next_node = NodeFactory.create(
+                        id=choice(config.intermediary_node_types),
                         label=label,
                         path_level=next_level,
                     )
+
                     self.nodes[label] = next_node
                     label = self.suffix_manager.increase_suffix(label)
 
@@ -193,36 +195,33 @@ class Graph:
 
         config = config or GraphConfig()
         label = "A"
-        non_end_node_types = list(set(config.node_types) - set([NodeType.BOSS_BATTLE]))
 
         # Start Nodes
-        start_node_type = (
-            NodeType.BATTLE
-            if NodeType.BATTLE in non_end_node_types
-            else choice(non_end_node_types)
-        )
         n_start_nodes = config.get_n_nodes(config.start_nodes)
         start_nodes: List[Node] = []
 
         for _ in range(n_start_nodes):
-            node = self.create_node(start_node_type, label=label, path_level=1)
+            node = NodeFactory.create(
+                id=choice(config.start_node_types),
+                label=label,
+                path_level=1,
+            )
+
             start_nodes.append(node)
             self.nodes[label] = node
             label = self.suffix_manager.increase_suffix(label)
 
         # End Nodes
-        end_node_type = (
-            NodeType.BOSS_BATTLE
-            if NodeType.BOSS_BATTLE in config.node_types
-            else choice(config.node_types)
-        )
         n_end_nodes = config.get_n_nodes(config.end_nodes)
         end_nodes: List[Node] = []
 
         for _ in range(n_end_nodes):
-            node = self.create_node(
-                end_node_type, label=label, path_level=config.max_length
+            node = NodeFactory.create(
+                id=choice(config.end_node_types),
+                label=label,
+                path_level=config.max_length,
             )
+
             end_nodes.append(node)
             self.nodes[label] = node
             label = self.suffix_manager.increase_suffix(label)
