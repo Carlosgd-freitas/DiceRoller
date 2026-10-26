@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List
 
+from src.areas.grasslands import Grasslands
 from src.base.color import color_string
 from src.base.difficulties import Difficulty, get_difficulty_color
+from src.base.team import Team
 from src.gamemodes.roguelike.select_character_menu import SelectCharacterMenu
 from src.gamemodes.roguelike.select_difficulty_menu import SelectDifficultyMenu
 from src.locales.languages import Language
@@ -194,7 +196,16 @@ class RoguelikeMenu(Menu):
         """
         Starts a new run in roguelike mode with the current selected game elements.
         """
-        pass
+        _ = Grasslands(self.difficulty)
+
+        name = "Placeholder"
+
+        _ = Team(
+            name=name,
+            members=[self.character],
+        )
+
+        return
 
     # =========================================================================
     # Rendering

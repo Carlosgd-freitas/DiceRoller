@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from src.base.difficulties import Difficulty
 from src.base.monster import Monster
 from src.factories.monster import MonsterFactory
 from src.monsters.slime import Slime
@@ -29,6 +30,24 @@ def test_monster_factory_create_args():
         isinstance(monster, Slime),
         monster.global_id == "SLIME",
         monster.local_id == "SLIME_0",
+    ]
+
+    assert_conditions(conditions)
+
+
+def test_monster_factory_create_difficulty():
+    slime_easy = MonsterFactory.create(
+        "SLIME",
+        difficulty=Difficulty.EASY,
+    )
+    slime_normal = MonsterFactory.create(
+        "SLIME",
+        difficulty=Difficulty.NORMAL,
+    )
+
+    conditions = [
+        slime_easy.max_hp == 3,
+        slime_normal.max_hp == 6,
     ]
 
     assert_conditions(conditions)

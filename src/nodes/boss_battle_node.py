@@ -3,6 +3,7 @@
 from typing import List
 
 from src.base.node import Node, NodeType
+from src.base.team import Team
 from src.combat.manager import CombatData, CombatManager, CombatStatus
 
 
@@ -29,6 +30,22 @@ class BossBattleNode(Node):
             previous_nodes=previous_nodes,
             next_nodes=next_nodes,
         )
+        self.encounter: Team = None
+
+    def __str__(self) -> str:
+        """String representation of BossBattleNode."""
+        _str = super().__str__()
+
+        if isinstance(self.encounter, Team) and len(self.encounter.members) > 0:
+            encounter = ", ".join(
+                [str(member.global_id) for member in self.encounter.members]
+            )
+        else:
+            encounter = str(self.encounter)
+
+        _str += f"\nEncounter: {encounter}"
+
+        return _str
 
     def enter(
         self, combat_manager: CombatManager, combat_data: CombatData

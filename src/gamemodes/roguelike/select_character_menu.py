@@ -9,6 +9,7 @@ from src.base.data import (
     next_value,
     previous_value,
 )
+from src.base.monster import ControlType
 from src.characters.mage import Mage
 from src.characters.ranger import Ranger
 from src.characters.rogue import Rogue
@@ -54,10 +55,10 @@ class SelectCharacterMenu(Menu):
 
         self.character = settings.last_character
         self.characters: List[Character] = [
-            Warrior(),
-            Mage(),
-            Ranger(),
-            Rogue(),
+            Warrior(control_type=ControlType.PLAYER),
+            Mage(control_type=ControlType.PLAYER),
+            Ranger(control_type=ControlType.PLAYER),
+            Rogue(control_type=ControlType.PLAYER),
         ]
         self.showing_character: Character = None
 

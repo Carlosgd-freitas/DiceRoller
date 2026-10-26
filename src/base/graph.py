@@ -101,6 +101,18 @@ class Graph:
         self.nodes = {} if nodes is None else nodes
         self.suffix_manager = suffix_manager or SuffixManager()
 
+    def __str__(self) -> str:
+        """String representation of Graph."""
+        n = len(self.nodes)
+
+        _str = ""
+        for i, (key, value) in enumerate(self.nodes.items()):
+            _str += f"{key}: {value}"
+            if i != n - 1:
+                _str += "\n"
+
+        return _str
+
     def get_nodes(self, path_level: int = None) -> List[Node]:
         """
         Returns Nodes from a Graph, with optional filter options.
