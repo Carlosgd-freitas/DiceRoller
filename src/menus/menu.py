@@ -96,8 +96,8 @@ class Menu(Manager):
         validate: bool = True,
     ) -> Option:
         """
-        Prompts the user to select an option from a list. If an invalid key is selected,
-        the prompt will repeat.
+        Prompts the user to select an option from a list. If an invalid key is
+        selected, the prompt will repeat.
 
         :param options: List of selectable options.
         :type options: List[Option]
@@ -105,7 +105,8 @@ class Menu(Manager):
         :param message: Message to use in the input prompt. Default value is None.
         :type message: str
 
-        :param validate: If the option will be validated when selected. Default value is True.
+        :param validate: If the option will be validated when selected. Default value
+        is True.
         :type validate: bool
 
         :return: Option selected by the user.

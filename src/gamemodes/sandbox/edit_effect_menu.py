@@ -684,7 +684,10 @@ class EditEffectMenu(EditMenu):
                     key="no",
                 ).title()
 
-            self.logger.log_boolean(message=message, value=self.editing.removable)
+            message = self.logger.color_boolean(
+                message=message, value=self.editing.removable
+            )
+            self.logger.log(message=message)
 
         # Target Keywords
         if self.editing.target_keywords is not None:

@@ -17,6 +17,7 @@ BASE = {
 }
 
 MAIN = {
+    "exit_confirmation": "Sair do jogo?",
     "new_game": "Novo Jogo",
     "sandbox_mode": "Modo Sandbox",
     "title": "Menu Principal",
@@ -53,6 +54,7 @@ PLAYER_ACTIONS = {
     "side_no_targets": "Não há alvos selecionáveis para esse lado.",
     "skills": "Habilidades",
     "skip_turn": "Pular Turno",
+    "walk": "Andar",
 }
 
 SANDBOX = {

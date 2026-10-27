@@ -402,8 +402,10 @@ class Logger:
                 **kwargs,
             )
 
-        if message:
+        if message is not None:
             message = "> " + message + ": "
+        else:
+            message = "> "
 
         return input(message)
 
@@ -457,16 +459,15 @@ class Logger:
 
         return
 
-    def log_boolean(
+    def color_boolean(
         self,
         message: str,
         value: bool,
-        end: str = "\n",
     ) -> None:
         """
         Logs a message that has an associated boolean value. If this value is
-        * false, the message will be logged as bright and red.
-        * true, the message will be logged as bright and green.
+        * false, the message will be logged as red and bright.
+        * true, the message will be logged as green and bright.
 
         :param message: A message.
         :type message: str
@@ -474,9 +475,8 @@ class Logger:
         :param value: The boolean value.
         :type value: bool
 
-        :param end: What will be printed at the end of the message. Default value is
-        \\n.
-        :type end: str
+        :return: The colored boolean value.
+        :rtype: str
         """
         if not value:
             message = color_string(
@@ -492,6 +492,4 @@ class Logger:
                 intensity="BRIGHT",
             )
 
-        self.log(message=message, end=end)
-
-        return
+        return message

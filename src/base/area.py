@@ -77,9 +77,7 @@ class Area:
             graph = Graph()
             graph.generate(config)
 
-            # Setuping Nodes
-            for _, node in graph.nodes.items():
-                self.setup_node(node)
+            self.setup_graph(graph)
 
         self.graph = graph
 
@@ -194,7 +192,7 @@ class Area:
         """
         Sets up a Node with information from the Area.
 
-        :var node: A Node of the Area.
+        :var node: A Node.
         :vartype node: Node
         """
         if node.type == NodeType.BATTLE:
@@ -208,5 +206,17 @@ class Area:
             encounter_entries = self.get_bosses()
             encounter = self.get_encounter(encounter_entries, k=1)
             node.encounter = encounter
+
+        return
+
+    def setup_graph(self, graph: Graph) -> None:
+        """
+        Sets up a Graph with information from the Area.
+
+        :var graph: A Graph.
+        :vartype graph: Graph
+        """
+        for _, node in graph.nodes.items():
+            self.setup_node(node)
 
         return

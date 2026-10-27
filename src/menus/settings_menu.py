@@ -12,7 +12,7 @@ from src.logger.logger import Logger
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.systems.file import FileManager
-from src.systems.settings import FILENAME, Settings
+from src.systems.settings import FILENAME, Settings, Toggle
 
 
 class SettingsMenu(Menu):
@@ -84,6 +84,15 @@ class SettingsMenu(Menu):
                 ),
             ),
             Option(
+                id="EXIT_CONFIRMATION",
+                key="3",
+                message=self.logger.get_message(
+                    namespace="settings",
+                    message_group="SETTINGS",
+                    key="exit_confirmation",
+                ),
+            ),
+            Option(
                 id="EXIT",
                 key="0",
                 message=self.logger.get_message(
@@ -132,6 +141,11 @@ class SettingsMenu(Menu):
                 ["AUTO", "MANUAL"], self.settings.monster_end_turn
             )
 
+        elif option.id == "EXIT_CONFIRMATION":
+            self.settings.exit_confirmation = next_value(
+                [Toggle.ON, Toggle.OFF], self.settings.exit_confirmation
+            )
+
         elif option.id == "EXIT":
             self.file_manager.save_file(FILENAME, self.settings)
 
@@ -161,19 +175,32 @@ class SettingsMenu(Menu):
 
                 setting_value = getattr(self.settings, option.id.lower())
 
-                if isinstance(setting_value, str):
-                    setting_value = setting_value.lower()
-                elif isinstance(setting_value, Enum):
-                    setting_value = setting_value.value.lower()
+                # On/Off setting -> Red/Green value
+                if isinstance(setting_value, Toggle):
+                    message += self.logger.color_boolean(
+                        self.logger.get_message(
+                            namespace="settings",
+                            message_group="VALUES",
+                            key=setting_value.name.lower(),
+                        ),
+                        value=setting_value.value,
+                    )
 
-                message += color_string(
-                    self.logger.get_message(
-                        namespace="settings",
-                        message_group="VALUES",
-                        key=setting_value,
-                    ),
-                    intensity="BRIGHT",
-                )
+                # Other settings -> White value
+                else:
+                    if isinstance(setting_value, str):
+                        setting_value = setting_value.lower()
+                    elif isinstance(setting_value, Enum):
+                        setting_value = setting_value.value.lower()
+
+                    message += color_string(
+                        self.logger.get_message(
+                            namespace="settings",
+                            message_group="VALUES",
+                            key=setting_value,
+                        ),
+                        intensity="BRIGHT",
+                    )
 
             if option.isolate_after:
                 message += "\n"

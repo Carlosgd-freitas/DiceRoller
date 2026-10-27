@@ -20,12 +20,13 @@ try:
 
     if loaded_settings and isinstance(loaded_settings, Settings):
         settings = loaded_settings
+        settings.migrate()
 
     # Main Menu
     menu = MainMenu(settings=settings)
     menu.open()
 
-except Exception as e:
+except Exception:
     traceback.print_exc()
     input()
-    raise e
+    raise

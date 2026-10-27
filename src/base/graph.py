@@ -15,7 +15,7 @@ class GraphConfig:
     GraphConfig dataclass.
 
     :param start_nodes: Generated Graph will have a number of starting nodes in this
-    closed interval. Default value is [1, 3].
+    closed interval. Default value is [2, 3].
     :type start_nodes: Tuple[int, int]
 
     :param end_nodes: Generated Graph will have a number of ending nodes in this
@@ -39,11 +39,11 @@ class GraphConfig:
     :type max_length: int
 
     :param chance_existing_node: Chance for choosing existing nodes when adding paths
-    in Graph generation.
+    in Graph generation. Default value is 0.6 (60%).
     :type chance_existing_node: float
     """
 
-    start_nodes: Tuple[int, int] = (1, 3)
+    start_nodes: Tuple[int, int] = (2, 3)
     end_nodes: Tuple[int, int] = (1, 1)
     start_node_types: List[NodeType] = field(
         default_factory=lambda: [

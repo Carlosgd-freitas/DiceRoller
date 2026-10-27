@@ -10,6 +10,7 @@ from src.gamemodes.sandbox.sandbox_menu import SandboxMenu
 from src.locales.languages import Language
 from src.logger.logger import Logger
 from src.menus.compendium_menu import CompendiumMenu
+from src.menus.confirmation_menu import ConfirmationMenu
 from src.menus.menu import Menu
 from src.menus.option import Option
 from src.menus.settings_menu import SettingsMenu
@@ -56,6 +57,15 @@ class MainMenu(Menu):
         self.sandbox_menu = SandboxMenu(self.settings, self.logger.enabled)
         self.compendium_menu = CompendiumMenu(self.settings, self.logger.enabled)
         self.settings_menu = SettingsMenu(self.settings, self.logger.enabled)
+
+        message = self.logger.get_message(
+            namespace="menus",
+            message_group="MAIN",
+            key="exit_confirmation",
+        )
+        self.confirmation_menu = ConfirmationMenu(
+            self.settings, self.logger.enabled, message=message
+        )
 
     def get_title(self) -> str:
         """
@@ -151,6 +161,13 @@ class MainMenu(Menu):
         self.compendium_menu.change_language(language, _messages)
         self.settings_menu.change_language(language, _messages)
 
+        self.confirmation_menu.change_language(language, _messages)
+        self.confirmation_menu.message = self.logger.get_message(
+            namespace="menus",
+            message_group="MAIN",
+            key="exit_confirmation",
+        )
+
     def toggle_logging(self, enabled: bool):
         """
         Enables or disables the Menu logging.
@@ -165,6 +182,7 @@ class MainMenu(Menu):
         self.sandbox_menu.toggle_logging(enabled)
         self.compendium_menu.toggle_logging(enabled)
         self.settings_menu.toggle_logging(enabled)
+        self.confirmation_menu.toggle_logging(enabled)
 
     # =========================================================================
     # Options
@@ -205,5 +223,35 @@ class MainMenu(Menu):
 
         elif option.id == "EXIT":
             self.file_manager.save_file(SETTINGS_FILENAME, self.settings)
+
+        return
+
+    def open(self):
+        """
+        Opens the Menu.
+        """
+        while True:
+            self.show_title()
+            self.show_options(self.options)
+
+            message = self.logger.get_message(
+                namespace="menus",
+                message_group="BASE",
+                key="select_option_prompt",
+            )
+            selected = self.select(self.options, message)
+            self.process_option(selected)
+
+            if selected.id == "EXIT":
+                if self.settings.exit_confirmation.value:
+                    exit_confirmation = self.confirmation_menu.open()
+                else:
+                    exit_confirmation = True
+
+                if exit_confirmation:
+                    break
+
+            else:
+                self.logger.log(message="")
 
         return
