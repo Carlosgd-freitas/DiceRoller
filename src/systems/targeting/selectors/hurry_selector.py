@@ -1,0 +1,219 @@
+"""Hurry Selector module."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
+
+from src.base.effect import Effect, EffectType
+from src.base.keywords import Keyword
+from src.factories.effect import EffectFactory
+from src.systems.targeting.selectors.selector import Selector
+
+if TYPE_CHECKING:
+    from src.base.monster import Monster
+
+
+class HurrySelector(Selector):
+    """
+    Selects monster targets for the hurry effect.
+    """
+
+    def get_targets_easy(
+        self,
+        source: Monster,
+        allies: List[Monster],
+        enemies: List[Monster],
+        k: int,
+        main_effect: Effect,
+    ) -> List[Monster]:
+        """
+        Returns a list of target monsters based on EASY difficulty criteria for
+        the hurry effect:
+        * 100% -> k random alive monsters, among source, allies and enemies
+
+        :param source: The source monster which is targeting others.
+        :type source: Monster
+
+        :param allies: The source monster's allies.
+        :type allies: List[Monster]
+
+        :param enemies: The source monster's enemies.
+        :type enemies: List[Monster]
+
+        :param k: The number of monsters which will be returned.
+        :type k: int
+
+        :param main_effect: The main effect.
+        :type main_effect: Effect
+
+        :return: A list of target monsters.
+        :rtype: List[Monster]
+        """
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            monsters.extend(enemies)
+
+        return self._get_targets_random(
+            monsters,
+            k=k,
+            consider=[],
+        )
+
+    def get_targets_normal(
+        self,
+        source: Monster,
+        allies: List[Monster],
+        enemies: List[Monster],
+        k: int,
+        main_effect: Effect,
+    ) -> List[Monster]:
+        """
+        Returns a list of target monsters based on NORMAL difficulty criteria for
+        the hurry effect:
+        * 100% -> k monsters with effects that can have their duration extended
+        by the hurry effect
+
+        :param source: The source monster which is targeting others.
+        :type source: Monster
+
+        :param allies: The source monster's allies.
+        :type allies: List[Monster]
+
+        :param enemies: The source monster's enemies.
+        :type enemies: List[Monster]
+
+        :param k: The number of monsters which will be returned.
+        :type k: int
+
+        :param main_effect: The main effect.
+        :type main_effect: Effect
+
+        :return: A list of target monsters.
+        :rtype: List[Monster]
+        """
+        monsters = []
+        if source:
+            monsters.append(source)
+        if allies:
+            monsters.extend(allies)
+        if enemies:
+            monsters.extend(enemies)
+
+        keyword_whitelist = None
+        if Keyword.ALL not in main_effect.target_keywords:
+            keyword_whitelist = main_effect.target_keywords
+
+        targets = self._get_targets_highest_hp(
+            monsters,
+            k=k,
+            keyword_whitelist=keyword_whitelist,
+            consider=[],
+        )
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    monsters,
+                    k=k,
+                    consider=[],
+                )
+            )
+
+        return targets
+
+    def get_targets_hard(
+        self,
+        source: Monster,
+        allies: List[Monster],
+        enemies: List[Monster],
+        k: int,
+        main_effect: Effect,
+    ) -> List[Monster]:
+        """
+        Returns a list of target monsters based on HARD difficulty criteria for
+        the hurry effect:
+        * 100% -> k monsters with the effects that can have their duration extended
+        by the hurry effect, prioritizing enemies if the the later are
+        benefitial or self and allies otherwise
+
+        :param source: The source monster which is targeting others.
+        :type source: Monster
+
+        :param allies: The source monster's allies.
+        :type allies: List[Monster]
+
+        :param enemies: The source monster's enemies.
+        :type enemies: List[Monster]
+
+        :param k: The number of monsters which will be returned.
+        :type k: int
+
+        :param main_effect: The main effect.
+        :type main_effect: Effect
+
+        :return: A list of target monsters.
+        :rtype: List[Monster]
+        """
+        target_effects = [
+            EffectFactory.create(keyword) for keyword in main_effect.target_keywords
+        ]
+
+        effect_type = self._get_most_frequent_effect_types(
+            target_effects,
+            k=k,
+        )[0]
+
+        monsters = []
+
+        if effect_type in [
+            EffectType.BUFF,
+            EffectType.CURSE,
+            EffectType.DEFENSIVE,
+            EffectType.RESTORATION,
+        ]:
+            if enemies:
+                monsters.extend(enemies)
+
+        elif effect_type in [
+            EffectType.DEBUFF,
+            EffectType.DETERIORATION,
+            EffectType.OFFENSIVE,
+        ]:
+            if source:
+                monsters.append(source)
+            if allies:
+                monsters.extend(allies)
+
+        else:
+            if source:
+                monsters.append(source)
+            if allies:
+                monsters.extend(allies)
+            if enemies:
+                monsters.extend(enemies)
+
+        keyword_whitelist = None
+        if Keyword.ALL not in main_effect.target_keywords:
+            keyword_whitelist = main_effect.target_keywords
+
+        targets = self._get_targets_highest_hp(
+            monsters,
+            k=k,
+            keyword_whitelist=keyword_whitelist,
+            consider=[],
+        )
+
+        if len(targets) < k:
+            targets.extend(
+                self._get_targets_random(
+                    monsters,
+                    k=k,
+                    consider=[],
+                )
+            )
+
+        return targets

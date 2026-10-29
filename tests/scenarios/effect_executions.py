@@ -33,6 +33,7 @@ from src.effects.fragile import FragileEffect
 from src.effects.freeze import FreezeEffect
 from src.effects.frostburn import FrostburnEffect
 from src.effects.haste import HasteEffect
+from src.effects.hurry import HurryEffect
 from src.effects.immunity import ImmunityEffect
 from src.effects.invulnerable import InvulnerableEffect
 from src.effects.mana_regen import ManaRegenEffect
@@ -313,11 +314,7 @@ delay_effect = DelayEffect(
     Stat(flat=3, percent=0.5),
     target_keywords=[
         Keyword.FROSTBURN,
-        Keyword.MANA_REGEN,
         Keyword.POISON,
-        Keyword.REGEN,
-        Keyword.STRENGTH,
-        Keyword.WEAK,
     ],
 )
 
@@ -328,6 +325,44 @@ combat_manager.effect_manager.execute_effect(
 )
 
 delay_effect = DelayEffect(Stat(flat=1), target_keywords=[Keyword.BURN])
+
+combat_manager.effect_manager.execute_effect(
+    effect=delay_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+monster_b.effects = []
+
+# ----------------------------
+
+print("\n===== Effect Execution: HURRY =====")
+
+poison_effect = PoisonEffect(Stat(flat=1))
+
+combat_manager.effect_manager.execute_effect(
+    effect=poison_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+delay_effect = HurryEffect(
+    Stat(flat=3, percent=0.5),
+    target_keywords=[
+        Keyword.FROSTBURN,
+        Keyword.POISON,
+    ],
+)
+
+combat_manager.effect_manager.execute_effect(
+    effect=delay_effect,
+    source=monster_b,
+    target=monster_b,
+)
+
+combat_manager.end_turn()
+
+delay_effect = HurryEffect(Stat(flat=1), target_keywords=[Keyword.BURN])
 
 combat_manager.effect_manager.execute_effect(
     effect=delay_effect,

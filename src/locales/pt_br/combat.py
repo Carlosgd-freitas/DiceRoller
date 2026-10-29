@@ -29,6 +29,7 @@ FAILS = {
     "act_disabled": "não pôde agir.",
     "default": "falhou.",
     "delay": "nenhum efeito pôde ser extendido.",
+    "hurry": "nenhum efeito pôde ser encurtado.",
     "non-persistable": "foi ineficaz.",
     "source_alive": "estava vivo.",
     "source_dead": "morreu antes de poder fazer isso.",

@@ -347,6 +347,28 @@ HEAL = {
     "status": None,
 }
 
+HURRY = {
+    "name": "HURRY",
+    "description": "Shortens the duration of effects on target.",
+    "description_all_flat": "Shortens the duration of all effects on target by {value_flat} turns.",
+    "description_all_percent": "Shortens the duration of all effects on target by {value_percent}%.",
+    "description_all_both": "Shortens the duration of all effects on target by ({value_flat} + {value_percent}%) turns.",
+    "description_specific_flat": "Shortens the duration of the following effects on target by {value_flat} turns: {target_keywords}.",
+    "description_specific_percent": "Shortens the duration of the following effects on target by {value_percent}%: {target_keywords}.",
+    "description_specific_both": "Shortens the duration of the following effects on target by ({value_flat} + {value_percent}%) turns: {target_keywords}.",
+    "action": "HURRIED",
+    "activation": None,
+    "execution_all": "{source} {action} the duration of all effects on {target} by {value} turns.",
+    "execution_all_self": "{source} {action} the duration of all effects on themselves by {value} turns.",
+    "execution_specific": "{source} {action} the duration of {affected_keywords} on {target} by {value} turns.",
+    "execution_specific_self": "{source} {action} the duration of {affected_keywords} on themselves by {value} turns.",
+    "execution_fail": "{source} tried to {keyword} the duration of effects on {target}, but",
+    "execution_fail_self": "{source} tried to {keyword} the duration of effects on themselves, but",
+    "fail": None,
+    "removal": None,
+    "status": None,
+}
+
 IMMUNITY = {
     "name": "IMMUNITY",
     "description": "The target can't have effects applied to it.",

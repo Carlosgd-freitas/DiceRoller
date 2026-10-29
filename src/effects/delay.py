@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import inf
+from math import ceil, inf
 from typing import TYPE_CHECKING, List
 
 from src.base.effect import Effect, EffectData, EffectType
@@ -149,7 +149,7 @@ class DelayEffect(Effect):
                 if self.value.percent is not None:
                     effective_value += self.value.percent * effect.duration
 
-                effect.duration += effective_value
+                effect.duration += ceil(effective_value)
 
         fail = None if len(affected_effects) > 0 else "delay"
 

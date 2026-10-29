@@ -550,18 +550,11 @@ class CombatManager(Manager):
 
         return True
 
-    def end_turn(self) -> Dict:
+    def end_turn(self):
         """
-        End the current monster's turn. The entity will be affected by Effects that
-        triggers on turn end. Then, all effects on the current monsters will be
-        decayed and removed if their duration are <= 0.
-
-        :return: A dictionary containing objects that were affected by the turn ending.
-        :rtype: Dict
-
-        **Return keys**
-        * ``removed_effects``: a list of effects that were removed from the current
-        monster
+        End the current monster's turn, triggering any effects on it that triggers on
+        turn end; decaying the duration of effects on it and applying their deltas. Any
+        effects on any monsters that have a duration <= 0 will be removed.
         """
         # Procesing effects on turn end
         self.effect_manager.process_trigger(
@@ -569,10 +562,7 @@ class CombatManager(Manager):
             target=self.current_monster,
         )
 
-        # Applying delta and removing effects
-        to_remove = []
-        removed_effects = []
-
+        # Applying delta and decaying effects on current monster
         for effect in self.current_monster.effects:
             if effect.duration != inf:
                 effect.duration -= 1
@@ -598,24 +588,27 @@ class CombatManager(Manager):
                 if effect.delta.percent:
                     effect.value.flat += effect.value.flat * effect.delta.percent
 
-            if effect.duration <= 0:
-                to_remove.append(effect.keyword)
+        # Removing effects on any monster in-combat
+        for team in self.teams:
+            for monster in team.members:
+                to_remove = []
 
-        for keyword in to_remove:
-            # Procesing effects on removal
-            self.effect_manager.process_trigger(
-                Trigger.REMOVE,
-                target=self.current_monster,
-            )
+                for effect in monster.effects:
+                    if effect.duration <= 0:
+                        to_remove.append(effect.keyword)
 
-            removed_effect = self.current_monster.remove_effect(keyword)
-            removed_effects.append(removed_effect)
+                for keyword in to_remove:
+                    # Procesing effects on removal
+                    self.effect_manager.process_trigger(
+                        Trigger.REMOVE,
+                        target=monster,
+                    )
+
+                    self.current_monster.remove_effect(keyword)
 
         self.turn += 1
 
-        return {
-            "removed_effects": removed_effects,
-        }
+        return
 
     def next_turn(self):
         """Sets up the next turn in the turn order."""

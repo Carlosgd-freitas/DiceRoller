@@ -29,6 +29,7 @@ FAILS = {
     "act_disabled": "they could not act.",
     "default": "failed.",
     "delay": "no effects could be extended.",
+    "hurry": "no effects could be shortened.",
     "non-persistable": "it was ineffective.",
     "source_alive": "they were alive.",
     "source_dead": "died before they could do that.",

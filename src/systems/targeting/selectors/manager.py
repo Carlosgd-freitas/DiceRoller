@@ -15,6 +15,7 @@ from src.systems.targeting.selectors.curse_selector import CurseSelector
 from src.systems.targeting.selectors.debuff_selector import DebuffSelector
 from src.systems.targeting.selectors.defensive_selector import DefensiveSelector
 from src.systems.targeting.selectors.delay_selector import DelaySelector
+from src.systems.targeting.selectors.hurry_selector import HurrySelector
 from src.systems.targeting.selectors.offensive_selector import OffensiveSelector
 from src.systems.targeting.selectors.random_selector import RandomSelector
 from src.systems.targeting.selectors.revive_selector import ReviveSelector
@@ -87,6 +88,9 @@ class SelectorManager:
 
             elif main_effect.keyword == Keyword.DELAY:
                 selector = DelaySelector()
+
+            elif main_effect.keyword == Keyword.HURRY:
+                selector = HurrySelector()
 
             elif main_effect.keyword == Keyword.REVIVE:
                 selector = ReviveSelector()

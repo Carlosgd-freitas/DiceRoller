@@ -29,6 +29,7 @@ class Keyword(Enum):
     FROSTBURN = "FROSTBURN"
     HASTE = "HASTE"
     HEAL = "HEAL"
+    HURRY = "HURRY"
     IMMUNITY = "IMMUNITY"
     INVISIBLE = "INVISIBLE"
     INVULNERABLE = "INVULNERABLE"
@@ -123,6 +124,8 @@ def get_keyword_color(keyword: Keyword) -> ColorData:
     elif keyword in [Keyword.BLEED, Keyword.EXECUTE]:
         foreground_color = Color.RED
         intensity = "DIM"
+    elif keyword in [Keyword.HURRY]:
+        foreground_color = Color.PEAR
     elif keyword in [Keyword.REPEL, Keyword.TAUNT]:
         foreground_color = Color.PINK
     elif keyword in [Keyword.FREEZE, Keyword.FROSTBURN]:

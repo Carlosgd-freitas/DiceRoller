@@ -347,6 +347,28 @@ HEAL = {
     "status": None,
 }
 
+HURRY = {
+    "name": "APRESSAR",
+    "description": "Encurta a duração de efeitos no alvo.",
+    "description_all_flat": "Encurta a duração de todos os efeitos no alvo em {value_flat} turnos.",
+    "description_all_percent": "Encurta a duração de todos os efeitos no alvo em {value_percent}%.",
+    "description_all_both": "Encurta a duração de todos os efeitos no alvo em ({value_flat} + {value_percent}%) turnos.",
+    "description_specific_flat": "Encurta a duração dos seguintes efeitos no alvo em {value_flat} turnos: {target_keywords}.",
+    "description_specific_percent": "Encurta a duração dos seguintes efeitos no alvo em {value_percent}%: {target_keywords}.",
+    "description_specific_both": "Encurta a duração dos seguintes efeitos no alvo em ({value_flat} + {value_percent}%) turnos: {target_keywords}.",
+    "action": "APRESSOU",
+    "activation": None,
+    "execution_all": "{source} {action} a duração de todos os efeitos em {target} por {value} turnos.",
+    "execution_all_self": "{source} {action} a duração de todos os efeitos em si mesmo por {value} turnos.",
+    "execution_specific": "{source} {action} a duração de {affected_keywords} em {target} por {value} turnos.",
+    "execution_specific_self": "{source} {action} a duração de {affected_keywords} em si mesmo por {value} turnos.",
+    "execution_fail": "{source} tentou {keyword} a duração de efeitos em {target}, mas",
+    "execution_fail_self": "{source} tentou {keyword} a duração de efeitos em si mesmo, mas",
+    "fail": None,
+    "removal": None,
+    "status": None,
+}
+
 IMMUNITY = {
     "name": "IMUNIDADE",
     "description": "O alvo não pode ter efeitos aplicados a si.",
